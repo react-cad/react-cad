@@ -1,4 +1,1 @@
-/build
-/work
-
-compile_commands.json
+node_modules

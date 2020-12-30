@@ -75,6 +75,6 @@ int main()
   Message::DefaultMessenger()->Send (OSD_MemInfo::PrintInfo(), Message_Trace);
 
   // load some file
-  emscripten_async_wget_data ("samples/Ball.brep", (void* )"samples/Ball.brep", onFileDataRead, onFileReadFailed);
+  // emscripten_async_wget_data ("samples/Ball.brep", (void* )"samples/Ball.brep", onFileDataRead, onFileReadFailed);
   return 0;
 }
