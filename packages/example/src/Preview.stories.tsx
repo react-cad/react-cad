@@ -5,11 +5,10 @@ import Preview from "./Preview";
 
 export default {
   title: "Example/Preview",
-  component: Preview,
+  component: Preview
 } as Meta;
 
 const Template: Story<{}> = args => <Preview {...args} />;
 
 export const Default = Template.bind({});
-Default.args = {
-};
+Default.args = {};

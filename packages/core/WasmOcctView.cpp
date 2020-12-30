@@ -36,16 +36,18 @@
 
 #include <iostream>
 
-#define THE_CANVAS_ID "canvas"
-
 namespace
 {
+  EM_JS(void, jsInitCanvas, (), {
+    specialHTMLTargets["!canvas"] = Module.canvas;
+  });
+
   EM_JS(int, jsCanvasGetWidth, (), {
-    return Module['canvas'].width;
+    return Module.canvas.width;
   });
 
   EM_JS(int, jsCanvasGetHeight, (), {
-    return Module['canvas'].height;
+    return Module.canvas.height;
   });
 
   EM_JS(float, jsDevicePixelRatio, (), {
@@ -108,9 +110,9 @@ void WasmOcctView::run()
 // ================================================================
 void WasmOcctView::initWindow()
 {
+  jsInitCanvas();
   myDevicePixelRatio = jsDevicePixelRatio();
-  myCanvasId = THE_CANVAS_ID;
-  const char* aTargetId = !myCanvasId.IsEmpty() ? myCanvasId.ToCString() : EMSCRIPTEN_EVENT_TARGET_WINDOW;
+  const char* aTargetId = "!canvas";
   const EM_BOOL toUseCapture = EM_TRUE;
   emscripten_set_resize_callback     (EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onResizeCallback);
 
@@ -305,7 +307,6 @@ void WasmOcctView::initDemoScene()
   aShapePrs->SetMaterial (Graphic3d_NameOfMaterial_Jade);
   myContext->Display (aShapePrs, AIS_Shaded, 0, false);
   myView->FitAll (0.1, true);
-  myView->Redraw();
 
   // Build with "--preload-file MySampleFile.brep" option to load some shapes here.
 }

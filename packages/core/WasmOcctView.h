@@ -146,7 +146,6 @@ private:
   Handle(V3d_View)               myView;             //!< 3D view
   Handle(Prs3d_TextAspect)       myTextStyle;        //!< text style for OSD elements
   Handle(AIS_ViewCube)           myViewCube;         //!< view cube object
-  TCollection_AsciiString        myCanvasId;         //!< canvas element id on HTML page
   Aspect_Touch                   myClickTouch;       //!< single touch position for handling clicks
   OSD_Timer                      myDoubleTapTimer;   //!< timer for handling double tap
   float                          myDevicePixelRatio; //!< device pixel ratio for handling high DPI displays

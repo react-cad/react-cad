@@ -7,19 +7,15 @@ const ReactCascadePreview: React.FC = () => {
   React.useEffect(() => {
     if (canvasRef.current) {
       createPreviewWindow({
+        print: console.log,
+        printErr: console.warn,
         canvas: canvasRef.current
       });
     }
   }, []);
 
-  const width = Math.max(
-    300,
-    Math.min(window.innerWidth, window.screen.availWidth) - 30
-  );
-  const height = Math.max(
-    300,
-    Math.min(window.innerHeight, window.screen.availHeight / 2)
-  );
+  const width = 640;
+  const height = 480;
 
   return (
     <canvas
@@ -28,7 +24,7 @@ const ReactCascadePreview: React.FC = () => {
         height: `${height}px`
       }}
       width={width * window.devicePixelRatio}
-      height={height * devicePixelRatio}
+      height={height * window.devicePixelRatio}
       ref={canvasRef}
     />
   );
