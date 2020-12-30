@@ -60,30 +60,6 @@ if (!isWasmSupported())
   anElement.innerHTML += "Browser is too old - WebAssembly support is missing!<br>Please check updates or install a modern browser.<br>";
 }
 
-//! Handle file uploading.
-fileInput.onchange = function()
-{
-  if (fileInput.files.length == 0) { return; }
-  // Warning! Entire file is pre-loaded into memory.
-  var aFile = fileInput.files[0];
-  var aReader = new FileReader();
-  aReader.onload = function()
-  {
-    var aNameLenBytes = lengthBytesUTF8(aFile.name) + 1;
-    const aNameBuffer = Module._malloc(aNameLenBytes);
-    stringToUTF8(aFile.name, aNameBuffer, aNameLenBytes);
-
-    var aDataArray = new Uint8Array (aReader.result);
-    const aDataBuffer = Module._malloc(aDataArray.length);
-    Module.HEAPU8.set(aDataArray, aDataBuffer);
-    Module.ccall('onFileDataRead', null, ['number', 'number', 'number'], [aNameBuffer, aDataBuffer, aDataArray.length]);
-    Module._free(aDataBuffer);
-    Module._free(aNameBuffer);
-    fileInput.value = '';
-  };
-  aReader.readAsArrayBuffer(aFile);
-};
-
 //! Define OCCT WebGL Viewer module.
 createViewer({
   print: (function() {
@@ -99,6 +75,30 @@ createViewer({
     var aCanvas = document.getElementById('canvas');
     return aCanvas;
   })()
+}).then(function(Module) {
+  //! Handle file uploading.
+  fileInput.onchange = function()
+  {
+    if (fileInput.files.length == 0) { return; }
+    // Warning! Entire file is pre-loaded into memory.
+    var aFile = fileInput.files[0];
+    var aReader = new FileReader();
+    aReader.onload = function()
+    {
+      var aNameLenBytes = lengthBytesUTF8(aFile.name) + 1;
+      const aNameBuffer = Module._malloc(aNameLenBytes);
+      stringToUTF8(aFile.name, aNameBuffer, aNameLenBytes);
+
+      var aDataArray = new Uint8Array (aReader.result);
+      const aDataBuffer = Module._malloc(aDataArray.length);
+      Module.HEAPU8.set(aDataArray, aDataBuffer);
+      Module.ccall('onFileDataRead', null, ['number', 'number', 'number'], [aNameBuffer, aDataBuffer, aDataArray.length]);
+      Module._free(aDataBuffer);
+      Module._free(aNameBuffer);
+      fileInput.value = '';
+    };
+    aReader.readAsArrayBuffer(aFile);
+  };
 });
 </script>
 </body>
