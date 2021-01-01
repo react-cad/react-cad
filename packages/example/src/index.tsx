@@ -1,1 +1,1 @@
-export { default as ReactCascadePreview } from "./Preview";
+export { default as ReactCadPreview } from "./Preview";

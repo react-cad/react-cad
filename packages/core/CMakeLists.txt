@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(react-cascade-core)
+project(react-cad-core)
 
 set(CMAKE_CXX_STANDARD 11)
 set(APP_VERSION_MAJOR 1)
 set(APP_VERSION_MINOR 0)
-set(APP_TARGET react-cascade-core)
+set(APP_TARGET react-cad-core)
 
 # customize build
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1")
@@ -54,7 +54,7 @@ target_link_libraries(
   ${OpenCASCADE_LIBS}
   freetype
 )
-set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS=['_main','_onFileDataRead'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap']")
+set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "--bind -s EXPORTED_FUNCTIONS=['_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap']")
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/lib" CACHE PATH "..." FORCE)

@@ -1,10 +1,13 @@
 {
-  "name": "@react-cascade/renderer",
+  "name": "@react-cad/renderer",
   "version": "1.0.0",
   "main": "lib/index.js",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "devDependencies": {
-    "@react-cascade/core": "^1.0.0",
+    "@react-cad/core": "^1.0.0",
     "@types/react": "^17.0.0",
     "@types/react-reconciler": "^0.18.0",
     "react": "^17.0.1",

@@ -32,7 +32,6 @@
 #include <Message_Messenger.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <Prs3d_DatumAspect.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
 
 #include <iostream>
 
@@ -300,13 +299,6 @@ void WasmOcctView::initDemoScene()
   myViewCube->SetFixedAnimationLoop (false);
   myViewCube->SetAutoStartAnimation (true);
   myContext->Display (myViewCube, false);
-
-  BRepPrimAPI_MakeBox aBox(10.,20.,10.);
-  TopoDS_Shape aShape = aBox.Solid(); 
-  Handle(AIS_Shape) aShapePrs = new AIS_Shape (aShape);
-  aShapePrs->SetMaterial (Graphic3d_NameOfMaterial_Jade);
-  myContext->Display (aShapePrs, AIS_Shaded, 0, false);
-  myView->FitAll (0.1, true);
 
   // Build with "--preload-file MySampleFile.brep" option to load some shapes here.
 }

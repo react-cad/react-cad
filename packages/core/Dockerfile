@@ -1,0 +1,25 @@
+FROM emscripten/emsdk:2.0.10
+
+RUN apt-get update \
+  && apt-get -y install tk-dev tcl-dev
+
+RUN git clone --branch VER-2-10-4 --depth 1 https://git.savannah.gnu.org/git/freetype/freetype2.git freetype \
+  && cd freetype\
+  && mkdir build \
+  && cd build \
+  && emcmake cmake .. \
+  && emmake make install
+
+RUN git clone --branch V7_5_0 --depth 1 https://git.dev.opencascade.org/repos/occt.git occt \
+  && cd occt \
+  && mkdir build \
+  && cd build \
+  && emcmake cmake .. \
+    -DBUILD_LIBRARY_TYPE=Static \
+    -DFREETYPE_INCLUDE_DIRS=/usr/local/include/freetype2 \
+    -DFREETYPE_LIBRARY=/usr/local/lib/libfreetype.a \
+    -D3RDPARTY_TK_INCLUDE_DIR=/usr/include/tk \
+    -D3RDPARTY_FREETYPE_INCLUDE_DIR_ft2build=/usr/local/include/freetype2 \
+    -D3RDPARTY_FREETYPE_INCLUDE_DIR_freetype2=/usr/local/include \
+    -D3RDPARTY_FREETYPE_LIBRARY_DIR=/usr/local/lib \
+  && emmake make -j`nproc` install

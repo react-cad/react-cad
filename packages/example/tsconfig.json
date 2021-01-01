@@ -2,7 +2,12 @@
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/@react-cad/renderer/types",
+      "../renderer/types"
+    ]
   },
   "include": ["./src/**/*"]
 }

@@ -1,14 +1,26 @@
 import React from "react";
 import { Story, Meta } from "@storybook/react";
 
-import Preview from "./Preview";
+interface Props {
+  x: number;
+  y: number;
+  z: number;
+}
+
+const Box: React.FC<Props> = (props) => <box {...props} />;
 
 export default {
-  title: "Example/Preview",
-  component: Preview
+  title: "Box",
+  component: Box,
 } as Meta;
 
-const Template: Story<{}> = args => <Preview {...args} />;
+const Template: Story<{ x: number; y: number; z: number; }> = args => (
+  <Box {...args} />
+);
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.args = {
+  x: 5,
+  y: 5,
+  z: 5
+};

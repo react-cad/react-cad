@@ -11,13 +11,53 @@
 #include <AIS_Shape.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
+#include <TopoDS_Shape.hxx>
 #include <Standard_ArrayStreamBuffer.hxx>
 
 #include <emscripten.h>
 #include <emscripten/html5.h>
+#include <emscripten/bind.h>
 
 //! Global viewer instance.
 static WasmOcctView aViewer;
+static Handle(AIS_Shape) aShapePrs;
+
+TopoDS_Shape makeBox(double x, double y, double z) {
+  BRepPrimAPI_MakeBox aBox(x, y, z);
+  return aBox.Solid(); 
+}
+
+void clearShape() {
+  AIS_ListOfInteractive aShapes;
+  aViewer.Context()->DisplayedObjects (AIS_KOI_Shape, -1, aShapes);
+  for (AIS_ListOfInteractive::Iterator aShapeIter (aShapes); aShapeIter.More(); aShapeIter.Next())
+  {
+    aViewer.Context()->Remove (aShapeIter.Value(), false);
+  }
+}
+
+void setShape(TopoDS_Shape& aShape) {
+  clearShape();
+
+  aShapePrs->SetShape(aShape);
+  aShapePrs->SetMaterial (Graphic3d_NameOfMaterial_Silver);
+  aViewer.Context()->Display (aShapePrs, AIS_Shaded, 0, false);
+  aViewer.View()->FitAll (0.01, false);
+  aViewer.View()->Redraw();
+  Message::DefaultMessenger()->Send (TCollection_AsciiString("Set shape"), Message_Info);
+  Message::DefaultMessenger()->Send (OSD_MemInfo::PrintInfo(), Message_Trace);
+}
+
+using namespace emscripten;
+
+EMSCRIPTEN_BINDINGS(react_cad) {
+  function("makeBox", &makeBox);
+  function("setShape", &setShape);
+  function("clearShape", &clearShape);
+  class_<TopoDS_Shape>("Shape");
+}
+
 
 //! Dummy main loop callback for a single shot.
 extern "C" void onMainLoop()
@@ -26,40 +66,6 @@ extern "C" void onMainLoop()
   emscripten_cancel_main_loop();
 }
 
-//! File data read event.
-extern "C" void onFileDataRead (void* theOpaque, void* theBuffer, int theDataLen)
-{
-  const char* aName = theOpaque != NULL ? (const char* )theOpaque : "";
-  {
-    AIS_ListOfInteractive aShapes;
-    aViewer.Context()->DisplayedObjects (AIS_KOI_Shape, -1, aShapes);
-    for (AIS_ListOfInteractive::Iterator aShapeIter (aShapes); aShapeIter.More(); aShapeIter.Next())
-    {
-      aViewer.Context()->Remove (aShapeIter.Value(), false);
-    }
-  }
-
-  Standard_ArrayStreamBuffer aStreamBuffer ((const char* )theBuffer, theDataLen);
-  std::istream aStream (&aStreamBuffer);
-  TopoDS_Shape aShape;
-  BRep_Builder aBuilder;
-  BRepTools::Read (aShape, aStream, aBuilder);
-
-  Handle(AIS_Shape) aShapePrs = new AIS_Shape (aShape);
-  aShapePrs->SetMaterial (Graphic3d_NameOfMaterial_Silver);
-  aViewer.Context()->Display (aShapePrs, AIS_Shaded, 0, false);
-  aViewer.View()->FitAll (0.01, false);
-  aViewer.View()->Redraw();
-  Message::DefaultMessenger()->Send (TCollection_AsciiString("Loaded file ") + aName, Message_Info);
-  Message::DefaultMessenger()->Send (OSD_MemInfo::PrintInfo(), Message_Trace);
-}
-
-//! File read error event.
-static void onFileReadFailed (void* theOpaque)
-{
-  const char* aName = (const char* )theOpaque;
-  Message::DefaultMessenger()->Send (TCollection_AsciiString("Error: unable to load file ") + aName, Message_Fail);
-}
 
 int main()
 {
@@ -72,6 +78,7 @@ int main()
   emscripten_set_main_loop (onMainLoop, -1, 0);
 
   aViewer.run();
+  aShapePrs = new AIS_Shape(makeBox(1, 1, 1));
   Message::DefaultMessenger()->Send (OSD_MemInfo::PrintInfo(), Message_Trace);
 
   // load some file

@@ -6,5 +6,5 @@ export default {
     file: "lib/index.js",
     format: "es"
   },
-  plugins: [wasm({ sync: ["build/react-cascade-core.wasm"] })]
+  plugins: [wasm({ sync: ["build/react-cad-core.wasm"] })]
 };

@@ -1,11 +1,12 @@
 {
-  "name": "@react-cascade/example",
+  "name": "@react-cad/example",
   "version": "1.0.0",
   "main": "lib/index.js",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.12.10",
-    "@react-cascade/core": "^1.0.0",
+    "@react-cad/storybook-addon": "^1.0.0",
+    "@react-cad/renderer": "^1.0.0",
     "@storybook/addon-actions": "^6.1.11",
     "@storybook/addon-essentials": "^6.1.11",
     "@storybook/addon-links": "^6.1.11",
