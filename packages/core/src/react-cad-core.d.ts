@@ -1,5 +1,3 @@
-/// <reference types="emscripten" />
-
 export interface Shape {
   delete(): void;
 }
@@ -16,6 +14,6 @@ export interface ReactCadCoreModule extends EmscriptenModule {
   canvas: HTMLCanvasElement;
 }
 
-declare const ModuleFactory: EmscriptenModuleFactory<ReactCadCoreModule>;
+const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule>;
 
-export default ModuleFactory;
+export default reactCadCore;
