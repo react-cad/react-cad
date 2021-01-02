@@ -6,8 +6,8 @@
   "license": "LGPL",
   "scripts": {
     "build-dev-docker": "docker build -t react-cad-build .",
-    "build-wasm": "docker run --rm -u=`id -u` -v $PWD:/src/react-cad react-cad-build",
-    "prebuild": "cp src/*.d.ts lib",
+    "build-wasm": "docker run --rm -it -u=`id -u` -v $PWD:/src/react-cad react-cad-build",
+    "prebuild": "cp src/ts/*.d.ts lib",
     "build": "tsc"
   },
   "devDependencies": {

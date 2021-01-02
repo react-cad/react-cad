@@ -1,7 +1,7 @@
 FROM emscripten/emsdk:2.0.10
 
 RUN apt-get update \
-  && apt-get -y install tk-dev tcl-dev
+  && apt-get -y install tk-dev tcl-dev fswatch
 
 RUN git clone --branch VER-2-10-4 --depth 1 https://git.savannah.gnu.org/git/freetype/freetype2.git freetype \
   && cd freetype\
