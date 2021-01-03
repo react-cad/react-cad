@@ -237,6 +237,7 @@ bool WasmOcctView::initViewer()
 
   Handle(V3d_Viewer) aViewer = new V3d_Viewer (aDriver);
   aViewer->SetComputedMode (false);
+  aViewer->ActivateGrid (Aspect_GT_Rectangular, Aspect_GDM_Lines);
   aViewer->SetDefaultShadingModel (Graphic3d_TOSM_FRAGMENT);
   aViewer->SetDefaultLights();
   aViewer->SetLightOn();

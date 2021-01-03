@@ -1,32 +1,43 @@
 import React from "react";
-import ReactReconciler, { Fiber } from "react-reconciler";
-import { ReactCadCoreModule, Shape } from "@react-cad/core";
-import { ReactCad } from "../types/jsx";
+import ReactReconciler from "react-reconciler";
+import {
+  Type,
+  Props,
+  Container,
+  Instance,
+  TextInstance,
+  HydratableInstance,
+  PublicInstance,
+  HostContext,
+  UpdatePayload,
+  ChildSet,
+  InstanceHandle
+} from "./types";
 
-export type Container = ReactCadCoreModule;
-export type HostContext = any;
-export type Type = "box";
-export interface Props {}
-export type Instance = Shape;
-export type TextInstance = never;
-export type HydratableInstance = never;
-export type PublicInstance = Instance;
-export type UpdatePayload = any;
-export type ChildSet = never;
+import {
+  createInstance,
+  appendInitialChild,
+  finalizeInitialChildren,
+  appendChild,
+  prepareUpdate,
+  commitUpdate,
+  destroyInstance
+} from "./elements";
 
-function createInstance<T extends keyof ReactCad.Props>(
-  type: T,
-  props: ReactCad.Props[T],
+function updateContainer(
   rootContainerInstance: Container,
-  hostContext: HostContext,
-  internalInstanceHandle: Fiber
-): Instance {
-  switch (type) {
-    case "box":
-      return rootContainerInstance.makeBox(props.x, props.y, props.z);
-    default:
-      throw Error(`Unknown component type: ${type}`);
+  hostContext: HostContext
+) {
+  const oldChildShape = rootContainerInstance.childShape;
+  if (rootContainerInstance.children) {
+    rootContainerInstance.childShape = rootContainerInstance.makeUnion(
+      rootContainerInstance.children.map(({ shape }) => shape)
+    );
+  } else {
+    rootContainerInstance.childShape = hostContext.nullShape();
   }
+  rootContainerInstance.setShape(rootContainerInstance.childShape);
+  oldChildShape?.delete();
 }
 
 export const HostConfig: ReactReconciler.HostConfig<
@@ -53,14 +64,15 @@ export const HostConfig: ReactReconciler.HostConfig<
   now: Date.now,
   // @ts-ignore
   clearContainer(rootContainerInstance: Container) {
-    console.log(rootContainerInstance);
     rootContainerInstance.clearShape();
   },
   getPublicInstance(instance: Instance) {
-    return instance;
+    return instance.shape;
   },
   getRootHostContext(rootContainerInstance: Container) {
-    const context: HostContext = {};
+    const context: HostContext = {
+      nullShape: () => new rootContainerInstance.Shape()
+    };
     return context;
   },
   getChildHostContext(
@@ -68,66 +80,75 @@ export const HostConfig: ReactReconciler.HostConfig<
     type: Type,
     rootContainerInstance: Container
   ) {
-    const context: HostContext = {
-      ...parentHostContext
-    };
-    return context;
+    return parentHostContext;
   },
   appendChildToContainer(rootContainerInstance: Container, child: Instance) {
-    rootContainerInstance.setShape(child);
+    rootContainerInstance.children = rootContainerInstance.children ?? [];
+    rootContainerInstance.children.push(child);
+    child.notifyParent = () => {
+      updateContainer(rootContainerInstance, child.hostContext);
+    };
+    updateContainer(rootContainerInstance, child.hostContext);
+  },
+  insertInContainerBefore(
+    rootContainerInstance: Container,
+    child: Instance,
+    beforeChild: Instance
+  ) {
+    rootContainerInstance.children = rootContainerInstance.children ?? [];
+    const index = rootContainerInstance.children.indexOf(beforeChild);
+    if (index < 0) {
+      throw new Error(`insertInContainerBefore child does not exist`);
+    }
+    rootContainerInstance.children.splice(index, 0, child);
+    child.notifyParent = () =>
+      updateContainer(rootContainerInstance, child.hostContext);
+    updateContainer(rootContainerInstance, child.hostContext);
+  },
+  removeChildFromContainer(rootContainerInstance: Container, child: Instance) {
+    rootContainerInstance.children = rootContainerInstance.children ?? [];
+    const index = rootContainerInstance.children.indexOf(child);
+    if (index < 0) {
+      throw new Error(`removeChildFromContainer child does not exist`);
+    }
+    rootContainerInstance.children.splice(index, 1);
+    updateContainer(rootContainerInstance, child.hostContext);
+    destroyInstance(child);
   },
   prepareForCommit(containerInfo: Container) {},
   resetAfterCommit(containerInfo: Container) {},
-  createInstance,
   shouldSetTextContent(type: Type, props: Props) {
     return false;
   },
   createTextInstance(
-    text: string,
-    rootContainerInstance: Container,
-    hostContext: HostContext,
-    internalInstanceHandle: Fiber
-  ) {
-    throw Error("TextInstance not implemented");
+      text: string,
+      rootContainerInstance: Container,
+      hostContext: HostContext,
+      internalInstanceHandle: InstanceHandle,
+  ): TextInstance {
+    throw Error("Text not supported");
   },
-  appendInitialChild(parentInstance: Instance, child: Instance) {},
-  finalizeInitialChildren(
-    parentInstance: Instance,
-    type: Type,
-    props: Props,
-    rootContainerInstance: Container,
-    hostContext: HostContext
-  ) {
-    return false;
+  commitTextUpdate() {
+    throw Error("Text not supported");
+  },
+  resetTextContent() {
+    throw Error("Text not supported");
   },
   shouldDeprioritizeSubtree(type: Type, props: Props) {
     return false;
   },
-  scheduleDeferredCallback(
-    callback: () => any,
-    options?: { timeout: number }
-  ) {},
-  cancelDeferredCallback(callbackID: any) {},
-  prepareUpdate(
-    instance: Instance,
-    type: Type,
-    oldProps: Props,
-    newProps: Props,
-    rootContainerInstance: Container,
-    hostContext: HostContext
-  ) {
-    return null;
-  }
+  createInstance,
+  appendInitialChild,
+  finalizeInitialChildren,
+  prepareUpdate,
+  commitUpdate,
+  appendChild
 };
 
 const reconcilerInstance = ReactReconciler(HostConfig);
 
 const Renderer = {
-  render(
-    element: React.ReactElement,
-    root: Container,
-    callback: () => void
-  ) {
+  render(element: React.ReactElement, root: Container, callback = () => {}) {
     const isAsync = false;
     const hydrate = false;
     const container = reconcilerInstance.createContainer(
@@ -144,6 +165,14 @@ const Renderer = {
       parentComponent,
       callback
     );
+
+    return (element: React.ReactElement, callback = () => {}) =>
+      reconcilerInstance.updateContainer(
+        element,
+        container,
+        parentComponent,
+        callback
+      );
   }
 };
 

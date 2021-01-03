@@ -3,15 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "lib/preset.js",
-  "files": [
-    "lib/**/*",
-    "README.md",
-    "*.js"
-  ],
-  "keywords": [
-    "storybook",
-    "addons"
-  ],
+  "files": ["lib/**/*", "README.md", "*.js"],
+  "keywords": ["storybook", "addons"],
   "author": "",
   "license": "MIT",
   "peerDependencies": {
@@ -28,6 +21,7 @@
     "@types/resize-observer-browser": "^0.1.4"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "tsc --watch"
   }
 }

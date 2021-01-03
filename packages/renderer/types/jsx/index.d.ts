@@ -1,16 +1,8 @@
-export namespace ReactCad {
-  export interface Props {
-    box: {
-      x: number;
-      y: number;
-      z: number;
-    };
-  }
-}
+import { ElementProps } from "../../src/types";
 
 declare global {
   namespace JSX {
-    interface IntrinsicElements extends ReactCad.Props {
+    interface IntrinsicElements extends ElementProps {
     }
   }
 }

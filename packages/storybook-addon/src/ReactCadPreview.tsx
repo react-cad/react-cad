@@ -1,7 +1,8 @@
 /// <reference types="resize-observer-browser" />
 //
 import React from "react";
-import createPreviewWindow, { ReactCadCoreModule } from "@react-cad/core";
+import reactCadCore, { ReactCadCoreModule } from "@react-cad/core";
+import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
 import ReactCadRenderer from "@react-cad/renderer";
 
 interface Props {
@@ -19,10 +20,7 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
       () => wrapperRef.current ?? undefined
     );
 
-    const [
-      previewWindow,
-      setPreviewWindow
-    ] = React.useState<ReactCadCoreModule>();
+    const render = React.useRef<ReturnType<typeof ReactCadRenderer["render"]>>();
 
     const [{ width, height }, setDimensions] = React.useState({
       width: 640,
@@ -53,29 +51,30 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
         }
       }
     }, []);
-     */
+    */
 
     React.useEffect(() => {
       if (canvasRef.current) {
-        createPreviewWindow({
+        reactCadCore({
           print: console.log,
           printErr: console.warn,
-          canvas: canvasRef.current
-        }).then(setPreviewWindow);
+          canvas: canvasRef.current,
+          locateFile: () => reactCadCoreWasm
+        }).then(core => {
+          render.current = ReactCadRenderer.render(shape, core);
+          core.fitShape();
+        });
       }
     }, []);
 
     React.useEffect(() => {
-      if (previewWindow) {
-        ReactCadRenderer.render(shape, previewWindow, () => {});
+      if (render.current) {
+        render.current(shape);
       }
-    }, [previewWindow, shape]);
+    }, [shape]);
 
     return (
-      <div
-        className={className}
-        ref={wrapperRef}
-      >
+      <div className={className} ref={wrapperRef}>
         <canvas
           style={{
             width: `${width}px`,
