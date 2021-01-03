@@ -37,11 +37,16 @@ export interface ReactCadEmscriptenModule extends EmscriptenModule {
   _main(): number;
   _onFileDataRead(nameBuffer: number, dataBuffer: number, dataLength: number): null;
   makeBox(x: number, y: number, z: number): Shape;
+  makeCylinder(radius: number, height: number): Shape;
+  makeSphere(radius: number): Shape;
+  makeTorus(radius1: number, radius2: number): Shape;
   makeRotation(axis: Axis, angle: number): Transform;
   makeTranslation(x: number, y: number, z: number): Transform;
   makeScale(factor: number): Transform;
   applyTransform(shape: Shape, transform: Transform): Shape;
   makeUnion(shapes: VectorShape): Shape;
+  makeDifference(shapes: VectorShape): Shape;
+  makeIntersection(shapes: VectorShape): Shape;
   clearShape(): void;
   setShape(shape: Shape): void;
   fitShape(): void;

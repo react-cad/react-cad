@@ -11,23 +11,31 @@ interface Props {
   angle: number;
 }
 
-const Box: React.FC<Props> = ({ x, y, z, axis, angle }) => 
+const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => 
   <rotation axis={axis} angle={angle}>
-    <box x={x} y={y} z={z} />
+    <rotation axis="z" angle={1 * 2 * Math.PI / 3}>
+      <box x={x} y={y} z={z} />
+    </rotation>
+    <rotation axis="z" angle={2 * 2 * Math.PI / 3}>
+      <box x={x} y={y} z={z} />
+    </rotation>
+    <rotation axis="z" angle={3 * 2 * Math.PI / 3}>
+      <box x={x} y={y} z={z} />
+    </rotation>
   </rotation>
 
 const positiveIntegerControl = {
   control: {
     type: "range",
     min: 1,
-    max: 100,
+    max: 10,
     step: 1
   }
 }
 
 export default {
-  title: "Box",
-  component: Box,
+  title: "Examples/Composed",
+  component: Composed,
   argTypes: {
     x: positiveIntegerControl,
     y: positiveIntegerControl,
@@ -43,14 +51,14 @@ export default {
         type: "range",
         min: 0,
         max: 2 * Math.PI,
-        step: 2 * Math.PI / 360
+        step: 2 * Math.PI / 90
       }
     }
   }
 } as Meta;
 
 const Template: Story<Props> = args => (
-  <Box {...args} />
+  <Composed {...args} />
 );
 
 export const Default = Template.bind({});

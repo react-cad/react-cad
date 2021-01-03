@@ -10,11 +10,31 @@ import {
 } from "../types";
 
 import * as box from "./box";
+import * as cylinder from "./cylinder";
+import * as sphere from "./sphere";
+import * as torus from "./torus";
+
 import * as rotation from "./rotation";
+import * as translation from "./translation";
+import * as scale from "./scale";
+
+import * as union from "./union";
+import * as difference from "./difference";
+import * as intersection from "./intersection";
 
 const elements: Record<Type, Element> = {
   box,
-  rotation
+  cylinder,
+  sphere,
+  torus,
+
+  rotation,
+  translation,
+  scale,
+
+  union,
+  difference,
+  intersection
 };
 
 function getElement(type: Type): Element {
@@ -46,9 +66,11 @@ function updateChildren(parentInstance: Instance) {
   const element = getElement(parentInstance.type);
 
   const oldChildShape = parentInstance.childShape;
-  parentInstance.childShape = parentInstance.rootContainerInstance.makeUnion(
-    parentInstance.children.map(({ shape }) => shape)
-  );
+  if (!element.skipChildUnion) {
+    parentInstance.childShape = parentInstance.rootContainerInstance.makeUnion(
+      parentInstance.children.map(({ shape }) => shape)
+    );
+  }
   element.commitChildren(parentInstance);
   oldChildShape?.delete();
   return;

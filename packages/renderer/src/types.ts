@@ -11,6 +11,7 @@ export interface Element {
   ): Instance<Type>;
   destroyInstance(instance: Instance<Type>): void;
   hasChildren: boolean;
+  skipChildUnion?: boolean;
   commitChildren(parentInstance: Instance<Type>): void;
   prepareUpdate(
     instance: Instance<Type>,
@@ -36,18 +37,62 @@ export interface ElementProps {
     y: number;
     z: number;
   };
+  cylinder: {
+    radius: number;
+    height: number;
+  };
+  sphere: {
+    radius: number;
+  };
+  torus: {
+    radius1: number;
+    radius2: number;
+  };
+
   rotation: {
     axis: "x" | "y" | "z";
     angle: number;
+    children?: React.ReactNode;
+  };
+  translation: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  scale: {
+    factor: number;
+  };
+
+  union: {
+    children?: React.ReactNode;
+  };
+  difference: {
+    children?: React.ReactNode;
+  };
+  intersection: {
     children?: React.ReactNode;
   };
 }
 
 export interface ElementData {
   box: undefined;
+  cylinder: undefined;
+  sphere: undefined;
+  torus: undefined;
+
   rotation: {
     transform: Transform;
   };
+  translation: {
+    transform: Transform;
+  };
+  scale: {
+    transform: Transform;
+  };
+
+  union: undefined;
+  difference: undefined;
+  intersection: undefined;
 }
 
 export type Container = ReactCadCoreModule & {

@@ -1,9 +1,25 @@
 /// <reference types="resize-observer-browser" />
 //
 import React from "react";
-import reactCadCore, { ReactCadCoreModule } from "@react-cad/core";
+import reactCadCore from "@react-cad/core";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
 import ReactCadRenderer from "@react-cad/renderer";
+
+function useStateWhenReady<T>(value: T) {
+  const [ready, setReady] = React.useState(true);
+  const [myValue, setMyValue] = React.useState(value);
+
+  React.useEffect(
+    () => {
+      if (ready) {
+        setMyValue(value);
+      }
+    },
+    [value, ready] 
+  );
+
+  return [myValue, setReady] as [T, typeof setReady];
+}
 
 interface Props {
   className?: string;
@@ -22,12 +38,12 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const render = React.useRef<ReturnType<typeof ReactCadRenderer["render"]>>();
 
+    /*
     const [{ width, height }, setDimensions] = React.useState({
       width: 640,
       height: 640
     });
 
-    /*
     React.useLayoutEffect(() => {
       if (wrapperRef.current) {
         setDimensions({
@@ -53,6 +69,8 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
     }, []);
     */
 
+    const [latestShape, setReady] = useStateWhenReady(shape);
+
     React.useEffect(() => {
       if (canvasRef.current) {
         reactCadCore({
@@ -61,7 +79,8 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
           canvas: canvasRef.current,
           locateFile: () => reactCadCoreWasm
         }).then(core => {
-          render.current = ReactCadRenderer.render(shape, core);
+          setReady(false);
+          render.current = ReactCadRenderer.render(shape, core, () => setReady(true));
           core.fitShape();
         });
       }
@@ -69,9 +88,12 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     React.useEffect(() => {
       if (render.current) {
-        render.current(shape);
+        setReady(false);
+        render.current(shape, () => setReady(true));
       }
-    }, [shape]);
+    }, [latestShape]);
+
+    const width = 640, height = 480;
 
     return (
       <div className={className} ref={wrapperRef}>

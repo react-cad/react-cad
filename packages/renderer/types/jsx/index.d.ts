@@ -2,7 +2,7 @@ import { ElementProps } from "../../src/types";
 
 declare global {
   namespace JSX {
-    interface IntrinsicElements extends ElementProps {
+    export interface IntrinsicElements extends ElementProps {
     }
   }
 }

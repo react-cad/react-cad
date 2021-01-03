@@ -13,9 +13,14 @@
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <BRepPrimAPI_MakeSphere.hxx>
+#include <BRepPrimAPI_MakeTorus.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepBuilderAPI_Copy.hxx>
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
+#include <BRepAlgoAPI_Common.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <Standard_ArrayStreamBuffer.hxx>
@@ -48,7 +53,6 @@ void setShape(TopoDS_Shape& aShape) {
   aShapePrs->SetMaterial (Graphic3d_NameOfMaterial_Silver);
   aViewer.Context()->Display (aShapePrs, AIS_Shaded, 0, false);
   aViewer.View()->Redraw();
-  Message::DefaultMessenger()->Send (OSD_MemInfo::PrintInfo(), Message_Trace);
 }
 
 void fitShape() {
@@ -63,6 +67,21 @@ TopoDS_Shape copyShape(TopoDS_Shape& aShape) {
 TopoDS_Shape makeBox(double x, double y, double z) {
   BRepPrimAPI_MakeBox aBox(x, y, z);
   return aBox.Solid(); 
+}
+
+TopoDS_Shape makeCylinder(double radius, double height) {
+  BRepPrimAPI_MakeCylinder aCylinder(radius, height);
+  return aCylinder.Solid(); 
+}
+
+TopoDS_Shape makeSphere(double radius) {
+  BRepPrimAPI_MakeSphere aSphere(radius);
+  return aSphere.Solid(); 
+}
+
+TopoDS_Shape makeTorus(double radius1, double radius2) {
+  BRepPrimAPI_MakeTorus aTorus(radius1, radius2);
+  return aTorus.Solid(); 
 }
 
 gp_Trsf makeRotation(const gp_Ax1& anAxis, Standard_Real angle) {
@@ -97,9 +116,7 @@ TopoDS_Shape makeUnion(std::vector<TopoDS_Shape> shapes) {
 
   TopTools_ListOfShape aLS;
   for(TopoDS_Shape shape : shapes) {
-    if (!shape.IsNull()) {
-      aLS.Append(shape);
-    }
+    aLS.Append(shape);
   }
 
   aBuilder.SetArguments(aLS);
@@ -111,6 +128,63 @@ TopoDS_Shape makeUnion(std::vector<TopoDS_Shape> shapes) {
     return nullShape;
   }
   return aBuilder.Shape();
+}
+
+TopoDS_Shape makeDifference(std::vector<TopoDS_Shape> shapes) {
+  BRepAlgoAPI_Cut aBuilder;
+
+  TopTools_ListOfShape aLS;
+  TopTools_ListOfShape aLT;
+
+  for(TopoDS_Shape shape : shapes) {
+    if (shape == shapes.front()) {
+      aLS.Append(shape);
+    } else {
+      aLT.Append(shape);
+    }
+  }
+
+  aBuilder.SetArguments(aLS);
+  aBuilder.SetTools(aLT);
+
+  aBuilder.Build();
+  if (aBuilder.HasErrors()) {
+    aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
+    TopoDS_Shape nullShape;
+    return nullShape;
+  }
+  return aBuilder.Shape();
+}
+
+TopoDS_Shape makeIntersection(std::vector<TopoDS_Shape> shapes) {
+  TopTools_ListOfShape aLS;
+  TopTools_ListOfShape aLT;
+
+  for (int i = 0; i < shapes.size(); i++) {
+    if (i == 0) {
+      aLS.Append(shapes.at(i));
+    } else {
+      aLT.Append(shapes.at(i));
+
+      BRepAlgoAPI_Common aBuilder;
+      aBuilder.SetArguments(aLS);
+      aBuilder.SetTools(aLT);
+
+      aBuilder.Build(); 
+
+      if (aBuilder.HasErrors()) {
+        aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
+        TopoDS_Shape nullShape;
+        return nullShape;
+      }
+
+      aLS.Clear();
+      aLS.Append(aBuilder.Shape());
+      aLT.Clear();
+    }
+  }
+
+  return aLS.First();
 }
 
 using namespace emscripten;
@@ -134,12 +208,17 @@ EMSCRIPTEN_BINDINGS(react_cad) {
   function("fitShape", &fitShape);
   function("clearShape", &clearShape);
   function("makeBox", &makeBox);
+  function("makeCylinder", &makeCylinder);
+  function("makeSphere", &makeSphere);
+  function("makeTorus", &makeTorus);
   function("makeRotation", &makeRotation);
   function("makeTranslation", &makeTranslation);
   function("makeScale", &makeScale);
   function("applyTransform", &applyTransform);
   function("copyShape", &copyShape);
   function("makeUnion", &makeUnion);
+  function("makeDifference", &makeDifference);
+  function("makeIntersection", &makeIntersection);
 }
 
 
