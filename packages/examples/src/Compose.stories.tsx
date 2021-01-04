@@ -13,15 +13,20 @@ interface Props {
 
 const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => 
   <rotation axis={axis} angle={angle}>
-    <rotation axis="z" angle={1 * 2 * Math.PI / 3}>
-      <box x={x} y={y} z={z} />
-    </rotation>
-    <rotation axis="z" angle={2 * 2 * Math.PI / 3}>
-      <box x={x} y={y} z={z} />
-    </rotation>
-    <rotation axis="z" angle={3 * 2 * Math.PI / 3}>
-      <box x={x} y={y} z={z} />
-    </rotation>
+    <difference>
+      <union>
+        <rotation axis="z" angle={1 * 2 * Math.PI / 3}>
+          <box x={x} y={y} z={z} />
+        </rotation>
+        <rotation axis="z" angle={2 * 2 * Math.PI / 3}>
+          <box x={x} y={y} z={z} />
+        </rotation>
+        <rotation axis="z" angle={3 * 2 * Math.PI / 3}>
+          <box x={x} y={y} z={z} />
+        </rotation>
+      </union>
+      <sphere radius={3} />
+    </difference>
   </rotation>
 
 const positiveIntegerControl = {

@@ -14,8 +14,8 @@ const Scale: React.FC<Props> = (props) => (
 const range = {
   control: {
     type: "range",
-    min: 1,
-    max: 10,
+    min: 0.1,
+    max: 2,
     step: 0.1,
   },
 };
