@@ -2,7 +2,8 @@
   "name": "@react-cad/react-cad",
   "private": true,
   "scripts": {
-    "setup": "lerna bootstrap",
+    "postinstall": "lerna bootstrap",
+    "setup": "lerna run --stream setup",
     "start": "lerna run --parallel start"
   },
   "devDependencies": {
