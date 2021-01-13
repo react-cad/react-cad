@@ -1,4 +1,4 @@
-FROM reactcad/build:7.5.0
+FROM reactcad/build:7.5.0-v1
 
 COPY . /src/react-cad
 
