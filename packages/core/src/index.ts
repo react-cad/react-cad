@@ -1,6 +1,6 @@
 import _reactCadCore, {
   ReactCadEmscriptenModule,
-  Shape
+  Shape,
 } from "./react-cad-core";
 
 export * from "./react-cad-core";
@@ -14,13 +14,15 @@ export type ReactCadCoreModule = Omit<
   makeIntersection(shapes: Shape[]): Shape;
 };
 
-const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async moduleOverrides => {
+const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async (
+  moduleOverrides
+) => {
   const { makeUnion, makeDifference, makeIntersection, ...overrides } =
     moduleOverrides ?? {};
-  return _reactCadCore(overrides).then(core => ({
+  return _reactCadCore(overrides).then((core) => ({
     ...core,
     makeUnion: (shapes: Shape[]) => {
-      const nonNullShapes = shapes.filter(shape => !shape.IsNull());
+      const nonNullShapes = shapes.filter((shape) => !shape.IsNull());
       switch (nonNullShapes.length) {
         case 0:
           return new core.Shape();
@@ -28,7 +30,7 @@ const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async moduleOv
           return core.copyShape(nonNullShapes[0]);
         default: {
           const shapeVector = new core.VectorShape();
-          nonNullShapes.forEach(shape => shapeVector.push_back(shape));
+          nonNullShapes.forEach((shape) => shapeVector.push_back(shape));
           const shape = core.makeUnion(shapeVector);
           shapeVector.delete();
           return shape;
@@ -39,7 +41,7 @@ const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async moduleOv
       if (shapes[0] && shapes[0].IsNull()) {
         return new core.Shape();
       }
-      const nonNullShapes = shapes.filter(shape => !shape.IsNull());
+      const nonNullShapes = shapes.filter((shape) => !shape.IsNull());
       switch (nonNullShapes.length) {
         case 0:
           return new core.Shape();
@@ -47,7 +49,7 @@ const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async moduleOv
           return core.copyShape(nonNullShapes[0]);
         default: {
           const shapeVector = new core.VectorShape();
-          nonNullShapes.forEach(shape => shapeVector.push_back(shape));
+          nonNullShapes.forEach((shape) => shapeVector.push_back(shape));
           const shape = core.makeDifference(shapeVector);
           shapeVector.delete();
           return shape;
@@ -55,7 +57,7 @@ const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async moduleOv
       }
     },
     makeIntersection: (shapes: Shape[]) => {
-      const nonNullShapes = shapes.filter(shape => !shape.IsNull());
+      const nonNullShapes = shapes.filter((shape) => !shape.IsNull());
       switch (nonNullShapes.length) {
         case 0:
           return new core.Shape();
@@ -63,13 +65,13 @@ const reactCadCore: EmscriptenModuleFactory<ReactCadCoreModule> = async moduleOv
           return core.copyShape(nonNullShapes[0]);
         default: {
           const shapeVector = new core.VectorShape();
-          nonNullShapes.forEach(shape => shapeVector.push_back(shape));
+          nonNullShapes.forEach((shape) => shapeVector.push_back(shape));
           const shape = core.makeIntersection(shapeVector);
           shapeVector.delete();
           return shape;
         }
       }
-    }
+    },
   }));
 };
 

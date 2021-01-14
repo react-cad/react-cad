@@ -1,1 +1,1 @@
-module.exports = require('./lib/preset.js');
+module.exports = require("./lib/preset.js");

@@ -5,4 +5,4 @@ export const parameters = {
       order: ["Primitives", "Transformations", "Operations", "Examples"],
     },
   },
-}
+};

@@ -3,16 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "lib/preset.js",
-  "files": ["lib/**/*", "README.md", "*.js"],
-  "keywords": ["storybook", "addons"],
+  "files": [
+    "lib/**/*",
+    "README.md",
+    "*.js"
+  ],
+  "keywords": [
+    "storybook",
+    "addons"
+  ],
   "author": "",
   "license": "MIT",
   "peerDependencies": {
     "@storybook/react": "^6.1.11",
     "react": "^17.0.1"
-  },
-  "devDependencies": {
-    "typescript": "^4.1.3"
   },
   "dependencies": {
     "@react-cad/core": "^1.0.0",

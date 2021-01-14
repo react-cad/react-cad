@@ -11,7 +11,7 @@ import {
   HostContext,
   UpdatePayload,
   ChildSet,
-  InstanceHandle
+  InstanceHandle,
 } from "./types";
 
 import {
@@ -21,7 +21,7 @@ import {
   appendChild,
   prepareUpdate,
   commitUpdate,
-  destroyInstance
+  destroyInstance,
 } from "./elements";
 
 function updateContainer(
@@ -62,7 +62,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   clearTimeout: clearTimeout,
   noTimeout: undefined,
   now: Date.now,
-  // @ts-ignore
+  // @ts-expect-error reconciler types don't include clearContainer but omitting causes a crash
   clearContainer(rootContainerInstance: Container) {
     rootContainerInstance.clearShape();
   },
@@ -71,14 +71,14 @@ export const HostConfig: ReactReconciler.HostConfig<
   },
   getRootHostContext(rootContainerInstance: Container) {
     const context: HostContext = {
-      nullShape: () => new rootContainerInstance.Shape()
+      nullShape: () => new rootContainerInstance.Shape(),
     };
     return context;
   },
   getChildHostContext(
     parentHostContext: HostContext,
-    type: Type,
-    rootContainerInstance: Container
+    _type: Type,
+    _rootContainerInstance: Container
   ) {
     return parentHostContext;
   },
@@ -115,16 +115,20 @@ export const HostConfig: ReactReconciler.HostConfig<
     updateContainer(rootContainerInstance, child.hostContext);
     destroyInstance(child);
   },
-  prepareForCommit(containerInfo: Container) {},
-  resetAfterCommit(containerInfo: Container) {},
-  shouldSetTextContent(type: Type, props: Props) {
+  prepareForCommit(_containerInfo: Container) {
+    // TODO: Implement?
+  },
+  resetAfterCommit(_containerInfo: Container) {
+    // TODO: Implement?
+  },
+  shouldSetTextContent(_type: Type, _props: Props) {
     return false;
   },
   createTextInstance(
-      text: string,
-      rootContainerInstance: Container,
-      hostContext: HostContext,
-      internalInstanceHandle: InstanceHandle,
+    _text: string,
+    _rootContainerInstance: Container,
+    _hostContext: HostContext,
+    _internalInstanceHandle: InstanceHandle
   ): TextInstance {
     throw Error("Text not supported");
   },
@@ -134,7 +138,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   resetTextContent() {
     throw Error("Text not supported");
   },
-  shouldDeprioritizeSubtree(type: Type, props: Props) {
+  shouldDeprioritizeSubtree(_type: Type, _props: Props) {
     return false;
   },
   createInstance,
@@ -142,13 +146,21 @@ export const HostConfig: ReactReconciler.HostConfig<
   finalizeInitialChildren,
   prepareUpdate,
   commitUpdate,
-  appendChild
+  appendChild,
 };
 
 const reconcilerInstance = ReactReconciler(HostConfig);
 
-const Renderer = {
-  render(element: React.ReactElement, root: Container, callback = () => {}) {
+interface Renderer {
+  render(
+    element: React.ReactElement,
+    root: Container,
+    callback?: () => void
+  ): (element: React.ReactElement, callback?: () => void) => void;
+}
+
+const Renderer: Renderer = {
+  render(element, root, callback = () => {}) {
     const isAsync = false;
     const hydrate = false;
     const container = reconcilerInstance.createContainer(
@@ -166,14 +178,14 @@ const Renderer = {
       callback
     );
 
-    return (element: React.ReactElement, callback = () => {}) =>
+    return (element, callback = () => {}) =>
       reconcilerInstance.updateContainer(
         element,
         container,
         parentComponent,
         callback
       );
-  }
+  },
 };
 
 export default Renderer;

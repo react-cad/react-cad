@@ -5,15 +5,15 @@ interface Props {
   radius: number;
 }
 
-const Sphere: React.FC<Props> = props => <sphere {...props} />;
+const Sphere: React.FC<Props> = (props) => <sphere {...props} />;
 
 const positiveIntegerControl = {
   control: {
     type: "range",
     min: 1,
     max: 10,
-    step: 0.1
-  }
+    step: 0.1,
+  },
 };
 
 export default {
@@ -21,10 +21,10 @@ export default {
   component: Sphere,
   argTypes: {
     radius: positiveIntegerControl,
-  }
+  },
 } as Meta;
 
-const Template: Story<Props> = args => <Sphere {...args} />;
+const Template: Story<Props> = (args) => <Sphere {...args} />;
 
 export const sphere = Template.bind({});
 sphere.args = {

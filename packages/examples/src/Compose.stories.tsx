@@ -11,32 +11,33 @@ interface Props {
   angle: number;
 }
 
-const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => 
+const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => (
   <rotation axis={axis} angle={angle}>
     <difference>
       <union>
-        <rotation axis="z" angle={1 * 2 * Math.PI / 3}>
+        <rotation axis="z" angle={(1 * 2 * Math.PI) / 3}>
           <box x={x} y={y} z={z} />
         </rotation>
-        <rotation axis="z" angle={2 * 2 * Math.PI / 3}>
+        <rotation axis="z" angle={(2 * 2 * Math.PI) / 3}>
           <box x={x} y={y} z={z} />
         </rotation>
-        <rotation axis="z" angle={3 * 2 * Math.PI / 3}>
+        <rotation axis="z" angle={(3 * 2 * Math.PI) / 3}>
           <box x={x} y={y} z={z} />
         </rotation>
       </union>
       <sphere radius={3} />
     </difference>
   </rotation>
+);
 
 const positiveIntegerControl = {
   control: {
     type: "range",
     min: 1,
     max: 10,
-    step: 1
-  }
-}
+    step: 1,
+  },
+};
 
 export default {
   title: "Examples/Composed",
@@ -48,23 +49,21 @@ export default {
     axis: {
       control: {
         type: "inline-radio",
-        options: ["x", "y", "z"]
-      }
+        options: ["x", "y", "z"],
+      },
     },
     angle: {
       control: {
         type: "range",
         min: 0,
         max: 2 * Math.PI,
-        step: 2 * Math.PI / 90
-      }
-    }
-  }
+        step: (2 * Math.PI) / 90,
+      },
+    },
+  },
 } as Meta;
 
-const Template: Story<Props> = args => (
-  <Composed {...args} />
-);
+const Template: Story<Props> = (args) => <Composed {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
@@ -72,5 +71,5 @@ Default.args = {
   y: 5,
   z: 5,
   axis: "z",
-  angle: 0
+  angle: 0,
 };

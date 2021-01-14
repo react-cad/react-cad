@@ -50,7 +50,7 @@ namespace
   });
 
   EM_JS(float, jsDevicePixelRatio, (), {
-    var aDevicePixelRatio = window.devicePixelRatio || 1;
+    var aDevicePixelRatio = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
     return aDevicePixelRatio;
   });
 

@@ -6,15 +6,15 @@ interface Props {
   height: number;
 }
 
-const Cylinder: React.FC<Props> = props => <cylinder {...props} />;
+const Cylinder: React.FC<Props> = (props) => <cylinder {...props} />;
 
 const range = {
   control: {
     type: "range",
     min: 1,
     max: 10,
-    step: 0.1
-  }
+    step: 0.1,
+  },
 };
 
 export default {
@@ -23,10 +23,10 @@ export default {
   argTypes: {
     radius: range,
     height: range,
-  }
+  },
 } as Meta;
 
-const Template: Story<Props> = args => <Cylinder {...args} />;
+const Template: Story<Props> = (args) => <Cylinder {...args} />;
 
 export const cylinder = Template.bind({});
 cylinder.args = {

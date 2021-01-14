@@ -4,7 +4,7 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Rotation = "rotation";
@@ -35,11 +35,11 @@ function getAxis(dimension: "x" | "y" | "z", rootContainerInstance: Container) {
 }
 
 export function createInstance(
-  type: Rotation,
+  _type: Rotation,
   props: ElementProps[Rotation],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Rotation> {
   validateProps(props);
   const axis = getAxis(props.axis, rootContainerInstance);
@@ -50,25 +50,23 @@ export function createInstance(
     type: "rotation",
     shape: rootContainerInstance.applyTransform(initialChild, transform),
     data: {
-      transform
+      transform,
     },
     children: [],
     childShape: initialChild,
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Rotation>) {
+export function destroyInstance(instance: Instance<Rotation>): void {
   instance.shape.delete();
   instance.data.transform.delete();
 }
 
 export const hasChildren = true;
 
-export function commitChildren(
-  parentInstance: Instance<Rotation>
-) {
+export function commitChildren(parentInstance: Instance<Rotation>): void {
   const oldShape = parentInstance.shape;
   if (parentInstance.childShape) {
     parentInstance.shape = parentInstance.rootContainerInstance.applyTransform(
@@ -83,8 +81,8 @@ export function commitChildren(
 }
 
 export function prepareUpdate(
-  instance: Instance<Rotation>,
-  type: Rotation,
+  _instance: Instance<Rotation>,
+  _type: Rotation,
   oldProps: ElementProps[Rotation],
   newProps: ElementProps[Rotation],
   rootContainerInstance: Container,
@@ -98,12 +96,12 @@ export function prepareUpdate(
 }
 export function commitUpdate(
   instance: Instance<Rotation>,
-  updatePayload: UpdatePayload,
-  type: Rotation,
-  oldProps: ElementProps[Rotation],
+  _updatePayload: UpdatePayload,
+  _type: Rotation,
+  _oldProps: ElementProps[Rotation],
   newProps: ElementProps[Rotation],
-  internalInstanceHandle: InstanceHandle
-) {
+  _internalInstanceHandle: InstanceHandle
+): void {
   const oldTransform = instance.data.transform;
   const axis = getAxis(newProps.axis, instance.rootContainerInstance);
 

@@ -1,5 +1,5 @@
 /// <reference types="resize-observer-browser" />
-//
+
 import React from "react";
 import reactCadCore from "@react-cad/core";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
@@ -9,14 +9,11 @@ function useStateWhenReady<T>(value: T) {
   const [ready, setReady] = React.useState(true);
   const [myValue, setMyValue] = React.useState(value);
 
-  React.useEffect(
-    () => {
-      if (ready) {
-        setMyValue(value);
-      }
-    },
-    [value, ready] 
-  );
+  React.useEffect(() => {
+    if (ready) {
+      setMyValue(value);
+    }
+  }, [value, ready]);
 
   return [myValue, setReady] as [T, typeof setReady];
 }
@@ -36,7 +33,9 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
       () => wrapperRef.current ?? undefined
     );
 
-    const render = React.useRef<ReturnType<typeof ReactCadRenderer["render"]>>();
+    const render = React.useRef<
+      ReturnType<typeof ReactCadRenderer["render"]>
+    >();
 
     /*
     const [{ width, height }, setDimensions] = React.useState({
@@ -77,10 +76,13 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
           print: console.log,
           printErr: console.warn,
           canvas: canvasRef.current,
-          locateFile: () => reactCadCoreWasm
-        }).then(core => {
+          locateFile: () => reactCadCoreWasm,
+        }).then((core) => {
           setReady(false);
-          render.current = ReactCadRenderer.render(shape, core, () => setReady(true));
+          core.init();
+          render.current = ReactCadRenderer.render(shape, core, () =>
+            setReady(true)
+          );
           core.fitShape();
         });
       }
@@ -93,7 +95,8 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
       }
     }, [latestShape]);
 
-    const width = 640, height = 480;
+    const width = 640,
+      height = 480;
 
     return (
       <div className={className} ref={wrapperRef}>
@@ -101,7 +104,7 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
           style={{
             width: `${width}px`,
             height: `${height}px`,
-            display: "block"
+            display: "block",
           }}
           width={width * window.devicePixelRatio}
           height={height * window.devicePixelRatio}

@@ -101,7 +101,7 @@ export type Container = ReactCadCoreModule & {
 };
 export type HostContext = { nullShape(): Shape };
 export type Type = keyof ElementProps;
-export interface Props {}
+export type Props = ElementProps[keyof ElementProps];
 export interface Instance<T extends Type = Type> {
   type: T;
   shape: Shape;

@@ -25,12 +25,10 @@ export default {
   component: Scale,
   argTypes: {
     factor: range,
-  }
+  },
 } as Meta;
 
-const Template: Story<Props> = args => (
-  <Scale {...args} />
-);
+const Template: Story<Props> = (args) => <Scale {...args} />;
 
 export const scale = Template.bind({});
 scale.args = {

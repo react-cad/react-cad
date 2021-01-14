@@ -14,8 +14,8 @@ const range = {
     type: "range",
     min: 1,
     max: 10,
-    step: 0.1
-  }
+    step: 0.1,
+  },
 };
 
 export default {
@@ -24,15 +24,15 @@ export default {
   argTypes: {
     x: range,
     y: range,
-    z: range
-  }
+    z: range,
+  },
 } as Meta;
 
-const Template: Story<Props> = args => <Box {...args} />;
+const Template: Story<Props> = (args) => <Box {...args} />;
 
 export const box = Template.bind({});
 box.args = {
   x: 5,
   y: 5,
-  z: 5
+  z: 5,
 };

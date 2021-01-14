@@ -4,17 +4,17 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Intersection = "intersection";
 
 export function createInstance(
-  type: Intersection,
-  props: ElementProps[Intersection],
+  _type: Intersection,
+  _props: ElementProps[Intersection],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Intersection> {
   return {
     type: "intersection",
@@ -22,11 +22,11 @@ export function createInstance(
     data: undefined,
     children: [],
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Intersection>) {
+export function destroyInstance(instance: Instance<Intersection>): void {
   instance.shape.delete();
 }
 
@@ -34,7 +34,7 @@ export const hasChildren = true;
 
 export const skipChildUnion = true;
 
-export function commitChildren(parentInstance: Instance<Intersection>) {
+export function commitChildren(parentInstance: Instance<Intersection>): void {
   const oldShape = parentInstance.shape;
   parentInstance.shape = parentInstance.rootContainerInstance.makeIntersection(
     parentInstance.children.map(({ shape }) => shape)
@@ -44,20 +44,20 @@ export function commitChildren(parentInstance: Instance<Intersection>) {
 }
 
 export function prepareUpdate(
-  instance: Instance<Intersection>,
-  type: Intersection,
-  oldProps: ElementProps[Intersection],
-  newProps: ElementProps[Intersection],
-  rootContainerInstance: Container,
-  hostContext: HostContext
+  _instance: Instance<Intersection>,
+  _type: Intersection,
+  _oldProps: ElementProps[Intersection],
+  _newProps: ElementProps[Intersection],
+  _rootContainerInstance: Container,
+  _hostContext: HostContext
 ): UpdatePayload | null {
   return null;
 }
 export function commitUpdate(
-  instance: Instance<Intersection>,
-  updatePayload: UpdatePayload,
-  type: Intersection,
-  oldProps: ElementProps[Intersection],
-  newProps: ElementProps[Intersection],
-  internalInstanceHandle: InstanceHandle
-) {}
+  _instance: Instance<Intersection>,
+  _updatePayload: UpdatePayload,
+  _type: Intersection,
+  _oldProps: ElementProps[Intersection],
+  _newProps: ElementProps[Intersection],
+  _internalInstanceHandle: InstanceHandle
+): void {}
