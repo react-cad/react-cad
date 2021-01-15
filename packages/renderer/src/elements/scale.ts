@@ -4,7 +4,7 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Scale = "scale";
@@ -18,11 +18,11 @@ function validateProps(props: ElementProps[Scale]): boolean {
 }
 
 export function createInstance(
-  type: Scale,
+  _type: Scale,
   props: ElementProps[Scale],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Scale> {
   validateProps(props);
   const transform = rootContainerInstance.makeScale(props.factor);
@@ -31,23 +31,23 @@ export function createInstance(
     type: "scale",
     shape: rootContainerInstance.applyTransform(initialChild, transform),
     data: {
-      transform
+      transform,
     },
     children: [],
     childShape: initialChild,
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Scale>) {
+export function destroyInstance(instance: Instance<Scale>): void {
   instance.shape.delete();
   instance.data.transform.delete();
 }
 
 export const hasChildren = true;
 
-export function commitChildren(parentInstance: Instance<Scale>) {
+export function commitChildren(parentInstance: Instance<Scale>): void {
   const oldShape = parentInstance.shape;
   if (parentInstance.childShape) {
     parentInstance.shape = parentInstance.rootContainerInstance.applyTransform(
@@ -62,8 +62,8 @@ export function commitChildren(parentInstance: Instance<Scale>) {
 }
 
 export function prepareUpdate(
-  instance: Instance<Scale>,
-  type: Scale,
+  _instance: Instance<Scale>,
+  _type: Scale,
   oldProps: ElementProps[Scale],
   newProps: ElementProps[Scale],
   rootContainerInstance: Container,
@@ -77,12 +77,12 @@ export function prepareUpdate(
 }
 export function commitUpdate(
   instance: Instance<Scale>,
-  updatePayload: UpdatePayload,
-  type: Scale,
-  oldProps: ElementProps[Scale],
+  _updatePayload: UpdatePayload,
+  _type: Scale,
+  _oldProps: ElementProps[Scale],
   newProps: ElementProps[Scale],
-  internalInstanceHandle: InstanceHandle
-) {
+  _internalInstanceHandle: InstanceHandle
+): void {
   const oldTransform = instance.data.transform;
 
   instance.data.transform = instance.rootContainerInstance.makeScale(

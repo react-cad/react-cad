@@ -8,10 +8,11 @@ interface Props {
   angle: number;
 }
 
-const Rotation: React.FC<Props> = ({ axis, angle }) => 
+const Rotation: React.FC<Props> = ({ axis, angle }) => (
   <rotation axis={axis} angle={angle}>
     <box x={5} y={5} z={5} />
   </rotation>
+);
 
 export default {
   title: "Transformations/rotation",
@@ -20,8 +21,8 @@ export default {
     axis: {
       control: {
         type: "inline-radio",
-        options: ["x", "y", "z"]
-      }
+        options: ["x", "y", "z"],
+      },
     },
     angle: {
       control: {
@@ -29,17 +30,15 @@ export default {
         min: -Math.PI,
         max: Math.PI,
         step: 0.1,
-      }
-    }
-  }
+      },
+    },
+  },
 } as Meta;
 
-const Template: Story<Props> = args => (
-  <Rotation {...args} />
-);
+const Template: Story<Props> = (args) => <Rotation {...args} />;
 
 export const rotation = Template.bind({});
 rotation.args = {
   axis: "z",
-  angle: 0
+  angle: 0,
 };

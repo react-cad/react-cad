@@ -4,17 +4,17 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Union = "union";
 
 export function createInstance(
-  type: Union,
-  props: ElementProps[Union],
+  _type: Union,
+  _props: ElementProps[Union],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Union> {
   return {
     type: "union",
@@ -22,41 +22,39 @@ export function createInstance(
     data: undefined,
     children: [],
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Union>) {
+export function destroyInstance(instance: Instance<Union>): void {
   instance.shape.delete();
 }
 
 export const hasChildren = true;
 
-export function commitChildren(
-  parentInstance: Instance<Union>
-) {
+export function commitChildren(parentInstance: Instance<Union>): void {
   const oldShape = parentInstance.shape;
-  parentInstance.shape = parentInstance.childShape ?? parentInstance.hostContext.nullShape();
+  parentInstance.shape =
+    parentInstance.childShape ?? parentInstance.hostContext.nullShape();
   parentInstance.notifyParent?.();
   oldShape.delete();
 }
 
 export function prepareUpdate(
-  instance: Instance<Union>,
-  type: Union,
-  oldProps: ElementProps[Union],
-  newProps: ElementProps[Union],
-  rootContainerInstance: Container,
-  hostContext: HostContext
+  _instance: Instance<Union>,
+  _type: Union,
+  _oldProps: ElementProps[Union],
+  _newProps: ElementProps[Union],
+  _rootContainerInstance: Container,
+  _hostContext: HostContext
 ): UpdatePayload | null {
   return null;
 }
 export function commitUpdate(
-  instance: Instance<Union>,
-  updatePayload: UpdatePayload,
-  type: Union,
-  oldProps: ElementProps[Union],
-  newProps: ElementProps[Union],
-  internalInstanceHandle: InstanceHandle
-) {
-}
+  _instance: Instance<Union>,
+  _updatePayload: UpdatePayload,
+  _type: Union,
+  _oldProps: ElementProps[Union],
+  _newProps: ElementProps[Union],
+  _internalInstanceHandle: InstanceHandle
+): void {}

@@ -8,8 +8,6 @@ export const decorators = [
     name: "withReactCadPreview",
     parameterName: "reactCadPreview",
     skipIfNoParametersOrOptions: false,
-    wrapper: (storyFn, context) => (
-      <ReactCadPreview shape={storyFn(context)} />
-    )
-  })
+    wrapper: (storyFn, context) => <ReactCadPreview shape={storyFn(context)} />,
+  }),
 ];

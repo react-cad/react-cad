@@ -2,11 +2,9 @@ export class EmClass {
   delete(): void;
 }
 
-export class Point extends EmClass {
-}
+export class Point extends EmClass {}
 
-export class Axis extends EmClass {
-}
+export class Axis extends EmClass {}
 
 export class Space extends EmClass {
   public static Origin(): Point;
@@ -19,12 +17,11 @@ export class Shape extends EmClass {
   public IsNull(): boolean;
 }
 
-export class Transform extends EmClass {
-}
+export class Transform extends EmClass {}
 
 export class VectorShape extends EmClass {
   public size(): number;
-  public push_back(element: Shape);
+  public push_back(element: Shape): void;
   public get(index: number): Shape;
 }
 
@@ -35,7 +32,13 @@ export interface ReactCadEmscriptenModule extends EmscriptenModule {
   cwrap: typeof cwrap;
   ccall: typeof ccall;
   _main(): number;
-  _onFileDataRead(nameBuffer: number, dataBuffer: number, dataLength: number): null;
+  _onFileDataRead(
+    nameBuffer: number,
+    dataBuffer: number,
+    dataLength: number
+  ): null;
+  init(): void;
+  init2(): void;
   makeBox(x: number, y: number, z: number): Shape;
   makeCylinder(radius: number, height: number): Shape;
   makeSphere(radius: number): Shape;
@@ -54,6 +57,6 @@ export interface ReactCadEmscriptenModule extends EmscriptenModule {
   canvas: HTMLCanvasElement;
 }
 
-const reactCadCore: EmscriptenModuleFactory<ReactCadEmscriptenModule>;
+declare const reactCadCore: EmscriptenModuleFactory<ReactCadEmscriptenModule>;
 
 export default reactCadCore;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@storybook/react";
 
-const Difference: React.FC = props => (
+const Difference: React.FC = (props) => (
   <difference {...props}>
     <sphere radius={3} />
     <box x={5} y={5} z={1} />
@@ -14,6 +14,6 @@ export default {
   component: Difference,
 } as Meta;
 
-const Template: Story = args => <Difference {...args} />;
+const Template: Story = (args) => <Difference {...args} />;
 
 export const difference = Template.bind({});

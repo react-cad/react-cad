@@ -6,7 +6,7 @@ import {
   InstanceHandle,
   Instance,
   Type,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 import * as box from "./box";
@@ -34,7 +34,7 @@ const elements: Record<Type, Element> = {
 
   union,
   difference,
-  intersection
+  intersection,
 };
 
 function getElement(type: Type): Element {
@@ -79,7 +79,7 @@ function updateChildren(parentInstance: Instance) {
 export function appendInitialChild<ParentType extends Type>(
   parentInstance: Instance<ParentType>,
   childInstance: Instance
-) {
+): void {
   parentInstance.children.push(childInstance);
   childInstance.notifyParent = () => updateChildren(parentInstance);
 }
@@ -87,7 +87,7 @@ export function appendInitialChild<ParentType extends Type>(
 export function appendChild<ParentType extends Type>(
   parentInstance: Instance<ParentType>,
   childInstance: Instance
-) {
+): void {
   appendInitialChild(parentInstance, childInstance);
   updateChildren(parentInstance);
 }
@@ -96,7 +96,7 @@ export function insertBefore<ParentType extends Type>(
   parentInstance: Instance<ParentType>,
   childInstance: Instance,
   beforeChild: Instance
-) {
+): void {
   const index = parentInstance.children.indexOf(beforeChild);
   if (index < 0) {
     throw new Error(`insertBefore child does not exist`);
@@ -106,12 +106,15 @@ export function insertBefore<ParentType extends Type>(
   updateChildren(parentInstance);
 }
 
-export function destroyInstance(instance: Instance) {
+export function destroyInstance(instance: Instance): void {
   const element = getElement(instance.type);
   element.destroyInstance(instance);
 }
 
-export function removeChild(parentInstance: Instance, childInstance: Instance) {
+export function removeChild(
+  parentInstance: Instance,
+  childInstance: Instance
+): void {
   const index = parentInstance.children.indexOf(childInstance);
   if (index < 0) {
     throw new Error(`removeChild child does not exist`);
@@ -123,11 +126,11 @@ export function removeChild(parentInstance: Instance, childInstance: Instance) {
 
 export function finalizeInitialChildren<ParentType extends Type>(
   parentInstance: Instance<ParentType>,
-  type: ParentType,
-  props: ElementProps[ParentType],
-  rootContainerInstance: Container,
-  hostContext: HostContext
-) {
+  _type: ParentType,
+  _props: ElementProps[ParentType],
+  _rootContainerInstance: Container,
+  _hostContext: HostContext
+): boolean {
   updateChildren(parentInstance);
   return false;
 }
@@ -162,7 +165,7 @@ export function commitUpdate<T extends Type>(
   oldProps: ElementProps[T],
   newProps: ElementProps[T],
   internalInstanceHandle: InstanceHandle
-) {
+): void {
   const element = elements[type];
   if (element) {
     return element.commitUpdate(

@@ -29,16 +29,14 @@ export default {
     x: range,
     y: range,
     z: range,
-  }
+  },
 } as Meta;
 
-const Template: Story<Props> = args => (
-  <Translation {...args} />
-);
+const Template: Story<Props> = (args) => <Translation {...args} />;
 
 export const translation = Template.bind({});
 translation.args = {
   x: 0,
   y: 0,
-  z: 0
+  z: 0,
 };

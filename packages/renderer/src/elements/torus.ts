@@ -4,7 +4,7 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Torus = "torus";
@@ -21,11 +21,11 @@ function validateProps(props: ElementProps[Torus]): boolean {
 }
 
 export function createInstance(
-  type: Torus,
+  _type: Torus,
   props: ElementProps[Torus],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Torus> {
   validateProps(props);
   return {
@@ -34,21 +34,21 @@ export function createInstance(
     data: undefined,
     children: [],
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Torus>) {
+export function destroyInstance(instance: Instance<Torus>): void {
   instance.shape.delete();
 }
 
 export const hasChildren = false;
 
-export function commitChildren() {}
+export function commitChildren(): void {}
 
 export function prepareUpdate(
-  instance: Instance<Torus>,
-  type: Torus,
+  _instance: Instance<Torus>,
+  _type: Torus,
   oldProps: ElementProps[Torus],
   newProps: ElementProps[Torus],
   rootContainerInstance: Container,
@@ -67,12 +67,12 @@ export function prepareUpdate(
 }
 export function commitUpdate(
   instance: Instance<Torus>,
-  updatePayload: UpdatePayload,
-  type: Torus,
-  oldProps: ElementProps[Torus],
+  _updatePayload: UpdatePayload,
+  _type: Torus,
+  _oldProps: ElementProps[Torus],
   newProps: ElementProps[Torus],
-  internalInstanceHandle: InstanceHandle
-) {
+  _internalInstanceHandle: InstanceHandle
+): void {
   const oldShape = instance.shape;
   (instance.shape = instance.rootContainerInstance.makeTorus(
     newProps.radius1,

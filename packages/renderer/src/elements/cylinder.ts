@@ -4,7 +4,7 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Cylinder = "cylinder";
@@ -21,11 +21,11 @@ function validateProps(props: ElementProps[Cylinder]): boolean {
 }
 
 export function createInstance(
-  type: Cylinder,
+  _type: Cylinder,
   props: ElementProps[Cylinder],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Cylinder> {
   validateProps(props);
   return {
@@ -34,21 +34,21 @@ export function createInstance(
     data: undefined,
     children: [],
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Cylinder>) {
+export function destroyInstance(instance: Instance<Cylinder>): void {
   instance.shape.delete();
 }
 
 export const hasChildren = false;
 
-export function commitChildren() {}
+export function commitChildren(): void {}
 
 export function prepareUpdate(
-  instance: Instance<Cylinder>,
-  type: Cylinder,
+  _instance: Instance<Cylinder>,
+  _type: Cylinder,
   oldProps: ElementProps[Cylinder],
   newProps: ElementProps[Cylinder],
   rootContainerInstance: Container,
@@ -67,14 +67,17 @@ export function prepareUpdate(
 }
 export function commitUpdate(
   instance: Instance<Cylinder>,
-  updatePayload: UpdatePayload,
-  type: Cylinder,
-  oldProps: ElementProps[Cylinder],
+  _updatePayload: UpdatePayload,
+  _type: Cylinder,
+  _oldProps: ElementProps[Cylinder],
   newProps: ElementProps[Cylinder],
-  internalInstanceHandle: InstanceHandle
-) {
+  _internalInstanceHandle: InstanceHandle
+): void {
   const oldShape = instance.shape;
-  instance.shape = instance.rootContainerInstance.makeCylinder(newProps.radius, newProps.height),
-  instance.notifyParent?.();
+  (instance.shape = instance.rootContainerInstance.makeCylinder(
+    newProps.radius,
+    newProps.height
+  )),
+    instance.notifyParent?.();
   oldShape.delete();
 }

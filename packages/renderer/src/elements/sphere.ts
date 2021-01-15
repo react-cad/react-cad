@@ -4,10 +4,10 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
-type Sphere= "sphere";
+type Sphere = "sphere";
 
 function validateProps(props: ElementProps[Sphere]): boolean {
   if (props.radius <= 0) {
@@ -18,11 +18,11 @@ function validateProps(props: ElementProps[Sphere]): boolean {
 }
 
 export function createInstance(
-  type: Sphere,
+  _type: Sphere,
   props: ElementProps[Sphere],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Sphere> {
   validateProps(props);
   return {
@@ -31,21 +31,21 @@ export function createInstance(
     data: undefined,
     children: [],
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Sphere>) {
+export function destroyInstance(instance: Instance<Sphere>): void {
   instance.shape.delete();
 }
 
 export const hasChildren = false;
 
-export function commitChildren() {}
+export function commitChildren(): void {}
 
 export function prepareUpdate(
-  instance: Instance<Sphere>,
-  type: Sphere,
+  _instance: Instance<Sphere>,
+  _type: Sphere,
   oldProps: ElementProps[Sphere],
   newProps: ElementProps[Sphere],
   rootContainerInstance: Container,
@@ -61,14 +61,14 @@ export function prepareUpdate(
 }
 export function commitUpdate(
   instance: Instance<Sphere>,
-  updatePayload: UpdatePayload,
-  type: Sphere,
-  oldProps: ElementProps[Sphere],
+  _updatePayload: UpdatePayload,
+  _type: Sphere,
+  _oldProps: ElementProps[Sphere],
   newProps: ElementProps[Sphere],
-  internalInstanceHandle: InstanceHandle
-) {
+  _internalInstanceHandle: InstanceHandle
+): void {
   const oldShape = instance.shape;
-  instance.shape = instance.rootContainerInstance.makeSphere(newProps.radius),
-  instance.notifyParent?.();
+  (instance.shape = instance.rootContainerInstance.makeSphere(newProps.radius)),
+    instance.notifyParent?.();
   oldShape.delete();
 }

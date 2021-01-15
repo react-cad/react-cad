@@ -4,19 +4,19 @@ import {
   HostContext,
   InstanceHandle,
   Instance,
-  UpdatePayload
+  UpdatePayload,
 } from "../types";
 
 type Box = "box";
 
-function validateProps(props: ElementProps[Box]): boolean {
-  if (props.x <= 0) {
+export function validateProps(props: ElementProps[Box]): boolean {
+  if (!props.x || props.x <= 0) {
     throw new Error(`box: "x" prop must be greater than 0`);
   }
-  if (props.y <= 0) {
+  if (!props.y || props.y <= 0) {
     throw new Error(`box: "y" prop must be greater than 0`);
   }
-  if (props.z <= 0) {
+  if (!props.z || props.z <= 0) {
     throw new Error(`box: "z" prop must be greater than 0`);
   }
 
@@ -24,11 +24,11 @@ function validateProps(props: ElementProps[Box]): boolean {
 }
 
 export function createInstance(
-  type: Box,
+  _type: Box,
   props: ElementProps[Box],
   rootContainerInstance: Container,
   hostContext: HostContext,
-  internalInstanceHandle: InstanceHandle
+  _internalInstanceHandle: InstanceHandle
 ): Instance<Box> {
   validateProps(props);
   return {
@@ -37,21 +37,21 @@ export function createInstance(
     data: undefined,
     children: [],
     rootContainerInstance,
-    hostContext
+    hostContext,
   };
 }
 
-export function destroyInstance(instance: Instance<Box>) {
+export function destroyInstance(instance: Instance<Box>): void {
   instance.shape.delete();
 }
 
 export const hasChildren = false;
 
-export function commitChildren() {}
+export function commitChildren(): void {}
 
 export function prepareUpdate(
-  instance: Instance<Box>,
-  type: Box,
+  _instance: Instance<Box>,
+  _type: Box,
   oldProps: ElementProps[Box],
   newProps: ElementProps[Box],
   rootContainerInstance: Container,
@@ -69,16 +69,21 @@ export function prepareUpdate(
 
   return null;
 }
+
 export function commitUpdate(
   instance: Instance<Box>,
-  updatePayload: UpdatePayload,
-  type: Box,
-  oldProps: ElementProps[Box],
+  _updatePayload: UpdatePayload,
+  _type: Box,
+  _oldProps: ElementProps[Box],
   newProps: ElementProps[Box],
-  internalInstanceHandle: InstanceHandle
-) {
+  _internalInstanceHandle: InstanceHandle
+): void {
   const oldShape = instance.shape;
-  instance.shape = instance.rootContainerInstance.makeBox(newProps.x, newProps.y, newProps.z),
-  instance.notifyParent?.();
+  (instance.shape = instance.rootContainerInstance.makeBox(
+    newProps.x,
+    newProps.y,
+    newProps.z
+  )),
+    instance.notifyParent?.();
   oldShape.delete();
 }
