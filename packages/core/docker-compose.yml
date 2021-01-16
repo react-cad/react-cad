@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  react_cad_core:
+    image: reactcad/build:7.5.0-v2
+    entrypoint: /react-cad/build.sh
+    command: -b /react-cad-build -s /react-cad/src -d /react-cad -f dev
+    volumes:
+      - .:/react-cad
+      - build_dir:/react-cad-build
+
+volumes:
+  build_dir:
