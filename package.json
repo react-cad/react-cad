@@ -19,7 +19,7 @@
     "*.{c,cpp,h}": [
       "clang-format -i -style=file"
     ],
-    "*.{js,jsx,ts,tsx,json,yml}": [
+    "*.{js,jsx,ts,tsx,json}": [
       "eslint --fix",
       "prettier --write --ignore-unknown"
     ]
