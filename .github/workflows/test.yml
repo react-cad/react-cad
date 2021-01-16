@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Lint
-        run: yarn nps lint
+        run: yarn lint
       - name: Build core wasm
         uses: ./.github/actions/build-core
       - name: Build tests
