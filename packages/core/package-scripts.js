@@ -15,8 +15,8 @@ module.exports = {
       compile: "tsc",
       compileWatch: "tsc --watch",
     },
-    build: npsUtils.series.nps("wasm.build", "ts.build"),
-    watch: npsUtils.concurrent.nps("wasm.watch", "ts.watch"),
-    default: npsUtils.concurrent.nps("wasm.watch", "ts.watch"),
+    build: npsUtils.series.nps("ts.build", "wasm.build"),
+    watch: npsUtils.concurrent.nps("ts.watch", "wasm.watch"),
+    default: npsUtils.concurrent.nps("ts.watch", "wasm.watch"),
   },
 };

@@ -20,9 +20,9 @@ jobs:
         run: yarn install
       - name: Lint
         run: yarn nps lint
-      - name: Build wasm
+      - name: Build core wasm
         uses: ./.github/actions/build-core
       - name: Build tests
-        run: yarn nps build.ci.test
+        run: yarn nps build.test.ci
       - name: Test
         run: yarn test
