@@ -5,16 +5,11 @@
   "author": "simlrh",
   "license": "LGPL",
   "scripts": {
-    "setup": "docker build -t react-cad-build .",
-    "build:wasm": "docker run --rm -i -u=`id -u` -v $PWD:/src/react-cad react-cad-build",
-    "build:ts": "tsc",
-    "build": "run-s build:wasm build:ts",
-    "build:wasm:watch": "docker run --rm -i -e 'BUILD_WATCH=true' -u=`id -u` -v $PWD:/src/react-cad react-cad-build",
-    "build:ts:watch": "tsc --watch",
-    "start": "run-p build:wasm:watch build:ts:watch"
+    "start": "nps",
+    "build:ts-only": "nps ts.build",
+    "build": "nps build"
   },
   "devDependencies": {
-    "npm-run-all": "^4.1.5",
     "typescript": "^4.1.3"
   }
 }

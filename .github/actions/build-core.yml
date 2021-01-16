@@ -3,13 +3,13 @@ description: 'Build the core wasm library in docker'
 runs:
   using: 'docker'
   image: 'reactcad/build:7.5.0-v2'
-  entrypoint: ${{ github.workspace }}/build.sh
+  entrypoint: /github/workspace/build.sh
   args:
     - '-b'
-    - ${{ github.workspace }}/build
+    - '/github/workspace/packages/core/build'
     - '-s'
-    - ${{ github.workspace }}/packages/core/src
+    - '/github/workspace/packages/core/src'
     - '-d'
-    - ${{ github.workspace }}
+    - '/github/workspace/packages/core'
     - '-f'
     - 'ci'

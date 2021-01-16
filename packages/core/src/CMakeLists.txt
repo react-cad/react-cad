@@ -60,4 +60,3 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "--bind -s EXTRA_EXPOR
 
 install(TARGETS ${APP_TARGET} DESTINATION lib)
 install(FILES "${CMAKE_BINARY_DIR}/${APP_TARGET}.wasm" DESTINATION lib)
-install(FILES "${APP_TARGET}.d.ts" DESTINATION lib)
