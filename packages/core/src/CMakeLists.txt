@@ -58,10 +58,5 @@ target_link_libraries(
 )
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "--bind -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap']")
 
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "/src/react-cad" CACHE PATH "..." FORCE)
-endif()
-
 install(TARGETS ${APP_TARGET} DESTINATION lib)
 install(FILES "${CMAKE_BINARY_DIR}/${APP_TARGET}.wasm" DESTINATION lib)
-install(FILES "${APP_TARGET}.d.ts" DESTINATION lib)
