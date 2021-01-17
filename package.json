@@ -4,6 +4,7 @@
   "scripts": {
     "start": "nps",
     "build": "nps build",
+    "lint": "nps lint",
     "test": "nps test"
   },
   "husky": {
