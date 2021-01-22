@@ -73,17 +73,14 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
     React.useEffect(() => {
       if (canvasRef.current) {
         reactCadCore({
-          print: console.log,
-          printErr: console.warn,
           canvas: canvasRef.current,
           locateFile: () => reactCadCoreWasm,
         }).then((core) => {
           setReady(false);
-          core.init();
-          render.current = ReactCadRenderer.render(shape, core, () =>
-            setReady(true)
-          );
-          core.fitShape();
+          render.current = ReactCadRenderer.render(shape, core, () => {
+            setReady(true);
+            core.getView().fit();
+          });
         });
       }
     }, []);
@@ -91,7 +88,9 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
     React.useEffect(() => {
       if (render.current) {
         setReady(false);
-        render.current(shape, () => setReady(true));
+        render.current(shape, () => {
+          setReady(true);
+        });
       }
     }, [latestShape]);
 

@@ -8,8 +8,5 @@
     "start": "nps",
     "build:ts-only": "nps ts.build",
     "build": "nps build"
-  },
-  "devDependencies": {
-    "typescript": "^4.1.3"
   }
 }

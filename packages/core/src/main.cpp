@@ -1,7 +1,20 @@
 #include <iostream>
+#include <memory>
+#include <string>
 #include <vector>
 
-#include "WasmOcctView.h"
+#include "ReactCADNode.h"
+#include "ReactCADView.h"
+
+#include "BoxFactory.h"
+#include "CylinderFactory.h"
+#include "DifferenceFactory.h"
+#include "IntersectionFactory.h"
+#include "RotationFactory.h"
+#include "SphereFactory.h"
+#include "TorusFactory.h"
+#include "TranslationFactory.h"
+#include "UnionFactory.h"
 
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
@@ -32,52 +45,46 @@
 #include <emscripten/bind.h>
 #include <emscripten/html5.h>
 
-//! Global viewer instance.
-static WasmOcctView aViewer;
-static Handle(AIS_Shape) aShapePrs;
-
-void clearShape()
+std::shared_ptr<ReactCADNode> createCADNode(std::string type)
 {
-  AIS_ListOfInteractive aShapes;
-  aViewer.Context()->DisplayedObjects(AIS_KOI_Shape, -1, aShapes);
-  for (AIS_ListOfInteractive::Iterator aShapeIter(aShapes); aShapeIter.More(); aShapeIter.Next())
+  if (type == "box")
   {
-    aViewer.Context()->Remove(aShapeIter.Value(), false);
+    return std::make_shared<ReactCADNode>(new BoxFactory());
   }
-  aViewer.View()->Redraw();
-}
+  if (type == "cylinder")
+  {
+    return std::make_shared<ReactCADNode>(new CylinderFactory());
+  }
+  if (type == "difference")
+  {
+    return std::make_shared<ReactCADNode>(new DifferenceFactory());
+  }
+  if (type == "intersection")
+  {
+    return std::make_shared<ReactCADNode>(new IntersectionFactory());
+  }
+  if (type == "rotation")
+  {
+    return std::make_shared<ReactCADNode>(new RotationFactory());
+  }
+  if (type == "sphere")
+  {
+    return std::make_shared<ReactCADNode>(new SphereFactory());
+  }
+  if (type == "torus")
+  {
+    return std::make_shared<ReactCADNode>(new TorusFactory());
+  }
+  if (type == "translation")
+  {
+    return std::make_shared<ReactCADNode>(new TranslationFactory());
+  }
+  if (type == "union")
+  {
+    return std::make_shared<ReactCADNode>(new UnionFactory());
+  }
 
-void setShape(TopoDS_Shape &aShape)
-{
-  clearShape();
-
-  aShapePrs->SetShape(aShape);
-  aShapePrs->SetMaterial(Graphic3d_NameOfMaterial_Silver);
-  aViewer.Context()->Display(aShapePrs, AIS_Shaded, 0, false);
-  aViewer.View()->Redraw();
-}
-
-void fitShape()
-{
-  aViewer.View()->FitAll(0.1, false);
-  aViewer.View()->Redraw();
-}
-
-TopoDS_Shape copyShape(TopoDS_Shape &aShape)
-{
-  return BRepBuilderAPI_Copy(aShape);
-}
-
-TopoDS_Shape makeBox(double x, double y, double z)
-{
-  BRepPrimAPI_MakeBox aBox(x, y, z);
-  return aBox.Solid();
-}
-
-TopoDS_Shape makeCylinder(double radius, double height)
-{
-  BRepPrimAPI_MakeCylinder aCylinder(radius, height);
-  return aCylinder.Solid();
+  return std::make_shared<ReactCADNode>(new BoxFactory());
 }
 
 TopoDS_Shape makeSphere(double radius)
@@ -222,7 +229,7 @@ extern "C" void onMainLoop()
   emscripten_cancel_main_loop();
 }
 
-int init()
+int main()
 {
   Message::DefaultMessenger()->Printers().First()->SetTraceLevel(Message_Trace);
   Handle(Message_PrinterSystemLog) aJSConsolePrinter = new Message_PrinterSystemLog("webgl-sample", Message_Trace);
@@ -235,46 +242,50 @@ int init()
   // eglSwapInterval()
   emscripten_set_main_loop(onMainLoop, -1, 0);
 
-  aViewer.run();
-  aShapePrs = new AIS_Shape(makeBox(1, 1, 1));
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
 
   return 0;
-}
-
-void init2()
-{
-  exit(0);
 }
 
 using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(react_cad)
 {
-  function("init", &init);
-  function("init2", &init2);
+  emscripten::class_<ReactCADNode>("ReactCADNode")
+      .smart_ptr<std::shared_ptr<ReactCADNode>>("ReactCADNode")
+      .function("setProps", &ReactCADNode::setProps)
+      .function("appendChild", &ReactCADNode::appendChild)
+      .function("insertChildBefore", &ReactCADNode::insertChildBefore)
+      .function("removeChild", &ReactCADNode::removeChild)
+      .function("hasParent", &ReactCADNode::hasParent)
+      .function("render", &ReactCADNode::render)
+      .property("shape", &ReactCADNode::shape);
+
+  emscripten::class_<ReactCADView>("ReactCADView")
+      .smart_ptr<std::shared_ptr<ReactCADView>>("ReactCADView")
+      .function("addNode", &ReactCADView::addNode)
+      .function("removeNode", &ReactCADView::removeNode)
+      .function("renderNodes", &ReactCADView::renderNodes)
+      .function("fit", &ReactCADView::fit);
+
+  function("createCADNode", &createCADNode);
+  function("getView", &ReactCADView::getView);
+
   class_<gp>("Space")
       .class_function("Origin", &gp::Origin)
       .class_function("OX", &gp::OX)
       .class_function("OY", &gp::OY)
       .class_function("OZ", &gp::OZ);
+
   class_<gp_Pnt>("Point");
   class_<gp_Ax1>("Axis");
-  class_<TopoDS_Shape>("Shape").constructor<>().function("IsNull", &TopoDS_Shape::IsNull);
-  register_vector<TopoDS_Shape>("VectorShape");
   class_<gp_Trsf>("Transform");
-  function("setShape", &setShape);
-  function("fitShape", &fitShape);
-  function("clearShape", &clearShape);
-  function("makeBox", &makeBox);
-  function("makeCylinder", &makeCylinder);
   function("makeSphere", &makeSphere);
   function("makeTorus", &makeTorus);
   function("makeRotation", &makeRotation);
   function("makeTranslation", &makeTranslation);
   function("makeScale", &makeScale);
   function("applyTransform", &applyTransform);
-  function("copyShape", &copyShape);
   function("makeUnion", &makeUnion);
   function("makeDifference", &makeDifference);
   function("makeIntersection", &makeIntersection);
