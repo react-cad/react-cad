@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE
 
-#include "WasmOcctView.h"
+#include "ReactCADView.h"
 
 #include "WasmVKeys.h"
 
@@ -37,48 +37,46 @@
 
 #include <iostream>
 
+// clang-format off
 namespace
 {
-// clang-format off
-EM_JS(void, jsInitCanvas, (), { specialHTMLTargets["!canvas"] = Module.canvas; });
+  EM_JS(void, jsInitCanvas, (), {
+    specialHTMLTargets["!canvas"] = Module.canvas;
+  });
 
-EM_JS(int, jsCanvasGetWidth, (), { return Module.canvas.width; });
+  EM_JS(int, jsCanvasGetWidth, (), {
+    return Module.canvas.width;
+  });
 
-EM_JS(int, jsCanvasGetHeight, (), { return Module.canvas.height; });
+  EM_JS(int, jsCanvasGetHeight, (), {
+    return Module.canvas.height;
+  });
 
-EM_JS(float, jsDevicePixelRatio, (), {
-  var aDevicePixelRatio = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-  return aDevicePixelRatio;
-});
-// clang-format on
-//! Return cavas size in pixels.
-static Graphic3d_Vec2i jsCanvasSize()
-{
-  return Graphic3d_Vec2i(jsCanvasGetWidth(), jsCanvasGetHeight());
-}
+  EM_JS(float, jsDevicePixelRatio, (), {
+    var aDevicePixelRatio = window.devicePixelRatio || 1;
+    return aDevicePixelRatio;
+  });
+
+  //! Return cavas size in pixels.
+  static Graphic3d_Vec2i jsCanvasSize()
+  {
+    return Graphic3d_Vec2i (jsCanvasGetWidth(), jsCanvasGetHeight());
+  }
 } // namespace
+// clang-format on
 
-// ================================================================
-// Function : WasmOcctView
-// Purpose  :
-// ================================================================
-WasmOcctView::WasmOcctView() : myDevicePixelRatio(1.0f), myUpdateRequests(0)
+std::shared_ptr<ReactCADView> ReactCADView::singleton = nullptr;
+
+std::shared_ptr<ReactCADView> ReactCADView::getView()
 {
+  if (singleton == nullptr)
+  {
+    singleton.reset(new ReactCADView());
+  }
+  return singleton;
 }
 
-// ================================================================
-// Function : ~WasmOcctView
-// Purpose  :
-// ================================================================
-WasmOcctView::~WasmOcctView()
-{
-}
-
-// ================================================================
-// Function : run
-// Purpose  :
-// ================================================================
-void WasmOcctView::run()
+ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0)
 {
   initWindow();
   initViewer();
@@ -90,23 +88,59 @@ void WasmOcctView::run()
 
   myView->MustBeResized();
   myView->Redraw();
+}
 
-  // There is no infinite message loop, main() will return from here
-  // immediately. Tell that our Module should be left loaded and handle events
-  // through callbacks.
-  // emscripten_set_main_loop (redrawView, 60, 1);
-  // emscripten_set_main_loop (redrawView, -1, 1);
-  // EM_ASM(Module['noExitRuntime'] = true);
+// ================================================================
+// Function : ~ReactCADView
+// Purpose  :
+// ================================================================
+ReactCADView::~ReactCADView()
+{
+}
+
+void ReactCADView::addNode(std::shared_ptr<ReactCADNode> node)
+{
+  Handle(AIS_Shape) shape = new AIS_Shape(TopoDS_Shape());
+  shape->SetMaterial(Graphic3d_NameOfMaterial_Aluminum);
+  myContext->Display(shape, AIS_Shaded, 0, false);
+  myView->Redraw();
+  myNodes.insert(std::pair<std::shared_ptr<ReactCADNode>, Handle(AIS_Shape)>(node, shape));
+}
+
+void ReactCADView::removeNode(std::shared_ptr<ReactCADNode> node)
+{
+  Handle(AIS_Shape) shape = myNodes.at(node);
+  myContext->Remove(shape, false);
+  myView->Redraw();
+  myNodes.erase(node);
+}
+
+void ReactCADView::renderNodes()
+{
+  for (auto it = std::begin(myNodes); it != std::end(myNodes); ++it)
+  {
+    std::shared_ptr<ReactCADNode> node = it->first;
+    Handle(AIS_Shape) shape = it->second;
+    node->render();
+    shape->SetShape(node->shape);
+    myContext->Redisplay(shape, false);
+  }
+  myView->Redraw();
+}
+
+void ReactCADView::fit()
+{
+  myView->FitAll(0.1, false);
+  myView->Redraw();
 }
 
 // ================================================================
 // Function : initWindow
 // Purpose  :
 // ================================================================
-void WasmOcctView::initWindow()
+void ReactCADView::initWindow()
 {
   jsInitCanvas();
-  myDevicePixelRatio = jsDevicePixelRatio();
   const char *aTargetId = "!canvas";
   const EM_BOOL toUseCapture(EM_TRUE);
   emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onResizeCallback);
@@ -135,7 +169,7 @@ void WasmOcctView::initWindow()
 // Function : dumpGlInfo
 // Purpose  :
 // ================================================================
-void WasmOcctView::dumpGlInfo(bool theIsBasic)
+void ReactCADView::dumpGlInfo(bool theIsBasic)
 {
   TColStd_IndexedDataMapOfStringString aGlCapsDict;
   myView->DiagnosticInformation(aGlCapsDict,
@@ -180,7 +214,7 @@ void WasmOcctView::dumpGlInfo(bool theIsBasic)
 // Function : initPixelScaleRatio
 // Purpose  :
 // ================================================================
-void WasmOcctView::initPixelScaleRatio()
+void ReactCADView::initPixelScaleRatio()
 {
   SetTouchToleranceScale(myDevicePixelRatio);
   if (!myView.IsNull())
@@ -209,7 +243,7 @@ void WasmOcctView::initPixelScaleRatio()
 // Function : initViewer
 // Purpose  :
 // ================================================================
-bool WasmOcctView::initViewer()
+bool ReactCADView::initViewer()
 {
   // Build with "--preload-file MyFontFile.ttf" option
   // and register font in Font Manager to use custom font(s).
@@ -278,7 +312,7 @@ bool WasmOcctView::initViewer()
 // Function : initDemoScene
 // Purpose  :
 // ================================================================
-void WasmOcctView::initDemoScene()
+void ReactCADView::initDemoScene()
 {
   if (myContext.IsNull())
   {
@@ -309,7 +343,7 @@ void WasmOcctView::initDemoScene()
 // Function : updateView
 // Purpose  :
 // ================================================================
-void WasmOcctView::updateView()
+void ReactCADView::updateView()
 {
   if (!myView.IsNull())
   {
@@ -324,7 +358,7 @@ void WasmOcctView::updateView()
 // Function : redrawView
 // Purpose  :
 // ================================================================
-void WasmOcctView::redrawView()
+void ReactCADView::redrawView()
 {
   if (!myView.IsNull())
   {
@@ -336,7 +370,7 @@ void WasmOcctView::redrawView()
 // Function : handleViewRedraw
 // Purpose  :
 // ================================================================
-void WasmOcctView::handleViewRedraw(const Handle(AIS_InteractiveContext) & theCtx, const Handle(V3d_View) & theView)
+void ReactCADView::handleViewRedraw(const Handle(AIS_InteractiveContext) & theCtx, const Handle(V3d_View) & theView)
 {
   myUpdateRequests = 0;
   AIS_ViewController::handleViewRedraw(theCtx, theView);
@@ -352,7 +386,7 @@ void WasmOcctView::handleViewRedraw(const Handle(AIS_InteractiveContext) & theCt
 // Function : onResizeEvent
 // Purpose  :
 // ================================================================
-EM_BOOL WasmOcctView::onResizeEvent(int theEventType, const EmscriptenUiEvent *theEvent)
+EM_BOOL ReactCADView::onResizeEvent(int theEventType, const EmscriptenUiEvent *theEvent)
 {
   (void)theEventType; // EMSCRIPTEN_EVENT_RESIZE or EMSCRIPTEN_EVENT_CANVASRESIZED
   (void)theEvent;
@@ -389,7 +423,7 @@ EM_BOOL WasmOcctView::onResizeEvent(int theEventType, const EmscriptenUiEvent *t
 // Function : onMouseEvent
 // Purpose  :
 // ================================================================
-EM_BOOL WasmOcctView::onMouseEvent(int theEventType, const EmscriptenMouseEvent *theEvent)
+EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent *theEvent)
 {
   if (myView.IsNull())
   {
@@ -473,7 +507,7 @@ EM_BOOL WasmOcctView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
 // Function : onWheelEvent
 // Purpose  :
 // ================================================================
-EM_BOOL WasmOcctView::onWheelEvent(int theEventType, const EmscriptenWheelEvent *theEvent)
+EM_BOOL ReactCADView::onWheelEvent(int theEventType, const EmscriptenWheelEvent *theEvent)
 {
   if (myView.IsNull() || theEventType != EMSCRIPTEN_EVENT_WHEEL)
   {
@@ -517,7 +551,7 @@ EM_BOOL WasmOcctView::onWheelEvent(int theEventType, const EmscriptenWheelEvent 
 // Function : onTouchEvent
 // Purpose  :
 // ================================================================
-EM_BOOL WasmOcctView::onTouchEvent(int theEventType, const EmscriptenTouchEvent *theEvent)
+EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent *theEvent)
 {
   const double aClickTolerance = 5.0;
   if (myView.IsNull())
@@ -603,7 +637,7 @@ EM_BOOL WasmOcctView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
 // Function : onKeyDownEvent
 // Purpose  :
 // ================================================================
-EM_BOOL WasmOcctView::onKeyDownEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent)
+EM_BOOL ReactCADView::onKeyDownEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent)
 {
   if (myView.IsNull() || theEventType != EMSCRIPTEN_EVENT_KEYDOWN) // EMSCRIPTEN_EVENT_KEYPRESS
   {
@@ -633,7 +667,7 @@ EM_BOOL WasmOcctView::onKeyDownEvent(int theEventType, const EmscriptenKeyboardE
 // Function : onKeyUpEvent
 // Purpose  :
 // ================================================================
-EM_BOOL WasmOcctView::onKeyUpEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent)
+EM_BOOL ReactCADView::onKeyUpEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent)
 {
   if (myView.IsNull() || theEventType != EMSCRIPTEN_EVENT_KEYUP)
   {

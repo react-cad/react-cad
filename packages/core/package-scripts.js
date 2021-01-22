@@ -13,7 +13,7 @@ module.exports = {
       watch: npsUtils.series.nps("ts.copy", "ts.compileWatch"),
       copy: "cp src/react-cad-core.d.ts lib",
       compile: "tsc",
-      compileWatch: "tsc --watch",
+      compileWatch: "tsc --watch --preserveWatchOutput",
     },
     build: npsUtils.series.nps("ts.build", "wasm.build"),
     watch: npsUtils.concurrent.nps("ts.watch", "wasm.watch"),

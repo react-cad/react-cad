@@ -167,7 +167,7 @@ function watch(){
     fswatch -o --event Updated ${src} \
         | \
         while read event; do \
-          build ${build_dir}; \
+          build ${build_dir} || true; \
           read event;
         done &
 

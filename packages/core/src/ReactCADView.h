@@ -21,30 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE
 
-#ifndef WasmOcctView_HeaderFile
-#define WasmOcctView_HeaderFile
+#ifndef ReactCADView_HeaderFile
+#define ReactCADView_HeaderFile
+
+#include "ReactCADNode.h"
+
+#include <map>
+#include <memory>
 
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_Shape.hxx>
 #include <AIS_ViewController.hxx>
+#include <TopoDS_Shape.hxx>
 #include <V3d_View.hxx>
 
 #include <emscripten.h>
+#include <emscripten/bind.h>
 #include <emscripten/html5.h>
 
 class AIS_ViewCube;
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
-class WasmOcctView : protected AIS_ViewController
+class ReactCADView : protected AIS_ViewController
 {
 public:
-  //! Default constructor.
-  WasmOcctView();
+  static std::shared_ptr<ReactCADView> getView();
 
   //! Destructor.
-  virtual ~WasmOcctView();
+  virtual ~ReactCADView();
 
-  //! Main application entry point.
-  void run();
+  void addNode(std::shared_ptr<ReactCADNode> node);
+  void removeNode(std::shared_ptr<ReactCADNode> node);
+  void renderNodes();
+
+  void fit();
 
   //! Return interactive context.
   const Handle(AIS_InteractiveContext) & Context() const
@@ -58,13 +68,11 @@ public:
     return myView;
   }
 
-  //! Return device pixel ratio for handling high DPI displays.
-  float DevicePixelRatio() const
-  {
-    return myDevicePixelRatio;
-  }
-
 private:
+  static std::shared_ptr<ReactCADView> singleton;
+  //! Default constructor.
+  ReactCADView();
+
   //! Create window.
   void initWindow();
 
@@ -130,37 +138,37 @@ private:
 private:
   static EM_BOOL onResizeCallback(int theEventType, const EmscriptenUiEvent *theEvent, void *theView)
   {
-    return ((WasmOcctView *)theView)->onResizeEvent(theEventType, theEvent);
+    return ((ReactCADView *)theView)->onResizeEvent(theEventType, theEvent);
   }
 
   static void onRedrawView(void *theView)
   {
-    return ((WasmOcctView *)theView)->redrawView();
+    return ((ReactCADView *)theView)->redrawView();
   }
 
   static EM_BOOL onMouseCallback(int theEventType, const EmscriptenMouseEvent *theEvent, void *theView)
   {
-    return ((WasmOcctView *)theView)->onMouseEvent(theEventType, theEvent);
+    return ((ReactCADView *)theView)->onMouseEvent(theEventType, theEvent);
   }
 
   static EM_BOOL onWheelCallback(int theEventType, const EmscriptenWheelEvent *theEvent, void *theView)
   {
-    return ((WasmOcctView *)theView)->onWheelEvent(theEventType, theEvent);
+    return ((ReactCADView *)theView)->onWheelEvent(theEventType, theEvent);
   }
 
   static EM_BOOL onTouchCallback(int theEventType, const EmscriptenTouchEvent *theEvent, void *theView)
   {
-    return ((WasmOcctView *)theView)->onTouchEvent(theEventType, theEvent);
+    return ((ReactCADView *)theView)->onTouchEvent(theEventType, theEvent);
   }
 
   static EM_BOOL onKeyDownCallback(int theEventType, const EmscriptenKeyboardEvent *theEvent, void *theView)
   {
-    return ((WasmOcctView *)theView)->onKeyDownEvent(theEventType, theEvent);
+    return ((ReactCADView *)theView)->onKeyDownEvent(theEventType, theEvent);
   }
 
   static EM_BOOL onKeyUpCallback(int theEventType, const EmscriptenKeyboardEvent *theEvent, void *theView)
   {
-    return ((WasmOcctView *)theView)->onKeyUpEvent(theEventType, theEvent);
+    return ((ReactCADView *)theView)->onKeyUpEvent(theEventType, theEvent);
   }
 
 private:
@@ -172,6 +180,7 @@ private:
   OSD_Timer myDoubleTapTimer;               //!< timer for handling double tap
   float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
   unsigned int myUpdateRequests;            //!< counter for unhandled update requests
+  std::map<std::shared_ptr<ReactCADNode>, Handle(AIS_Shape)> myNodes;
 };
 
-#endif // _WasmOcctView_HeaderFile
+#endif // _ReactCADView_HeaderFile
