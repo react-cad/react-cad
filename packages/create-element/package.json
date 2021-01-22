@@ -1,0 +1,8 @@
+{
+  "name": "@react-cad/create-element",
+  "version": "0.1.0",
+  "license": "MIT",
+  "bin": {
+    "create-element": "lib/cli.js"
+  }
+}

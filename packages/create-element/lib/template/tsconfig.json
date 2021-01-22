@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/@react-cad/renderer/types"
+    ]
+  },
+  "include": ["./src/**/*"]
+}
