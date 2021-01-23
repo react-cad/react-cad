@@ -12,7 +12,7 @@ export interface Element {
   ): UpdatePayload | null;
 }
 
-export interface ElementProps {
+export interface ReactCADElements {
   box: {
     x: number;
     y: number;
@@ -30,30 +30,25 @@ export interface ElementProps {
     radius2: number;
   };
 
-  rotation: {
+  rotation: React.PropsWithChildren<{
     axis: "x" | "y" | "z";
     angle: number;
-    children?: React.ReactNode;
-  };
-  translation: {
+  }>;
+  translation: React.PropsWithChildren<{
     x: number;
     y: number;
     z: number;
-  };
-  scale: {
+  }>;
+  scale: React.PropsWithChildren<{
     factor: number;
-  };
+  }>;
 
-  union: {
-    children?: React.ReactNode;
-  };
-  difference: {
-    children?: React.ReactNode;
-  };
-  intersection: {
-    children?: React.ReactNode;
-  };
+  union: React.PropsWithChildren<unknown>;
+  difference: React.PropsWithChildren<unknown>;
+  intersection: React.PropsWithChildren<unknown>;
 }
+
+export type ElementProps = ReactCADElements;
 
 export type Container = {
   core: ReactCadCoreModule;

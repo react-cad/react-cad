@@ -1,6 +1,6 @@
 {
   "name": "@react-cad/renderer",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "tsc --watch --preserveWatchOutput"
   },
   "devDependencies": {
-    "@react-cad/core": "^1.0.0",
+    "@react-cad/core": "^0.1.0",
     "react": "^17.0.1",
     "react-reconciler": "^0.26.1"
   }
