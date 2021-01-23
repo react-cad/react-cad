@@ -1,3 +1,4 @@
 # TODO: A better way to ensure this directory exists with correct permissions during ci
 *
+!.npmignore
 !.gitignore
