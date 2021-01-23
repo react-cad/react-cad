@@ -284,7 +284,9 @@ bool ReactCADView::initViewer()
   myView = new V3d_View(aViewer);
   myView->SetImmediateUpdate(false);
   myView->ChangeRenderingParams().Resolution = (unsigned int)(96.0 * myDevicePixelRatio + 0.5);
+#ifdef REACTCAD_DEBUG
   myView->ChangeRenderingParams().ToShowStats = true;
+#endif
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);

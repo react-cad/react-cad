@@ -34,7 +34,7 @@ function copyDir(fromPath, toPath) {
 const templatePath = path.join(__dirname, 'template');
 const packagePath = path.join(cwd, packageName);
 
-console.log(`Creating @react-cad element in ${packagePath}`);
+console.log(`Creating @react-cad component in ${packagePath}`);
 
 fs.mkdirSync(packagePath)
 copyDir(templatePath, packagePath);
