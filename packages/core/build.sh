@@ -24,6 +24,7 @@ function show_help() {
 Usage: ${0##*/} -b BUILD_DIR -s SOURCE_DIR -d DEST_DIR -f [ setup | build | watch | ci]
 Sets up, builds or watches the @react-cad/core wasm library
     -h                             Display this help and exit.
+    -t BUILD_TYPE                  Release or Debug (defaults to Debug unless function is "ci")
     -b BUILD_DIR                   Location of working dir
     -s SOURCE_DIR                  Location of source code
     -d DEST_DIR                    Location to install binary
@@ -45,11 +46,13 @@ function parse_options() {
     # It is a good idea to make OPTIND local if you process options in a function.
     local OPTIND=1
 
-    while getopts h:b:s:d:f: opt; do
+    while getopts h:t:b:s:d:f: opt; do
         case $opt in
             h)
                 show_help
                 exit 0
+                ;;
+            t)  BUILD_TYPE=$OPTARG
                 ;;
             b)  BUILD_DIR=$OPTARG
                 ;;
@@ -107,6 +110,10 @@ function parse_options() {
         show_help >&2
         exit 1
     fi
+
+    if [ ! "${BUILD_TYPE}" ]; then
+        BUILD_TYPE=Debug
+    fi
 }
 
 #######################################
@@ -122,11 +129,13 @@ function setup(){
     local src=${1}
     local dest=${2}
     local build_dir=${3}
+    local build_type=${4}
 
     mkdir -p ${build_dir} && cd ${build_dir}
     emcmake cmake ${src} \
       -DOpenCASCADE_DIR=/opt/occt/lib/cmake/opencascade \
-      -DCMAKE_INSTALL_PREFIX=${dest}
+      -DCMAKE_INSTALL_PREFIX=${dest} \
+      -DCMAKE_BUILD_TYPE=${build_type}
 }
 
 #######################################
@@ -142,7 +151,7 @@ function build(){
     local build_dir=${1}
 
     cd ${build_dir}
-    emmake make install
+    emmake make -j`nproc` install
 }
 
 #######################################
@@ -168,7 +177,6 @@ function watch(){
         | \
         while read event; do \
           build ${build_dir} || true; \
-          read event;
         done &
 
     local child=$!
@@ -179,7 +187,7 @@ function watch(){
 #######################################
 # Main script logic
 # Globals:
-#   SOURCE_DIR DEST_DIR BUILD_DIR
+#   SOURCE_DIR DEST_DIR BUILD_DIR BUILD_TYPE
 # Arguments:
 #   None
 # Returns:
@@ -190,14 +198,14 @@ function main(){
 
     # Logic to select the action to take on the script
     if [[ "${FUNCTION}" == 'ci' ]]; then
-        setup ${SOURCE_DIR} ${DEST_DIR} ${BUILD_DIR}
+        setup ${SOURCE_DIR} ${DEST_DIR} ${BUILD_DIR} Release
         build ${BUILD_DIR}
     elif [[ "${FUNCTION}" == 'dev' ]]; then
-        setup ${SOURCE_DIR} ${DEST_DIR} ${BUILD_DIR}
+        setup ${SOURCE_DIR} ${DEST_DIR} ${BUILD_DIR} ${BUILD_TYPE}
         build ${BUILD_DIR}
         watch ${SOURCE_DIR} ${BUILD_DIR}
     elif [[ "${FUNCTION}" == 'setup' ]]; then
-        setup ${SOURCE_DIR} ${DEST_DIR} ${BUILD_DIR}
+        setup ${SOURCE_DIR} ${DEST_DIR} ${BUILD_DIR} ${BUILD_TYPE}
     elif [[ "${FUNCTION}" == 'build' ]]; then
         build ${BUILD_DIR}
     elif [[ "${FUNCTION}" == 'watch' ]]; then

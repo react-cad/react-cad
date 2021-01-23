@@ -1,6 +1,6 @@
 import React from "react";
 import ReactReconciler from "react-reconciler";
-import { ReactCadCoreModule } from "@react-cad/core";
+import { ReactCADCore } from "@react-cad/core";
 
 import {
   Type,
@@ -179,7 +179,7 @@ const reconcilerInstance = ReactReconciler(HostConfig);
 interface Renderer {
   render(
     element: React.ReactElement,
-    core: ReactCadCoreModule,
+    core: ReactCADCore,
     callback?: () => void
   ): (element: React.ReactElement, callback?: () => void) => void;
 }

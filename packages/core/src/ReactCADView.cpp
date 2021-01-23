@@ -26,7 +26,6 @@
 #include "WasmVKeys.h"
 
 #include <AIS_Shape.hxx>
-#include <AIS_ViewCube.hxx>
 #include <Aspect_DisplayConnection.hxx>
 #include <Aspect_Handle.hxx>
 #include <Aspect_NeutralWindow.hxx>
@@ -123,7 +122,7 @@ void ReactCADView::renderNodes()
     Handle(AIS_Shape) shape = it->second;
     node->render();
     shape->SetShape(node->shape);
-    myContext->Redisplay(shape, false);
+    myContext->Redisplay(shape, false, true);
   }
   myView->Redraw();
 }
@@ -224,18 +223,6 @@ void ReactCADView::initPixelScaleRatio()
   if (!myContext.IsNull())
   {
     myContext->SetPixelTolerance(int(myDevicePixelRatio * 6.0));
-    if (!myViewCube.IsNull())
-    {
-      static const double THE_CUBE_SIZE = 60.0;
-      myViewCube->SetSize(myDevicePixelRatio * THE_CUBE_SIZE, false);
-      myViewCube->SetBoxFacetExtension(myViewCube->Size() * 0.15);
-      myViewCube->SetAxesPadding(myViewCube->Size() * 0.10);
-      myViewCube->SetFontHeight(THE_CUBE_SIZE * 0.16);
-      if (myViewCube->HasInteractiveContext())
-      {
-        myContext->Redisplay(myViewCube, false);
-      }
-    }
   }
 }
 
@@ -301,7 +288,10 @@ bool ReactCADView::initViewer()
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);
+
+#ifdef REACTCAD_DEBUG
   dumpGlInfo(false);
+#endif
 
   myContext = new AIS_InteractiveContext(aViewer);
   initPixelScaleRatio();
@@ -322,18 +312,8 @@ void ReactCADView::initDemoScene()
   // myView->TriedronDisplay (Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.08,
   // V3d_WIREFRAME);
 
-  myViewCube = new AIS_ViewCube();
   // presentation parameters
   initPixelScaleRatio();
-  myViewCube->SetTransformPersistence(
-      new Graphic3d_TransformPers(Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_LOWER, Graphic3d_Vec2i(100, 100)));
-  myViewCube->Attributes()->SetDatumAspect(new Prs3d_DatumAspect());
-  myViewCube->Attributes()->DatumAspect()->SetTextAspect(myTextStyle);
-  // animation parameters
-  myViewCube->SetViewAnimation(myViewAnimation);
-  myViewCube->SetFixedAnimationLoop(false);
-  myViewCube->SetAutoStartAnimation(true);
-  myContext->Display(myViewCube, false);
 
   // Build with "--preload-file MySampleFile.brep" option to load some shapes
   // here.

@@ -1,8 +1,6 @@
 #include <BRepPrimAPI_MakeTorus.hxx>
 
 #include "TorusFactory.h"
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 
 TorusFactory::TorusFactory() : radius1(1), radius2(1)
 {
