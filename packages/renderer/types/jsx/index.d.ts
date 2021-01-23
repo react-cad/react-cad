@@ -1,4 +1,4 @@
-import { ElementProps } from "../../src/types";
+import { ElementProps } from "../../lib/types";
 
 declare global {
   namespace JSX {
