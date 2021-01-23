@@ -1,11 +1,26 @@
 {
   "name": "@react-cad/renderer",
+  "description": "Custom React renderer for @react-cad CAD system",
   "version": "0.1.0",
   "main": "lib/index.js",
+  "files": [
+    "lib/**/*",
+    "types/**/*"
+  ],
   "license": "MIT",
+  "repository": "github:react-cad/react-cad",
+  "homepage": "https://github.com/react-cad/react-cad",
+  "bugs": "https://github.com/react-cad/react-cad/issues",
+  "author": {
+    "name": "React CAD Dev",
+    "email": "react.cad.dev@gmail.com"
+  },
   "scripts": {
     "build": "tsc",
     "start": "tsc --watch --preserveWatchOutput"
+  },
+  "peerDependencies": {
+    "@react-cad/core": "^0.1.0"
   },
   "devDependencies": {
     "@react-cad/core": "^0.1.0",

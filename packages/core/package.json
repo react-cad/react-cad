@@ -1,8 +1,16 @@
 {
   "name": "@react-cad/core",
   "version": "0.1.0",
+  "description": "Core WebAssembly library for @react-cad CAD system",
   "main": "lib/react-cad-core.js",
-  "author": "simlrh",
+  "files": ["lib/**/*", "licenses/**/*"],
+  "repository": "github:react-cad/react-cad",
+  "homepage": "https://github.com/react-cad/react-cad",
+  "bugs": "https://github.com/react-cad/react-cad/issues",
+  "author": {
+    "name": "React CAD Dev",
+    "email": "react.cad.dev@gmail.com"
+  },
   "license": "LGPL-2.1-only",
   "scripts": {
     "start": "nps",
