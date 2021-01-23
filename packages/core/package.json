@@ -1,6 +1,6 @@
 {
   "name": "@react-cad/core",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "Core WebAssembly library for @react-cad CAD system",
   "main": "lib/react-cad-core.js",
   "module": "lib/react-cad-core.esm.js",
