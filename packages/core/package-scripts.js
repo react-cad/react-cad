@@ -5,7 +5,7 @@ module.exports = {
   scripts: {
     wasm: {
       build:
-        "docker-compose run --rm react_cad_core -b /react-cad-build -s /react-cad/src -d react-cad -f ci",
+        "docker-compose run --rm react_cad_core -b /react-cad-build -s /react-cad/src -d /react-cad -f ci",
       watch: "docker-compose up",
     },
     ts: {
