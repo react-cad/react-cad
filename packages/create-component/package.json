@@ -1,7 +1,7 @@
 {
   "name": "@react-cad/create-component",
   "description": "Generator for a @react-cad design project",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "bin": "./lib/cli.js",
   "repository": "github:react-cad/react-cad",
