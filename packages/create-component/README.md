@@ -9,7 +9,7 @@ yarn create @react-cad/component my-component
 cd my-component
 yarn install
 yarn start
-`
+```
 
 or
 

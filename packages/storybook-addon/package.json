@@ -27,7 +27,8 @@
   "dependencies": {
     "@react-cad/core": "^0.1.0",
     "@react-cad/renderer": "^0.1.0",
-    "@storybook/addons": "^6.1.11"
+    "@storybook/addons": "^6.1.11",
+    "file-loader": "^6.2.0"
   },
   "scripts": {
     "build": "tsc",
