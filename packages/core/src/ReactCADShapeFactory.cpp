@@ -1,6 +1,4 @@
 #include "ReactCADShapeFactory.h"
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
 
@@ -54,7 +52,6 @@ TopoDS_Shape ReactCADShapeFactory::fuse(const std::vector<TopoDS_Shape> &childre
     aBuilder.Build();
     if (aBuilder.HasErrors())
     {
-      aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
       TopoDS_Shape nullShape;
       return nullShape;
     }

@@ -45,7 +45,6 @@ TopoDS_Shape IntersectionFactory::common(const std::vector<TopoDS_Shape> &childr
 
         if (aBuilder.HasErrors())
         {
-          aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
           TopoDS_Shape nullShape;
           return nullShape;
         }

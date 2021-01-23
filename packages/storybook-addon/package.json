@@ -1,8 +1,8 @@
 {
   "name": "@react-cad/storybook-addon",
   "version": "0.1.0",
-  "description": "",
-  "main": "lib/preset.js",
+  "description": "Storybook Addon to render @react-cad projects in the browser",
+  "main": "preset.js",
   "files": [
     "lib/**/*",
     "README.md",
@@ -12,7 +12,13 @@
     "storybook",
     "addons"
   ],
-  "author": "",
+  "repository": "github:react-cad/react-cad",
+  "homepage": "https://github.com/react-cad/react-cad",
+  "bugs": "https://github.com/react-cad/react-cad/issues",
+  "author": {
+    "name": "React CAD Dev",
+    "email": "react.cad.dev@gmail.com"
+  },
   "license": "MIT",
   "peerDependencies": {
     "@storybook/react": "^6.1.11",
@@ -22,7 +28,7 @@
     "@react-cad/core": "^0.1.0",
     "@react-cad/renderer": "^0.1.0",
     "@storybook/addons": "^6.1.11",
-    "@types/resize-observer-browser": "^0.1.4"
+    "file-loader": "^6.2.0"
   },
   "scripts": {
     "build": "tsc",

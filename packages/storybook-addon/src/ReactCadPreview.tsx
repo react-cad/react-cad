@@ -1,5 +1,3 @@
-/// <reference types="resize-observer-browser" />
-
 import React from "react";
 import reactCadCore from "@react-cad/core";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
@@ -36,37 +34,6 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
     const render = React.useRef<
       ReturnType<typeof ReactCadRenderer["render"]>
     >();
-
-    /*
-    const [{ width, height }, setDimensions] = React.useState({
-      width: 640,
-      height: 640
-    });
-
-    React.useLayoutEffect(() => {
-      if (wrapperRef.current) {
-        setDimensions({
-          width: wrapperRef.current.clientWidth,
-          height: wrapperRef.current.clientHeight
-        });
-
-        if ("ResizeObserver" in window) {
-          const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-              setDimensions({
-                width: entry.contentRect.width,
-                height: entry.contentRect.height
-              });
-            }
-          });
-
-          const wrapper = wrapperRef.current;
-          resizeObserver.observe(wrapper);
-          return () => resizeObserver.unobserve(wrapper);
-        }
-      }
-    }, []);
-    */
 
     const [latestShape, setReady] = useStateWhenReady(shape);
 

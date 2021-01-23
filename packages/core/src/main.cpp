@@ -22,24 +22,7 @@
 #include <OSD_MemInfo.hxx>
 #include <OSD_Parallel.hxx>
 
-#include <AIS_Shape.hxx>
-#include <BRepAlgoAPI_BuilderAlgo.hxx>
-#include <BRepAlgoAPI_Common.hxx>
-#include <BRepAlgoAPI_Cut.hxx>
-#include <BRepBuilderAPI_Copy.hxx>
-#include <BRepBuilderAPI_Transform.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <BRepPrimAPI_MakeSphere.hxx>
-#include <BRepPrimAPI_MakeTorus.hxx>
-#include <BRepTools.hxx>
-#include <BRep_Builder.hxx>
 #include <Standard_ArrayStreamBuffer.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <TopoDS_Shape.hxx>
-
-#include <gp.hxx>
-#include <gp_Trsf.hxx>
 
 #include <emscripten.h>
 #include <emscripten/bind.h>
@@ -87,141 +70,6 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   return std::make_shared<ReactCADNode>(new BoxFactory());
 }
 
-TopoDS_Shape makeSphere(double radius)
-{
-  BRepPrimAPI_MakeSphere aSphere(radius);
-  return aSphere.Solid();
-}
-
-TopoDS_Shape makeTorus(double radius1, double radius2)
-{
-  BRepPrimAPI_MakeTorus aTorus(radius1, radius2);
-  return aTorus.Solid();
-}
-
-gp_Trsf makeRotation(const gp_Ax1 &anAxis, Standard_Real angle)
-{
-  gp_Trsf trsf;
-  trsf.SetRotation(anAxis, angle);
-  return trsf;
-}
-
-gp_Trsf makeTranslation(Standard_Real x, Standard_Real y, Standard_Real z)
-{
-  gp_Trsf trsf;
-  trsf.SetTranslation(gp::Origin(), gp_Pnt(x, y, z));
-  return trsf;
-}
-
-gp_Trsf makeScale(Standard_Real factor)
-{
-  gp_Trsf trsf;
-  trsf.SetScale(gp::Origin(), factor);
-  return trsf;
-}
-
-TopoDS_Shape applyTransform(const TopoDS_Shape &aShape, const gp_Trsf &trsf)
-{
-  if (aShape.IsNull())
-  {
-    return aShape;
-  }
-  BRepBuilderAPI_Transform theTransform(trsf);
-  theTransform.Perform(aShape, true);
-  return theTransform.Shape();
-}
-
-TopoDS_Shape makeUnion(std::vector<TopoDS_Shape> shapes)
-{
-  BRepAlgoAPI_BuilderAlgo aBuilder;
-
-  TopTools_ListOfShape aLS;
-  for (TopoDS_Shape shape : shapes)
-  {
-    aLS.Append(shape);
-  }
-
-  aBuilder.SetArguments(aLS);
-
-  aBuilder.Build();
-  if (aBuilder.HasErrors())
-  {
-    aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
-    TopoDS_Shape nullShape;
-    return nullShape;
-  }
-  return aBuilder.Shape();
-}
-
-TopoDS_Shape makeDifference(std::vector<TopoDS_Shape> shapes)
-{
-  BRepAlgoAPI_Cut aBuilder;
-
-  TopTools_ListOfShape aLS;
-  TopTools_ListOfShape aLT;
-
-  for (TopoDS_Shape shape : shapes)
-  {
-    if (shape == shapes.front())
-    {
-      aLS.Append(shape);
-    }
-    else
-    {
-      aLT.Append(shape);
-    }
-  }
-
-  aBuilder.SetArguments(aLS);
-  aBuilder.SetTools(aLT);
-
-  aBuilder.Build();
-  if (aBuilder.HasErrors())
-  {
-    aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
-    TopoDS_Shape nullShape;
-    return nullShape;
-  }
-  return aBuilder.Shape();
-}
-
-TopoDS_Shape makeIntersection(std::vector<TopoDS_Shape> shapes)
-{
-  TopTools_ListOfShape aLS;
-  TopTools_ListOfShape aLT;
-
-  for (int i = 0; i < shapes.size(); i++)
-  {
-    if (i == 0)
-    {
-      aLS.Append(shapes.at(i));
-    }
-    else
-    {
-      aLT.Append(shapes.at(i));
-
-      BRepAlgoAPI_Common aBuilder;
-      aBuilder.SetArguments(aLS);
-      aBuilder.SetTools(aLT);
-
-      aBuilder.Build();
-
-      if (aBuilder.HasErrors())
-      {
-        aBuilder.DumpErrors(Message::DefaultMessenger()->SendFail());
-        TopoDS_Shape nullShape;
-        return nullShape;
-      }
-
-      aLS.Clear();
-      aLS.Append(aBuilder.Shape());
-      aLT.Clear();
-    }
-  }
-
-  return aLS.First();
-}
-
 //! Dummy main loop callback for a single shot.
 extern "C" void onMainLoop()
 {
@@ -231,18 +79,19 @@ extern "C" void onMainLoop()
 
 int main()
 {
+#ifdef REACTCAD_DEBUG
   Message::DefaultMessenger()->Printers().First()->SetTraceLevel(Message_Trace);
   Handle(Message_PrinterSystemLog) aJSConsolePrinter = new Message_PrinterSystemLog("webgl-sample", Message_Trace);
   Message::DefaultMessenger()->AddPrinter(
       aJSConsolePrinter); // open JavaScript console within the Browser to see this output
   Message::DefaultMessenger()->Send(
       TCollection_AsciiString("NbLogicalProcessors: ") + OSD_Parallel::NbLogicalProcessors(), Message_Trace);
+  Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
+#endif
 
   // setup a dummy single-shot main loop callback just to shut up a useless Emscripten error message on calling
   // eglSwapInterval()
   emscripten_set_main_loop(onMainLoop, -1, 0);
-
-  Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
 
   return 0;
 }
@@ -258,8 +107,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("insertChildBefore", &ReactCADNode::insertChildBefore)
       .function("removeChild", &ReactCADNode::removeChild)
       .function("hasParent", &ReactCADNode::hasParent)
-      .function("render", &ReactCADNode::render)
-      .property("shape", &ReactCADNode::shape);
+      .function("render", &ReactCADNode::render);
 
   emscripten::class_<ReactCADView>("ReactCADView")
       .smart_ptr<std::shared_ptr<ReactCADView>>("ReactCADView")
@@ -270,23 +118,4 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   function("createCADNode", &createCADNode);
   function("getView", &ReactCADView::getView);
-
-  class_<gp>("Space")
-      .class_function("Origin", &gp::Origin)
-      .class_function("OX", &gp::OX)
-      .class_function("OY", &gp::OY)
-      .class_function("OZ", &gp::OZ);
-
-  class_<gp_Pnt>("Point");
-  class_<gp_Ax1>("Axis");
-  class_<gp_Trsf>("Transform");
-  function("makeSphere", &makeSphere);
-  function("makeTorus", &makeTorus);
-  function("makeRotation", &makeRotation);
-  function("makeTranslation", &makeTranslation);
-  function("makeScale", &makeScale);
-  function("applyTransform", &applyTransform);
-  function("makeUnion", &makeUnion);
-  function("makeDifference", &makeDifference);
-  function("makeIntersection", &makeIntersection);
 }

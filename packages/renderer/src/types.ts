@@ -1,5 +1,5 @@
 import { Fiber } from "react-reconciler";
-import { ReactCadCoreModule, ReactCADNode } from "@react-cad/core";
+import { ReactCADCore, ReactCADNode } from "@react-cad/core";
 
 export interface Element {
   prepareUpdate(
@@ -51,7 +51,7 @@ export interface ReactCADElements {
 export type ElementProps = ReactCADElements;
 
 export type Container = {
-  core: ReactCadCoreModule;
+  core: ReactCADCore;
   nodes: ReactCADNode[];
   rootNodes: ReactCADNode[];
 };

@@ -2,19 +2,13 @@ export class EmClass {
   delete(): void;
 }
 
-export class Shape extends EmClass {
-  public IsNull(): boolean;
-}
-
 export class ReactCADNode extends EmClass {
-  public setProps(props: any): void;
-  public appendChild(child: ReactCadNode): void;
-  public insertChildBefore(child: ReactCadNode, before: ReactCadNode): void;
-  public removeChild(child: ReactCadNode): void;
-  public render(): void;
-  public shape: Shape;
-  public needsRender: boolean;
+  public setProps(props: unknown): void;
+  public appendChild(child: ReactCADNode): void;
+  public insertChildBefore(child: ReactCADNode, before: ReactCADNode): void;
+  public removeChild(child: ReactCADNode): void;
   public hasParent(): boolean;
+  public render(): void;
 }
 
 export class ReactCADView extends EmClass {
@@ -24,26 +18,7 @@ export class ReactCADView extends EmClass {
   public fit(): void;
 }
 
-export class Point extends EmClass {}
-
-export class Axis extends EmClass {}
-
-export class Space extends EmClass {
-  public static Origin(): Point;
-  public static OX(): Axis;
-  public static OY(): Axis;
-  public static OZ(): Axis;
-}
-
-export class Transform extends EmClass {}
-
-export class VectorShape extends EmClass {
-  public size(): number;
-  public push_back(element: Shape): void;
-  public get(index: number): Shape;
-}
-
-export interface ReactCadEmscriptenModule extends EmscriptenModule {
+export interface ReactCADCore extends EmscriptenModule {
   ReactCADNode: typeof ReactCADNode;
   ReactCADView: typeof ReactCADView;
   createCADNode(type: string): ReactCADNode;
@@ -53,6 +28,6 @@ export interface ReactCadEmscriptenModule extends EmscriptenModule {
   canvas: HTMLCanvasElement;
 }
 
-declare const reactCadCore: EmscriptenModuleFactory<ReactCadEmscriptenModule>;
+declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;
 
 export default reactCadCore;

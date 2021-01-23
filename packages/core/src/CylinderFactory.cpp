@@ -1,8 +1,6 @@
 #include <BRepPrimAPI_MakeCylinder.hxx>
 
 #include "CylinderFactory.h"
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 
 CylinderFactory::CylinderFactory() : radius(1), height(1)
 {

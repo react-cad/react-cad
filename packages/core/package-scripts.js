@@ -5,15 +5,12 @@ module.exports = {
   scripts: {
     wasm: {
       build:
-        "docker-compose run --rm react_cad_core -b /react-cad-build -s /react-cad/src -d react-cad -f ci",
+        "docker-compose run --rm react_cad_core -b /react-cad-build -s /react-cad/src -d /react-cad -f ci",
       watch: "docker-compose up",
     },
     ts: {
-      build: npsUtils.series.nps("ts.copy", "ts.compile"),
-      watch: npsUtils.series.nps("ts.copy", "ts.compileWatch"),
-      copy: "cp src/react-cad-core.d.ts lib",
-      compile: "tsc",
-      compileWatch: "tsc --watch --preserveWatchOutput",
+      build: "cp src/react-cad-core.d.ts lib",
+      watch: "nodemon --watch src/*.ts --exec yarn nps ts.build",
     },
     build: npsUtils.series.nps("ts.build", "wasm.build"),
     watch: npsUtils.concurrent.nps("ts.watch", "wasm.watch"),

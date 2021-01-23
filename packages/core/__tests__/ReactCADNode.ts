@@ -1,4 +1,4 @@
-import reactCadCore from "../lib";
+import reactCadCore from "..";
 
 describe("ReactCADNode", () => {
   it("should be a shape", async () => {
