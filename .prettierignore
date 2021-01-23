@@ -1,2 +1,4 @@
-lib
-storybook-static
+**/lib
+**/storybook-static
+**/react-cad-core.js
+**/react-cad-core.esm.js

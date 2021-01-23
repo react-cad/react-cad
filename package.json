@@ -19,7 +19,7 @@
     ],
     "*.{js,jsx,ts,tsx,json,yml}": [
       "eslint --fix",
-      "prettier --write --ignore-unknown"
+      "prettier --ignore-unknown --write"
     ]
   },
   "devDependencies": {
