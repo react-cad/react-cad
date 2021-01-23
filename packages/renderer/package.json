@@ -20,7 +20,7 @@
     "start": "tsc --watch --preserveWatchOutput"
   },
   "peerDependencies": {
-    "@react-cad/core": "^0.1.0"
+    "@react-cad/core": "^0.1.1"
   },
   "devDependencies": {
     "@react-cad/core": "^0.1.1",
@@ -30,5 +30,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "021d53db8b9a13e6b5d6c91fb1c04834f518cb8b"
+  "gitHead": "021d53db8b9a13e6b5d6c91fb1c04834f518cb8b",
+  "dependencies": {
+    "react-reconciler": "^0.26.1"
+  }
 }
