@@ -10,5 +10,9 @@
   "author": {
     "name": "React CAD Dev",
     "email": "react.cad.dev@gmail.com"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "021d53db8b9a13e6b5d6c91fb1c04834f518cb8b"
 }

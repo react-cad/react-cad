@@ -20,5 +20,9 @@
     "start": "nps",
     "build:ts-only": "nps ts.build",
     "build": "nps build"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "021d53db8b9a13e6b5d6c91fb1c04834f518cb8b"
 }
