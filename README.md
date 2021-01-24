@@ -22,3 +22,5 @@ Check the README inside your generated project for more information.
 ## Contributing
 
 Requires yarn and docker. Clone the repository and `yarn install` and `yarn build`. `yarn start` will begin the hot-reloading development environment.
+
+@react-cad uses conventional-commits, follow the prompts when committing.
