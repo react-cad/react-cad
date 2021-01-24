@@ -5,12 +5,11 @@ module.exports = {
   scripts: {
     build: {
       default: "lerna run --stream build",
-      core: {
-        ts: "lerna run --stream --scope '@react-cad/core' build:ts-only",
-      },
-      test: {
-        ts: "lerna run --stream --ignore '@react-cad/{core,examples}' build",
-        ci: npsUtils.series.nps("build.core.ts", "build.test.ts"),
+      ts: {
+        default: npsUtils.series.nps("build.ts.core", "build.ts.nonCore"),
+        core: "lerna run --stream --scope '@react-cad/core' build:ts-only",
+        nonCore:
+          "lerna run --stream --ignore '@react-cad/{core,examples}' build",
       },
     },
     default: "lerna run --parallel start",

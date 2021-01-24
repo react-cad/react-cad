@@ -2,8 +2,7 @@ name: Lint & Test
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [$default-branch]
 
 jobs:
   test:
@@ -22,7 +21,7 @@ jobs:
         run: yarn lint
       - name: Build core wasm
         uses: ./.github/actions/build-core
-      - name: Build tests
-        run: yarn nps build.test.ci
+      - name: Build Typescript
+        run: yarn nps build.ts
       - name: Test
         run: yarn test
