@@ -12,6 +12,7 @@ import * as box from "./box";
 import * as cylinder from "./cylinder";
 import * as sphere from "./sphere";
 import * as torus from "./torus";
+import * as helix from "./helix";
 
 import * as rotation from "./rotation";
 import * as translation from "./translation";
@@ -26,6 +27,7 @@ const elements: Record<Type, Element> = {
   cylinder,
   sphere,
   torus,
+  helix,
 
   rotation,
   translation,

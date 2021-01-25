@@ -26,7 +26,7 @@ else()
   set(OCCT_BIN_DIR)
 endif()
 
-set(OpenCASCADE_LIBS TKBO TKOpenGl TKV3d TKHLR TKMesh TKService TKShHealing TKPrim TKTopAlgo TKGeomAlgo TKBRep TKGeomBase TKG3d TKG2d TKMath TKernel)
+set(OpenCASCADE_LIBS TKRWMesh TKBinXCAF TKBin TKBinL TKOpenGl TKXCAF TKVCAF TKCAF TKV3d TKHLR TKMesh TKService TKShHealing TKOffset TKBool TKBO TKPrim TKTopAlgo TKGeomAlgo TKBRep TKGeomBase TKG3d TKG2d TKMath TKLCAF TKCDF TKernel)
 
 add_executable(${APP_TARGET} ${SOURCES})
 target_compile_definitions(${APP_TARGET} PRIVATE $<$<CONFIG:Debug>:REACTCAD_DEBUG>)
@@ -41,6 +41,7 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s MODULARIZE=1 \
   -s USE_WEBGL2=1 \
   -s USE_FREETYPE=1 \
+  -s INITIAL_MEMORY=536870912 \
   -s ALLOW_MEMORY_GROWTH=1 \
   -s DISABLE_EXCEPTION_CATCHING=0 \
   -s NO_EXIT_RUNTIME=1 \

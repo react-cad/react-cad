@@ -9,6 +9,7 @@
 #include "BoxFactory.h"
 #include "CylinderFactory.h"
 #include "DifferenceFactory.h"
+#include "HelixFactory.h"
 #include "IntersectionFactory.h"
 #include "RotationFactory.h"
 #include "SphereFactory.h"
@@ -41,6 +42,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "difference")
   {
     return std::make_shared<ReactCADNode>(new DifferenceFactory());
+  }
+  if (type == "helix")
+  {
+    return std::make_shared<ReactCADNode>(new HelixFactory());
   }
   if (type == "intersection")
   {

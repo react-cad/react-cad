@@ -29,6 +29,10 @@ export interface ReactCADElements {
     radius1: number;
     radius2: number;
   };
+  helix: {
+    radius: number;
+    height: number;
+  };
 
   rotation: React.PropsWithChildren<{
     axis: "x" | "y" | "z";
