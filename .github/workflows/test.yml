@@ -2,7 +2,8 @@ name: Lint & Test
 
 on:
   pull_request:
-    branches: [$default-branch]
+    branches:
+      - main
 
 jobs:
   test:
