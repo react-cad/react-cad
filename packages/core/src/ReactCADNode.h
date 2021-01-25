@@ -5,15 +5,15 @@
 #include <memory>
 #include <vector>
 
-#include <emscripten/bind.h>
+#include <TopoDS_Shape.hxx>
 
-#include "ReactCADShapeFactory.h"
+#include <emscripten/bind.h>
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADNode : public std::enable_shared_from_this<ReactCADNode>
 {
 public:
-  ReactCADNode(ReactCADShapeFactory *shapeFactory);
+  ReactCADNode();
   virtual ~ReactCADNode();
 
   void appendChild(std::shared_ptr<ReactCADNode> child);
@@ -21,15 +21,24 @@ public:
   void removeChild(ReactCADNode &child);
   bool hasParent();
 
-  void setProps(const emscripten::val &newProps);
-  void render();
+  void renderTree();
   TopoDS_Shape shape;
+
+protected:
+  void propsChanged();
+
+  virtual void renderChildren(const std::vector<TopoDS_Shape> &children);
+  virtual void renderShape();
+
+  TopoDS_Shape fuse(const std::vector<TopoDS_Shape> &children);
+  TopoDS_Shape m_childShape;
+
+  bool isType(const emscripten::val &value, const std::string &type);
+  bool doubleEquals(double a, double b);
 
 private:
   std::shared_ptr<ReactCADNode> m_parent;
   std::vector<std::shared_ptr<ReactCADNode>> m_children;
-
-  std::shared_ptr<ReactCADShapeFactory> m_shapeFactory;
 
   bool m_propsChanged;
   bool m_childrenChanged;

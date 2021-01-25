@@ -4,8 +4,8 @@ import { Story, Meta } from "@storybook/react";
 const Difference: React.FC = (props) => (
   <difference {...props}>
     <sphere radius={3} />
-    <box x={5} y={5} z={1} />
-    <box x={1} y={1} z={3} />
+    <box center x={6} y={6} z={1} />
+    <box center x={1} y={1} z={6} />
   </difference>
 );
 

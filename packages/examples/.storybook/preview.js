@@ -2,7 +2,15 @@ export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
   options: {
     storySort: {
-      order: ["Primitives", "Transformations", "Operations", "Examples"],
+      order: [
+        "Primitives",
+        "Sweeps",
+        ["prism", "revolution", "helix"],
+        "Transformations",
+        "Operations",
+        ["union", "intersection", "difference"],
+        "Examples",
+      ],
     },
   },
 };

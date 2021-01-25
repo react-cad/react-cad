@@ -9,7 +9,7 @@ interface Props {
 
 const Translation: React.FC<Props> = (props) => (
   <translation {...props}>
-    <box x={5} y={5} z={5} />
+    <box center x={5} y={5} z={5} />
   </translation>
 );
 

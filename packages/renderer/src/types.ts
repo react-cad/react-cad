@@ -1,24 +1,23 @@
 import { Fiber } from "react-reconciler";
-import { ReactCADCore, ReactCADNode } from "@react-cad/core";
+import { ReactCADCore, ReactCADNode, Axis, Point } from "@react-cad/core";
 
-export interface Element {
+export interface Element<T extends Type = Type> {
   prepareUpdate(
-    instance: Instance<Type>,
-    type: Type,
-    oldProps: ElementProps[Type],
-    newProps: ElementProps[Type],
-    rootContainerInstance: Container,
-    hostContext: HostContext
-  ): UpdatePayload | null;
+    oldProps: Props<T>,
+    newProps: Props<T>
+  ): UpdatePayload<T> | null;
+  commitUpdate(instance: Instance<T>, updatePayload: UpdatePayload<T>): void;
 }
 
 export interface ReactCADElements {
   box: {
+    center?: boolean;
     x: number;
     y: number;
     z: number;
   };
   cylinder: {
+    center?: boolean;
     radius: number;
     height: number;
   };
@@ -30,8 +29,24 @@ export interface ReactCADElements {
     radius2: number;
   };
 
+  prism: {
+    profile: Point[];
+    axis: Axis;
+    height: number;
+  };
+  revolution: {
+    profile: Point[];
+    axis: Axis;
+    angle: number;
+  };
+  helix: {
+    profile: Point[];
+    pitch: number;
+    height: number;
+  };
+
   rotation: React.PropsWithChildren<{
-    axis: "x" | "y" | "z";
+    axis: Axis;
     angle: number;
   }>;
   translation: React.PropsWithChildren<{
@@ -58,7 +73,7 @@ export type Container = {
 
 export type HostContext = unknown;
 export type Type = keyof ElementProps;
-export type Props = ElementProps[keyof ElementProps];
+export type Props<T extends Type = Type> = ElementProps[T];
 export interface Instance<T extends Type = Type> {
   type: T;
   node: ReactCADNode;
@@ -66,7 +81,7 @@ export interface Instance<T extends Type = Type> {
 export type TextInstance = Instance;
 export type HydratableInstance = never;
 export type PublicInstance = ReactCADNode;
-export type UpdatePayload = Props;
+export type UpdatePayload<T extends Type = Type> = Props<T>;
 
 export type ChildSet = never;
 export type InstanceHandle = Fiber;

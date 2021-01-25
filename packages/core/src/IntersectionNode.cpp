@@ -1,21 +1,21 @@
-#include "IntersectionFactory.h"
+#include "IntersectionNode.h"
 
 #include <BRepAlgoAPI_Common.hxx>
 
-IntersectionFactory::IntersectionFactory()
+IntersectionNode::IntersectionNode()
 {
 }
 
-IntersectionFactory::~IntersectionFactory()
+IntersectionNode::~IntersectionNode()
 {
 }
 
-void IntersectionFactory::renderChildren(const std::vector<TopoDS_Shape> &children)
+void IntersectionNode::renderChildren(const std::vector<TopoDS_Shape> &children)
 {
-  m_children = common(children);
+  m_childShape = common(children);
 }
 
-TopoDS_Shape IntersectionFactory::common(const std::vector<TopoDS_Shape> &children)
+TopoDS_Shape IntersectionNode::common(const std::vector<TopoDS_Shape> &children)
 {
   switch (children.size())
   {

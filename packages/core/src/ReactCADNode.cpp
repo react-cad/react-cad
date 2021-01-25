@@ -1,10 +1,13 @@
 #include <algorithm>
+#include <math.h>
+
+#include <BRepAlgoAPI_BuilderAlgo.hxx>
 
 #include "ReactCADNode.h"
 
-ReactCADNode::ReactCADNode(ReactCADShapeFactory *factory)
-    : m_parent(nullptr), shape(TopoDS_Shape()), m_shapeFactory(factory), m_propsChanged(false), m_children(),
-      m_childrenChanged(false)
+ReactCADNode::ReactCADNode()
+    : m_parent(nullptr), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
+      m_childShape(TopoDS_Shape())
 {
 }
 
@@ -55,9 +58,8 @@ bool ReactCADNode::hasParent()
   return m_parent && true;
 }
 
-void ReactCADNode::setProps(const emscripten::val &newProps)
+void ReactCADNode::propsChanged()
 {
-  m_shapeFactory->setProps(newProps);
   m_propsChanged = true;
   notifyAncestors();
 }
@@ -72,7 +74,7 @@ void ReactCADNode::notifyAncestors()
   }
 }
 
-void ReactCADNode::render()
+void ReactCADNode::renderTree()
 {
   if (m_propsChanged || m_childrenChanged)
   {
@@ -81,14 +83,75 @@ void ReactCADNode::render()
       std::vector<TopoDS_Shape> shapes;
       for (auto child : m_children)
       {
-        child->render();
+        child->renderTree();
         shapes.push_back(child->shape);
       }
-      m_shapeFactory->renderChildren(shapes);
+      renderChildren(shapes);
       m_childrenChanged = false;
     }
 
-    shape = m_shapeFactory->render();
+    renderShape();
     m_propsChanged = false;
   }
+}
+
+void ReactCADNode::renderChildren(const std::vector<TopoDS_Shape> &children)
+{
+  m_childShape = fuse(children);
+}
+
+void ReactCADNode::renderShape()
+{
+  shape = m_childShape;
+}
+
+bool ReactCADNode::isType(const emscripten::val &value, const std::string &type)
+{
+  std::string valType = value.typeOf().as<std::string>();
+  return valType == type;
+}
+
+TopoDS_Shape ReactCADNode::fuse(const std::vector<TopoDS_Shape> &children)
+{
+  switch (children.size())
+  {
+  case 0:
+    return TopoDS_Shape();
+  case 1:
+    return children[0];
+  default: {
+    BRepAlgoAPI_BuilderAlgo aBuilder;
+
+    TopTools_ListOfShape aLS;
+    for (TopoDS_Shape shape : children)
+    {
+      aLS.Append(shape);
+    }
+
+    aBuilder.SetArguments(aLS);
+
+    aBuilder.Build();
+    if (aBuilder.HasErrors())
+    {
+      TopoDS_Shape nullShape;
+      return nullShape;
+    }
+    return aBuilder.Shape();
+  }
+  }
+}
+
+bool ReactCADNode::doubleEquals(double a, double b)
+{
+  double diff = fabs(a - b);
+  a = fabs(a);
+  b = fabs(b);
+
+  double largest = (b > a) ? b : a;
+  if (diff <= largest * DBL_EPSILON)
+  {
+    return true;
+  }
+
+  return false;
 }
