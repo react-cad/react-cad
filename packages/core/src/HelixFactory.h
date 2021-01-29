@@ -1,9 +1,9 @@
 #ifndef HelixFactory_HeaderFile
 #define HelixFactory_HeaderFile
 
-#include "ReactCADShapeFactory.h"
+#include "SweepFactory.h"
 
-class HelixFactory : public ReactCADShapeFactory
+class HelixFactory : public SweepFactory
 {
 public:
   HelixFactory();
@@ -12,7 +12,7 @@ public:
   TopoDS_Shape render();
 
 private:
-  Standard_Real radius;
+  Standard_Real pitch;
   Standard_Real height;
 };
 

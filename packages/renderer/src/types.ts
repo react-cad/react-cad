@@ -30,7 +30,7 @@ export interface ReactCADElements {
     radius2: number;
   };
   helix: {
-    radius: number;
+    pitch: number;
     height: number;
   };
 

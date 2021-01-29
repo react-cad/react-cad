@@ -1,13 +1,10 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepLib.hxx>
 #include <BRepOffsetAPI_MakePipeShell.hxx>
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom_CylindricalSurface.hxx>
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <gp_Lin2d.hxx>
@@ -16,8 +13,9 @@
 
 #include "HelixFactory.h"
 
-HelixFactory::HelixFactory() : radius(1), height(1)
+HelixFactory::HelixFactory() : pitch(1), height(1)
 {
+  profile = BRepBuilderAPI_MakePolygon(gp_Pnt(-1, -1, 0), gp_Pnt(-1, 1, 0), gp_Pnt(1, 1, 0), gp_Pnt(1, -1, 0), true);
 }
 
 HelixFactory::~HelixFactory()
@@ -26,17 +24,7 @@ HelixFactory::~HelixFactory()
 
 void HelixFactory::setProps(const emscripten::val &props)
 {
-  emscripten::val prop = props["radius"];
-  if (isType(prop, "number"))
-  {
-    Standard_Real newRadius = prop.as<Standard_Real>();
-    if (newRadius >= 0)
-    {
-      radius = newRadius;
-    }
-  }
-
-  prop = props["height"];
+  emscripten::val prop = props["height"];
   if (isType(prop, "number"))
   {
     Standard_Real newHeight = prop.as<Standard_Real>();
@@ -45,31 +33,41 @@ void HelixFactory::setProps(const emscripten::val &props)
       height = newHeight;
     }
   }
+
+  prop = props["pitch"];
+  if (isType(prop, "number"))
+  {
+    Standard_Real newPitch = prop.as<Standard_Real>();
+    if (newPitch >= 0)
+    {
+      pitch = newPitch;
+    }
+  }
 }
 
 TopoDS_Shape HelixFactory::render()
 {
-  Standard_Real length = height * sqrt(pow(M_PI * 2.0, 2) * 2);
-  Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(gp::XOY(), radius);
-  gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(1.0, 0.5));
+  BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, height));
+  BRepBuilderAPI_MakeWire spine(edge);
+
+  Standard_Real radius = 1.0;
+  Standard_Real circumference = 2 * M_PI * radius;
+  Standard_Real length = height * sqrt((pitch * pitch) + (circumference * circumference));
+
+  gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(circumference, pitch));
   Handle_Geom2d_TrimmedCurve aSegment = GCE2d_MakeSegment(aLine2d, 0.0, length);
-  TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length).Edge();
+
+  Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(gp::XOY(), radius);
+  TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length);
   BRepLib::BuildCurve3d(aHelixEdge);
 
-  BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, height));
-  BRepBuilderAPI_MakeWire wire1(edge);
-  BRepBuilderAPI_MakeWire wire(aHelixEdge);
+  BRepBuilderAPI_MakeWire guide(aHelixEdge);
 
-  // BRepBuilderAPI_MakePolygon polygon(gp_Pnt(1, 0, 0), gp_Pnt(1, 0, 1), gp_Pnt(2, 0, 1), gp_Pnt(2, 0, 0), true);
-  BRepBuilderAPI_MakePolygon polygon(gp_Pnt(-1, -1, 0), gp_Pnt(-1, 1, 0), gp_Pnt(1, 1, 0), gp_Pnt(1, -1, 0), true);
-  BRepBuilderAPI_MakeFace face(polygon.Wire());
-
-  BRepOffsetAPI_MakePipeShell pipe(wire1);
-  pipe.SetMode(wire, false);
-  pipe.Add(polygon);
+  BRepOffsetAPI_MakePipeShell pipe(spine);
+  pipe.SetMode(guide, false);
+  pipe.Add(profile);
   pipe.Build();
   pipe.MakeSolid();
 
   return pipe.Shape();
-  // return w;
 }

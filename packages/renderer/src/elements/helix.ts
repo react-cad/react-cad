@@ -9,8 +9,8 @@ import {
 type Helix = "helix";
 
 function validateProps(props: ElementProps[Helix]): boolean {
-  if (props.radius <= 0) {
-    throw new Error(`helix: "radius" prop must be greater than or equal to 0`);
+  if (props.pitch <= 0) {
+    throw new Error(`helix: "pitch" prop must be greater than or equal to 0`);
   }
   if (props.height <= 0) {
     throw new Error(`helix: "height" prop must be greater than 0`);
@@ -28,7 +28,7 @@ export function prepareUpdate(
   _hostContext: HostContext
 ): UpdatePayload | null {
   if (
-    oldProps.radius !== newProps.radius ||
+    oldProps.pitch !== newProps.pitch ||
     oldProps.height !== newProps.height
   ) {
     validateProps(newProps);

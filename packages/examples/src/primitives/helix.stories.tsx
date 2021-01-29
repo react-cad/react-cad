@@ -2,7 +2,7 @@ import React from "react";
 import { Story, Meta } from "@storybook/react";
 
 interface Props {
-  radius: number;
+  pitch: number;
   height: number;
 }
 
@@ -21,7 +21,7 @@ export default {
   title: "Primitives/helix",
   component: Helix,
   argTypes: {
-    radius: range,
+    pitch: range,
     height: range,
   },
 } as Meta;
@@ -30,6 +30,6 @@ const Template: Story<Props> = (args) => <Helix {...args} />;
 
 export const helix = Template.bind({});
 helix.args = {
-  radius: 2,
+  pitch: 2,
   height: 5,
 };
