@@ -7,7 +7,7 @@ interface Props {
 
 const Scale: React.FC<Props> = (props) => (
   <scale {...props}>
-    <box x={1} y={1} z={1} />
+    <box center x={1} y={1} z={1} />
   </scale>
 );
 

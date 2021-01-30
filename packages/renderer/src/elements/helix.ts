@@ -1,14 +1,9 @@
-import {
-  ElementProps,
-  Container,
-  HostContext,
-  Instance,
-  UpdatePayload,
-} from "../types";
+import { ReactCADHelixNode, HelixProps, Point } from "@react-cad/core";
+import { Props, Instance, UpdatePayload } from "../types";
 
 type Helix = "helix";
 
-function validateProps(props: ElementProps[Helix]): boolean {
+function validateProps(props: Props<Helix>): boolean {
   if (props.pitch <= 0) {
     throw new Error(`helix: "pitch" prop must be greater than or equal to 0`);
   }
@@ -20,14 +15,11 @@ function validateProps(props: ElementProps[Helix]): boolean {
 }
 
 export function prepareUpdate(
-  _instance: Instance<Helix>,
-  _type: Helix,
-  oldProps: ElementProps[Helix],
-  newProps: ElementProps[Helix],
-  _rootContainerInstance: Container,
-  _hostContext: HostContext
-): UpdatePayload | null {
+  oldProps: Props<Helix>,
+  newProps: Props<Helix>
+): UpdatePayload<Helix> | null {
   if (
+    oldProps.profile !== newProps.profile ||
     oldProps.pitch !== newProps.pitch ||
     oldProps.height !== newProps.height
   ) {
@@ -36,4 +28,29 @@ export function prepareUpdate(
   }
 
   return null;
+}
+
+const defaultProfile: Point[] = [
+  [-0.5, -0.5, 0],
+  [-0.5, 0.5, 0],
+  [0.5, 0.5, 0],
+  [0.5, -0.5, 0],
+];
+
+export function commitUpdate(
+  instance: Instance<Helix>,
+  updatePayload: UpdatePayload<Helix>
+): void {
+  const { profile, ...helixProps } = updatePayload;
+  const props: HelixProps = Object.assign(
+    {
+      pitch: 1,
+      height: 1,
+    },
+    helixProps
+  );
+  const helix = instance.node as ReactCADHelixNode;
+
+  helix.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  helix.setProps(props);
 }

@@ -1,14 +1,9 @@
-import {
-  ElementProps,
-  Container,
-  HostContext,
-  Instance,
-  UpdatePayload,
-} from "../types";
+import { ReactCADCylinderNode, CylinderProps } from "@react-cad/core";
+import { Props, Instance, UpdatePayload } from "../types";
 
 type Cylinder = "cylinder";
 
-function validateProps(props: ElementProps[Cylinder]): boolean {
+function validateProps(props: Props<Cylinder>): boolean {
   if (props.radius <= 0) {
     throw new Error(`cylinder: "radius" prop must be greater than 0`);
   }
@@ -20,14 +15,11 @@ function validateProps(props: ElementProps[Cylinder]): boolean {
 }
 
 export function prepareUpdate(
-  _instance: Instance<Cylinder>,
-  _type: Cylinder,
-  oldProps: ElementProps[Cylinder],
-  newProps: ElementProps[Cylinder],
-  _rootContainerInstance: Container,
-  _hostContext: HostContext
-): UpdatePayload | null {
+  oldProps: Props<Cylinder>,
+  newProps: Props<Cylinder>
+): UpdatePayload<Cylinder> | null {
   if (
+    oldProps.center !== newProps.center ||
     oldProps.radius !== newProps.radius ||
     oldProps.height !== newProps.height
   ) {
@@ -36,4 +28,19 @@ export function prepareUpdate(
   }
 
   return null;
+}
+
+export function commitUpdate(
+  instance: Instance<Cylinder>,
+  updatePayload: UpdatePayload<Cylinder>
+): void {
+  const props: CylinderProps = Object.assign(
+    {
+      center: false,
+      radius: 1,
+      height: 1,
+    },
+    updatePayload
+  );
+  (instance.node as ReactCADCylinderNode).setProps(props);
 }

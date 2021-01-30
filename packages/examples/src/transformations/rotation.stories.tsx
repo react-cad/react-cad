@@ -10,7 +10,7 @@ interface Props {
 
 const Rotation: React.FC<Props> = ({ axis, angle }) => (
   <rotation axis={axis} angle={angle}>
-    <box x={5} y={5} z={5} />
+    <box center x={5} y={5} z={5} />
   </rotation>
 );
 

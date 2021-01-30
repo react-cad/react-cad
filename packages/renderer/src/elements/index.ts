@@ -1,17 +1,10 @@
-import {
-  Element,
-  ElementProps,
-  Container,
-  HostContext,
-  Instance,
-  Type,
-  UpdatePayload,
-} from "../types";
+import { Element, Props, Instance, Type, UpdatePayload } from "../types";
 
 import * as box from "./box";
 import * as cylinder from "./cylinder";
 import * as sphere from "./sphere";
 import * as torus from "./torus";
+
 import * as helix from "./helix";
 
 import * as rotation from "./rotation";
@@ -27,6 +20,7 @@ const elements: Record<Type, Element> = {
   cylinder,
   sphere,
   torus,
+
   helix,
 
   rotation,
@@ -39,24 +33,25 @@ const elements: Record<Type, Element> = {
 };
 
 export function prepareUpdate<T extends Type>(
-  instance: Instance<T>,
+  _instance: Instance<T>,
   type: T,
-  oldProps: ElementProps[T],
-  newProps: ElementProps[T],
-  rootContainerInstance: Container,
-  hostContext: HostContext
+  oldProps: Props<T>,
+  newProps: Props<T>
 ): UpdatePayload | null {
   const element = elements[type];
   if (element) {
-    return element.prepareUpdate(
-      instance,
-      type,
-      oldProps,
-      newProps,
-      rootContainerInstance,
-      hostContext
-    );
+    return element.prepareUpdate(oldProps, newProps);
   }
-
   return null;
+}
+
+export function commitUpdate<T extends Type>(
+  instance: Instance<T>,
+  updatePayload: UpdatePayload,
+  type: T
+): void {
+  const element = elements[type];
+  if (element) {
+    return element.commitUpdate(instance, updatePayload);
+  }
 }

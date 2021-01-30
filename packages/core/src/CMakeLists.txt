@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 
 project(react-cad-core)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(APP_VERSION_MAJOR 1)
 set(APP_VERSION_MINOR 0)
 set(APP_TARGET react-cad-core)
 set(APP_TARGET_ES6 react-cad-core.esm.js)
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 file(GLOB SOURCES
