@@ -6,6 +6,8 @@ import * as sphere from "./sphere";
 import * as torus from "./torus";
 
 import * as helix from "./helix";
+import * as prism from "./prism";
+import * as revolution from "./revolution";
 
 import * as rotation from "./rotation";
 import * as translation from "./translation";
@@ -22,6 +24,8 @@ const elements: Record<Type, Element> = {
   torus,
 
   helix,
+  prism,
+  revolution,
 
   rotation,
   translation,

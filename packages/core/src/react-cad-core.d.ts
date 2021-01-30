@@ -19,6 +19,7 @@ export class ReactCADNode extends EmClass {
 
 export type Axis = "x" | "y" | "z";
 export type Point = [number, number, number];
+export type Profile = Point[];
 
 // Primitives
 export interface BoxProps {
@@ -57,7 +58,23 @@ export class ReactCADTorusNode extends ReactCADNode {
 
 // Sweeps
 export class ReactCADSweepNode extends ReactCADNode {
-  public setProfile(path: Point[]): void;
+  public setProfile(path: Profile): void;
+}
+
+export interface RevolutionProps {
+  axis: Axis;
+  angle: number;
+}
+export class ReactCADRevolutionNode extends ReactCADSweepNode {
+  public setProps(props: RevolutionProps): void;
+}
+
+export interface PrismProps {
+  axis: Axis;
+  height: number;
+}
+export class ReactCADPrismNode extends ReactCADSweepNode {
+  public setProps(props: PrismProps): void;
 }
 
 export interface HelixProps {
@@ -65,7 +82,7 @@ export interface HelixProps {
   height: number;
 }
 export class ReactCADHelixNode extends ReactCADSweepNode {
-  public setProps(props: { height: number; pitch: number }): void;
+  public setProps(props: HelixProps): void;
 }
 
 // Transformations

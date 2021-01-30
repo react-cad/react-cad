@@ -28,6 +28,17 @@ export interface ReactCADElements {
     radius1: number;
     radius2: number;
   };
+
+  prism: {
+    profile: Point[];
+    axis: Axis;
+    height: number;
+  };
+  revolution: {
+    profile: Point[];
+    axis: Axis;
+    angle: number;
+  };
   helix: {
     profile: Point[];
     pitch: number;

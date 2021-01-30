@@ -20,6 +20,8 @@
 #include "UnionNode.h"
 
 #include "HelixNode.h"
+#include "PrismNode.h"
+#include "RevolutionNode.h"
 
 #include "RotationNode.h"
 #include "ScaleNode.h"
@@ -58,6 +60,14 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "intersection")
   {
     return std::make_shared<IntersectionNode>();
+  }
+  if (type == "prism")
+  {
+    return std::make_shared<PrismNode>();
+  }
+  if (type == "revolution")
+  {
+    return std::make_shared<RevolutionNode>();
   }
   if (type == "rotation")
   {
@@ -199,6 +209,20 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
       .smart_ptr<std::shared_ptr<SweepNode>>("ReactCADSweepNode")
       .function("setProfile", &SweepNode::setProfile);
+
+  emscripten::value_object<PrismProps>("PrismProps")
+      .field("axis", &PrismProps::axis)
+      .field("height", &PrismProps::height);
+  emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
+      .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
+      .function("setProps", &PrismNode::setProps);
+
+  emscripten::value_object<RevolutionProps>("RevolutionProps")
+      .field("axis", &RevolutionProps::axis)
+      .field("angle", &RevolutionProps::angle);
+  emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
+      .smart_ptr<std::shared_ptr<RevolutionNode>>("ReactCADRevolutionNode")
+      .function("setProps", &RevolutionNode::setProps);
 
   emscripten::value_object<HelixProps>("HelixProps")
       .field("pitch", &HelixProps::pitch)

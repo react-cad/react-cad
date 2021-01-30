@@ -1,36 +1,34 @@
 import React from "react";
 import { Story, Meta } from "@storybook/react";
 import { Point } from "@react-cad/core";
+import { ReactCADElements } from "@react-cad/renderer/src/types";
 
-interface Props {
-  profile: string;
-  pitch: number;
-  height: number;
+function makePolygon(sides: number) {
+  return [...Array(sides)].map(
+    (_, i): Point => {
+      const theta = Math.PI / sides + (i / sides) * 2 * Math.PI;
+      return [Math.sin(theta), Math.cos(theta), 0];
+    }
+  );
+}
+
+function offsetPolygon(polygon: Point[]): Point[] {
+  return polygon.map(([x, y, z]) => [x + 1.5, y, z]);
+}
+
+function rotatePolygon(polygon: Point[]): Point[] {
+  return polygon.map(([x, y, z]) => [x, z, y]);
 }
 
 const profiles: Record<string, Point[]> = {
-  "XY Square": [
-    [1, 1, 0],
-    [1, -1, 0],
-    [-1, -1, 0],
-    [-1, 1, 0],
-  ],
-  "Offset XY Square": [
-    [0, 0, 0],
-    [0, 1, 0],
-    [1, 1, 0],
-    [1, 0, 0],
-  ],
-  "XZ Square": [
-    [0, 0, 0],
-    [0, 0, 1],
-    [1, 0, 1],
-    [1, 0, 0],
-  ],
+  Triangle: makePolygon(3),
+  Square: makePolygon(4),
+  Pentagon: makePolygon(5),
+  Hexagon: makePolygon(6),
 };
 
-const Helix: React.FC<Props> = ({ profile, ...props }) => (
-  <helix profile={profiles[profile]} {...props} />
+const Helix: React.FC<ReactCADElements["helix"]> = (props) => (
+  <helix {...props} />
 );
 
 const range = {
@@ -46,22 +44,41 @@ export default {
   title: "Sweeps/helix",
   component: Helix,
   argTypes: {
-    profile: {
+    profileName: {
       control: {
         type: "select",
         options: Object.keys(profiles),
       },
     },
+    rotated: { control: "boolean" },
     pitch: range,
     height: range,
   },
 } as Meta;
 
-const Template: Story<Props> = (args) => <Helix {...args} />;
+interface StoryProps {
+  profileName: keyof typeof profiles;
+  rotated: boolean;
+  pitch: number;
+  height: number;
+}
+
+const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
+  const profile: Point[] = React.useMemo(() => {
+    let points = profiles[profileName];
+    if (rotated) {
+      points = offsetPolygon(rotatePolygon(points));
+    }
+    return points;
+  }, [profileName, rotated]);
+
+  return <Helix profile={profile} {...args} />;
+};
 
 export const helix = Template.bind({});
 helix.args = {
-  profile: "XY Square",
+  profileName: "Square",
+  rotated: false,
   pitch: 2,
   height: 5,
 };

@@ -10,7 +10,7 @@ function validateProps(props: Props<Rotation>): boolean {
     throw new Error(`rotation: unknown axis "${props.axis}"`);
   }
   if (typeof props.angle !== "number") {
-    throw new Error(`rotation: expected numeric angle, got "${props.angle}"`);
+    throw new Error(`rotation: "angle" must be greater than 0`);
   }
   return true;
 }

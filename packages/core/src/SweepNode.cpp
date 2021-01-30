@@ -1,5 +1,6 @@
 #include "SweepNode.h"
 
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
 
 SweepNode::SweepNode()
@@ -56,5 +57,10 @@ void SweepNode::makeProfileFromPoints()
     polygon.Add(gp_Pnt(point.x, point.y, point.z));
   }
   polygon.Close();
-  m_profile = polygon.Wire();
+
+  BRepBuilderAPI_MakeFace face(polygon, Standard_True);
+  if (face.IsDone())
+  {
+    m_profile = polygon.Wire();
+  }
 }
