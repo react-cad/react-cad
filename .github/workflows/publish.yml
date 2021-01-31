@@ -22,7 +22,7 @@ jobs:
           git config --global user.email 'react.cad.dev+bot@gmail.com'
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       - name: Set up node
         uses: actions/setup-node@v2
         with:
