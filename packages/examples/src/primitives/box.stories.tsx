@@ -2,12 +2,13 @@ import React from "react";
 import { Story, Meta } from "@storybook/react";
 
 interface Props {
+  center: boolean;
   x: number;
   y: number;
   z: number;
 }
 
-const Box: React.FC<Props> = ({ x, y, z }) => <box x={x} y={y} z={z} />;
+const Box: React.FC<Props> = (props) => <box {...props} />;
 
 const range = {
   control: {
@@ -22,6 +23,9 @@ export default {
   title: "Primitives/box",
   component: Box,
   argTypes: {
+    center: {
+      control: "boolean",
+    },
     x: range,
     y: range,
     z: range,
@@ -32,6 +36,7 @@ const Template: Story<Props> = (args) => <Box {...args} />;
 
 export const box = Template.bind({});
 box.args = {
+  center: false,
   x: 5,
   y: 5,
   z: 5,

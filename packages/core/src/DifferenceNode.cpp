@@ -1,21 +1,21 @@
-#include "DifferenceFactory.h"
+#include "DifferenceNode.h"
 
 #include <BRepAlgoAPI_Cut.hxx>
 
-DifferenceFactory::DifferenceFactory()
+DifferenceNode::DifferenceNode()
 {
 }
 
-DifferenceFactory::~DifferenceFactory()
+DifferenceNode::~DifferenceNode()
 {
 }
 
-void DifferenceFactory::renderChildren(const std::vector<TopoDS_Shape> &children)
+void DifferenceNode::renderChildren(const std::vector<TopoDS_Shape> &children)
 {
-  m_children = cut(children);
+  m_childShape = cut(children);
 }
 
-TopoDS_Shape DifferenceFactory::cut(const std::vector<TopoDS_Shape> &children)
+TopoDS_Shape DifferenceNode::cut(const std::vector<TopoDS_Shape> &children)
 {
   switch (children.size())
   {

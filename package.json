@@ -22,7 +22,7 @@
       "clang-format -i -style=file"
     ],
     "*.{js,jsx,ts,tsx,json,yml}": [
-      "eslint --fix",
+      "eslint --ext .js,.jsx,.ts,.tsx --fix",
       "prettier --ignore-unknown --write"
     ]
   },

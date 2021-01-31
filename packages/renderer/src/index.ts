@@ -17,7 +17,7 @@ import {
   ElementProps,
 } from "./types";
 
-import { prepareUpdate } from "./elements";
+import { prepareUpdate, commitUpdate } from "./elements";
 
 export const HostConfig: ReactReconciler.HostConfig<
   Type,
@@ -141,19 +141,20 @@ export const HostConfig: ReactReconciler.HostConfig<
   },
   createInstance<T extends Type>(
     type: T,
-    props: ElementProps[T],
+    props: Props<T>,
     rootContainerInstance: Container,
     _hostContext: HostContext,
     _internalInstanceHandle: InstanceHandle
   ): Instance {
     const { core, nodes } = rootContainerInstance;
     const node = core.createCADNode(type);
-    node.setProps(props);
     nodes.push(node);
-    return {
+    const instance = {
       type,
       node,
     };
+    commitUpdate(instance, props, type);
+    return instance;
   },
   appendInitialChild(parentInstance: Instance, childInstance: Instance): void {
     parentInstance.node.appendChild(childInstance.node);
@@ -162,16 +163,7 @@ export const HostConfig: ReactReconciler.HostConfig<
     parentInstance.node.appendChild(childInstance.node);
   },
   prepareUpdate,
-  commitUpdate<T extends Type>(
-    instance: Instance<T>,
-    _updatePayload: UpdatePayload,
-    _type: T,
-    _oldProps: ElementProps[T],
-    newProps: ElementProps[T],
-    _internalInstanceHandle: InstanceHandle
-  ): void {
-    instance.node.setProps(newProps);
-  },
+  commitUpdate,
 };
 
 const reconcilerInstance = ReactReconciler(HostConfig);

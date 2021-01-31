@@ -1,20 +1,31 @@
 #include <iostream>
+
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "ReactCADNode.h"
 #include "ReactCADView.h"
 
-#include "BoxFactory.h"
-#include "CylinderFactory.h"
-#include "DifferenceFactory.h"
-#include "IntersectionFactory.h"
-#include "RotationFactory.h"
-#include "SphereFactory.h"
-#include "TorusFactory.h"
-#include "TranslationFactory.h"
-#include "UnionFactory.h"
+#include "Geometry.h"
+
+#include "BoxNode.h"
+#include "CylinderNode.h"
+#include "SphereNode.h"
+#include "TorusNode.h"
+
+#include "DifferenceNode.h"
+#include "IntersectionNode.h"
+#include "UnionNode.h"
+
+#include "HelixNode.h"
+#include "PrismNode.h"
+#include "RevolutionNode.h"
+
+#include "RotationNode.h"
+#include "ScaleNode.h"
+#include "TranslationNode.h"
 
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
@@ -32,42 +43,58 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
 {
   if (type == "box")
   {
-    return std::make_shared<ReactCADNode>(new BoxFactory());
+    return std::make_shared<BoxNode>();
   }
   if (type == "cylinder")
   {
-    return std::make_shared<ReactCADNode>(new CylinderFactory());
+    return std::make_shared<CylinderNode>();
   }
   if (type == "difference")
   {
-    return std::make_shared<ReactCADNode>(new DifferenceFactory());
+    return std::make_shared<DifferenceNode>();
+  }
+  if (type == "helix")
+  {
+    return std::make_shared<HelixNode>();
   }
   if (type == "intersection")
   {
-    return std::make_shared<ReactCADNode>(new IntersectionFactory());
+    return std::make_shared<IntersectionNode>();
+  }
+  if (type == "prism")
+  {
+    return std::make_shared<PrismNode>();
+  }
+  if (type == "revolution")
+  {
+    return std::make_shared<RevolutionNode>();
   }
   if (type == "rotation")
   {
-    return std::make_shared<ReactCADNode>(new RotationFactory());
+    return std::make_shared<RotationNode>();
+  }
+  if (type == "scale")
+  {
+    return std::make_shared<ScaleNode>();
   }
   if (type == "sphere")
   {
-    return std::make_shared<ReactCADNode>(new SphereFactory());
+    return std::make_shared<SphereNode>();
   }
   if (type == "torus")
   {
-    return std::make_shared<ReactCADNode>(new TorusFactory());
+    return std::make_shared<TorusNode>();
   }
   if (type == "translation")
   {
-    return std::make_shared<ReactCADNode>(new TranslationFactory());
+    return std::make_shared<TranslationNode>();
   }
   if (type == "union")
   {
-    return std::make_shared<ReactCADNode>(new UnionFactory());
+    return std::make_shared<UnionNode>();
   }
 
-  return std::make_shared<ReactCADNode>(new BoxFactory());
+  return std::make_shared<BoxNode>();
 }
 
 //! Dummy main loop callback for a single shot.
@@ -96,19 +123,40 @@ int main()
   return 0;
 }
 
-using namespace emscripten;
+namespace emscripten
+{
+namespace internal
+{
+
+template <typename T, typename Allocator> struct BindingType<std::vector<T, Allocator>>
+{
+  using ValBinding = BindingType<val>;
+  using WireType = ValBinding::WireType;
+
+  static std::vector<T, Allocator> fromWireType(WireType value)
+  {
+    return vecFromJSArray<T>(ValBinding::fromWireType(value));
+  }
+};
+
+template <typename T>
+struct TypeID<
+    T, typename std::enable_if_t<std::is_same<typename Canonicalized<T>::type,
+                                              std::vector<typename Canonicalized<T>::type::value_type,
+                                                          typename Canonicalized<T>::type::allocator_type>>::value>>
+{
+  static constexpr TYPEID get()
+  {
+    return TypeID<val>::get();
+  }
+};
+
+} // namespace internal
+} // namespace emscripten
 
 EMSCRIPTEN_BINDINGS(react_cad)
 {
-  emscripten::class_<ReactCADNode>("ReactCADNode")
-      .smart_ptr<std::shared_ptr<ReactCADNode>>("ReactCADNode")
-      .function("setProps", &ReactCADNode::setProps)
-      .function("appendChild", &ReactCADNode::appendChild)
-      .function("insertChildBefore", &ReactCADNode::insertChildBefore)
-      .function("removeChild", &ReactCADNode::removeChild)
-      .function("hasParent", &ReactCADNode::hasParent)
-      .function("render", &ReactCADNode::render);
-
+  // View object
   emscripten::class_<ReactCADView>("ReactCADView")
       .smart_ptr<std::shared_ptr<ReactCADView>>("ReactCADView")
       .function("addNode", &ReactCADView::addNode)
@@ -116,6 +164,94 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("renderNodes", &ReactCADView::renderNodes)
       .function("fit", &ReactCADView::fit);
 
-  function("createCADNode", &createCADNode);
-  function("getView", &ReactCADView::getView);
+  // Base node
+  emscripten::class_<ReactCADNode>("ReactCADNode")
+      .smart_ptr<std::shared_ptr<ReactCADNode>>("ReactCADNode")
+      .function("appendChild", &ReactCADNode::appendChild)
+      .function("insertChildBefore", &ReactCADNode::insertChildBefore)
+      .function("removeChild", &ReactCADNode::removeChild)
+      .function("hasParent", &ReactCADNode::hasParent)
+      .function("render", &ReactCADNode::renderTree);
+
+  emscripten::value_array<Point>("Point").element(&Point::x).element(&Point::y).element(&Point::z);
+
+  // Primitives
+  emscripten::value_object<BoxProps>("BoxProps")
+      .field("center", &BoxProps::center)
+      .field("x", &BoxProps::x)
+      .field("y", &BoxProps::y)
+      .field("z", &BoxProps::z);
+  emscripten::class_<BoxNode, emscripten::base<ReactCADNode>>("ReactCADBoxNode")
+      .smart_ptr<std::shared_ptr<BoxNode>>("ReactCADBoxNode")
+      .function("setProps", &BoxNode::setProps);
+
+  emscripten::value_object<CylinderProps>("CylinderProps")
+      .field("center", &CylinderProps::center)
+      .field("radius", &CylinderProps::radius)
+      .field("height", &CylinderProps::height);
+  emscripten::class_<CylinderNode, emscripten::base<ReactCADNode>>("ReactCADCylinderNode")
+      .smart_ptr<std::shared_ptr<CylinderNode>>("ReactCADCylinderNode")
+      .function("setProps", &CylinderNode::setProps);
+
+  emscripten::value_object<TorusProps>("TorusProps")
+      .field("radius1", &TorusProps::radius1)
+      .field("radius2", &TorusProps::radius2);
+  emscripten::class_<TorusNode, emscripten::base<ReactCADNode>>("ReactCADTorusNode")
+      .smart_ptr<std::shared_ptr<TorusNode>>("ReactCADTorusNode")
+      .function("setProps", &TorusNode::setProps);
+
+  emscripten::value_object<SphereProps>("SphereProps").field("radius", &SphereProps::radius);
+  emscripten::class_<SphereNode, emscripten::base<ReactCADNode>>("ReactCADSphereNode")
+      .smart_ptr<std::shared_ptr<SphereNode>>("ReactCADSphereNode")
+      .function("setProps", &SphereNode::setProps);
+
+  // Sweeps
+  emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
+      .smart_ptr<std::shared_ptr<SweepNode>>("ReactCADSweepNode")
+      .function("setProfile", &SweepNode::setProfile);
+
+  emscripten::value_object<PrismProps>("PrismProps")
+      .field("axis", &PrismProps::axis)
+      .field("height", &PrismProps::height);
+  emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
+      .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
+      .function("setProps", &PrismNode::setProps);
+
+  emscripten::value_object<RevolutionProps>("RevolutionProps")
+      .field("axis", &RevolutionProps::axis)
+      .field("angle", &RevolutionProps::angle);
+  emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
+      .smart_ptr<std::shared_ptr<RevolutionNode>>("ReactCADRevolutionNode")
+      .function("setProps", &RevolutionNode::setProps);
+
+  emscripten::value_object<HelixProps>("HelixProps")
+      .field("pitch", &HelixProps::pitch)
+      .field("height", &HelixProps::height);
+  emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
+      .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
+      .function("setProps", &HelixNode::setProps);
+
+  // Transformations
+  emscripten::value_object<TranslationProps>("TranslationProps")
+      .field("x", &TranslationProps::x)
+      .field("y", &TranslationProps::y)
+      .field("z", &TranslationProps::z);
+  emscripten::class_<TranslationNode, emscripten::base<ReactCADNode>>("ReactCADTranslationNode")
+      .smart_ptr<std::shared_ptr<TranslationNode>>("ReactCADTranslationNode")
+      .function("setProps", &TranslationNode::setProps);
+
+  emscripten::value_object<RotationProps>("RotationProps")
+      .field("axis", &RotationProps::axis)
+      .field("angle", &RotationProps::angle);
+  emscripten::class_<RotationNode, emscripten::base<ReactCADNode>>("ReactCADRotationNode")
+      .smart_ptr<std::shared_ptr<RotationNode>>("ReactCADRotationNode")
+      .function("setProps", &RotationNode::setProps);
+
+  emscripten::value_object<ScaleProps>("ScaleProps").field("factor", &ScaleProps::factor);
+  emscripten::class_<ScaleNode, emscripten::base<ReactCADNode>>("ReactCADScaleNode")
+      .smart_ptr<std::shared_ptr<ScaleNode>>("ReactCADScaleNode")
+      .function("setProps", &ScaleNode::setProps);
+
+  emscripten::function("createCADNode", &createCADNode);
+  emscripten::function("getView", &ReactCADView::getView);
 }

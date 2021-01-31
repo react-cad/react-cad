@@ -2,6 +2,7 @@ import React from "react";
 import { Story, Meta } from "@storybook/react";
 
 interface Props {
+  center: boolean;
   radius: number;
   height: number;
 }
@@ -21,6 +22,7 @@ export default {
   title: "Primitives/cylinder",
   component: Cylinder,
   argTypes: {
+    center: { control: "boolean" },
     radius: range,
     height: range,
   },
@@ -30,6 +32,7 @@ const Template: Story<Props> = (args) => <Cylinder {...args} />;
 
 export const cylinder = Template.bind({});
 cylinder.args = {
+  center: false,
   radius: 2,
   height: 5,
 };

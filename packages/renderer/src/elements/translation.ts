@@ -1,21 +1,12 @@
-import {
-  ElementProps,
-  Container,
-  HostContext,
-  Instance,
-  UpdatePayload,
-} from "../types";
+import { ReactCADTranslationNode, TranslationProps } from "@react-cad/core";
+import { Props, Instance, UpdatePayload } from "../types";
 
 type Translation = "translation";
 
 export function prepareUpdate(
-  _instance: Instance<Translation>,
-  _type: Translation,
-  oldProps: ElementProps[Translation],
-  newProps: ElementProps[Translation],
-  _rootContainerInstance: Container,
-  _hostContext: HostContext
-): UpdatePayload | null {
+  oldProps: Props<Translation>,
+  newProps: Props<Translation>
+): UpdatePayload<Translation> | null {
   if (
     oldProps.x !== newProps.x ||
     oldProps.y !== newProps.y ||
@@ -24,4 +15,19 @@ export function prepareUpdate(
     return newProps;
   }
   return null;
+}
+
+export function commitUpdate(
+  instance: Instance<Translation>,
+  updatePayload: UpdatePayload<Translation>
+): void {
+  const props: TranslationProps = Object.assign(
+    {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    updatePayload
+  );
+  (instance.node as ReactCADTranslationNode).setProps(props);
 }

@@ -120,7 +120,7 @@ void ReactCADView::renderNodes()
   {
     std::shared_ptr<ReactCADNode> node = it->first;
     Handle(AIS_Shape) shape = it->second;
-    node->render();
+    node->renderTree();
     shape->SetShape(node->shape);
     myContext->Redisplay(shape, false, true);
   }
