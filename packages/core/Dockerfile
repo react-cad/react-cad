@@ -12,7 +12,7 @@ RUN mkdir occt/build
 RUN cd occt/build && emcmake cmake .. \
   -DBUILD_LIBRARY_TYPE=Static \
   -DBUILD_MODULE_Draw=0 \
-  -DCMAKE_CXX_FLAGES="-s USE_FREETYPE=1" \
+  -DCMAKE_CXX_FLAGS="-s USE_FREETYPE=1" \
   -D3RDPARTY_TK_INCLUDE_DIR=/usr/include/tk \
   -D3RDPARTY_FREETYPE_INCLUDE_DIR_ft2build=/usr/local/include/freetype2 \
   -D3RDPARTY_FREETYPE_INCLUDE_DIR_freetype2=/usr/local/include \
@@ -23,6 +23,7 @@ FROM emscripten/emsdk:2.0.10
 
 RUN apt-get update && apt-get -y install tk-dev tcl-dev fswatch
 COPY --from=0 /opt/occt /opt/occt
+COPY --from=0 /emsdk/upstream/emscripten/cache /emsdk/upstream/emscripten/cache
 
 RUN mkdir /react-cad
 WORKDIR /react-cad
