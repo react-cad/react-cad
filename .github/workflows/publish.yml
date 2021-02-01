@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Publish
-    if: ${{ !contains(github.event.commits[0].message, "chore(release)") }}
+    if: ${{ !contains(github.event.commits[0].message, 'chore(release)') }}
     runs-on: ubuntu-latest
     steps:
       - name: "Git: checkout"
