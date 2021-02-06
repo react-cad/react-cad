@@ -1,6 +1,6 @@
 {
   "name": "@react-cad/storybook-addon",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Storybook Addon to render @react-cad projects in the browser",
   "main": "preset.js",
   "files": [
