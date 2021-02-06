@@ -1,7 +1,7 @@
 {
   "name": "@react-cad/create-component",
   "description": "Generator for a @react-cad design project",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "license": "MIT",
   "bin": "./lib/cli.js",
   "repository": "github:react-cad/react-cad",
@@ -12,8 +12,8 @@
     "email": "react.cad.dev@gmail.com"
   },
   "devDependencies": {
-    "@react-cad/renderer": "^0.3.0",
-    "@react-cad/storybook-addon": "^0.3.1"
+    "@react-cad/renderer": "^0.3.2",
+    "@react-cad/storybook-addon": "^0.3.2"
   },
   "publishConfig": {
     "access": "public"
