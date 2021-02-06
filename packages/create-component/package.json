@@ -11,6 +11,10 @@
     "name": "React CAD Dev",
     "email": "react.cad.dev@gmail.com"
   },
+  "devDependencies": {
+    "@react-cad/renderer": "^0.3.0",
+    "@react-cad/storybook-addon": "^0.3.0"
+  },
   "publishConfig": {
     "access": "public"
   },

@@ -10,26 +10,26 @@ interface Props {
 }
 
 const STLDownload = React.memo<Props>(({ filename, renderToSTL }) => {
-  const [linearDeflection, setLinearDeflection] = React.useState(0.05);
+  const [linearDeflection, setLinearDeflection] = React.useState("0.05");
   const [isRelative, setIsRelative] = React.useState(false);
-  const [angularDeflection, setAngularDeflection] = React.useState(0.5);
+  const [angularDeflection, setAngularDeflection] = React.useState("0.5");
 
   const handleClick = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    renderToSTL(linearDeflection, isRelative, angularDeflection).then(
-      (content) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(
-          new Blob([content], { type: "model/stl" })
-        );
-        a.download = filename;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(a.href);
-        document.body.removeChild(a);
-      }
-    );
+    renderToSTL(
+      Number.parseFloat(linearDeflection),
+      isRelative,
+      Number.parseFloat(angularDeflection)
+    ).then((content) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([content], { type: "model/stl" }));
+      a.download = filename;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    });
   };
 
   return (
@@ -46,9 +46,7 @@ const STLDownload = React.memo<Props>(({ filename, renderToSTL }) => {
           name="linearDeflection"
           value={linearDeflection}
           onInput={(event) =>
-            setLinearDeflection(
-              Number.parseFloat((event.target as HTMLInputElement).value)
-            )
+            setLinearDeflection((event.target as HTMLInputElement).value)
           }
         />
       </div>
@@ -79,9 +77,7 @@ const STLDownload = React.memo<Props>(({ filename, renderToSTL }) => {
           name="angularDeflection"
           value={angularDeflection}
           onInput={(event) =>
-            setAngularDeflection(
-              Number.parseFloat((event.target as HTMLInputElement).value)
-            )
+            setAngularDeflection((event.target as HTMLInputElement).value)
           }
         />
       </div>

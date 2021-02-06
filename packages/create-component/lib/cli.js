@@ -38,3 +38,16 @@ console.log(`Creating @react-cad component in ${packagePath}`);
 
 fs.mkdirSync(packagePath)
 copyDir(templatePath, packagePath);
+
+// Copy lerna-managed package versions from own package.json
+const myPackage = require('../package.json');
+const newPackage = require(path.join(packagePath, 'package.json'));
+newPackage.devDependencies = {
+  ...newPackage.devDependencies,
+  ...myPackage.devDependencies,
+};
+fs.writeFileSync(
+  path.join(packagePath, 'package.json'),
+  JSON.stringify(newPackage, null, 2),
+  'utf8'
+);
