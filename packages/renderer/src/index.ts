@@ -43,10 +43,8 @@ export const HostConfig: ReactReconciler.HostConfig<
   now: Date.now,
   // @ts-expect-error reconciler types don't include clearContainer but omitting causes a crash
   clearContainer(rootContainerInstance: Container) {
-    const { core, rootNodes } = rootContainerInstance;
-    rootNodes.forEach((node) => {
-      core.getView().removeNode(node);
-    });
+    const { rootNodes, root } = rootContainerInstance;
+    rootNodes.forEach((node) => root.removeChild(node));
     rootContainerInstance.rootNodes = [];
   },
   getPublicInstance(instance: Instance) {
@@ -64,31 +62,27 @@ export const HostConfig: ReactReconciler.HostConfig<
     return parentHostContext;
   },
   appendChildToContainer(rootContainerInstance: Container, child: Instance) {
-    const { rootNodes, core } = rootContainerInstance;
-    core.getView().addNode(child.node);
+    const { rootNodes, root } = rootContainerInstance;
+    root.appendChild(child.node);
     rootNodes.push(child.node);
   },
   insertInContainerBefore(
     rootContainerInstance: Container,
     child: Instance,
-    beforeChild: Instance
+    _beforeChild: Instance
   ) {
-    const { rootNodes, core } = rootContainerInstance;
-    const index = rootNodes.indexOf(beforeChild.node);
-    if (index < 0) {
-      throw new Error(`insertInContainerBefore child does not exist`);
-    }
-    core.getView().addNode(child.node);
-    rootNodes.splice(index, 0, child.node);
+    const { rootNodes, root } = rootContainerInstance;
+    root.appendChild(child.node);
+    rootNodes.push(child.node);
   },
   removeChildFromContainer(rootContainerInstance: Container, child: Instance) {
-    const { core, rootNodes } = rootContainerInstance;
+    const { root, rootNodes } = rootContainerInstance;
     const index = rootNodes.indexOf(child.node);
     if (index < 0) {
       throw new Error(`removeChildFromContainer child does not exist`);
     }
     rootNodes.splice(index, 1);
-    core.getView().removeNode(child.node);
+    root.removeChild(child.node);
   },
   finalizeInitialChildren<T extends Type>(
     _instance: Instance<T>,
@@ -103,19 +97,17 @@ export const HostConfig: ReactReconciler.HostConfig<
     // TODO: Implement?
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { core, rootNodes, nodes } = rootContainerInstance;
-    // Update view
-    core.getView().renderNodes();
+    const { rootNodes, nodes } = rootContainerInstance;
 
     // Free memory of removed nodes
-    const removedNodes = nodes.filter(
-      (node) => !rootNodes.includes(node) && !node.hasParent()
-    );
-    removedNodes.forEach((node) => {
-      node.delete();
-    });
+    const removedNodes = nodes.filter((node) => !node.hasParent());
+    removedNodes.forEach((node) => node.delete());
+
     // Remove deleted nodes from list
     rootContainerInstance.nodes = rootContainerInstance.nodes.filter(
+      (node) => !removedNodes.includes(node)
+    );
+    rootContainerInstance.rootNodes = rootNodes.filter(
       (node) => !removedNodes.includes(node)
     );
   },
@@ -168,45 +160,135 @@ export const HostConfig: ReactReconciler.HostConfig<
 
 const reconcilerInstance = ReactReconciler(HostConfig);
 
-interface Renderer {
-  render(
-    element: React.ReactElement,
-    core: ReactCADCore,
-    callback?: () => void
-  ): (element: React.ReactElement, callback?: () => void) => void;
+interface RendererConfig {
+  context: Container;
+  container: ReactReconciler.FiberRoot;
 }
 
-const Renderer: Renderer = {
-  render(element, core, callback = () => {}) {
-    const isAsync = false;
-    const hydrate = false;
-    const container = reconcilerInstance.createContainer(
-      {
-        core,
-        nodes: [],
-        rootNodes: [],
-      },
-      isAsync,
-      hydrate
-    ); // Creates root fiber node.
+const rendererConfigs: Map<ReactCADCore, RendererConfig> = new Map();
 
-    const parentComponent = null;
+function createConfig(core: ReactCADCore): RendererConfig {
+  const root = core.createCADNode("union");
+  const view = core.getView();
+  view.setNode(root);
+  view.delete();
 
+  const isAsync = false;
+  const hydrate = false;
+
+  const context: Container = {
+    core,
+    nodes: [],
+    rootNodes: [],
+    root,
+  };
+
+  const container = reconcilerInstance.createContainer(
+    context,
+    isAsync,
+    hydrate
+  );
+
+  return { context, container };
+}
+
+export function render(
+  element: React.ReactElement,
+  core: ReactCADCore
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const existingContainer = rendererConfigs.get(core);
+    const { container } =
+      existingContainer ??
+      rendererConfigs.set(core, createConfig(core)).get(core) ??
+      {};
+
+    if (container) {
+      reconcilerInstance.updateContainer(element, container, null, () => {
+        const view = core.getView();
+        view.render();
+        if (!existingContainer) {
+          view.fit();
+        }
+        view.delete();
+        resolve();
+      });
+      return;
+    }
+
+    reject("React container could not be created");
+  });
+}
+
+export function destroyContainer(core: ReactCADCore): void {
+  const config = rendererConfigs.get(core);
+  if (!config) {
+    return;
+  }
+  rendererConfigs.delete(core);
+  config.context.nodes.forEach((node) => node.delete());
+  config.context.root.delete();
+}
+
+export function renderToSTL(
+  element: React.ReactElement,
+  core: ReactCADCore,
+  linearDeflection = 0.05,
+  isRelative = false,
+  angularDeflection = 0.5
+): Promise<string> {
+  const isAsync = false;
+  const hydrate = false;
+
+  const context: Container = {
+    core,
+    nodes: [],
+    rootNodes: [],
+    root: core.createCADNode("union"),
+  };
+
+  const container = reconcilerInstance.createContainer(
+    context,
+    isAsync,
+    hydrate
+  ); // Creates root fiber node.
+
+  const parentComponent = null;
+
+  return new Promise((resolve, reject) => {
     reconcilerInstance.updateContainer(
       element,
       container,
       parentComponent,
-      callback ?? (() => {})
+      () => {
+        try {
+          const filename = "/tmp/shape.stl";
+          const success = core.writeSTL(
+            context.root,
+            filename,
+            linearDeflection,
+            isRelative,
+            angularDeflection
+          );
+          context.nodes.forEach((node) => node.delete());
+          context.root.delete();
+          if (success) {
+            const content = core.FS.readFile(filename, { encoding: "utf8" });
+            core.FS.unlink(filename);
+            resolve(content);
+          }
+          core.FS.unlink(filename);
+          reject("Could not create stl");
+        } catch (e) {
+          reject(e);
+        }
+      }
     );
+  });
+}
 
-    return (element, callback = () => {}) =>
-      reconcilerInstance.updateContainer(
-        element,
-        container,
-        parentComponent,
-        callback
-      );
-  },
+export default {
+  render,
+  renderToSTL,
+  destroyContainer,
 };
-
-export default Renderer;

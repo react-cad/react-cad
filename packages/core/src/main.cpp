@@ -1,9 +1,10 @@
 #include <iostream>
-
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
+
+#include <StlAPI.hxx>
 
 #include "ReactCADNode.h"
 #include "ReactCADView.h"
@@ -27,6 +28,7 @@
 #include "ScaleNode.h"
 #include "TranslationNode.h"
 
+#include <BRepMesh_IncrementalMesh.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
 #include <Message_PrinterSystemLog.hxx>
@@ -97,6 +99,15 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   return std::make_shared<BoxNode>();
 }
 
+Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::string filename,
+                          const Standard_Real theLinDeflection, const Standard_Boolean isRelative,
+                          const Standard_Real theAngDeflection)
+{
+  node->renderTree();
+  BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
+  return StlAPI::Write(node->shape, filename.c_str());
+}
+
 //! Dummy main loop callback for a single shot.
 extern "C" void onMainLoop()
 {
@@ -159,9 +170,9 @@ EMSCRIPTEN_BINDINGS(react_cad)
   // View object
   emscripten::class_<ReactCADView>("ReactCADView")
       .smart_ptr<std::shared_ptr<ReactCADView>>("ReactCADView")
-      .function("addNode", &ReactCADView::addNode)
+      .function("setNode", &ReactCADView::setNode)
       .function("removeNode", &ReactCADView::removeNode)
-      .function("renderNodes", &ReactCADView::renderNodes)
+      .function("render", &ReactCADView::render)
       .function("fit", &ReactCADView::fit);
 
   // Base node
@@ -254,4 +265,5 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   emscripten::function("createCADNode", &createCADNode);
   emscripten::function("getView", &ReactCADView::getView);
+  emscripten::function("writeSTL", &writeSTL);
 }

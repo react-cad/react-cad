@@ -48,9 +48,9 @@ public:
   //! Destructor.
   virtual ~ReactCADView();
 
-  void addNode(std::shared_ptr<ReactCADNode> node);
-  void removeNode(std::shared_ptr<ReactCADNode> node);
-  void renderNodes();
+  void setNode(std::shared_ptr<ReactCADNode> node);
+  void removeNode();
+  void render();
 
   void fit();
 
@@ -177,7 +177,8 @@ private:
   OSD_Timer myDoubleTapTimer;               //!< timer for handling double tap
   float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
   unsigned int myUpdateRequests;            //!< counter for unhandled update requests
-  std::map<std::shared_ptr<ReactCADNode>, Handle(AIS_Shape)> myNodes;
+  std::shared_ptr<ReactCADNode> myNode;
+  Handle_AIS_Shape myShape;
 };
 
 #endif // _ReactCADView_HeaderFile

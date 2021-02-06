@@ -67,6 +67,7 @@ export type ElementProps = ReactCADElements;
 
 export type Container = {
   core: ReactCADCore;
+  root: ReactCADNode;
   nodes: ReactCADNode[];
   rootNodes: ReactCADNode[];
 };
