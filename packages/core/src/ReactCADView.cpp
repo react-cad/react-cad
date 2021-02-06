@@ -75,6 +75,11 @@ std::shared_ptr<ReactCADView> ReactCADView::getView()
   return singleton;
 }
 
+void ReactCADView::destroyView()
+{
+  singleton = nullptr;
+}
+
 ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0)
 {
 

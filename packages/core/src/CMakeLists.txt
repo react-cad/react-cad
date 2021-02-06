@@ -39,12 +39,13 @@ target_link_libraries(
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   --bind \
   -s EXTRA_EXPORTED_RUNTIME_METHODS=['FS','ccall','cwrap'] \
+  -s EXPORTED_FUNCTIONS=['_main','_shutdown'] \
   -s WASM=1 \
   -s MODULARIZE=1 \
   -s USE_WEBGL2=1 \
   -s USE_FREETYPE=1 \
   -s ALLOW_MEMORY_GROWTH=1 \
-  -s NO_EXIT_RUNTIME=1 \
+  -s EXIT_RUNTIME=1 \
 ")
 
 add_custom_command(

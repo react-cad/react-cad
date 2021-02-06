@@ -134,6 +134,12 @@ int main()
   return 0;
 }
 
+extern "C" void shutdown()
+{
+  ReactCADView::destroyView();
+  emscripten_force_exit(0);
+}
+
 namespace emscripten
 {
 namespace internal
