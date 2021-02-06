@@ -133,6 +133,7 @@ export interface ReactCADCore extends EmscriptenModule {
     readFile(path: string, opts?: { flags?: string }): Uint8Array;
     unlink(path: string): void;
   };
+  _shutdown(): void;
 }
 
 declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;

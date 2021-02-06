@@ -13,7 +13,6 @@ interface Props {
 const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
   ({ className, shape }, forwardedRef) => {
     const wrapperRef = React.useRef<HTMLDivElement>(null);
-    const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
     React.useImperativeHandle(
       forwardedRef,
@@ -21,13 +20,14 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
     );
 
     const coreRef = React.useRef<ReactCADCore>();
+    const loaded = React.useRef<Promise<void>>(Promise.resolve());
 
     const [latestShape, setReady] = useStateWhenReady(shape);
 
-    React.useEffect(() => {
-      if (canvasRef.current) {
-        const setup = reactCadCore({
-          canvas: canvasRef.current,
+    const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
+      if (canvas) {
+        loaded.current = reactCadCore({
+          canvas,
           locateFile: () => reactCadCoreWasm,
         })
           .then((core) => {
@@ -36,14 +36,18 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
             return ReactCadRenderer.render(shape, coreRef.current);
           })
           .then(() => setReady(true));
-
-        return () => {
-          setup.then(() => {
-            if (coreRef.current) {
-              ReactCadRenderer.destroyContainer(coreRef.current);
+      } else {
+        loaded.current.then(() => {
+          if (coreRef.current) {
+            ReactCadRenderer.destroyContainer(coreRef.current);
+            try {
+              coreRef.current._shutdown();
+            } catch (e) {
+              // Ignore emscripten exit message
             }
-          });
-        };
+            coreRef.current = undefined;
+          }
+        });
       }
     }, []);
 

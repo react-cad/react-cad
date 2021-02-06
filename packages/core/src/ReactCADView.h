@@ -44,6 +44,7 @@ class ReactCADView : protected AIS_ViewController
 {
 public:
   static std::shared_ptr<ReactCADView> getView();
+  static void destroyView();
 
   //! Destructor.
   virtual ~ReactCADView();
