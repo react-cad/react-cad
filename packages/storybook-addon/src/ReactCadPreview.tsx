@@ -1,20 +1,9 @@
 import React from "react";
-import reactCadCore from "@react-cad/core";
+import reactCadCore, { ReactCADCore } from "@react-cad/core";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
 import ReactCadRenderer from "@react-cad/renderer";
-
-function useStateWhenReady<T>(value: T) {
-  const [ready, setReady] = React.useState(true);
-  const [myValue, setMyValue] = React.useState(value);
-
-  React.useEffect(() => {
-    if (ready) {
-      setMyValue(value);
-    }
-  }, [value, ready]);
-
-  return [myValue, setReady] as [T, typeof setReady];
-}
+import STLDownload from "./STLDownload";
+import useStateWhenReady from "./useStateWhenReady";
 
 interface Props {
   className?: string;
@@ -31,35 +20,59 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
       () => wrapperRef.current ?? undefined
     );
 
-    const render = React.useRef<
-      ReturnType<typeof ReactCadRenderer["render"]>
-    >();
+    const coreRef = React.useRef<ReactCADCore>();
 
     const [latestShape, setReady] = useStateWhenReady(shape);
 
     React.useEffect(() => {
       if (canvasRef.current) {
-        reactCadCore({
+        const setup = reactCadCore({
           canvas: canvasRef.current,
           locateFile: () => reactCadCoreWasm,
-        }).then((core) => {
-          setReady(false);
-          render.current = ReactCadRenderer.render(shape, core, () => {
-            setReady(true);
-            core.getView().fit();
+        })
+          .then((core) => {
+            coreRef.current = core;
+            setReady(false);
+            return ReactCadRenderer.render(shape, coreRef.current);
+          })
+          .then(() => setReady(true));
+
+        return () => {
+          setup.then(() => {
+            if (coreRef.current) {
+              ReactCadRenderer.destroyContainer(coreRef.current);
+            }
           });
-        });
+        };
       }
     }, []);
 
     React.useEffect(() => {
-      if (render.current) {
+      if (coreRef.current) {
         setReady(false);
-        render.current(shape, () => {
-          setReady(true);
-        });
+        ReactCadRenderer.render(latestShape, coreRef.current).then(() =>
+          setReady(true)
+        );
       }
     }, [latestShape]);
+
+    const renderToSTL = React.useCallback(
+      (
+        linearDeflection: number,
+        isRelative: boolean,
+        angularDeflection: number
+      ) =>
+        coreRef.current
+          ? ReactCadRenderer.renderToSTL(
+              shape,
+              coreRef.current,
+              linearDeflection,
+              isRelative,
+              angularDeflection
+            )
+          : Promise.reject("react-cad not initialised"),
+      [shape]
+    );
 
     const width = 640,
       height = 480;
@@ -75,6 +88,10 @@ const ReactCadPreview = React.forwardRef<HTMLDivElement | undefined, Props>(
           width={width * window.devicePixelRatio}
           height={height * window.devicePixelRatio}
           ref={canvasRef}
+        />
+        <STLDownload
+          filename={`${(shape.type as any).displayName || "react-cad"}.stl`}
+          renderToSTL={renderToSTL}
         />
       </div>
     );

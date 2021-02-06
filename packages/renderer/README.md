@@ -13,9 +13,11 @@ const canvas = document.getElementById("my-canvas");
 const box = <box x={1} y={2} x={3} />;
 
 reactCadCore({ canvas }).then(core => {
-  const renderUpdate = reactCadRenderer.render(box, core);
+  reactCadRenderer.render(box, core);
   const updatedBox = <box x={4} y={5} x={6} />;
-  renderUpdate(updatedBox);
+  reactCadRenderer.render(updatedBox, core);
+
+  const stlString = reactCadRenderer.renderToSTL(updatedBox, core, 0.05, false, 0.5);
 });
 ```
 

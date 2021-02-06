@@ -3,9 +3,9 @@ export class EmClass {
 }
 
 export class ReactCADView extends EmClass {
-  public addNode(node: ReactCADNode): void;
+  public setNode(node: ReactCADNode): void;
   public removeNode(node: ReactCADNode): void;
-  public renderNodes(): void;
+  public render(): void;
   public fit(): void;
 }
 
@@ -114,9 +114,25 @@ export interface ReactCADCore extends EmscriptenModule {
   ReactCADView: typeof ReactCADView;
   createCADNode(type: string): ReactCADNode;
   getView(): ReactCADView;
+  writeSTL(
+    node: ReactCADNode,
+    filename: string,
+    linearDeflection: number,
+    isRelative: boolean,
+    angularDeflection: number
+  ): boolean;
   cwrap: typeof cwrap;
   ccall: typeof ccall;
   canvas: HTMLCanvasElement;
+  FS: {
+    readFile(
+      path: string,
+      opts: { encoding: "binary"; flags?: string }
+    ): Uint8Array;
+    readFile(path: string, opts: { encoding: "utf8"; flags?: string }): string;
+    readFile(path: string, opts?: { flags?: string }): Uint8Array;
+    unlink(path: string): void;
+  };
 }
 
 declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;

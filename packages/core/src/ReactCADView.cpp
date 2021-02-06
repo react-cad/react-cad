@@ -77,6 +77,7 @@ std::shared_ptr<ReactCADView> ReactCADView::getView()
 
 ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0)
 {
+
   initWindow();
   initViewer();
   initDemoScene();
@@ -86,6 +87,9 @@ ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdat
   }
 
   myView->MustBeResized();
+  myShape = new AIS_Shape(TopoDS_Shape());
+  myShape->SetMaterial(Graphic3d_NameOfMaterial_Aluminum);
+  myContext->Display(myShape, AIS_Shaded, 0, false);
   myView->Redraw();
 }
 
@@ -97,34 +101,34 @@ ReactCADView::~ReactCADView()
 {
 }
 
-void ReactCADView::addNode(std::shared_ptr<ReactCADNode> node)
+void ReactCADView::setNode(std::shared_ptr<ReactCADNode> node)
 {
-  Handle(AIS_Shape) shape = new AIS_Shape(TopoDS_Shape());
-  shape->SetMaterial(Graphic3d_NameOfMaterial_Aluminum);
-  myContext->Display(shape, AIS_Shaded, 0, false);
+  myNode = node;
+  myShape->SetShape(myNode->shape);
+  myContext->Redisplay(myShape, false, true);
   myView->Redraw();
-  myNodes.insert(std::pair<std::shared_ptr<ReactCADNode>, Handle(AIS_Shape)>(node, shape));
 }
 
-void ReactCADView::removeNode(std::shared_ptr<ReactCADNode> node)
+void ReactCADView::removeNode()
 {
-  Handle(AIS_Shape) shape = myNodes.at(node);
-  myContext->Remove(shape, false);
-  myView->Redraw();
-  myNodes.erase(node);
-}
-
-void ReactCADView::renderNodes()
-{
-  for (auto it = std::begin(myNodes); it != std::end(myNodes); ++it)
+  if (myNode)
   {
-    std::shared_ptr<ReactCADNode> node = it->first;
-    Handle(AIS_Shape) shape = it->second;
-    node->renderTree();
-    shape->SetShape(node->shape);
-    myContext->Redisplay(shape, false, true);
+    myShape->SetShape(TopoDS_Shape());
+    myContext->Redisplay(myShape, false, true);
+    myView->Redraw();
+    myNode = nullptr;
   }
-  myView->Redraw();
+}
+
+void ReactCADView::render()
+{
+  if (myNode)
+  {
+    myNode->renderTree();
+    myShape->SetShape(myNode->shape);
+    myContext->Redisplay(myShape, false, true);
+    myView->Redraw();
+  }
 }
 
 void ReactCADView::fit()
