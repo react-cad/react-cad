@@ -1,7 +1,8 @@
 #include "DifferenceNode.hpp"
 #include "PerformanceTimer.hpp"
+#include "operations.hpp"
 
-#include <BRepAlgoAPI_Cut.hxx>
+#include <TopTools_ListOfShape.hxx>
 
 DifferenceNode::DifferenceNode()
 {
@@ -11,50 +12,23 @@ DifferenceNode::~DifferenceNode()
 {
 }
 
-void DifferenceNode::computeChildren(const std::vector<TopoDS_Shape> &children)
+void DifferenceNode::computeChildren(TopTools_ListOfShape children)
 {
-  m_childShape = cut(children);
-}
-
-TopoDS_Shape DifferenceNode::cut(const std::vector<TopoDS_Shape> &children)
-{
-  switch (children.size())
+  PerformanceTimer timer("Calculate difference");
+  switch (children.Size())
   {
   case 0:
-    return TopoDS_Shape();
+    m_childShape = TopoDS_Shape();
+    break;
   case 1:
-    return children.at(0);
+    m_childShape = children.First();
+    break;
   default: {
-    PerformanceTimer timer("Difference render time");
-    timer.start();
-    BRepAlgoAPI_Cut aBuilder;
-
-    TopTools_ListOfShape aLS;
-    TopTools_ListOfShape aLT;
-
-    for (TopoDS_Shape shape : children)
-    {
-      if (shape == children.front())
-      {
-        aLS.Append(shape);
-      }
-      else
-      {
-        aLT.Append(shape);
-      }
-    }
-
-    aBuilder.SetArguments(aLS);
-    aBuilder.SetTools(aLT);
-
-    aBuilder.Build();
-    if (aBuilder.HasErrors())
-    {
-      TopoDS_Shape nullShape;
-      return nullShape;
-    }
-    timer.end();
-    return aBuilder.Shape();
+    TopoDS_Shape positive = children.First();
+    children.RemoveFirst();
+    m_childShape = differenceOp(positive, children);
+    break;
   }
   }
+  timer.end();
 }

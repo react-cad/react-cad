@@ -1,7 +1,9 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Point } from "@react-cad/core";
+import { Point, Profile } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
+
+import reactIcon from "./react-icon";
 
 function makePolygon(sides: number) {
   return [...Array(sides)].map(
@@ -20,25 +22,17 @@ function rotatePolygon(polygon: Point[]): Point[] {
   return polygon.map(([x, y, z]) => [x, z, y]);
 }
 
-const profiles: Record<string, Point[]> = {
+const profiles: Record<string, Profile> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
+  SVG: reactIcon,
 };
 
 export const Helix: React.FC<ReactCADElements["helix"]> = (props) => (
   <helix {...props} />
 );
-
-const range = {
-  control: {
-    type: "range",
-    min: 1,
-    max: 10,
-    step: 0.1,
-  },
-};
 
 export default {
   title: "Sweeps/Helix",
@@ -51,8 +45,22 @@ export default {
       },
     },
     rotated: { control: "boolean" },
-    pitch: range,
-    height: range,
+    pitch: {
+      control: {
+        type: "range",
+        min: 1,
+        max: 50,
+        step: 5,
+      },
+    },
+    height: {
+      control: {
+        type: "range",
+        min: 1,
+        max: 5,
+        step: 1,
+      },
+    },
   },
 } as Meta;
 
@@ -65,7 +73,7 @@ interface StoryProps {
 
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
   let points = profiles[profileName];
-  if (rotated) {
+  if (rotated && typeof points !== "string") {
     points = offsetPolygon(rotatePolygon(points));
   }
 

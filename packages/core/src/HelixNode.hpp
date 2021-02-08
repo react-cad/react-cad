@@ -21,6 +21,9 @@ protected:
 
 private:
   HelixProps m_props;
+  bool m_pitchOrHeightChanged = false;
+
+  TopoDS_Shape makeHelix(TopoDS_Wire profile);
 };
 
 #endif

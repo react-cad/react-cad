@@ -2,15 +2,22 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepLib.hxx>
 #include <BRepOffsetAPI_MakePipeShell.hxx>
+#include <BRepTools.hxx>
+#include <BRep_Builder.hxx>
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <gp_Lin2d.hxx>
 
+#include <Message.hxx>
+#include <Message_Messenger.hxx>
 #include <math.h>
 
 #include "HelixNode.hpp"
+
+#include "PerformanceTimer.hpp"
+#include "operations.hpp"
 
 HelixNode::HelixNode() : m_props({.pitch = 1, .height = 1})
 {
@@ -29,7 +36,7 @@ void HelixNode::setProps(const HelixProps &props)
   }
 }
 
-void HelixNode::computeShape()
+TopoDS_Shape HelixNode::makeHelix(TopoDS_Wire profile)
 {
   BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_props.height));
   BRepBuilderAPI_MakeWire spine(edge);
@@ -49,9 +56,56 @@ void HelixNode::computeShape()
 
   BRepOffsetAPI_MakePipeShell pipe(spine);
   pipe.SetMode(guide, false);
-  pipe.Add(m_profile);
+  pipe.Add(profile);
+
   pipe.Build();
   pipe.MakeSolid();
 
-  shape = pipe.Shape();
+  return pipe;
+}
+
+void HelixNode::computeShape()
+{
+  makeProfile();
+
+  Message::DefaultMessenger()->Send("About to calculate helix");
+
+  PerformanceTimer timer("Calculate helix");
+
+  BRep_Builder builder;
+  TopoDS_Compound compound;
+  builder.MakeCompound(compound);
+
+  std::vector<ShapeWires>::iterator it;
+  for (it = wires.begin(); it != wires.end(); ++it)
+  {
+    BRep_Builder positiveBuilder;
+    TopoDS_Compound positiveCompound;
+    positiveBuilder.MakeCompound(positiveCompound);
+
+    for (std::vector<TopoDS_Wire>::iterator pos = it->first.begin(); pos != it->first.end(); ++pos)
+    {
+      positiveBuilder.Add(positiveCompound, makeHelix(*pos));
+    }
+
+    if (it->second.size() == 0)
+    {
+      builder.Add(compound, positiveCompound);
+    }
+    else
+    {
+      BRep_Builder negativeBuilder;
+      TopoDS_Compound negativeCompound;
+      negativeBuilder.MakeCompound(negativeCompound);
+
+      for (std::vector<TopoDS_Wire>::iterator neg = it->second.begin(); neg != it->second.end(); ++neg)
+      {
+        negativeBuilder.Add(negativeCompound, makeHelix(*neg));
+      }
+
+      builder.Add(compound, differenceOp(positiveCompound, negativeCompound));
+    }
+  }
+  shape = compound;
+  timer.end();
 }

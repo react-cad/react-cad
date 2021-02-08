@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include <TopTools_ListOfShape.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <emscripten/bind.h>
@@ -33,10 +34,9 @@ public:
 protected:
   void propsChanged();
 
-  virtual void computeChildren(const std::vector<TopoDS_Shape> &children);
+  virtual void computeChildren(TopTools_ListOfShape children);
   virtual void computeShape();
 
-  TopoDS_Shape fuse(const std::vector<TopoDS_Shape> &children);
   TopoDS_Shape m_childShape;
 
   bool isType(const emscripten::val &value, const std::string &type);

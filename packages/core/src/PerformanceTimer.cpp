@@ -6,12 +6,10 @@
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
 
-PerformanceTimer::PerformanceTimer(std::string name) : name(name){};
-
-void PerformanceTimer::start()
+PerformanceTimer::PerformanceTimer(std::string name) : name(name)
 {
   startTime = std::chrono::high_resolution_clock::now();
-}
+};
 
 void PerformanceTimer::end()
 {

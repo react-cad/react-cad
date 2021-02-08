@@ -174,7 +174,6 @@ void ReactCADView::render(TopoDS_Shape shape, bool reset)
     myShape = shape;
 
     PerformanceTimer timer("Compute mesh");
-    timer.start();
     drawShape(shape);
     timer.end();
   }

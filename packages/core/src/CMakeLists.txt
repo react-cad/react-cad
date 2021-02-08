@@ -13,6 +13,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 set(CMAKE_CXX_FLAGS "-pthread")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(/usr/local/include)
 file(GLOB SOURCES
   *.hpp
   *.cpp

@@ -362,7 +362,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
   // Sweeps
   emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
       .smart_ptr<std::shared_ptr<SweepNode>>("ReactCADSweepNode")
-      .function("setProfile", &SweepNode::setProfile);
+      .function("setProfile", &SweepNode::setProfile)
+      .function("setSVGProfile", &SweepNode::setSVGProfile);
 
   emscripten::value_object<PrismProps>("PrismProps")
       .field("axis", &PrismProps::axis)

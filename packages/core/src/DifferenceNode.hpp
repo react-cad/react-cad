@@ -3,6 +3,8 @@
 
 #include "ReactCADNode.hpp"
 
+#include <TopTools_ListOfShape.hxx>
+
 class DifferenceNode : public ReactCADNode
 {
 public:
@@ -10,10 +12,7 @@ public:
   virtual ~DifferenceNode();
 
 protected:
-  void computeChildren(const std::vector<TopoDS_Shape> &children) override;
-
-private:
-  TopoDS_Shape cut(const std::vector<TopoDS_Shape> &children);
+  void computeChildren(TopTools_ListOfShape children) override;
 };
 
 #endif

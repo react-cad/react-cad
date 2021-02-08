@@ -9,9 +9,11 @@ export class ReactCADNode extends EmClass {
   public hasParent(): boolean;
 }
 
-export type Axis = "x" | "y" | "z";
+export type Vector = [number, number, number];
 export type Point = [number, number, number];
 export type Profile = Point[];
+export type Axis = "x" | "y" | "z";
+
 export type Projection = number & { _opaque: typeof Projection };
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
 
@@ -53,6 +55,7 @@ export class ReactCADTorusNode extends ReactCADNode {
 // Sweeps
 export class ReactCADSweepNode extends ReactCADNode {
   public setProfile(path: Profile): void;
+  public setSVGProfile(svg: string): void;
 }
 
 export interface RevolutionProps {

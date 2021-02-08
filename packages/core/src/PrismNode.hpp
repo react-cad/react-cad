@@ -20,7 +20,14 @@ protected:
   void computeShape() override;
 
 private:
+  double m_sectionHeight;
   PrismProps m_props;
+  bool m_heightChanged = false;
+  bool m_axisChanged = false;
+  TopoDS_Shape m_section;
+  bool m_sectionChanged = false;
+
+  void computeSection();
 };
 
 #endif

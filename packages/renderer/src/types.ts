@@ -1,5 +1,11 @@
 import { Fiber } from "react-reconciler";
-import { ReactCADCore, ReactCADNode, Axis, Point } from "@react-cad/core";
+import {
+  ReactCADCore,
+  ReactCADNode,
+  Axis,
+  Profile,
+  Point,
+} from "@react-cad/core";
 
 export interface Element<T extends Type = Type> {
   prepareUpdate(
@@ -30,7 +36,7 @@ export interface ReactCADElements {
   };
 
   prism: {
-    profile: Point[];
+    profile: Profile;
     axis: Axis;
     height: number;
   };
@@ -40,7 +46,7 @@ export interface ReactCADElements {
     angle: number;
   };
   helix: {
-    profile: Point[];
+    profile: Profile;
     pitch: number;
     height: number;
   };
