@@ -53,6 +53,10 @@ export function commitUpdate(
   );
   const prism = instance.node as ReactCADPrismNode;
 
-  prism.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  if (typeof profile === "string") {
+    prism.setSVGProfile(profile);
+  } else {
+    prism.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  }
   prism.setProps(props);
 }

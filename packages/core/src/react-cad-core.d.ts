@@ -59,6 +59,7 @@ export class ReactCADTorusNode extends ReactCADNode {
 // Sweeps
 export class ReactCADSweepNode extends ReactCADNode {
   public setProfile(path: Profile): void;
+  public setSVGProfile(svg: string): void;
 }
 
 export interface RevolutionProps {

@@ -11,6 +11,7 @@ set(APP_TARGET_ES6 react-cad-core.esm.js)
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(/usr/local/include)
 file(GLOB SOURCES
   *.h
   *.cpp

@@ -30,7 +30,7 @@ export interface ReactCADElements {
   };
 
   prism: {
-    profile: Point[];
+    profile: Point[] | string;
     axis: Axis;
     height: number;
   };

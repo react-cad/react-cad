@@ -38,8 +38,7 @@ void PrismNode::renderShape()
     axis.SetZ(m_props.height);
   }
 
-  BRepBuilderAPI_MakeFace profile(m_profile);
-  BRepPrimAPI_MakePrism prism(profile, axis);
+  BRepPrimAPI_MakePrism prism(m_face, axis);
 
   shape = prism.Shape();
 }
