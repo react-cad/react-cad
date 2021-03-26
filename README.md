@@ -4,7 +4,7 @@ Yet another javascript CAD library
 
 * Write CAD models with React in your favourite editor
 * Preview in Storybook as you work
-* TODO: Export to STL via Storybook or the command line
+* Export to STL via Storybook or the command line
 
 ## Usage
 
