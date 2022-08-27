@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 import { Axis, Point } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
 
@@ -19,7 +19,7 @@ const profiles: Record<string, Point[]> = {
   Hexagon: makePolygon(6),
 };
 
-const Prism: React.FC<ReactCADElements["prism"]> = (props) => (
+export const Prism: React.FC<ReactCADElements["prism"]> = (props) => (
   <prism {...props} />
 );
 
@@ -33,7 +33,7 @@ const range = {
 };
 
 export default {
-  title: "Sweeps/prism",
+  title: "Sweeps/Prism",
   component: Prism,
   argTypes: {
     profileName: {

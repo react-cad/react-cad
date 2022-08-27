@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 interface Props {
   center: boolean;
@@ -7,7 +7,7 @@ interface Props {
   height: number;
 }
 
-const Cylinder: React.FC<Props> = (props) => <cylinder {...props} />;
+export const Cylinder: React.FC<Props> = (props) => <cylinder {...props} />;
 
 const range = {
   control: {
@@ -19,7 +19,7 @@ const range = {
 };
 
 export default {
-  title: "Primitives/cylinder",
+  title: "Primitives/Cylinder",
   component: Cylinder,
   argTypes: {
     center: { control: "boolean" },

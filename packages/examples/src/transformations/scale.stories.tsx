@@ -1,11 +1,11 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 interface Props {
   factor: number;
 }
 
-const Scale: React.FC<Props> = (props) => (
+export const Scale: React.FC<Props> = (props) => (
   <scale {...props}>
     <box center x={1} y={1} z={1} />
   </scale>
@@ -21,7 +21,7 @@ const range = {
 };
 
 export default {
-  title: "Transformations/scale",
+  title: "Transformations/Scale",
   component: Scale,
   argTypes: {
     factor: range,

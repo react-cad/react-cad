@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 type Axis = "x" | "y" | "z";
 
@@ -11,7 +11,7 @@ interface Props {
   angle: number;
 }
 
-const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => (
+export const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => (
   <rotation axis={axis} angle={angle}>
     <difference>
       <union>
@@ -65,8 +65,8 @@ export default {
 
 const Template: Story<Props> = (args) => <Composed {...args} />;
 
-export const Default = Template.bind({});
-Default.args = {
+export const composed = Template.bind({});
+composed.args = {
   x: 5,
   y: 5,
   z: 5,

@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 import { Axis, Point } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
 
@@ -19,12 +19,12 @@ const profiles: Record<string, Point[]> = {
   Hexagon: makePolygon(6),
 };
 
-const Revolution: React.FC<ReactCADElements["revolution"]> = (props) => (
+export const Revolution: React.FC<ReactCADElements["revolution"]> = (props) => (
   <revolution {...props} />
 );
 
 export default {
-  title: "Sweeps/revolution",
+  title: "Sweeps/Revolution",
   component: Revolution,
   argTypes: {
     profileName: {

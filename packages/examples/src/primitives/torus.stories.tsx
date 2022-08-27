@@ -1,12 +1,12 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 interface Props {
   radius1: number;
   radius2: number;
 }
 
-const Torus: React.FC<Props> = (props) => <torus {...props} />;
+export const Torus: React.FC<Props> = (props) => <torus {...props} />;
 
 const range = {
   control: {
@@ -18,7 +18,7 @@ const range = {
 };
 
 export default {
-  title: "Primitives/torus",
+  title: "Primitives/Torus",
   component: Torus,
   argTypes: {
     radius1: range,
