@@ -138,6 +138,7 @@ void ReactCADView::render()
 
 void ReactCADView::fit()
 {
+  myView->Reset(false);
   myView->FitAll(0.1, false);
   myView->Redraw();
 }

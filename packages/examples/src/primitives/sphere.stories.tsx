@@ -1,11 +1,11 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 interface Props {
   radius: number;
 }
 
-const Sphere: React.FC<Props> = (props) => <sphere {...props} />;
+export const Sphere: React.FC<Props> = (props) => <sphere {...props} />;
 
 const positiveIntegerControl = {
   control: {
@@ -17,7 +17,7 @@ const positiveIntegerControl = {
 };
 
 export default {
-  title: "Primitives/sphere",
+  title: "Primitives/Sphere",
   component: Sphere,
   argTypes: {
     radius: positiveIntegerControl,

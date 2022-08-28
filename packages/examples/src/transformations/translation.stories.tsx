@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 interface Props {
   x: number;
@@ -7,7 +7,7 @@ interface Props {
   z: number;
 }
 
-const Translation: React.FC<Props> = (props) => (
+export const Translation: React.FC<Props> = (props) => (
   <translation {...props}>
     <box center x={5} y={5} z={5} />
   </translation>
@@ -23,7 +23,7 @@ const range = {
 };
 
 export default {
-  title: "Transformations/translation",
+  title: "Transformations/Translation",
   component: Translation,
   argTypes: {
     x: range,

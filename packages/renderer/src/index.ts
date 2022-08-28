@@ -94,10 +94,14 @@ export const HostConfig: ReactReconciler.HostConfig<
     return false;
   },
   prepareForCommit(_containerInfo: Container) {
-    // TODO: Implement?
+    return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { rootNodes, nodes } = rootContainerInstance;
+    const { rootNodes, nodes, core } = rootContainerInstance;
+
+    const view = core.getView();
+    view.render();
+    view.delete();
 
     // Free memory of removed nodes
     const removedNodes = nodes.filter((node) => !node.hasParent());
@@ -205,12 +209,11 @@ export function render(
 
     if (container) {
       reconcilerInstance.updateContainer(element, container, null, () => {
-        const view = core.getView();
-        view.render();
         if (!existingContainer) {
+          const view = core.getView();
           view.fit();
+          view.delete();
         }
-        view.delete();
         resolve();
       });
       return;

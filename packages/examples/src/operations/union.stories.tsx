@@ -1,7 +1,7 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
-const Union: React.FC = (props) => (
+export const Union: React.FC = (props) => (
   <union {...props}>
     <box x={5} y={5} z={1} />
     <sphere radius={3} />
@@ -9,7 +9,7 @@ const Union: React.FC = (props) => (
 );
 
 export default {
-  title: "Operations/union",
+  title: "Operations/Union",
   component: Union,
 } as Meta;
 

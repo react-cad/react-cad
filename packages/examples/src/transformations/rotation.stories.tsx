@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 type Axis = "x" | "y" | "z";
 
@@ -8,14 +8,14 @@ interface Props {
   angle: number;
 }
 
-const Rotation: React.FC<Props> = ({ axis, angle }) => (
+export const Rotation: React.FC<Props> = ({ axis, angle }) => (
   <rotation axis={axis} angle={angle}>
     <box center x={5} y={5} z={5} />
   </rotation>
 );
 
 export default {
-  title: "Transformations/rotation",
+  title: "Transformations/Rotation",
   component: Rotation,
   argTypes: {
     axis: {

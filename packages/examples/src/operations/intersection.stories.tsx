@@ -1,7 +1,7 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
-const Intersection: React.FC = (props) => (
+export const Intersection: React.FC = (props) => (
   <intersection {...props}>
     <sphere radius={2} />
     <box x={5} y={5} z={1} />
@@ -12,7 +12,7 @@ const Intersection: React.FC = (props) => (
 );
 
 export default {
-  title: "Operations/intersection",
+  title: "Operations/Intersection",
   component: Intersection,
 } as Meta;
 

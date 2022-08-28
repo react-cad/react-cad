@@ -3,6 +3,12 @@ module.exports = {
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
-    "@react-cad/storybook-addon",
   ],
+  framework: "@react-cad/storybook-framework",
+  core: {
+    builder: "webpack5",
+  },
+  reactOptions: {
+    fastRefresh: true,
+  },
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 import { Point } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
 
@@ -27,7 +27,7 @@ const profiles: Record<string, Point[]> = {
   Hexagon: makePolygon(6),
 };
 
-const Helix: React.FC<ReactCADElements["helix"]> = (props) => (
+export const Helix: React.FC<ReactCADElements["helix"]> = (props) => (
   <helix {...props} />
 );
 
@@ -41,7 +41,7 @@ const range = {
 };
 
 export default {
-  title: "Sweeps/helix",
+  title: "Sweeps/Helix",
   component: Helix,
   argTypes: {
     profileName: {

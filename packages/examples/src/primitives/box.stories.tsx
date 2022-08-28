@@ -1,5 +1,5 @@
 import React from "react";
-import { Story, Meta } from "@storybook/react";
+import { Story, Meta } from "@react-cad/storybook-framework";
 
 interface Props {
   center: boolean;
@@ -8,7 +8,7 @@ interface Props {
   z: number;
 }
 
-const Box: React.FC<Props> = (props) => <box {...props} />;
+export const Box: React.FC<Props> = (props) => <box {...props} />;
 
 const range = {
   control: {
@@ -20,7 +20,7 @@ const range = {
 };
 
 export default {
-  title: "Primitives/box",
+  title: "Primitives/Box",
   component: Box,
   argTypes: {
     center: {
