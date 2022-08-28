@@ -1,6 +1,6 @@
 {
   "name": "@react-cad/preview",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "React component to preview @react-cad projects in the browser",
   "main": "lib/index.js",
   "files": [
@@ -24,8 +24,8 @@
     "react": "^17.0.1"
   },
   "dependencies": {
-    "@react-cad/core": "^0.3.2",
-    "@react-cad/renderer": "^0.3.2"
+    "@react-cad/core": "^0.4.0",
+    "@react-cad/renderer": "^0.4.0"
   },
   "scripts": {
     "build": "tsc",
