@@ -6,8 +6,9 @@
     "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.10",
     "@storybook/addon-links": "^6.5.10",
+    "@storybook/builder-webpack5": "^6.5.10",
     "@storybook/core": "^6.5.10",
-    "@react-cad/storybook-framework": "^0.3.2",
+    "@storybook/manager-webpack5": "^6.5.10",
     "@types/react": "^17.0.1",
     "react": "^17.0.1"
   },
