@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/react-cad/react-cad/compare/v0.4.0...v0.4.1) (2022-08-28)
+
+
+### Bug Fixes
+
+* **create-component:** fix create-component dependencies ([5d3e818](https://github.com/react-cad/react-cad/commit/5d3e81866c0f2717c43c6f704f8a425aa62f3474))
+
+
+
+
+
 # [0.4.0](https://github.com/react-cad/react-cad/compare/v0.3.2...v0.4.0) (2022-08-28)
 
 
