@@ -12,8 +12,7 @@
     "email": "react.cad.dev@gmail.com"
   },
   "devDependencies": {
-    "@react-cad/renderer": "^0.4.0",
-    "@react-cad/storybook-addon": "^0.3.2"
+    "@react-cad/storybook-framework": "^0.4.0"
   },
   "publishConfig": {
     "access": "public"

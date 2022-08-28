@@ -9,6 +9,6 @@ module.exports = {
     builder: "webpack5",
   },
   reactOptions: {
-    fastRefresh: true,
+    fastRefresh: false,
   },
 };

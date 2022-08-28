@@ -2632,16 +2632,6 @@
     schema-utils "^3.0.0"
     source-map "^0.7.3"
 
-"@react-cad/storybook-addon@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@react-cad/storybook-addon/-/storybook-addon-0.3.2.tgz#c429121e04fad9b6ea86088280d126f59fd96c72"
-  integrity sha512-XsQh6xsBMTgB35qStdULSoyMHHGwA5e11OjxzLvtD7GdptMbqCCgwmw9e3EeJy+GqYRBXC+Ay4b/oVBwN8x9pA==
-  dependencies:
-    "@react-cad/core" "^0.3.2"
-    "@react-cad/renderer" "^0.3.2"
-    "@storybook/addons" "^6.1.11"
-    file-loader "^6.2.0"
-
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -2856,7 +2846,7 @@
     prop-types "^15.7.2"
     regenerator-runtime "^0.13.7"
 
-"@storybook/addons@6.5.10", "@storybook/addons@^6.1.11", "@storybook/addons@^6.5.10":
+"@storybook/addons@6.5.10", "@storybook/addons@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/addons/-/addons-6.5.10.tgz#bff2f8fb8453e9df04fa6dbc41341fd05f4cdeba"
   integrity sha512-VD4tBCQ23PkSeDoxuHcKy0RfhIs3oMYjBacOZx7d0bvOzK9WjPyvE2ysDAh7r/ceqnwmWHAScIpE+I1RU7gl+g==
