@@ -586,6 +586,7 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
     {
       updateView();
     }
+    return EM_FALSE;
     break;
   }
   case EMSCRIPTEN_EVENT_CLICK:

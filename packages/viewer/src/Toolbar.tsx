@@ -31,6 +31,7 @@ interface Props {
   onZoom: (amount: number) => void;
   onResetView: () => void;
   onFit: () => void;
+  focus?: boolean;
 }
 
 const Toolbar: React.FC<Props> = ({
@@ -41,7 +42,18 @@ const Toolbar: React.FC<Props> = ({
   onZoom,
   onResetView,
   onFit,
+  focus,
+  children,
 }) => {
+  const wrapperRef = React.useCallback(
+    (div) => {
+      if (div && focus) {
+        div.focus();
+      }
+    },
+    [focus]
+  );
+
   const toggleShaded = React.useCallback(
     () =>
       setOptions((options) => ({
@@ -83,110 +95,192 @@ const Toolbar: React.FC<Props> = ({
   const handleSetViewpoint = (viewpoint: Viewpoint) =>
     React.useCallback(() => onSetViewpoint(viewpoint), []);
 
+  const handleKeyPress = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      switch (event.key) {
+        case "+":
+          handleZoomIn();
+          break;
+        case "-":
+          handleZoomOut();
+          break;
+        case "=":
+          onFit();
+          break;
+        case "p":
+          setOptions((options) => ({
+            ...options,
+            projection:
+              options.projection === "PERSPECTIVE"
+                ? "ORTHOGRAPHIC"
+                : "PERSPECTIVE",
+          }));
+          break;
+        case "x":
+          toggleAxes();
+          break;
+        case "g":
+          toggleGrid();
+          break;
+        case "m":
+          toggleShaded();
+          break;
+        case "w":
+          toggleWireframe();
+          break;
+        case "r":
+          onResetView();
+          break;
+      }
+      if (event.shiftKey) {
+        switch (event.code) {
+          case "Digit8":
+            onSetViewpoint("TOP");
+            break;
+          case "Digit2":
+            onSetViewpoint("BOTTOM");
+            break;
+          case "Digit4":
+            onSetViewpoint("LEFT");
+            break;
+          case "Digit6":
+            onSetViewpoint("RIGHT");
+            break;
+          case "Digit1":
+            onSetViewpoint("FRONT");
+            break;
+          case "Digit9":
+            onSetViewpoint("BACK");
+            break;
+        }
+      }
+    },
+    []
+  );
+
   return (
     <div
-      style={{
+      css={{
         display: "flex",
-        flexWrap: "wrap",
-        flexGrow: 0,
-        alignContent: "flex-start",
-        border: "1px solid rgba(0,0,0,0.1)",
-        padding: "2px 1px",
-        writingMode: "vertical-lr",
+        alignItems: "stretch",
+        width: "100%",
+        height: "100%",
+        "&:focus": {
+          outline: "rgba(30,167,253,0.5) solid 1px",
+        },
       }}
+      tabIndex={0}
+      onKeyPress={handleKeyPress}
+      ref={wrapperRef}
     >
-      <Section>
-        <Button title="Zoom in" onClick={handleZoomIn}>
-          <TbZoomIn />
-        </Button>
-        <Button title="Zoom out" onClick={handleZoomOut}>
-          <TbZoomOut />
-        </Button>
-        <Button title="Zoom to fit" onClick={onFit}>
-          <TbZoomCancel />
-        </Button>
-        <Separator />
-      </Section>
-      <Section>
-        <Button title="Top" onClick={handleSetViewpoint("TOP")}>
-          <TbArrowBarToDown />
-        </Button>
-        <Button title="Bottom" onClick={handleSetViewpoint("BOTTOM")}>
-          <TbArrowBarToUp />
-        </Button>
-        <Button title="Left" onClick={handleSetViewpoint("LEFT")}>
-          <TbArrowBarToRight style={{ transform: "rotate(45deg)" }} />
-        </Button>
-        <Button title="Right" onClick={handleSetViewpoint("RIGHT")}>
-          <TbArrowBarToLeft style={{ transform: "rotate(45deg)" }} />
-        </Button>
-        <Button title="Front" onClick={handleSetViewpoint("FRONT")}>
-          <TbArrowBarToUp style={{ transform: "rotate(45deg)" }} />
-        </Button>
-        <Button title="Back" onClick={handleSetViewpoint("BACK")}>
-          <TbArrowBarToDown style={{ transform: "rotate(45deg)" }} />
-        </Button>
-        <Button title="Reset view" onClick={onResetView}>
-          <TbArrowBackUp />
-        </Button>
-        <Separator />
-      </Section>
-      <Section>
-        <Button
-          active={options.projection === "ORTHOGRAPHIC"}
-          title="Orthographic"
-          onClick={setProjection("ORTHOGRAPHIC")}
-        >
-          <TbSquare />
-        </Button>
-        <Button
-          active={options.projection === "PERSPECTIVE"}
-          title="Perspective"
-          onClick={setProjection("PERSPECTIVE")}
-        >
-          <TbPerspective />
-        </Button>
-        <Separator />
-      </Section>
-      <Section>
-        <Button
-          title="Show shaded"
-          onClick={toggleShaded}
-          active={options.showShaded}
-        >
-          <TbBox />
-        </Button>
-        <Button
-          title="Show wireframe"
-          onClick={toggleWireframe}
-          active={options.showWireframe}
-        >
-          <Tb3DCubeSphere />
-        </Button>
-        <Separator />
-      </Section>
-      <Section>
-        <Button
-          title="Show axes"
-          onClick={toggleAxes}
-          active={options.showAxes}
-        >
-          <TbGizmo />
-        </Button>
-        <Button
-          title="Show grid"
-          onClick={toggleGrid}
-          active={options.showGrid}
-        >
-          <TbFrame />
-        </Button>
-        <Separator />
-      </Section>
-      <Section>
-        <Button title="Download as STL" onClick={onDownload}>
-          <TbFileDownload />
-        </Button>
-      </Section>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          flexGrow: 0,
+          alignContent: "flex-start",
+          border: "1px solid rgba(0,0,0,0.1)",
+          padding: "2px 1px",
+          writingMode: "vertical-lr",
+        }}
+      >
+        <Section>
+          <Button title="Zoom in (+)" onClick={handleZoomIn}>
+            <TbZoomIn />
+          </Button>
+          <Button title="Zoom out (-)" onClick={handleZoomOut}>
+            <TbZoomOut />
+          </Button>
+          <Button title="Zoom to fit (=)" onClick={onFit}>
+            <TbZoomCancel />
+          </Button>
+          <Separator />
+        </Section>
+        <Section>
+          <Button title="Top (Shift+8)" onClick={handleSetViewpoint("TOP")}>
+            <TbArrowBarToDown />
+          </Button>
+          <Button
+            title="Bottom (Shift+2)"
+            onClick={handleSetViewpoint("BOTTOM")}
+          >
+            <TbArrowBarToUp />
+          </Button>
+          <Button title="Left (Shift+4)" onClick={handleSetViewpoint("LEFT")}>
+            <TbArrowBarToRight style={{ transform: "rotate(45deg)" }} />
+          </Button>
+          <Button title="Right (Shift+6)" onClick={handleSetViewpoint("RIGHT")}>
+            <TbArrowBarToLeft style={{ transform: "rotate(45deg)" }} />
+          </Button>
+          <Button title="Front (Shift+1)" onClick={handleSetViewpoint("FRONT")}>
+            <TbArrowBarToUp style={{ transform: "rotate(45deg)" }} />
+          </Button>
+          <Button title="Back (Shift+9)" onClick={handleSetViewpoint("BACK")}>
+            <TbArrowBarToDown style={{ transform: "rotate(45deg)" }} />
+          </Button>
+          <Button title="Reset view (R)" onClick={onResetView}>
+            <TbArrowBackUp />
+          </Button>
+          <Separator />
+        </Section>
+        <Section>
+          <Button
+            active={options.projection === "ORTHOGRAPHIC"}
+            title="Orthographic (P)"
+            onClick={setProjection("ORTHOGRAPHIC")}
+          >
+            <TbSquare />
+          </Button>
+          <Button
+            active={options.projection === "PERSPECTIVE"}
+            title="Perspective (P)"
+            onClick={setProjection("PERSPECTIVE")}
+          >
+            <TbPerspective />
+          </Button>
+          <Separator />
+        </Section>
+        <Section>
+          <Button
+            title="Show model (M)"
+            onClick={toggleShaded}
+            active={options.showShaded}
+          >
+            <TbBox />
+          </Button>
+          <Button
+            title="Show wireframe (W)"
+            onClick={toggleWireframe}
+            active={options.showWireframe}
+          >
+            <Tb3DCubeSphere />
+          </Button>
+          <Separator />
+        </Section>
+        <Section>
+          <Button
+            title="Show axes (X)"
+            onClick={toggleAxes}
+            active={options.showAxes}
+          >
+            <TbGizmo />
+          </Button>
+          <Button
+            title="Show grid (G)"
+            onClick={toggleGrid}
+            active={options.showGrid}
+          >
+            <TbFrame />
+          </Button>
+          <Separator />
+        </Section>
+        <Section>
+          <Button title="Download as STL" onClick={onDownload}>
+            <TbFileDownload />
+          </Button>
+        </Section>
+      </div>
+      <div style={{ flexGrow: 1 }}>{children}</div>
     </div>
   );
 };

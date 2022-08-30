@@ -12,10 +12,11 @@ interface Props {
   shape: React.ReactElement<unknown>;
   name?: string;
   reset?: boolean;
+  focus?: boolean;
 }
 
 const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
-  ({ className, coreUrl, shape, name, reset }, forwardedRef) => {
+  ({ className, coreUrl, shape, name, reset, focus }, forwardedRef) => {
     const wrapperRef = React.useRef<HTMLDivElement>(null);
 
     React.useImperativeHandle(
@@ -81,14 +82,7 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
     );
 
     return (
-      <div
-        className={className}
-        ref={wrapperRef}
-        style={{
-          display: "flex",
-          alignItems: "stretch",
-        }}
-      >
+      <div className={className} ref={wrapperRef}>
         <Toolbar
           options={options}
           setOptions={setOptions}
@@ -97,8 +91,10 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           onZoom={handleZoom}
           onFit={handleFit}
           onResetView={handleResetView}
-        />
-        <canvas style={{ flexGrow: 1 }} ref={canvasRef} />
+          focus={focus}
+        >
+          <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
+        </Toolbar>
       </div>
     );
   }

@@ -44,6 +44,7 @@ export function renderToDOM(
             shape={storyFn()}
             name={name}
             reset={reset}
+            focus
           />
         )}
       </RemountHandler>
