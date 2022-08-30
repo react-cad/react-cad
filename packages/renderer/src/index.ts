@@ -99,9 +99,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   resetAfterCommit(rootContainerInstance: Container) {
     const { rootNodes, nodes, core } = rootContainerInstance;
 
-    const view = core.getView();
-    view.render();
-    view.delete();
+    core.render();
 
     // Free memory of removed nodes
     const removedNodes = nodes.filter((node) => !node.hasParent());
@@ -173,9 +171,7 @@ const rendererConfigs: Map<ReactCADCore, RendererConfig> = new Map();
 
 function createConfig(core: ReactCADCore): RendererConfig {
   const root = core.createCADNode("union");
-  const view = core.getView();
-  view.setNode(root);
-  view.delete();
+  core.setNode(root);
 
   const isAsync = false;
   const hydrate = false;
@@ -210,9 +206,7 @@ export function render(
     if (container) {
       reconcilerInstance.updateContainer(element, container, null, () => {
         if (!existingContainer) {
-          const view = core.getView();
-          view.fit();
-          view.delete();
+          core.fit();
         }
         resolve();
       });

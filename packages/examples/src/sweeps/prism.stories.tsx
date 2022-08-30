@@ -37,15 +37,15 @@ export default {
   component: Prism,
   argTypes: {
     profileName: {
+      options: Object.keys(profiles),
       control: {
         type: "select",
-        options: Object.keys(profiles),
       },
     },
     axis: {
+      options: ["x", "y", "z"],
       control: {
         type: "inline-radio",
-        options: ["x", "y", "z"],
       },
     },
     height: range,

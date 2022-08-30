@@ -1,5 +1,5 @@
 import React from "react";
-import ReactCadPreview from "@react-cad/preview";
+import ReactCadViewer from "@react-cad/viewer";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
 import {
   extractComponentDescription,
@@ -15,7 +15,7 @@ export const parameters = {
   docs: {
     inlineStories: true,
     prepareForInline: (storyFn: PartialStoryFn<any>): React.ReactNode => (
-      <ReactCadPreview coreUrl={reactCadCoreWasm} shape={storyFn()} />
+      <ReactCadViewer coreUrl={reactCadCoreWasm} shape={storyFn()} />
     ),
     extractArgTypes,
     extractComponentDescription,

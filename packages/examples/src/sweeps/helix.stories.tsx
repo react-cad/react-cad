@@ -45,9 +45,9 @@ export default {
   component: Helix,
   argTypes: {
     profileName: {
+      options: Object.keys(profiles),
       control: {
         type: "select",
-        options: Object.keys(profiles),
       },
     },
     rotated: { control: "boolean" },
@@ -64,15 +64,12 @@ interface StoryProps {
 }
 
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
-  const profile: Point[] = React.useMemo(() => {
-    let points = profiles[profileName];
-    if (rotated) {
-      points = offsetPolygon(rotatePolygon(points));
-    }
-    return points;
-  }, [profileName, rotated]);
+  let points = profiles[profileName];
+  if (rotated) {
+    points = offsetPolygon(rotatePolygon(points));
+  }
 
-  return <Helix profile={profile} {...args} />;
+  return <Helix profile={points} {...args} />;
 };
 
 export const helix = Template.bind({});

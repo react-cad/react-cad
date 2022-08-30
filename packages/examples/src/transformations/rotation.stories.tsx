@@ -19,9 +19,9 @@ export default {
   component: Rotation,
   argTypes: {
     axis: {
+      options: ["x", "y", "z"],
       control: {
         type: "inline-radio",
-        options: ["x", "y", "z"],
       },
     },
     angle: {

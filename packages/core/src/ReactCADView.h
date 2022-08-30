@@ -28,10 +28,12 @@
 
 #include <map>
 #include <memory>
+#include <string>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_ViewController.hxx>
+#include <Graphic3d_Camera.hxx>
 #include <TopoDS_Shape.hxx>
 #include <V3d_View.hxx>
 
@@ -43,6 +45,15 @@
 class ReactCADView : protected AIS_ViewController
 {
 public:
+  enum Viewpoint
+  {
+    Top,
+    Bottom,
+    Left,
+    Right,
+    Front,
+    Back
+  };
   static std::shared_ptr<ReactCADView> getView();
   static void destroyView();
 
@@ -53,7 +64,22 @@ public:
   void removeNode();
   void render();
 
+  void setColor(std::string color);
+
+  void zoom(double delta);
+  void resetView();
   void fit();
+  void setViewpoint(Viewpoint viewpoint);
+
+  void setProjection(Graphic3d_Camera::Projection projection);
+
+  void showAxes(bool show);
+  void showGrid(bool show);
+
+  void showWireframe(bool show);
+  void showShaded(bool show);
+
+  void onResize();
 
   //! Return interactive context.
   const Handle(AIS_InteractiveContext) & Context() const
@@ -115,9 +141,6 @@ private:
 
   //! @name Emscripten callbacks
 private:
-  //! Window resize event.
-  EM_BOOL onResizeEvent(int theEventType, const EmscriptenUiEvent *theEvent);
-
   //! Mouse event.
   EM_BOOL onMouseEvent(int theEventType, const EmscriptenMouseEvent *theEvent);
 
@@ -127,19 +150,8 @@ private:
   //! Touch event.
   EM_BOOL onTouchEvent(int theEventType, const EmscriptenTouchEvent *theEvent);
 
-  //! Key down event.
-  EM_BOOL onKeyDownEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent);
-
-  //! Key up event.
-  EM_BOOL onKeyUpEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent);
-
   //! @name Emscripten callbacks (static functions)
 private:
-  static EM_BOOL onResizeCallback(int theEventType, const EmscriptenUiEvent *theEvent, void *theView)
-  {
-    return ((ReactCADView *)theView)->onResizeEvent(theEventType, theEvent);
-  }
-
   static void onRedrawView(void *theView)
   {
     return ((ReactCADView *)theView)->redrawView();
@@ -160,16 +172,6 @@ private:
     return ((ReactCADView *)theView)->onTouchEvent(theEventType, theEvent);
   }
 
-  static EM_BOOL onKeyDownCallback(int theEventType, const EmscriptenKeyboardEvent *theEvent, void *theView)
-  {
-    return ((ReactCADView *)theView)->onKeyDownEvent(theEventType, theEvent);
-  }
-
-  static EM_BOOL onKeyUpCallback(int theEventType, const EmscriptenKeyboardEvent *theEvent, void *theView)
-  {
-    return ((ReactCADView *)theView)->onKeyUpEvent(theEventType, theEvent);
-  }
-
 private:
   Handle(AIS_InteractiveContext) myContext; //!< interactive context
   Handle(V3d_View) myView;                  //!< 3D view
@@ -180,6 +182,7 @@ private:
   unsigned int myUpdateRequests;            //!< counter for unhandled update requests
   std::shared_ptr<ReactCADNode> myNode;
   Handle_AIS_Shape myShape;
+  Handle_AIS_Shape myWireframe;
 };
 
 #endif // _ReactCADView_HeaderFile

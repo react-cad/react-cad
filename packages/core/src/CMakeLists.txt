@@ -31,7 +31,7 @@ endif()
 set(OpenCASCADE_LIBS TKSTL TKRWMesh TKBinXCAF TKBin TKBinL TKOpenGl TKXCAF TKVCAF TKCAF TKV3d TKHLR TKMesh TKService TKShHealing TKOffset TKBool TKBO TKPrim TKTopAlgo TKGeomAlgo TKBRep TKGeomBase TKG3d TKG2d TKMath TKLCAF TKCDF TKernel)
 
 add_executable(${APP_TARGET} ${SOURCES})
-target_compile_definitions(${APP_TARGET} PRIVATE $<$<CONFIG:Debug>:REACTCAD_DEBUG>)
+#target_compile_definitions(${APP_TARGET} PRIVATE $<$<CONFIG:Debug>:REACTCAD_DEBUG>)
 target_link_libraries(
   ${APP_TARGET}
   ${OpenCASCADE_LIBS}

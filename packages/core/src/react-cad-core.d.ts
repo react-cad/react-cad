@@ -2,13 +2,6 @@ export class EmClass {
   delete(): void;
 }
 
-export class ReactCADView extends EmClass {
-  public setNode(node: ReactCADNode): void;
-  public removeNode(node: ReactCADNode): void;
-  public render(): void;
-  public fit(): void;
-}
-
 export class ReactCADNode extends EmClass {
   public appendChild(child: ReactCADNode): void;
   public insertChildBefore(child: ReactCADNode, before: ReactCADNode): void;
@@ -20,6 +13,8 @@ export class ReactCADNode extends EmClass {
 export type Axis = "x" | "y" | "z";
 export type Point = [number, number, number];
 export type Profile = Point[];
+export type Projection = number & { _opaque: typeof Projection };
+export type Viewpoint = number & { _opaque: typeof Viewpoint };
 
 // Primitives
 export interface BoxProps {
@@ -112,8 +107,33 @@ export class ReactCADScaleNode extends ReactCADNode {
 export interface ReactCADCore extends EmscriptenModule {
   ReactCADNode: typeof ReactCADNode;
   ReactCADView: typeof ReactCADView;
+  Projection: {
+    ORTHOGRAPHIC: Projection;
+    PERSPECTIVE: Projection;
+  };
+  Viewpoint: {
+    TOP: Viewpoint;
+    BOTTOM: Viewpoint;
+    LEFT: Viewpoint;
+    RIGHT: Viewpoint;
+    FRONT: Viewpoint;
+    BACK: Viewpoint;
+  };
   createCADNode(type: string): ReactCADNode;
-  getView(): ReactCADView;
+  setNode(node: ReactCADNode): void;
+  removeNode(node: ReactCADNode): void;
+  render(): void;
+  // setColor(color: string): void;
+  zoom(delta: number): void;
+  setViewpoint(viewpoint: Viewpoint): void;
+  resetView(): void;
+  fit(): void;
+  setProjection(projection: Projection): void;
+  showAxes(show: boolean): void;
+  showGrid(show: boolean): void;
+  showWireframe(show: boolean): void;
+  showShaded(show: boolean): void;
+  onResize(): void;
   writeSTL(
     node: ReactCADNode,
     filename: string,

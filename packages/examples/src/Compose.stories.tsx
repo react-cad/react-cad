@@ -47,9 +47,9 @@ export default {
     y: positiveIntegerControl,
     z: positiveIntegerControl,
     axis: {
+      options: ["x", "y", "z"],
       control: {
         type: "inline-radio",
-        options: ["x", "y", "z"],
       },
     },
     angle: {
