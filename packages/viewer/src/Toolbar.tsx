@@ -32,6 +32,7 @@ interface Props {
   onResetView: () => void;
   onFit: () => void;
   focus?: boolean;
+  onResize?: () => void;
 }
 
 const Toolbar: React.FC<Props> = ({
@@ -43,16 +44,33 @@ const Toolbar: React.FC<Props> = ({
   onResetView,
   onFit,
   focus,
+  onResize,
   children,
 }) => {
-  const wrapperRef = React.useCallback(
-    (div) => {
-      if (div && focus) {
-        div.focus();
-      }
-    },
-    [focus]
-  );
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (focus) {
+      wrapperRef.current?.focus();
+    }
+  }, [focus]);
+
+  React.useEffect(() => {
+    if (onResize && wrapperRef.current) {
+      const div = wrapperRef.current;
+      let mounted = false;
+
+      const observer = new ResizeObserver(() => {
+        if (mounted) {
+          onResize();
+        }
+        mounted = true;
+      });
+      observer.observe(div, {});
+
+      return () => observer.disconnect();
+    }
+  }, [onResize]);
 
   const toggleShaded = React.useCallback(
     () =>
@@ -165,9 +183,15 @@ const Toolbar: React.FC<Props> = ({
         alignItems: "stretch",
         width: "100%",
         height: "100%",
+        overflow: "hidden",
         "&:focus": {
           outline: "rgba(30,167,253,0.5) solid 1px",
         },
+        ...(onResize
+          ? {
+              resize: "both",
+            }
+          : {}),
       }}
       tabIndex={0}
       onKeyPress={handleKeyPress}

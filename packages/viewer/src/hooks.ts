@@ -7,12 +7,13 @@ export function useReactCadCore(
 ): [
   React.MutableRefObject<ReactCADCore | undefined>,
   boolean,
-  (canvas: HTMLCanvasElement | null) => void
+  (canvas: HTMLCanvasElement | null) => void,
+  () => void
 ] {
   const core = React.useRef<ReactCADCore>();
   const [loaded, setLoaded] = React.useState(false);
   const cancelled = React.useRef<boolean>(false);
-  const [canvas, setCanvas] = React.useState<HTMLCanvasElement>();
+  const [onResize, setOnResize] = React.useState(() => () => {});
 
   const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
     function unload() {
@@ -32,7 +33,6 @@ export function useReactCadCore(
 
     if (canvas) {
       setLoaded(false);
-      setCanvas(canvas);
 
       cancelled.current = false;
 
@@ -42,34 +42,30 @@ export function useReactCadCore(
         if (cancelled.current) {
           unload();
         } else {
+          canvas.width = canvas.clientWidth * window.devicePixelRatio;
+          canvas.height = canvas.clientHeight * window.devicePixelRatio;
+
+          setOnResize(() => () => {
+            canvas.width = canvas.clientWidth * window.devicePixelRatio;
+            canvas.height = canvas.clientHeight * window.devicePixelRatio;
+            core.current?.onResize();
+          });
+
           setLoaded(true);
         }
       });
     } else {
-      setCanvas(undefined);
-
       cancelled.current = true;
       unload();
     }
   }, []);
 
   React.useEffect(() => {
-    function onResize() {
-      if (canvas && loaded) {
-        canvas.width = canvas.clientWidth * window.devicePixelRatio;
-        canvas.height = canvas.clientHeight * window.devicePixelRatio;
-        core.current?.onResize();
-      }
-    }
-
-    onResize();
-
     window.addEventListener("resize", onResize);
-
     return () => window.removeEventListener("resize", onResize);
-  }, [canvas, loaded]);
+  }, [onResize]);
 
-  return [core, loaded, canvasRef];
+  return [core, loaded, canvasRef, onResize];
 }
 
 export function useReactCadRenderer(

@@ -15,7 +15,7 @@ export const parameters = {
   docs: {
     inlineStories: true,
     prepareForInline: (storyFn: PartialStoryFn<any>): React.ReactNode => (
-      <ReactCadViewer coreUrl={reactCadCoreWasm} shape={storyFn()} />
+      <ReactCadViewer coreUrl={reactCadCoreWasm} shape={storyFn()} resizable />
     ),
     extractArgTypes,
     extractComponentDescription,

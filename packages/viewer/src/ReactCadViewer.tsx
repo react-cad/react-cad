@@ -13,10 +13,14 @@ interface Props {
   name?: string;
   reset?: boolean;
   focus?: boolean;
+  resizable?: boolean;
 }
 
 const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
-  ({ className, coreUrl, shape, name, reset, focus }, forwardedRef) => {
+  (
+    { className, coreUrl, shape, name, reset, focus, resizable },
+    forwardedRef
+  ) => {
     const wrapperRef = React.useRef<HTMLDivElement>(null);
 
     React.useImperativeHandle(
@@ -32,7 +36,7 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       projection: "ORTHOGRAPHIC",
     });
 
-    const [core, loaded, canvasRef] = useReactCadCore(coreUrl);
+    const [core, loaded, canvasRef, onResize] = useReactCadCore(coreUrl);
     useReactCadRenderer(core, loaded, shape, reset);
 
     React.useEffect(() => {
@@ -92,6 +96,7 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           onFit={handleFit}
           onResetView={handleResetView}
           focus={focus}
+          onResize={resizable ? onResize : undefined}
         >
           <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
         </Toolbar>
