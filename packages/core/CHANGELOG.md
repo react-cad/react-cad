@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/react-cad/react-cad/compare/v0.4.1...v0.5.0) (2022-08-31)
+
+
+### Features
+
+* **@react-cad/viewer:** add high and low detail levels to viewer ([3ea7cd6](https://github.com/react-cad/react-cad/commit/3ea7cd645c13c31f84317aba8b4fa41b0bb11a4d))
+* **@react-cad/viewer:** add keyboard shortcuts to viewer ([6aaeaad](https://github.com/react-cad/react-cad/commit/6aaeaad5c7699da55ba8cfc733449bcd4152b189))
+* **@react-cad/viewer:** implement viewer controls ([c33fc41](https://github.com/react-cad/react-cad/commit/c33fc4120aaa46b95df5f23fe98d055fe248d240)), closes [#6](https://github.com/react-cad/react-cad/issues/6)
+
+
+
+
+
 # [0.4.0](https://github.com/react-cad/react-cad/compare/v0.3.2...v0.4.0) (2022-08-28)
 
 
