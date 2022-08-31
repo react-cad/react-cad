@@ -3,7 +3,9 @@
 
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
+
+#include "PerformanceTimer.hpp"
 
 ReactCADNode::ReactCADNode()
     : m_parent(nullptr), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
@@ -120,6 +122,8 @@ TopoDS_Shape ReactCADNode::fuse(const std::vector<TopoDS_Shape> &children)
   case 1:
     return children[0];
   default: {
+    PerformanceTimer timer("Union render time");
+    timer.start();
     BRepAlgoAPI_BuilderAlgo aBuilder;
 
     TopTools_ListOfShape aLS;
@@ -136,6 +140,7 @@ TopoDS_Shape ReactCADNode::fuse(const std::vector<TopoDS_Shape> &children)
       TopoDS_Shape nullShape;
       return nullShape;
     }
+    timer.end();
     return aBuilder.Shape();
   }
   }

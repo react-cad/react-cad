@@ -1,7 +1,7 @@
 #ifndef HelixNode_HeaderFile
 #define HelixNode_HeaderFile
 
-#include "SweepNode.h"
+#include "SweepNode.hpp"
 
 struct HelixProps
 {

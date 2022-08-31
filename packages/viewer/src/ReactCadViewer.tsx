@@ -4,6 +4,7 @@ import ReactCadRenderer from "@react-cad/renderer";
 import { useReactCadCore, useReactCadRenderer } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
+import DetailContext from "./DetailContext";
 import Toolbar from "./Toolbar";
 
 interface Props {
@@ -14,11 +15,23 @@ interface Props {
   reset?: boolean;
   focus?: boolean;
   resizable?: boolean;
+  highDetail?: [number, number];
+  lowDetail?: [number, number];
 }
 
 const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
   (
-    { className, coreUrl, shape, name, reset, focus, resizable },
+    {
+      className,
+      coreUrl,
+      shape,
+      name,
+      reset,
+      focus,
+      resizable,
+      highDetail = [0.001, 0.5],
+      lowDetail = [0.002, 1],
+    },
     forwardedRef
   ) => {
     const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -34,10 +47,20 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       showWireframe: true,
       showShaded: true,
       projection: "ORTHOGRAPHIC",
+      detail: "LOW",
     });
 
+    const detailShape = React.useMemo(
+      () => (
+        <DetailContext.Provider value={options.detail}>
+          {shape}
+        </DetailContext.Provider>
+      ),
+      [shape, options.detail]
+    );
+
     const [core, loaded, canvasRef, onResize] = useReactCadCore(coreUrl);
-    useReactCadRenderer(core, loaded, shape, reset);
+    useReactCadRenderer(core, loaded, detailShape, reset);
 
     React.useEffect(() => {
       core.current?.showAxes(options.showAxes);
@@ -45,23 +68,24 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       core.current?.showWireframe(options.showWireframe);
       core.current?.showShaded(options.showShaded);
       core.current?.setProjection(core.current.Projection[options.projection]);
-    }, [loaded, options]);
+      const quality = options.detail === "HIGH" ? highDetail : lowDetail;
+      core.current?.setQuality(...quality);
+    }, [loaded, options, ...highDetail, ...lowDetail]);
 
-    const handleSetViewpoint = React.useCallback(
-      (viewpoint: Viewpoint) =>
-        core.current?.setViewpoint(core.current.Viewpoint[viewpoint]),
-      []
-    );
+    const handleSetViewpoint = React.useCallback((viewpoint: Viewpoint) => {
+      core.current?.setViewpoint(core.current.Viewpoint[viewpoint]);
+      core.current?.updateView();
+    }, []);
 
-    const handleZoom = React.useCallback(
-      (amount: number) => core.current?.zoom(amount),
-      []
-    );
+    const handleZoom = React.useCallback((amount: number) => {
+      core.current?.zoom(amount);
+      core.current?.updateView();
+    }, []);
 
-    const handleResetView = React.useCallback(
-      () => core.current?.resetView(),
-      []
-    );
+    const handleResetView = React.useCallback(() => {
+      core.current?.resetView();
+      core.current?.updateView();
+    }, []);
     const handleFit = React.useCallback(() => core.current?.fit(), []);
 
     const handleDownload = React.useCallback(

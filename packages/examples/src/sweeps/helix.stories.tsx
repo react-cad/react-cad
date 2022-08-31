@@ -76,6 +76,6 @@ export const helix = Template.bind({});
 helix.args = {
   profileName: "Square",
   rotated: false,
-  pitch: 2,
+  pitch: 5,
   height: 5,
 };

@@ -1,7 +1,7 @@
 #ifndef BoxNode_HeaderFile
 #define BoxNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 struct BoxProps
 {

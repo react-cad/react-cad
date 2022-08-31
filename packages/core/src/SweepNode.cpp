@@ -1,4 +1,4 @@
-#include "SweepNode.h"
+#include "SweepNode.hpp"
 
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>

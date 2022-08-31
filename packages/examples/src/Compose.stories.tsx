@@ -25,7 +25,9 @@ export const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => (
           <box x={x} y={y} z={z} />
         </rotation>
       </union>
-      <sphere radius={3} />
+      <translation x={0} y={0} z={z}>
+        <sphere radius={4} />
+      </translation>
     </difference>
   </rotation>
 );

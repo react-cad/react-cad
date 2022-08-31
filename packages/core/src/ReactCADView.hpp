@@ -24,7 +24,7 @@
 #ifndef ReactCADView_HeaderFile
 #define ReactCADView_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 #include <map>
 #include <memory>
@@ -64,6 +64,8 @@ public:
   void removeNode();
   void render();
 
+  void setQuality(double deviationCoefficent, double angle);
+
   void setColor(std::string color);
 
   void zoom(double delta);
@@ -80,6 +82,9 @@ public:
   void showShaded(bool show);
 
   void onResize();
+
+  //! Request view redrawing.
+  void updateView();
 
   //! Return interactive context.
   const Handle(AIS_InteractiveContext) & Context() const
@@ -109,9 +114,6 @@ private:
 
   //! Application event loop.
   void mainloop();
-
-  //! Request view redrawing.
-  void updateView();
 
   //! Flush events and redraw view.
   void redrawView();

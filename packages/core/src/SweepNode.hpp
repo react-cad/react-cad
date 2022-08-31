@@ -1,8 +1,8 @@
 #ifndef SweepNode_HeaderFile
 #define SweepNode_HeaderFile
 
-#include "Geometry.h"
-#include "ReactCADNode.h"
+#include "Geometry.hpp"
+#include "ReactCADNode.hpp"
 
 #include <TopoDS_Wire.hxx>
 #include <vector>

@@ -1,7 +1,7 @@
 #ifndef PrismNode_HeaderFile
 #define PrismNode_HeaderFile
 
-#include "SweepNode.h"
+#include "SweepNode.hpp"
 
 struct PrismProps
 {

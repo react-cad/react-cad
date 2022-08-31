@@ -28,10 +28,14 @@ export function renderToDOM(
     forceRemount,
     id,
     name,
+    storyContext,
   }: RenderContext<ReactCadFramework>,
   domElement: Element
 ): void {
   showMain();
+
+  const { highDetail, lowDetail, resizable } =
+    storyContext.parameters.reactCad || {};
 
   ReactDOM.render(
     <>
@@ -45,6 +49,9 @@ export function renderToDOM(
             name={name}
             reset={reset}
             focus
+            highDetail={highDetail}
+            lowDetail={lowDetail}
+            resizable={resizable}
           />
         )}
       </RemountHandler>

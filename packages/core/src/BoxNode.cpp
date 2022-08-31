@@ -1,7 +1,7 @@
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <gp_Pnt.hxx>
 
-#include "BoxNode.h"
+#include "BoxNode.hpp"
 
 BoxNode::BoxNode() : m_props({.center = false, .x = 1, .y = 1, .z = 1})
 {

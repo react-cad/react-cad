@@ -4,37 +4,36 @@
 #include <type_traits>
 #include <vector>
 
-#include <Graphic3d_Camera.hxx>
-#include <StlAPI.hxx>
+#include "ReactCADNode.hpp"
+#include "ReactCADView.hpp"
 
-#include "ReactCADNode.h"
-#include "ReactCADView.h"
+#include "Geometry.hpp"
 
-#include "Geometry.h"
+#include "BoxNode.hpp"
+#include "CylinderNode.hpp"
+#include "SphereNode.hpp"
+#include "TorusNode.hpp"
 
-#include "BoxNode.h"
-#include "CylinderNode.h"
-#include "SphereNode.h"
-#include "TorusNode.h"
+#include "DifferenceNode.hpp"
+#include "IntersectionNode.hpp"
+#include "UnionNode.hpp"
 
-#include "DifferenceNode.h"
-#include "IntersectionNode.h"
-#include "UnionNode.h"
+#include "HelixNode.hpp"
+#include "PrismNode.hpp"
+#include "RevolutionNode.hpp"
 
-#include "HelixNode.h"
-#include "PrismNode.h"
-#include "RevolutionNode.h"
-
-#include "RotationNode.h"
-#include "ScaleNode.h"
-#include "TranslationNode.h"
+#include "RotationNode.hpp"
+#include "ScaleNode.hpp"
+#include "TranslationNode.hpp"
 
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
 #include <Message_PrinterSystemLog.hxx>
 #include <OSD_MemInfo.hxx>
 #include <OSD_Parallel.hxx>
+#include <StlAPI.hxx>
 
 #include <Standard_ArrayStreamBuffer.hxx>
 
@@ -118,6 +117,12 @@ void render()
   view->render();
 }
 
+void setQuality(double deviationCoefficent, double angle)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->setQuality(deviationCoefficent, angle);
+}
+
 void setColor(std::string color)
 {
   std::shared_ptr<ReactCADView> view = ReactCADView::getView();
@@ -178,6 +183,12 @@ void showShaded(bool show)
   view->showShaded(show);
 }
 
+void updateView()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->updateView();
+}
+
 void onResize()
 {
   std::shared_ptr<ReactCADView> view = ReactCADView::getView();
@@ -205,8 +216,10 @@ int main()
 #ifdef REACTCAD_DEBUG
   Message::DefaultMessenger()->Printers().First()->SetTraceLevel(Message_Trace);
   Handle(Message_PrinterSystemLog) aJSConsolePrinter = new Message_PrinterSystemLog("webgl-sample", Message_Trace);
+  /*
   Message::DefaultMessenger()->AddPrinter(
       aJSConsolePrinter); // open JavaScript console within the Browser to see this output
+      */
   Message::DefaultMessenger()->Send(
       TCollection_AsciiString("NbLogicalProcessors: ") + OSD_Parallel::NbLogicalProcessors(), Message_Trace);
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
@@ -363,8 +376,10 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("removeNode", &removeNode);
   emscripten::function("render", &render);
   // emscripten::function("setColor", &setColor);
+  emscripten::function("setQuality", &setQuality);
   emscripten::function("zoom", &zoom);
   emscripten::function("resetView", &resetView);
+  emscripten::function("updateView", &updateView);
   emscripten::function("fit", &fit);
   emscripten::function("setViewpoint", &setViewpoint);
   emscripten::function("setProjection", &setProjection);

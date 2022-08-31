@@ -1,7 +1,7 @@
 #ifndef TranslationNode_HeaderFile
 #define TranslationNode_HeaderFile
 
-#include "TransformationNode.h"
+#include "TransformationNode.hpp"
 
 struct TranslationProps
 {

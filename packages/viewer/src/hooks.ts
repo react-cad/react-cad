@@ -49,6 +49,7 @@ export function useReactCadCore(
             canvas.width = canvas.clientWidth * window.devicePixelRatio;
             canvas.height = canvas.clientHeight * window.devicePixelRatio;
             core.current?.onResize();
+            core.current?.updateView();
           });
 
           setLoaded(true);
@@ -95,6 +96,7 @@ export function useReactCadRenderer(
         setReady(true);
         if (latestReset) {
           core.current?.resetView();
+          core.current?.updateView();
         }
       });
     }
@@ -106,6 +108,7 @@ export function useReactCadRenderer(
       ReactCadRenderer.render(latestShape, core.current).then(() => {
         setReady(true);
         core.current?.resetView();
+        core.current?.updateView();
       });
     }
   }, [loaded]);

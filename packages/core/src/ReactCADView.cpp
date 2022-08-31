@@ -21,9 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE
 
-#include "ReactCADView.h"
+#include "ReactCADView.hpp"
 
-#include "WasmVKeys.h"
+#include "WasmVKeys.hpp"
 
 #include <AIS_Shape.hxx>
 #include <Aspect_DisplayConnection.hxx>
@@ -150,12 +150,22 @@ void ReactCADView::render()
   }
 }
 
+void ReactCADView::setQuality(double deviationCoefficent, double angle)
+{
+  myShape->SetOwnDeviationCoefficient(deviationCoefficent);
+  myShape->SetOwnDeviationAngle(angle);
+  myWireframe->SetOwnDeviationCoefficient(deviationCoefficent);
+  myWireframe->SetOwnDeviationAngle(angle);
+
+  render();
+}
+
 void ReactCADView::setColor(std::string colorString)
 {
   Quantity_Color color;
   Quantity_Color::ColorFromHex(colorString.c_str(), color);
   myShape->SetColor(color);
-  myView->Redraw();
+  myView->Invalidate();
 }
 
 void ReactCADView::zoom(double delta)
@@ -167,7 +177,7 @@ void ReactCADView::zoom(double delta)
 
   if (UpdateZoom(Aspect_ScrollDelta(aNewPos, delta)))
   {
-    updateView();
+    myView->Invalidate();
   }
 }
 
@@ -181,7 +191,6 @@ void ReactCADView::fit()
 {
   myView->FitAll(0.5, false);
   myView->Invalidate();
-  updateView();
 }
 
 void ReactCADView::setViewpoint(Viewpoint viewpoint)
@@ -219,7 +228,7 @@ void ReactCADView::setViewpoint(Viewpoint viewpoint)
 void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 {
   myView->Camera()->SetProjectionType(projection);
-  myView->Redraw();
+  myView->Invalidate();
 }
 
 void ReactCADView::showAxes(bool show)
@@ -227,7 +236,6 @@ void ReactCADView::showAxes(bool show)
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
   myView->Invalidate();
-  updateView();
 }
 
 void ReactCADView::showGrid(bool show)
@@ -242,7 +250,6 @@ void ReactCADView::showGrid(bool show)
     aViewer->DeactivateGrid();
   }
   myView->Invalidate();
-  updateView();
 }
 
 void ReactCADView::showWireframe(bool show)
@@ -256,7 +263,6 @@ void ReactCADView::showWireframe(bool show)
     myContext->Erase(myWireframe, true);
   }
   myView->Invalidate();
-  updateView();
 }
 
 void ReactCADView::showShaded(bool show)
@@ -270,7 +276,6 @@ void ReactCADView::showShaded(bool show)
     myContext->Erase(myShape, true);
   }
   myView->Invalidate();
-  updateView();
 }
 
 // ================================================================

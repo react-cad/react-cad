@@ -1,7 +1,7 @@
 #ifndef TorusNode_HeaderFile
 #define TorusNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 struct TorusProps
 {

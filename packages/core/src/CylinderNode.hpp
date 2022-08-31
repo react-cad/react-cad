@@ -1,7 +1,7 @@
 #ifndef CylinderNode_HeaderFile
 #define CylinderNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 struct CylinderProps
 {

@@ -1,4 +1,4 @@
-#include "UnionNode.h"
+#include "UnionNode.hpp"
 
 UnionNode::UnionNode()
 {

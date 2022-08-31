@@ -69,10 +69,10 @@ export const HostConfig: ReactReconciler.HostConfig<
   insertInContainerBefore(
     rootContainerInstance: Container,
     child: Instance,
-    _beforeChild: Instance
+    before: Instance
   ) {
     const { rootNodes, root } = rootContainerInstance;
-    root.appendChild(child.node);
+    root.insertChildBefore(child.node, before.node);
     rootNodes.push(child.node);
   },
   removeChildFromContainer(rootContainerInstance: Container, child: Instance) {
@@ -83,6 +83,12 @@ export const HostConfig: ReactReconciler.HostConfig<
     }
     rootNodes.splice(index, 1);
     root.removeChild(child.node);
+  },
+  insertBefore(parent, child, before) {
+    parent.node.insertChildBefore(child.node, before.node);
+  },
+  removeChild(parent: Instance, child: Instance) {
+    parent.node.removeChild(child.node);
   },
   finalizeInitialChildren<T extends Type>(
     _instance: Instance<T>,
@@ -204,10 +210,14 @@ export function render(
       {};
 
     if (container) {
+      const start = performance.now();
       reconcilerInstance.updateContainer(element, container, null, () => {
         if (!existingContainer) {
           core.fit();
+          core.updateView();
         }
+        const time = performance.now() - start;
+        console.log(`Renderer time: ${time}`);
         resolve();
       });
       return;

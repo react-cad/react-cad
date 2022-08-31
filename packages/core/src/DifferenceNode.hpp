@@ -1,7 +1,7 @@
 #ifndef DifferenceNode_HeaderFile
 #define DifferenceNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 class DifferenceNode : public ReactCADNode
 {

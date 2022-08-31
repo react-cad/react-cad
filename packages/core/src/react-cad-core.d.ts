@@ -128,12 +128,14 @@ export interface ReactCADCore extends EmscriptenModule {
   setViewpoint(viewpoint: Viewpoint): void;
   resetView(): void;
   fit(): void;
+  setQuality(deviationCoefficent: number, angle: number): void;
   setProjection(projection: Projection): void;
   showAxes(show: boolean): void;
   showGrid(show: boolean): void;
   showWireframe(show: boolean): void;
   showShaded(show: boolean): void;
   onResize(): void;
+  updateView(): void;
   writeSTL(
     node: ReactCADNode,
     filename: string,

@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 file(GLOB SOURCES
-  *.h
+  *.hpp
   *.cpp
 )
 

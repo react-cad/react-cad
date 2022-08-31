@@ -15,6 +15,8 @@ import {
   TbBox,
   Tb3DCubeSphere,
   TbFileDownload,
+  TbPentagon,
+  TbCircle,
 } from "react-icons/tb";
 
 import { Section, Button, Separator } from "./ui";
@@ -101,6 +103,14 @@ const Toolbar: React.FC<Props> = ({
       setOptions((options) => ({ ...options, showGrid: !options.showGrid })),
     []
   );
+  const setHighDetail = React.useCallback(
+    () => setOptions((options) => ({ ...options, detail: "HIGH" })),
+    []
+  );
+  const setLowDetail = React.useCallback(
+    () => setOptions((options) => ({ ...options, detail: "LOW" })),
+    []
+  );
   const setProjection = (projection: ViewOptions["projection"]) =>
     React.useCallback(
       () => setOptions((options) => ({ ...options, projection })),
@@ -148,6 +158,12 @@ const Toolbar: React.FC<Props> = ({
           break;
         case "r":
           onResetView();
+          break;
+        case "h":
+          setHighDetail();
+          break;
+        case "l":
+          setLowDetail();
           break;
       }
       if (event.shiftKey) {
@@ -295,6 +311,23 @@ const Toolbar: React.FC<Props> = ({
             active={options.showGrid}
           >
             <TbFrame />
+          </Button>
+          <Separator />
+        </Section>
+        <Section>
+          <Button
+            title="High detail (H)"
+            onClick={setHighDetail}
+            active={options.detail === "HIGH"}
+          >
+            <TbCircle />
+          </Button>
+          <Button
+            title="Low detail (L)"
+            onClick={setLowDetail}
+            active={options.detail === "LOW"}
+          >
+            <TbPentagon />
           </Button>
           <Separator />
         </Section>

@@ -1,7 +1,7 @@
 #ifndef ScaleNode_HeaderFile
 #define ScaleNode_HeaderFile
 
-#include "TransformationNode.h"
+#include "TransformationNode.hpp"
 
 struct ScaleProps
 {
