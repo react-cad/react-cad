@@ -69,10 +69,10 @@ export const HostConfig: ReactReconciler.HostConfig<
   insertInContainerBefore(
     rootContainerInstance: Container,
     child: Instance,
-    _beforeChild: Instance
+    before: Instance
   ) {
     const { rootNodes, root } = rootContainerInstance;
-    root.appendChild(child.node);
+    root.insertChildBefore(child.node, before.node);
     rootNodes.push(child.node);
   },
   removeChildFromContainer(rootContainerInstance: Container, child: Instance) {
@@ -83,6 +83,12 @@ export const HostConfig: ReactReconciler.HostConfig<
     }
     rootNodes.splice(index, 1);
     root.removeChild(child.node);
+  },
+  insertBefore(parent, child, before) {
+    parent.node.insertChildBefore(child.node, before.node);
+  },
+  removeChild(parent: Instance, child: Instance) {
+    parent.node.removeChild(child.node);
   },
   finalizeInitialChildren<T extends Type>(
     _instance: Instance<T>,
@@ -99,9 +105,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   resetAfterCommit(rootContainerInstance: Container) {
     const { rootNodes, nodes, core } = rootContainerInstance;
 
-    const view = core.getView();
-    view.render();
-    view.delete();
+    core.render();
 
     // Free memory of removed nodes
     const removedNodes = nodes.filter((node) => !node.hasParent());
@@ -173,9 +177,7 @@ const rendererConfigs: Map<ReactCADCore, RendererConfig> = new Map();
 
 function createConfig(core: ReactCADCore): RendererConfig {
   const root = core.createCADNode("union");
-  const view = core.getView();
-  view.setNode(root);
-  view.delete();
+  core.setNode(root);
 
   const isAsync = false;
   const hydrate = false;
@@ -208,12 +210,14 @@ export function render(
       {};
 
     if (container) {
+      const start = performance.now();
       reconcilerInstance.updateContainer(element, container, null, () => {
         if (!existingContainer) {
-          const view = core.getView();
-          view.fit();
-          view.delete();
+          core.fit();
+          core.updateView();
         }
+        const time = performance.now() - start;
+        console.log(`Renderer time: ${time}`);
         resolve();
       });
       return;

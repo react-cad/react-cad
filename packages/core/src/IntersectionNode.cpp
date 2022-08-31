@@ -1,4 +1,4 @@
-#include "IntersectionNode.h"
+#include "IntersectionNode.hpp"
 
 #include <BRepAlgoAPI_Common.hxx>
 

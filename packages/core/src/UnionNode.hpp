@@ -1,7 +1,7 @@
 #ifndef UnionNode_HeaderFile
 #define UnionNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 class UnionNode : public ReactCADNode
 {

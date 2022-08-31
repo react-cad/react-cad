@@ -1,4 +1,4 @@
-#include "ScaleNode.h"
+#include "ScaleNode.hpp"
 
 ScaleNode::ScaleNode() : m_props({.factor = 1})
 {

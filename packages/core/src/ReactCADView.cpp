@@ -21,18 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE
 
-#include "ReactCADView.h"
+#include "ReactCADView.hpp"
 
-#include "WasmVKeys.h"
+#include "WasmVKeys.hpp"
 
 #include <AIS_Shape.hxx>
 #include <Aspect_DisplayConnection.hxx>
 #include <Aspect_Handle.hxx>
 #include <Aspect_NeutralWindow.hxx>
+#include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <Prs3d_DatumAspect.hxx>
+#include <Quantity_Color.hxx>
 
 #include <iostream>
 
@@ -93,8 +95,11 @@ ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdat
 
   myView->MustBeResized();
   myShape = new AIS_Shape(TopoDS_Shape());
-  myShape->SetMaterial(Graphic3d_NameOfMaterial_Aluminum);
   myContext->Display(myShape, AIS_Shaded, 0, false);
+
+  myWireframe = new AIS_Shape(TopoDS_Shape());
+  myContext->Display(myWireframe, AIS_WireFrame, 0, false);
+
   myView->Redraw();
 }
 
@@ -110,8 +115,11 @@ void ReactCADView::setNode(std::shared_ptr<ReactCADNode> node)
 {
   myNode = node;
   myShape->SetShape(myNode->shape);
+  myWireframe->SetShape(myNode->shape);
   myContext->Redisplay(myShape, false, true);
-  myView->Redraw();
+  myContext->Redisplay(myWireframe, false, true);
+  myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::removeNode()
@@ -119,8 +127,11 @@ void ReactCADView::removeNode()
   if (myNode)
   {
     myShape->SetShape(TopoDS_Shape());
+    myWireframe->SetShape(TopoDS_Shape());
     myContext->Redisplay(myShape, false, true);
-    myView->Redraw();
+    myContext->Redisplay(myWireframe, false, true);
+    myView->Invalidate();
+    updateView();
     myNode = nullptr;
   }
 }
@@ -131,16 +142,140 @@ void ReactCADView::render()
   {
     myNode->renderTree();
     myShape->SetShape(myNode->shape);
+    myWireframe->SetShape(myNode->shape);
     myContext->Redisplay(myShape, false, true);
-    myView->Redraw();
+    myContext->Redisplay(myWireframe, false, true);
+    myView->Invalidate();
+    updateView();
   }
+}
+
+void ReactCADView::setQuality(double deviationCoefficent, double angle)
+{
+  myShape->SetOwnDeviationCoefficient(deviationCoefficent);
+  myShape->SetOwnDeviationAngle(angle);
+  myWireframe->SetOwnDeviationCoefficient(deviationCoefficent);
+  myWireframe->SetOwnDeviationAngle(angle);
+
+  render();
+}
+
+void ReactCADView::setColor(std::string colorString)
+{
+  Quantity_Color color;
+  Quantity_Color::ColorFromHex(colorString.c_str(), color);
+  myShape->SetColor(color);
+  myView->Invalidate();
+}
+
+void ReactCADView::zoom(double delta)
+{
+  Graphic3d_Vec2i aWinSize;
+  myView->Window()->Size(aWinSize.x(), aWinSize.y());
+
+  const Graphic3d_Vec2i aNewPos = convertPointToBacking(Graphic3d_Vec2i(aWinSize.x() / 2, aWinSize.y() / 2));
+
+  if (UpdateZoom(Aspect_ScrollDelta(aNewPos, delta)))
+  {
+    myView->Invalidate();
+  }
+}
+
+void ReactCADView::resetView()
+{
+  myView->ResetViewOrientation();
+  fit();
 }
 
 void ReactCADView::fit()
 {
-  myView->Reset(false);
-  myView->FitAll(0.1, false);
-  myView->Redraw();
+  myView->FitAll(0.5, false);
+  myView->Invalidate();
+}
+
+void ReactCADView::setViewpoint(Viewpoint viewpoint)
+{
+  switch (viewpoint)
+  {
+  case Viewpoint::Top:
+    myView->SetProj(0, 0, 1);
+    myView->SetUp(0, 1, 0);
+    break;
+  case Viewpoint::Bottom:
+    myView->SetProj(0, 0, -1);
+    myView->SetUp(0, 1, 0);
+    break;
+  case Viewpoint::Left:
+    myView->SetProj(-1, 0, 0);
+    myView->SetUp(0, 0, 1);
+    break;
+  case Viewpoint::Right:
+    myView->SetProj(1, 0, 0);
+    myView->SetUp(0, 0, 1);
+    break;
+  case Viewpoint::Front:
+    myView->SetProj(0, -1, 0);
+    myView->SetUp(0, 0, 1);
+    break;
+  case Viewpoint::Back:
+    myView->SetProj(0, 1, 0);
+    myView->SetUp(0, 0, 1);
+    break;
+  }
+  fit();
+}
+
+void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
+{
+  myView->Camera()->SetProjectionType(projection);
+  myView->Invalidate();
+}
+
+void ReactCADView::showAxes(bool show)
+{
+  Handle(V3d_Viewer) aViewer = myView->Viewer();
+  aViewer->DisplayPrivilegedPlane(show, 5);
+  myView->Invalidate();
+}
+
+void ReactCADView::showGrid(bool show)
+{
+  Handle(V3d_Viewer) aViewer = myView->Viewer();
+  if (show)
+  {
+    aViewer->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
+  }
+  else
+  {
+    aViewer->DeactivateGrid();
+  }
+  myView->Invalidate();
+}
+
+void ReactCADView::showWireframe(bool show)
+{
+  if (show)
+  {
+    myContext->Display(myWireframe, AIS_WireFrame, 0, true);
+  }
+  else
+  {
+    myContext->Erase(myWireframe, true);
+  }
+  myView->Invalidate();
+}
+
+void ReactCADView::showShaded(bool show)
+{
+  if (show)
+  {
+    myContext->Display(myShape, AIS_Shaded, 0, true);
+  }
+  else
+  {
+    myContext->Erase(myShape, true);
+  }
+  myView->Invalidate();
 }
 
 // ================================================================
@@ -152,7 +287,6 @@ void ReactCADView::initWindow()
   jsInitCanvas();
   const char *aTargetId = "!canvas";
   const EM_BOOL toUseCapture(EM_TRUE);
-  emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onResizeCallback);
 
   emscripten_set_mousedown_callback(aTargetId, this, toUseCapture, onMouseCallback);
   emscripten_set_mouseup_callback(aTargetId, this, toUseCapture, onMouseCallback);
@@ -167,11 +301,6 @@ void ReactCADView::initWindow()
   emscripten_set_touchend_callback(aTargetId, this, toUseCapture, onTouchCallback);
   emscripten_set_touchmove_callback(aTargetId, this, toUseCapture, onTouchCallback);
   emscripten_set_touchcancel_callback(aTargetId, this, toUseCapture, onTouchCallback);
-
-  // emscripten_set_keypress_callback   (EMSCRIPTEN_EVENT_TARGET_WINDOW, this,
-  // toUseCapture, onKeyCallback);
-  emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onKeyDownCallback);
-  emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onKeyUpCallback);
 }
 
 // ================================================================
@@ -374,17 +503,11 @@ void ReactCADView::handleViewRedraw(const Handle(AIS_InteractiveContext) & theCt
   }
 }
 
-// ================================================================
-// Function : onResizeEvent
-// Purpose  :
-// ================================================================
-EM_BOOL ReactCADView::onResizeEvent(int theEventType, const EmscriptenUiEvent *theEvent)
+void ReactCADView::onResize()
 {
-  (void)theEventType; // EMSCRIPTEN_EVENT_RESIZE or EMSCRIPTEN_EVENT_CANVASRESIZED
-  (void)theEvent;
   if (myView.IsNull())
   {
-    return EM_FALSE;
+    return;
   }
 
   Handle(Aspect_NeutralWindow) aWindow = Handle(Aspect_NeutralWindow)::DownCast(myView->Window());
@@ -408,7 +531,6 @@ EM_BOOL ReactCADView::onResizeEvent(int theEventType, const EmscriptenUiEvent *t
     myView->Redraw();
     dumpGlInfo(true);
   }
-  return EM_TRUE;
 }
 
 // ================================================================
@@ -469,6 +591,7 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
     {
       updateView();
     }
+    return EM_FALSE;
     break;
   }
   case EMSCRIPTEN_EVENT_CLICK:
@@ -601,8 +724,7 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
         {
           if (myDoubleTapTimer.IsStarted() && myDoubleTapTimer.ElapsedTime() <= myMouseDoubleClickInt)
           {
-            myView->FitAll(0.01, false);
-            myView->Invalidate();
+            fit();
           }
           else
           {
@@ -623,75 +745,4 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
     updateView();
   }
   return hasUpdates || !myTouchPoints.IsEmpty() ? EM_TRUE : EM_FALSE;
-}
-
-// ================================================================
-// Function : onKeyDownEvent
-// Purpose  :
-// ================================================================
-EM_BOOL ReactCADView::onKeyDownEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent)
-{
-  if (myView.IsNull() || theEventType != EMSCRIPTEN_EVENT_KEYDOWN) // EMSCRIPTEN_EVENT_KEYPRESS
-  {
-    return EM_FALSE;
-  }
-
-  const double aTimeStamp = EventTime();
-  const Aspect_VKey aVKey = WasmVKeys_VirtualKeyFromNative(theEvent->keyCode);
-  if (aVKey == Aspect_VKey_UNKNOWN)
-  {
-    return EM_FALSE;
-  }
-
-  if (theEvent->repeat == EM_FALSE)
-  {
-    myKeys.KeyDown(aVKey, aTimeStamp);
-  }
-
-  if (Aspect_VKey2Modifier(aVKey) == 0)
-  {
-    // normal key
-  }
-  return EM_FALSE;
-}
-
-// ================================================================
-// Function : onKeyUpEvent
-// Purpose  :
-// ================================================================
-EM_BOOL ReactCADView::onKeyUpEvent(int theEventType, const EmscriptenKeyboardEvent *theEvent)
-{
-  if (myView.IsNull() || theEventType != EMSCRIPTEN_EVENT_KEYUP)
-  {
-    return EM_FALSE;
-  }
-
-  const double aTimeStamp = EventTime();
-  const Aspect_VKey aVKey = WasmVKeys_VirtualKeyFromNative(theEvent->keyCode);
-  if (aVKey == Aspect_VKey_UNKNOWN)
-  {
-    return EM_FALSE;
-  }
-
-  if (theEvent->repeat == EM_TRUE)
-  {
-    return EM_FALSE;
-  }
-
-  const unsigned int aModif = myKeys.Modifiers();
-  myKeys.KeyUp(aVKey, aTimeStamp);
-  if (Aspect_VKey2Modifier(aVKey) == 0)
-  {
-    // normal key released
-    switch (aVKey | aModif)
-    {
-    case Aspect_VKey_F: {
-      myView->FitAll(0.01, false);
-      myView->Invalidate();
-      updateView();
-      return EM_TRUE;
-    }
-    }
-  }
-  return EM_FALSE;
 }

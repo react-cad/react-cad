@@ -5,10 +5,10 @@ export const parameters = {
       order: [
         "Primitives",
         "Sweeps",
-        ["prism", "revolution", "helix"],
+        ["Prism", "Revolution", "Helix"],
         "Transformations",
         "Operations",
-        ["union", "intersection", "difference"],
+        ["Union", "Intersection", "Difference"],
         "Examples",
       ],
     },

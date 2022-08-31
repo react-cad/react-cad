@@ -4,36 +4,36 @@
 #include <type_traits>
 #include <vector>
 
-#include <StlAPI.hxx>
+#include "ReactCADNode.hpp"
+#include "ReactCADView.hpp"
 
-#include "ReactCADNode.h"
-#include "ReactCADView.h"
+#include "Geometry.hpp"
 
-#include "Geometry.h"
+#include "BoxNode.hpp"
+#include "CylinderNode.hpp"
+#include "SphereNode.hpp"
+#include "TorusNode.hpp"
 
-#include "BoxNode.h"
-#include "CylinderNode.h"
-#include "SphereNode.h"
-#include "TorusNode.h"
+#include "DifferenceNode.hpp"
+#include "IntersectionNode.hpp"
+#include "UnionNode.hpp"
 
-#include "DifferenceNode.h"
-#include "IntersectionNode.h"
-#include "UnionNode.h"
+#include "HelixNode.hpp"
+#include "PrismNode.hpp"
+#include "RevolutionNode.hpp"
 
-#include "HelixNode.h"
-#include "PrismNode.h"
-#include "RevolutionNode.h"
-
-#include "RotationNode.h"
-#include "ScaleNode.h"
-#include "TranslationNode.h"
+#include "RotationNode.hpp"
+#include "ScaleNode.hpp"
+#include "TranslationNode.hpp"
 
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
 #include <Message_PrinterSystemLog.hxx>
 #include <OSD_MemInfo.hxx>
 #include <OSD_Parallel.hxx>
+#include <StlAPI.hxx>
 
 #include <Standard_ArrayStreamBuffer.hxx>
 
@@ -99,6 +99,102 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   return std::make_shared<BoxNode>();
 }
 
+void setNode(std::shared_ptr<ReactCADNode> node)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->setNode(node);
+}
+
+void removeNode()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->removeNode();
+}
+
+void render()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->render();
+}
+
+void setQuality(double deviationCoefficent, double angle)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->setQuality(deviationCoefficent, angle);
+}
+
+void setColor(std::string color)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->setColor(color);
+}
+
+void zoom(double delta)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->zoom(delta);
+}
+
+void resetView()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->resetView();
+}
+
+void fit()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->fit();
+}
+
+void setViewpoint(ReactCADView::Viewpoint viewpoint)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->setViewpoint(viewpoint);
+}
+
+void setProjection(Graphic3d_Camera::Projection projection)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->setProjection(projection);
+}
+
+void showAxes(bool show)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->showAxes(show);
+}
+
+void showGrid(bool show)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->showGrid(show);
+}
+
+void showWireframe(bool show)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->showWireframe(show);
+}
+
+void showShaded(bool show)
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->showShaded(show);
+}
+
+void updateView()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->updateView();
+}
+
+void onResize()
+{
+  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+  view->onResize();
+}
+
 Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::string filename,
                           const Standard_Real theLinDeflection, const Standard_Boolean isRelative,
                           const Standard_Real theAngDeflection)
@@ -120,8 +216,10 @@ int main()
 #ifdef REACTCAD_DEBUG
   Message::DefaultMessenger()->Printers().First()->SetTraceLevel(Message_Trace);
   Handle(Message_PrinterSystemLog) aJSConsolePrinter = new Message_PrinterSystemLog("webgl-sample", Message_Trace);
+  /*
   Message::DefaultMessenger()->AddPrinter(
       aJSConsolePrinter); // open JavaScript console within the Browser to see this output
+      */
   Message::DefaultMessenger()->Send(
       TCollection_AsciiString("NbLogicalProcessors: ") + OSD_Parallel::NbLogicalProcessors(), Message_Trace);
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
@@ -173,14 +271,6 @@ struct TypeID<
 
 EMSCRIPTEN_BINDINGS(react_cad)
 {
-  // View object
-  emscripten::class_<ReactCADView>("ReactCADView")
-      .smart_ptr<std::shared_ptr<ReactCADView>>("ReactCADView")
-      .function("setNode", &ReactCADView::setNode)
-      .function("removeNode", &ReactCADView::removeNode)
-      .function("render", &ReactCADView::render)
-      .function("fit", &ReactCADView::fit);
-
   // Base node
   emscripten::class_<ReactCADNode>("ReactCADNode")
       .smart_ptr<std::shared_ptr<ReactCADNode>>("ReactCADNode")
@@ -269,7 +359,34 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<std::shared_ptr<ScaleNode>>("ReactCADScaleNode")
       .function("setProps", &ScaleNode::setProps);
 
+  emscripten::enum_<Graphic3d_Camera::Projection>("Projection")
+      .value("ORTHOGRAPHIC", Graphic3d_Camera::Projection_Orthographic)
+      .value("PERSPECTIVE", Graphic3d_Camera::Projection_Perspective);
+
+  emscripten::enum_<ReactCADView::Viewpoint>("Viewpoint")
+      .value("TOP", ReactCADView::Viewpoint::Top)
+      .value("BOTTOM", ReactCADView::Viewpoint::Bottom)
+      .value("LEFT", ReactCADView::Viewpoint::Left)
+      .value("RIGHT", ReactCADView::Viewpoint::Right)
+      .value("FRONT", ReactCADView::Viewpoint::Front)
+      .value("BACK", ReactCADView::Viewpoint::Back);
+
   emscripten::function("createCADNode", &createCADNode);
-  emscripten::function("getView", &ReactCADView::getView);
+  emscripten::function("setNode", &setNode);
+  emscripten::function("removeNode", &removeNode);
+  emscripten::function("render", &render);
+  // emscripten::function("setColor", &setColor);
+  emscripten::function("setQuality", &setQuality);
+  emscripten::function("zoom", &zoom);
+  emscripten::function("resetView", &resetView);
+  emscripten::function("updateView", &updateView);
+  emscripten::function("fit", &fit);
+  emscripten::function("setViewpoint", &setViewpoint);
+  emscripten::function("setProjection", &setProjection);
+  emscripten::function("showAxes", &showAxes);
+  emscripten::function("showGrid", &showGrid);
+  emscripten::function("showWireframe", &showWireframe);
+  emscripten::function("showShaded", &showShaded);
+  emscripten::function("onResize", &onResize);
   emscripten::function("writeSTL", &writeSTL);
 }

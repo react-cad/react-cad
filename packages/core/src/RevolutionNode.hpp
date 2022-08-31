@@ -1,7 +1,7 @@
 #ifndef RevolutionNode_HeaderFile
 #define RevolutionNode_HeaderFile
 
-#include "SweepNode.h"
+#include "SweepNode.hpp"
 
 struct RevolutionProps
 {

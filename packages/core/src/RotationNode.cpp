@@ -1,4 +1,4 @@
-#include "RotationNode.h"
+#include "RotationNode.hpp"
 
 RotationNode::RotationNode() : m_props({.axis = "z", .angle = 0})
 {

@@ -1,7 +1,7 @@
 {
-  "name": "@react-cad/preview",
+  "name": "@react-cad/viewer",
   "version": "0.4.0",
-  "description": "React component to preview @react-cad projects in the browser",
+  "description": "React component to view @react-cad projects in the browser",
   "main": "lib/index.js",
   "files": [
     "lib/**/*",
@@ -21,11 +21,14 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "react": "^17.0.1"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.4",
     "@react-cad/core": "^0.4.0",
-    "@react-cad/renderer": "^0.4.0"
+    "@react-cad/renderer": "^0.4.0",
+    "react-icons": "^4.4.0"
   },
   "scripts": {
     "build": "tsc",

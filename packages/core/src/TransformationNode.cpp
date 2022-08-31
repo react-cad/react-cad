@@ -1,6 +1,6 @@
 #include <BRepBuilderAPI_Transform.hxx>
 
-#include "TransformationNode.h"
+#include "TransformationNode.hpp"
 
 TransformationNode::TransformationNode()
 {

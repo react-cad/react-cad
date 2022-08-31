@@ -1,7 +1,7 @@
 #ifndef SphereNode_HeaderFile
 #define SphereNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 struct SphereProps
 {

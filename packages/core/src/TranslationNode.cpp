@@ -1,4 +1,4 @@
-#include "TranslationNode.h"
+#include "TranslationNode.hpp"
 
 TranslationNode::TranslationNode() : m_props({.x = 0, .y = 0, .z = 0})
 {

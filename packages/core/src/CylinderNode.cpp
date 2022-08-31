@@ -1,6 +1,6 @@
 #include <BRepPrimAPI_MakeCylinder.hxx>
 
-#include "CylinderNode.h"
+#include "CylinderNode.hpp"
 
 CylinderNode::CylinderNode() : m_props({.center = false, .radius = 1, .height = 1})
 {

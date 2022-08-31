@@ -1,7 +1,7 @@
 #ifndef IntersectionNode_HeaderFile
 #define IntersectionNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 class IntersectionNode : public ReactCADNode
 {

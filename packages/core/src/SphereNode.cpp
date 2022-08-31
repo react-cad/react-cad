@@ -1,6 +1,6 @@
 #include <BRepPrimAPI_MakeSphere.hxx>
 
-#include "SphereNode.h"
+#include "SphereNode.hpp"
 
 SphereNode::SphereNode() : m_props({.radius = 1})
 {

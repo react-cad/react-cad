@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-#include "RevolutionNode.h"
+#include "RevolutionNode.hpp"
 
 RevolutionNode::RevolutionNode() : m_props({.axis = "z", .angle = 2 * M_PI})
 {

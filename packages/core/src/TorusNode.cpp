@@ -1,6 +1,6 @@
 #include <BRepPrimAPI_MakeTorus.hxx>
 
-#include "TorusNode.h"
+#include "TorusNode.hpp"
 
 TorusNode::TorusNode() : m_props({.radius1 = 1, .radius2 = 1})
 {

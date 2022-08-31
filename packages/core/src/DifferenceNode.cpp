@@ -1,4 +1,5 @@
-#include "DifferenceNode.h"
+#include "DifferenceNode.hpp"
+#include "PerformanceTimer.hpp"
 
 #include <BRepAlgoAPI_Cut.hxx>
 
@@ -24,6 +25,8 @@ TopoDS_Shape DifferenceNode::cut(const std::vector<TopoDS_Shape> &children)
   case 1:
     return children.at(0);
   default: {
+    PerformanceTimer timer("Difference render time");
+    timer.start();
     BRepAlgoAPI_Cut aBuilder;
 
     TopTools_ListOfShape aLS;
@@ -50,6 +53,7 @@ TopoDS_Shape DifferenceNode::cut(const std::vector<TopoDS_Shape> &children)
       TopoDS_Shape nullShape;
       return nullShape;
     }
+    timer.end();
     return aBuilder.Shape();
   }
   }

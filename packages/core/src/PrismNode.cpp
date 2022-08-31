@@ -1,7 +1,7 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 
-#include "PrismNode.h"
+#include "PrismNode.hpp"
 
 PrismNode::PrismNode() : m_props({.axis = "z", .height = 1})
 {

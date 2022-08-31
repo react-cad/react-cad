@@ -1,7 +1,7 @@
 #ifndef TransformationNode_HeaderFile
 #define TransformationNode_HeaderFile
 
-#include "ReactCADNode.h"
+#include "ReactCADNode.hpp"
 
 #include <gp.hxx>
 #include <gp_Trsf.hxx>

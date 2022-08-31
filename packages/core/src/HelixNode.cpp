@@ -10,7 +10,9 @@
 
 #include <math.h>
 
-#include "HelixNode.h"
+#include "HelixNode.hpp"
+
+#include "PerformanceTimer.hpp"
 
 HelixNode::HelixNode() : m_props({.pitch = 1, .height = 1})
 {
@@ -31,6 +33,9 @@ void HelixNode::setProps(const HelixProps &props)
 
 void HelixNode::renderShape()
 {
+  PerformanceTimer timer("Helix render time");
+  timer.start();
+
   BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_props.height));
   BRepBuilderAPI_MakeWire spine(edge);
 
@@ -54,4 +59,6 @@ void HelixNode::renderShape()
   pipe.MakeSolid();
 
   shape = pipe.Shape();
+
+  timer.end();
 }
