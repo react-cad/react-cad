@@ -8,7 +8,10 @@ import {
 import { RenderContext } from "@storybook/store";
 import { ReactCadFramework } from "./types-6-0";
 import ReactCadViewer from "@react-cad/viewer";
+import reactCadCoreJs from "@react-cad/core/lib/react-cad-core";
+import reactCadCoreEsm from "@react-cad/core/lib/react-cad-core.esm";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
+import reactCadCoreWorker from "@react-cad/core/lib/react-cad-core.worker";
 
 const RemountHandler: React.FC<{
   forceRemount: boolean;
@@ -45,6 +48,9 @@ export function renderToDOM(
           <ReactCadViewer
             className="full-height-preview"
             coreUrl={reactCadCoreWasm}
+            jsUrl={reactCadCoreJs}
+            esmUrl={reactCadCoreEsm}
+            workerUrl={reactCadCoreWorker}
             shape={storyFn()}
             name={name}
             reset={reset}

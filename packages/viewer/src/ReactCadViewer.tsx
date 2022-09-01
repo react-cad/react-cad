@@ -4,12 +4,14 @@ import ReactCadRenderer from "@react-cad/renderer";
 import { useReactCadCore, useReactCadRenderer } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
-import DetailContext from "./DetailContext";
 import Toolbar from "./Toolbar";
 
 interface Props {
   className?: string;
   coreUrl: string;
+  jsUrl: string;
+  esmUrl: string;
+  workerUrl: string;
   shape: React.ReactElement<unknown>;
   name?: string;
   reset?: boolean;
@@ -24,6 +26,9 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
     {
       className,
       coreUrl,
+      jsUrl,
+      esmUrl,
+      workerUrl,
       shape,
       name,
       reset,
@@ -48,43 +53,33 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       showShaded: true,
       projection: "ORTHOGRAPHIC",
       detail: "LOW",
+      highDetail,
+      lowDetail,
     });
 
-    const detailShape = React.useMemo(
-      () => (
-        <DetailContext.Provider value={options.detail}>
-          {shape}
-        </DetailContext.Provider>
-      ),
-      [shape, options.detail]
+    const [core, loaded, canvasRef, onResize] = useReactCadCore(
+      coreUrl,
+      jsUrl,
+      esmUrl,
+      workerUrl
     );
+    useReactCadRenderer(core, loaded, shape, options, reset);
 
-    const [core, loaded, canvasRef, onResize] = useReactCadCore(coreUrl);
-    useReactCadRenderer(core, loaded, detailShape, reset);
-
-    React.useEffect(() => {
-      core.current?.showAxes(options.showAxes);
-      core.current?.showGrid(options.showGrid);
-      core.current?.showWireframe(options.showWireframe);
-      core.current?.showShaded(options.showShaded);
-      core.current?.setProjection(core.current.Projection[options.projection]);
-      const quality = options.detail === "HIGH" ? highDetail : lowDetail;
-      core.current?.setQuality(...quality);
-    }, [loaded, options, ...highDetail, ...lowDetail]);
+    React.useEffect(
+      () => setOptions((options) => ({ ...options, highDetail, lowDetail })),
+      [...highDetail, ...lowDetail]
+    );
 
     const handleSetViewpoint = React.useCallback((viewpoint: Viewpoint) => {
       core.current?.setViewpoint(core.current.Viewpoint[viewpoint]);
-      core.current?.updateView();
     }, []);
 
     const handleZoom = React.useCallback((amount: number) => {
       core.current?.zoom(amount);
-      core.current?.updateView();
     }, []);
 
     const handleResetView = React.useCallback(() => {
       core.current?.resetView();
-      core.current?.updateView();
     }, []);
     const handleFit = React.useCallback(() => core.current?.fit(), []);
 

@@ -4,7 +4,8 @@
     "rootDir": "./src",
     "outDir": "./lib",
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react"
+    "jsxImportSource": "@emotion/react",
+    "module": "Node16"
   },
   "include": ["./src/**/*"]
 }

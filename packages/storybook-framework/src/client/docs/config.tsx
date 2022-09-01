@@ -1,6 +1,9 @@
 import React from "react";
 import ReactCadViewer from "@react-cad/viewer";
+import reactCadCoreJs from "@react-cad/core/lib/react-cad-core";
+import reactCadCoreEsm from "@react-cad/core/lib/react-cad-core.esm";
 import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
+import reactCadCoreWorker from "@react-cad/core/lib/react-cad-core.worker";
 import {
   extractComponentDescription,
   enhanceArgTypes,
@@ -19,12 +22,18 @@ export const parameters = {
       storyFn: PartialStoryFn<any>,
       { parameters }: StoryContext<ReactCadFramework>
     ): React.ReactNode => {
-      const { highDetail, lowDetail, resizable = true } =
-        parameters.reactCad || {};
+      const {
+        highDetail,
+        lowDetail,
+        resizable = true,
+      } = parameters.reactCad || {};
 
       return (
         <ReactCadViewer
           coreUrl={reactCadCoreWasm}
+          jsUrl={reactCadCoreJs}
+          esmUrl={reactCadCoreEsm}
+          workerUrl={reactCadCoreWorker}
           shape={storyFn()}
           highDetail={highDetail}
           lowDetail={lowDetail}

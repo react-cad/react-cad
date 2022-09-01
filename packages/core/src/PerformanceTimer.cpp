@@ -22,5 +22,5 @@ void PerformanceTimer::end()
   std::stringstream message;
   message << name << ": " << millis.count() << "ms";
 
-  Message::DefaultMessenger()->Send(TCollection_AsciiString(message.str().c_str()), Message_Trace);
+  Message::DefaultMessenger()->Send(message, Message_Trace);
 }

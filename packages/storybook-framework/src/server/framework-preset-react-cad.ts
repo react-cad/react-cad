@@ -47,7 +47,19 @@ export async function babelDefault(
 export function webpack(config: Configuration): Configuration {
   config.module?.rules?.push({
     test: /react-cad-core\.wasm$/,
-    type: "asset/resource",
+    use: "file-loader",
+  });
+  config.module?.rules?.push({
+    test: /react-cad-core\.js$/,
+    use: "file-loader",
+  });
+  config.module?.rules?.push({
+    test: /react-cad-core\.esm\.js$/,
+    use: "file-loader",
+  });
+  config.module?.rules?.push({
+    test: /react-cad-core\.worker\.js$/,
+    use: "file-loader",
   });
 
   config.resolve = {
@@ -56,6 +68,7 @@ export function webpack(config: Configuration): Configuration {
       ...config.resolve?.fallback,
       fs: false,
       path: false,
+      "perf-hooks": false,
     },
   };
 

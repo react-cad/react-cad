@@ -41,6 +41,8 @@
 #include <emscripten/bind.h>
 #include <emscripten/html5.h>
 
+#include <pthread.h>
+
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADView : protected AIS_ViewController
 {
@@ -62,7 +64,7 @@ public:
 
   void setNode(std::shared_ptr<ReactCADNode> node);
   void removeNode();
-  void render();
+  void render(bool reset = false);
 
   void setQuality(double deviationCoefficent, double angle);
 
@@ -82,9 +84,6 @@ public:
   void showShaded(bool show);
 
   void onResize();
-
-  //! Request view redrawing.
-  void updateView();
 
   //! Return interactive context.
   const Handle(AIS_InteractiveContext) & Context() const
@@ -117,6 +116,11 @@ private:
 
   //! Flush events and redraw view.
   void redrawView();
+
+  void drawShape(TopoDS_Shape shape);
+
+  //! Request view redrawing.
+  void updateView();
 
   //! Handle view redraw.
   virtual void handleViewRedraw(const Handle(AIS_InteractiveContext) & theCtx,
@@ -175,6 +179,10 @@ private:
   }
 
 private:
+  static void lock();
+  static void unlock();
+  static pthread_mutex_t viewMutex;
+  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE webglContext;
   Handle(AIS_InteractiveContext) myContext; //!< interactive context
   Handle(V3d_View) myView;                  //!< 3D view
   Handle(Prs3d_TextAspect) myTextStyle;     //!< text style for OSD elements
@@ -183,8 +191,14 @@ private:
   float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
   unsigned int myUpdateRequests;            //!< counter for unhandled update requests
   std::shared_ptr<ReactCADNode> myNode;
-  Handle_AIS_Shape myShape;
-  Handle_AIS_Shape myWireframe;
+  Handle_AIS_Shape myShapeFront;
+  Handle_AIS_Shape myShapeBack;
+  Handle_AIS_Shape myWireframeFront;
+  Handle_AIS_Shape myWireframeBack;
+  bool myShowShaded = true;
+  bool myShowWireframe = true;
+  pthread_mutex_t shadedHandleMutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_t wireframeHandleMutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 #endif // _ReactCADView_HeaderFile

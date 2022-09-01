@@ -27,16 +27,22 @@
 
 #include <AIS_Shape.hxx>
 #include <Aspect_DisplayConnection.hxx>
+#include <Aspect_Grid.hxx>
 #include <Aspect_Handle.hxx>
 #include <Aspect_NeutralWindow.hxx>
 #include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
+#include <OpenGl_Context.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <Prs3d_DatumAspect.hxx>
 #include <Quantity_Color.hxx>
 
+#include <emscripten/html5.h>
+
 #include <iostream>
+
+#include "PerformanceTimer.hpp"
 
 // clang-format off
 namespace
@@ -67,6 +73,17 @@ namespace
 // clang-format on
 
 std::shared_ptr<ReactCADView> ReactCADView::singleton = nullptr;
+pthread_mutex_t ReactCADView::viewMutex = PTHREAD_MUTEX_INITIALIZER;
+
+void ReactCADView::lock()
+{
+  pthread_mutex_lock(&ReactCADView::viewMutex);
+}
+
+void ReactCADView::unlock()
+{
+  pthread_mutex_unlock(&ReactCADView::viewMutex);
+}
 
 std::shared_ptr<ReactCADView> ReactCADView::getView()
 {
@@ -74,6 +91,7 @@ std::shared_ptr<ReactCADView> ReactCADView::getView()
   {
     singleton.reset(new ReactCADView());
   }
+
   return singleton;
 }
 
@@ -94,13 +112,19 @@ ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdat
   }
 
   myView->MustBeResized();
-  myShape = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myShape, AIS_Shaded, 0, false);
+  myShapeFront = new AIS_Shape(TopoDS_Shape());
+  myContext->Display(myShapeFront, AIS_Shaded, 0, false);
+  myShapeBack = new AIS_Shape(TopoDS_Shape());
+  myContext->Display(myShapeBack, AIS_Shaded, 0, false);
+  myContext->Erase(myShapeBack, false);
 
-  myWireframe = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myWireframe, AIS_WireFrame, 0, false);
+  myWireframeFront = new AIS_Shape(TopoDS_Shape());
+  myContext->Display(myWireframeFront, AIS_WireFrame, 0, false);
+  myWireframeBack = new AIS_Shape(TopoDS_Shape());
+  myContext->Display(myWireframeBack, AIS_Shaded, 0, false);
+  myContext->Erase(myWireframeBack, false);
 
-  myView->Redraw();
+  updateView();
 }
 
 // ================================================================
@@ -111,61 +135,102 @@ ReactCADView::~ReactCADView()
 {
 }
 
+void ReactCADView::drawShape(TopoDS_Shape shape)
+{
+
+  myShapeBack->SetShape(shape);
+  myContext->Redisplay(myShapeBack, false);
+
+  pthread_mutex_lock(&shadedHandleMutex);
+  Handle_AIS_Shape temp = myShapeBack;
+  myShapeBack = myShapeFront;
+  myShapeFront = temp;
+  if (myShowShaded)
+  {
+    myContext->Display(myShapeFront, AIS_Shaded, 0, false);
+  }
+  myContext->Erase(myShapeBack, false);
+  pthread_mutex_unlock(&shadedHandleMutex);
+
+  myWireframeBack->SetShape(shape);
+  myContext->Redisplay(myWireframeBack, false);
+
+  pthread_mutex_lock(&wireframeHandleMutex);
+  temp = myWireframeBack;
+  myWireframeBack = myWireframeFront;
+  myWireframeFront = temp;
+  if (myShowWireframe)
+  {
+    myContext->Display(myWireframeFront, AIS_WireFrame, 0, false);
+  }
+  myContext->Erase(myWireframeBack, false);
+  pthread_mutex_unlock(&wireframeHandleMutex);
+}
+
 void ReactCADView::setNode(std::shared_ptr<ReactCADNode> node)
 {
   myNode = node;
-  myShape->SetShape(myNode->shape);
-  myWireframe->SetShape(myNode->shape);
-  myContext->Redisplay(myShape, false, true);
-  myContext->Redisplay(myWireframe, false, true);
+  myNode->renderTree();
+  drawShape(myNode->shape);
   myView->Invalidate();
-  updateView();
+  myView->ResetViewOrientation();
+  myView->FitAll(0.5, false);
+  redrawView();
 }
 
 void ReactCADView::removeNode()
 {
   if (myNode)
   {
-    myShape->SetShape(TopoDS_Shape());
-    myWireframe->SetShape(TopoDS_Shape());
-    myContext->Redisplay(myShape, false, true);
-    myContext->Redisplay(myWireframe, false, true);
+    drawShape(TopoDS_Shape());
     myView->Invalidate();
-    updateView();
+    redrawView();
     myNode = nullptr;
   }
 }
 
-void ReactCADView::render()
+void ReactCADView::render(bool reset)
 {
   if (myNode)
   {
+    PerformanceTimer timer1("Compute geometry");
+    PerformanceTimer timer2("Compute mesh");
+    timer1.start();
     myNode->renderTree();
-    myShape->SetShape(myNode->shape);
-    myWireframe->SetShape(myNode->shape);
-    myContext->Redisplay(myShape, false, true);
-    myContext->Redisplay(myWireframe, false, true);
+    timer1.end();
+    timer2.start();
+    drawShape(myNode->shape);
+    timer2.end();
+    if (reset)
+    {
+      myView->ResetViewOrientation();
+      myView->FitAll(0.5, false);
+    }
     myView->Invalidate();
-    updateView();
+    redrawView();
   }
 }
 
 void ReactCADView::setQuality(double deviationCoefficent, double angle)
 {
-  myShape->SetOwnDeviationCoefficient(deviationCoefficent);
-  myShape->SetOwnDeviationAngle(angle);
-  myWireframe->SetOwnDeviationCoefficient(deviationCoefficent);
-  myWireframe->SetOwnDeviationAngle(angle);
-
-  render();
+  myShapeFront->SetOwnDeviationCoefficient(deviationCoefficent);
+  myShapeFront->SetOwnDeviationAngle(angle);
+  myShapeBack->SetOwnDeviationCoefficient(deviationCoefficent);
+  myShapeBack->SetOwnDeviationAngle(angle);
+  myWireframeFront->SetOwnDeviationCoefficient(deviationCoefficent);
+  myWireframeFront->SetOwnDeviationAngle(angle);
+  myWireframeBack->SetOwnDeviationCoefficient(deviationCoefficent);
+  myWireframeBack->SetOwnDeviationAngle(angle);
 }
 
 void ReactCADView::setColor(std::string colorString)
 {
   Quantity_Color color;
   Quantity_Color::ColorFromHex(colorString.c_str(), color);
-  myShape->SetColor(color);
+  myShapeFront->SetColor(color);
+  myShapeBack->SetColor(color);
   myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::zoom(double delta)
@@ -179,18 +244,22 @@ void ReactCADView::zoom(double delta)
   {
     myView->Invalidate();
   }
+  updateView();
 }
 
 void ReactCADView::resetView()
 {
   myView->ResetViewOrientation();
+  myView->Invalidate();
   fit();
+  updateView();
 }
 
 void ReactCADView::fit()
 {
   myView->FitAll(0.5, false);
   myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::setViewpoint(Viewpoint viewpoint)
@@ -223,12 +292,15 @@ void ReactCADView::setViewpoint(Viewpoint viewpoint)
     break;
   }
   fit();
+  myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 {
   myView->Camera()->SetProjectionType(projection);
   myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::showAxes(bool show)
@@ -236,6 +308,7 @@ void ReactCADView::showAxes(bool show)
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
   myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::showGrid(bool show)
@@ -250,32 +323,41 @@ void ReactCADView::showGrid(bool show)
     aViewer->DeactivateGrid();
   }
   myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::showWireframe(bool show)
 {
-  if (show)
+  pthread_mutex_lock(&wireframeHandleMutex);
+  myShowWireframe = show;
+  if (myShowWireframe)
   {
-    myContext->Display(myWireframe, AIS_WireFrame, 0, true);
+    myContext->Display(myWireframeFront, AIS_WireFrame, 0, false);
   }
   else
   {
-    myContext->Erase(myWireframe, true);
+    myContext->Erase(myWireframeFront, false);
   }
+  pthread_mutex_unlock(&wireframeHandleMutex);
   myView->Invalidate();
+  updateView();
 }
 
 void ReactCADView::showShaded(bool show)
 {
-  if (show)
+  pthread_mutex_lock(&shadedHandleMutex);
+  myShowShaded = show;
+  if (myShowShaded)
   {
-    myContext->Display(myShape, AIS_Shaded, 0, true);
+    myContext->Display(myShapeFront, AIS_Shaded, 0, false);
   }
   else
   {
-    myContext->Erase(myShape, true);
+    myContext->Erase(myShapeFront, false);
   }
+  pthread_mutex_unlock(&shadedHandleMutex);
   myView->Invalidate();
+  updateView();
 }
 
 // ================================================================
@@ -384,10 +466,19 @@ bool ReactCADView::initViewer()
     Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: font '")
   + aFontPath + "' is not found", Message_Fail);
   }*/
+  EmscriptenWebGLContextAttributes attributes;
+  emscripten_webgl_init_context_attributes(&attributes);
+  attributes.alpha = false;
+  attributes.powerPreference = EM_WEBGL_POWER_PREFERENCE_HIGH_PERFORMANCE;
+  attributes.renderViaOffscreenBackBuffer = true;
+  attributes.proxyContextToMainThread = EMSCRIPTEN_WEBGL_CONTEXT_PROXY_ALWAYS;
+  webglContext = emscripten_webgl_create_context("!canvas", &attributes);
+  EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(webglContext);
 
   Handle(Aspect_DisplayConnection) aDisp;
+
   Handle(OpenGl_GraphicDriver) aDriver = new OpenGl_GraphicDriver(aDisp, false);
-  aDriver->ChangeOptions().buffersNoSwap = true; // swap has no effect in WebGL
+  // aDriver->ChangeOptions().buffersNoSwap = true; // swap has no effect in WebGL
   if (!aDriver->InitContext())
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Error: EGL initialization failed"), Message_Fail);
@@ -397,9 +488,13 @@ bool ReactCADView::initViewer()
   Handle(V3d_Viewer) aViewer = new V3d_Viewer(aDriver);
   aViewer->SetComputedMode(false);
   aViewer->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
+  aViewer->SetRectangularGridValues(0, 0, 1, 1, 0);
+  aViewer->SetRectangularGridGraphicValues(1000, 1000, 0);
+  aViewer->Grid()->SetColors(Quantity_NOC_GRAY90, Quantity_NOC_GRAY75);
   aViewer->SetDefaultShadingModel(Graphic3d_TOSM_FRAGMENT);
   aViewer->SetDefaultLights();
   aViewer->SetLightOn();
+  aViewer->SetDefaultBackgroundColor(Quantity_NOC_AZURE);
 
   Handle(Aspect_NeutralWindow) aWindow = new Aspect_NeutralWindow();
   Graphic3d_Vec2i aWinSize = jsCanvasSize();
@@ -431,7 +526,7 @@ bool ReactCADView::initViewer()
   myView->SetWindow(aWindow);
 
 #ifdef REACTCAD_DEBUG
-  dumpGlInfo(false);
+  // dumpGlInfo(false);
 #endif
 
   myContext = new AIS_InteractiveContext(aViewer);
@@ -483,7 +578,10 @@ void ReactCADView::redrawView()
 {
   if (!myView.IsNull())
   {
+    lock();
+    EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(webglContext);
     FlushViewEvents(myContext, myView, true);
+    unlock();
   }
 }
 
@@ -528,8 +626,8 @@ void ReactCADView::onResize()
     aWindow->SetSize(aWinSizeNew.x(), aWinSizeNew.y());
     myView->MustBeResized();
     myView->Invalidate();
-    myView->Redraw();
-    dumpGlInfo(true);
+    redrawView();
+    // dumpGlInfo(true);
   }
 }
 

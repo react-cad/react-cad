@@ -3,7 +3,6 @@
   "version": "0.5.2",
   "description": "Core WebAssembly library for @react-cad CAD system",
   "main": "lib/react-cad-core.js",
-  "module": "lib/react-cad-core.esm.js",
   "files": [
     "lib/**/*",
     "licenses/**/*"

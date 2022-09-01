@@ -8,6 +8,21 @@ declare module "@react-cad/core/lib/react-cad-core.wasm" {
   export default wasmUrl;
 }
 
+declare module "@react-cad/core/lib/react-cad-core" {
+  const jsUrl: string;
+  export default jsUrl;
+}
+
+declare module "@react-cad/core/lib/react-cad-core.esm" {
+  const jsUrl: string;
+  export default jsUrl;
+}
+
+declare module "@react-cad/core/lib/react-cad-core.worker" {
+  const workerUrl: string;
+  export default workerUrl;
+}
+
 declare module "@storybook/react/dist/esm/client/docs/jsxDecorator" {
   export * from "@storybook/react/dist/ts3.9/client/docs/jsxDecorator";
 }
