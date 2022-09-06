@@ -1,4 +1,4 @@
-FROM emscripten/emsdk:2.0.10
+FROM emscripten/emsdk:3.1.20
 
 RUN apt-get update && apt-get -y install tk-dev tcl-dev
 
@@ -19,7 +19,7 @@ RUN cd occt/build && emcmake cmake .. \
   -DCMAKE_INSTALL_PREFIX=/opt/occt
 RUN cd occt/build && emmake make -j`nproc` install
 
-FROM emscripten/emsdk:2.0.10
+FROM emscripten/emsdk:3.1.20
 
 RUN apt-get update && apt-get -y install tk-dev tcl-dev fswatch
 COPY --from=0 /opt/occt /opt/occt
