@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     name: Tag version
+    if: ${{ !contains(github.event.commits[0].message, 'chore(release)') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

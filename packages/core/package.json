@@ -20,7 +20,7 @@
     "start": "nps",
     "build:ts-only": "nps ts.build",
     "build": "nps build",
-    "version": "echo DOCKER_TAG=\\\"$npm_package_version\\\" > .env"
+    "version": "echo DOCKER_TAG=\\\"$npm_package_version\\\" > .env && git add .env"
   },
   "publishConfig": {
     "access": "public"
