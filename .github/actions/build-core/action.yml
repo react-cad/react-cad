@@ -1,8 +1,12 @@
 name: "Build @react-cad/core"
 description: "Build the core wasm library in docker"
+inputs:
+  tag:
+    description: "Which docker image version to use"
+    default: "latest"
 runs:
   using: "docker"
-  image: "reactcad/build:latest"
+  image: ${{ format('reactcad/build:{0}', inputs.tag) }}
   entrypoint: /github/workspace/packages/core/build.sh
   args:
     - -b

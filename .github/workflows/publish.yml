@@ -51,6 +51,8 @@ jobs:
         run: yarn install
       - name: Build core wasm
         uses: ./.github/actions/build-core
+        with:
+          tag: ${{ github.ref_name }}
       - name: Build Typescript
         run: yarn nps build.ts
       - name: Release
