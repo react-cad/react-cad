@@ -1,0 +1,27 @@
+name: Tag version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Tag version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure git
+        run: |
+          git config --global user.name 'React CAD Bot'
+          git config --global user.email 'react.cad.dev+bot@gmail.com'
+      - name: Set up node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+          registry-url: https://registry.npmjs.org/
+      - name: Tag version
+        run: npx lerna version --yes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
