@@ -1,8 +1,8 @@
 name: "Build @react-cad/core"
-description: "Build the core wasm library in docker from dockerhub"
+description: "Build the core wasm library in local docker"
 runs:
   using: "docker"
-  image: "reactcad/build:latest"
+  image: "../../../packages/core/Dockerfile"
   entrypoint: /github/workspace/packages/core/build.sh
   args:
     - -b
