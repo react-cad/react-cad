@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to DockerHub
@@ -49,6 +47,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install dependencies
         run: yarn install
+      - name: Update docker action
+        run: 'sed -i "s/latest/${{ github.ref_name }}/" .github/actions/build-core/action.yml'
       - name: Build core wasm
         uses: ./.github/actions/build-core
       - name: Build Typescript
