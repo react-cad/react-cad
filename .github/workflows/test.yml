@@ -45,14 +45,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Update docker action (pr)
-        if: ${{ needs.docker.outputs.changed == 'true' }}
-        run: 'sed -i "s/latest/pr-${{ github.event.number }}/" .github/actions/build-core/action.yml'
-      - name: Update docker action (tag)
-        if: ${{ needs.docker.outputs.changed == 'false' }}
-        run: 'sed -i "s/latest/${{ needs.docker.outputs.tag }}/" .github/actions/build-core/action.yml'
-      - name: Build core wasm
-        uses: ./.github/actions/build-core
       - name: Set up node
         uses: actions/setup-node@v2
         with:
@@ -61,6 +53,14 @@ jobs:
         run: yarn install
       - name: Lint
         run: yarn lint
+      - name: Update docker action (pr)
+        if: ${{ needs.docker.outputs.changed == 'true' }}
+        run: 'sed -i "s/latest/pr-${{ github.event.number }}/" .github/actions/build-core/action.yml'
+      - name: Update docker action (tag)
+        if: ${{ needs.docker.outputs.changed == 'false' }}
+        run: 'sed -i "s/latest/${{ needs.docker.outputs.tag }}/" .github/actions/build-core/action.yml'
+      - name: Build core wasm
+        uses: ./.github/actions/build-core
       - name: Build Typescript
         run: yarn nps build.ts
       - name: Test
