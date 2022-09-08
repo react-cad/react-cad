@@ -106,8 +106,10 @@ void ReactCADNode::notifyAncestors()
   }
 }
 
-void ReactCADNode::renderTree()
+bool ReactCADNode::computeGeometry()
 {
+  bool changed = false;
+
   lock();
   if (m_propsChanged || m_childrenChanged)
   {
@@ -116,25 +118,29 @@ void ReactCADNode::renderTree()
       std::vector<TopoDS_Shape> shapes;
       for (auto child : m_children)
       {
-        child->renderTree();
+        child->computeGeometry();
         shapes.push_back(child->shape);
       }
-      renderChildren(shapes);
+      computeChildren(shapes);
       m_childrenChanged = false;
     }
 
-    renderShape();
+    computeShape();
     m_propsChanged = false;
+
+    changed = true;
   }
   unlock();
+
+  return changed;
 }
 
-void ReactCADNode::renderChildren(const std::vector<TopoDS_Shape> &children)
+void ReactCADNode::computeChildren(const std::vector<TopoDS_Shape> &children)
 {
   m_childShape = fuse(children);
 }
 
-void ReactCADNode::renderShape()
+void ReactCADNode::computeShape()
 {
   shape = m_childShape;
 }

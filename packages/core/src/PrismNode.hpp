@@ -17,7 +17,7 @@ public:
   void setProps(const PrismProps &props);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   PrismProps m_props;

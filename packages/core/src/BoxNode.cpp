@@ -21,7 +21,7 @@ void BoxNode::setProps(const BoxProps &props)
   }
 }
 
-void BoxNode::renderShape()
+void BoxNode::computeShape()
 {
   if (m_props.center)
   {

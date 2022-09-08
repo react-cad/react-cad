@@ -119,9 +119,7 @@ export interface ReactCADCore extends EmscriptenModule {
     BACK: Viewpoint;
   };
   createCADNode(type: string): ReactCADNode;
-  setNode(node: ReactCADNode): void;
-  removeNode(node: ReactCADNode): void;
-  render(reset = false): void;
+  render(node: ReactCADNode, reset = false): void;
   // setColor(color: string): void;
   zoom(delta: number): void;
   setViewpoint(viewpoint: Viewpoint): void;

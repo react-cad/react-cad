@@ -1,8 +1,9 @@
+#include <forward_list>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <string>
 #include <type_traits>
-#include <vector>
 
 #include "ReactCADNode.hpp"
 #include "ReactCADView.hpp"
@@ -101,22 +102,16 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   return std::make_shared<BoxNode>();
 }
 
-void setNode(std::shared_ptr<ReactCADNode> node)
+struct RenderRequest
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->setNode(node);
-}
+  std::shared_ptr<ReactCADNode> node;
+  bool reset;
+};
 
-void removeNode()
-{
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->removeNode();
-}
+std::list<RenderRequest> renderQueue;
 
 pthread_mutex_t render_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t render_cond = PTHREAD_COND_INITIALIZER;
-bool renderRequested = false;
-bool resetRequested = false;
 
 void *renderInternal(void *data)
 {
@@ -129,30 +124,46 @@ void *renderInternal(void *data)
 
     do
     {
-      bool reset = resetRequested;
-      renderRequested = false;
-      resetRequested = false;
+      RenderRequest request = renderQueue.back();
+
+      std::list<RenderRequest>::reverse_iterator it;
+      for (it = renderQueue.rbegin(); it != renderQueue.rend(); ++it)
+      {
+        if (it->node != request.node)
+        {
+          break;
+        }
+        if (it->reset)
+        {
+          request.reset = true;
+        }
+      }
+      renderQueue.clear();
       pthread_mutex_unlock(&render_mutex);
 
-      view->render(reset);
+      bool changed = request.node->computeGeometry();
+      if (changed)
+      {
+        view->render(request.node->shape, request.reset);
+      }
+      else if (request.reset)
+      {
+        view->resetView();
+      }
 
       pthread_mutex_lock(&render_mutex);
       // Catch requests that came in during render
-    } while (renderRequested);
+    } while (renderQueue.size());
 
     pthread_mutex_unlock(&render_mutex);
   }
   return NULL;
 }
 
-void render(bool reset = false)
+void render(std::shared_ptr<ReactCADNode> node, bool reset = false)
 {
   pthread_mutex_lock(&render_mutex);
-  renderRequested = true;
-  if (reset)
-  {
-    resetRequested = true;
-  }
+  renderQueue.push_back({node, reset});
   pthread_cond_signal(&render_cond);
   pthread_mutex_unlock(&render_mutex);
 }
@@ -233,7 +244,7 @@ Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::
                           const Standard_Real theLinDeflection, const Standard_Boolean isRelative,
                           const Standard_Real theAngDeflection)
 {
-  node->renderTree();
+  node->computeGeometry();
   BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
   return StlAPI::Write(node->shape, filename.c_str());
 }
@@ -242,7 +253,6 @@ Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::
 extern "C" void onMainLoop()
 {
   // do nothing here - viewer updates are handled on demand
-  emscripten_cancel_main_loop();
 }
 
 int main()
@@ -259,10 +269,6 @@ int main()
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
 #endif
 
-  // setup a dummy single-shot main loop callback just to shut up a useless Emscripten error message on calling
-  // eglSwapInterval()
-  emscripten_set_main_loop(onMainLoop, -1, 0);
-
   ReactCADNode::initializeMutex();
 
   pthread_t thread;
@@ -270,13 +276,14 @@ int main()
   int iret1 = pthread_create(&thread, NULL, renderInternal, &data);
   pthread_detach(thread);
 
+  emscripten_set_main_loop(onMainLoop, 1, 0);
+
   return 0;
 }
 
 extern "C" void shutdown()
 {
   ReactCADView::destroyView();
-  emscripten_force_exit(0);
 }
 
 namespace emscripten
@@ -412,8 +419,6 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .value("BACK", ReactCADView::Viewpoint::Back);
 
   emscripten::function("createCADNode", &createCADNode);
-  emscripten::function("setNode", &setNode);
-  emscripten::function("removeNode", &removeNode);
   emscripten::function("render", &render);
   // emscripten::function("setColor", &setColor);
   emscripten::function("setQuality", &setQuality);

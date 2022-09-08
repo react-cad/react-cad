@@ -29,7 +29,7 @@ void HelixNode::setProps(const HelixProps &props)
   }
 }
 
-void HelixNode::renderShape()
+void HelixNode::computeShape()
 {
   BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_props.height));
   BRepBuilderAPI_MakeWire spine(edge);

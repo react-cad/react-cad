@@ -19,7 +19,7 @@ public:
   void setProps(const BoxProps &props);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   BoxProps m_props;

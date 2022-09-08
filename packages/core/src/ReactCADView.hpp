@@ -24,8 +24,6 @@
 #ifndef ReactCADView_HeaderFile
 #define ReactCADView_HeaderFile
 
-#include "ReactCADNode.hpp"
-
 #include <map>
 #include <memory>
 #include <string>
@@ -62,9 +60,7 @@ public:
   //! Destructor.
   virtual ~ReactCADView();
 
-  void setNode(std::shared_ptr<ReactCADNode> node);
-  void removeNode();
-  void render(bool reset = false);
+  void render(TopoDS_Shape shape, bool reset = false);
 
   void setQuality(double deviationCoefficent, double angle);
 
@@ -190,7 +186,7 @@ private:
   OSD_Timer myDoubleTapTimer;               //!< timer for handling double tap
   float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
   unsigned int myUpdateRequests;            //!< counter for unhandled update requests
-  std::shared_ptr<ReactCADNode> myNode;
+  TopoDS_Shape myShape;
   Handle_AIS_Shape myShapeFront;
   Handle_AIS_Shape myShapeBack;
   Handle_AIS_Shape myWireframeFront;

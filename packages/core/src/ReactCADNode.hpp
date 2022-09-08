@@ -27,14 +27,14 @@ public:
   static void lock();
   static void unlock();
 
-  void renderTree();
+  bool computeGeometry();
   TopoDS_Shape shape;
 
 protected:
   void propsChanged();
 
-  virtual void renderChildren(const std::vector<TopoDS_Shape> &children);
-  virtual void renderShape();
+  virtual void computeChildren(const std::vector<TopoDS_Shape> &children);
+  virtual void computeShape();
 
   TopoDS_Shape fuse(const std::vector<TopoDS_Shape> &children);
   TopoDS_Shape m_childShape;

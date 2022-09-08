@@ -103,10 +103,9 @@ export const HostConfig: ReactReconciler.HostConfig<
     return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { rootNodes, nodes, core, reset } = rootContainerInstance;
+    const { root, rootNodes, nodes, core, reset } = rootContainerInstance;
 
-    console.log("React renderer commiting update");
-    core.render(reset);
+    core.render(root, reset);
     rootContainerInstance.reset = false;
 
     // Free memory of removed nodes
@@ -179,7 +178,6 @@ const rendererConfigs: Map<ReactCADCore, RendererConfig> = new Map();
 
 function createConfig(core: ReactCADCore): RendererConfig {
   const root = core.createCADNode("union");
-  core.setNode(root);
 
   const isAsync = false;
   const hydrate = false;

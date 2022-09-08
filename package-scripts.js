@@ -13,7 +13,7 @@ module.exports = {
       },
     },
     default: "lerna run --parallel start",
-    test: "jest --detectOpenHandles",
+    test: "jest --forceExit",
     lint: "eslint . --ext .js,.jsx,.ts,.tsx",
     format:
       "prettier --write --ignore-unknown '**/*.{js,jsx,ts,tsx}' '**/tsconfig*.json'",

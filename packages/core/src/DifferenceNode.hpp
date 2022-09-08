@@ -10,7 +10,7 @@ public:
   virtual ~DifferenceNode();
 
 protected:
-  void renderChildren(const std::vector<TopoDS_Shape> &children) override;
+  void computeChildren(const std::vector<TopoDS_Shape> &children) override;
 
 private:
   TopoDS_Shape cut(const std::vector<TopoDS_Shape> &children);

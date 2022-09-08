@@ -167,48 +167,26 @@ void ReactCADView::drawShape(TopoDS_Shape shape)
   pthread_mutex_unlock(&wireframeHandleMutex);
 }
 
-void ReactCADView::setNode(std::shared_ptr<ReactCADNode> node)
+void ReactCADView::render(TopoDS_Shape shape, bool reset)
 {
-  myNode = node;
-  myNode->renderTree();
-  drawShape(myNode->shape);
+  if (shape.IsNotEqual(myShape))
+  {
+    myShape = shape;
+
+    PerformanceTimer timer("Compute mesh");
+    timer.start();
+    drawShape(shape);
+    timer.end();
+  }
+
+  if (reset)
+  {
+    myView->ResetViewOrientation();
+    myView->FitAll(0.5, false);
+  }
+
   myView->Invalidate();
-  myView->ResetViewOrientation();
-  myView->FitAll(0.5, false);
   redrawView();
-}
-
-void ReactCADView::removeNode()
-{
-  if (myNode)
-  {
-    drawShape(TopoDS_Shape());
-    myView->Invalidate();
-    redrawView();
-    myNode = nullptr;
-  }
-}
-
-void ReactCADView::render(bool reset)
-{
-  if (myNode)
-  {
-    PerformanceTimer timer1("Compute geometry");
-    PerformanceTimer timer2("Compute mesh");
-    timer1.start();
-    myNode->renderTree();
-    timer1.end();
-    timer2.start();
-    drawShape(myNode->shape);
-    timer2.end();
-    if (reset)
-    {
-      myView->ResetViewOrientation();
-      myView->FitAll(0.5, false);
-    }
-    myView->Invalidate();
-    redrawView();
-  }
 }
 
 void ReactCADView::setQuality(double deviationCoefficent, double angle)

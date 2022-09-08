@@ -17,7 +17,7 @@ public:
   void setProps(const HelixProps &props);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   HelixProps m_props;
