@@ -51,6 +51,8 @@ jobs:
         run: 'sed -i "s/latest/${{ github.ref_name }}/" .github/actions/build-core/action.yml'
       - name: Build core wasm
         uses: ./.github/actions/build-core
+      - name: Revert docker action
+        run: git restore .github/actions/build-core/action.yml
       - name: Build Typescript
         run: yarn nps build.ts
       - name: Release
