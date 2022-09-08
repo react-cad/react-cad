@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/react-cad/react-cad/compare/v0.5.2...v0.6.0) (2022-09-08)
+
+
+### Bug Fixes
+
+* **core:** ignore open workers after tests ([b14e238](https://github.com/react-cad/react-cad/commit/b14e2380c076d62073845166900de85d34aec097))
+
+
+### Features
+
+* **@react-cad/core:** render off the ui thread ([406a0a4](https://github.com/react-cad/react-cad/commit/406a0a4f529cf32bc0cbb974c2347c952cd46647))
+
+
+
+
+
 ## 0.5.2 (2022-09-06)
 
 **Note:** Version bump only for package @react-cad/renderer

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/react-cad/react-cad/compare/v0.5.2...v0.6.0) (2022-09-08)
+
+
+### Bug Fixes
+
+* **core:** ignore open workers after tests ([b14e238](https://github.com/react-cad/react-cad/commit/b14e2380c076d62073845166900de85d34aec097))
+* **core:** increase test timeout ([f6cded2](https://github.com/react-cad/react-cad/commit/f6cded2fef45f12b905c9e29abaee015a81dad60))
+* **core:** reduce initial memory ([a0b89b7](https://github.com/react-cad/react-cad/commit/a0b89b7eb19170bf574a05dbd9ff926da82d43ce))
+* **core:** use correct docker tag ([f708569](https://github.com/react-cad/react-cad/commit/f708569b18ceaea7274aaff4b9ac1ec909b16a00))
+
+
+### Features
+
+* **@react-cad/core:** render off the ui thread ([406a0a4](https://github.com/react-cad/react-cad/commit/406a0a4f529cf32bc0cbb974c2347c952cd46647))
+
+
+
+
+
 ## 0.5.2 (2022-09-06)
 
 **Note:** Version bump only for package @react-cad/core
