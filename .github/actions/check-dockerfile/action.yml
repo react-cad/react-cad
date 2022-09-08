@@ -1,0 +1,22 @@
+name: "Check Dockerfile"
+description: "Outputs true if Dockerfile has changed"
+outputs:
+  changed:
+    description: "'true' if Dockerfile changed, 'false' otherwise"
+    value: ${{ steps.check.outputs.changed }}
+  tag:
+    description: "Latest git tag"
+    value: ${{ steps.check.outputs.tag }}
+runs:
+  using: "composite"
+  steps:
+    - id: check
+      shell: bash
+      run: |
+        echo "::set-output name=tag::$(git describe --abbrev=0)"
+        if git diff --name-only $(git describe --abbrev=0) | grep -q packages/core/Dockerfile
+        then
+          echo "::set-output name=changed::true"
+        else
+          echo "::set-output name=changed::false"
+        fi

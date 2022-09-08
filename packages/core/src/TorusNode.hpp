@@ -17,7 +17,7 @@ public:
   void setProps(const TorusProps &props);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   TorusProps m_props;

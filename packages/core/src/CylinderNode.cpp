@@ -20,7 +20,7 @@ void CylinderNode::setProps(const CylinderProps &props)
   }
 }
 
-void CylinderNode::renderShape()
+void CylinderNode::computeShape()
 {
   TopoDS_Shape cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height).Solid();
   if (m_props.center)

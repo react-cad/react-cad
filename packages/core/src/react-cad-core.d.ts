@@ -7,7 +7,6 @@ export class ReactCADNode extends EmClass {
   public insertChildBefore(child: ReactCADNode, before: ReactCADNode): void;
   public removeChild(child: ReactCADNode): void;
   public hasParent(): boolean;
-  public renderTree(): void;
 }
 
 export type Axis = "x" | "y" | "z";
@@ -120,9 +119,7 @@ export interface ReactCADCore extends EmscriptenModule {
     BACK: Viewpoint;
   };
   createCADNode(type: string): ReactCADNode;
-  setNode(node: ReactCADNode): void;
-  removeNode(node: ReactCADNode): void;
-  render(): void;
+  render(node: ReactCADNode, reset = false): void;
   // setColor(color: string): void;
   zoom(delta: number): void;
   setViewpoint(viewpoint: Viewpoint): void;
@@ -135,7 +132,6 @@ export interface ReactCADCore extends EmscriptenModule {
   showWireframe(show: boolean): void;
   showShaded(show: boolean): void;
   onResize(): void;
-  updateView(): void;
   writeSTL(
     node: ReactCADNode,
     filename: string,
@@ -146,6 +142,7 @@ export interface ReactCADCore extends EmscriptenModule {
   cwrap: typeof cwrap;
   ccall: typeof ccall;
   canvas: HTMLCanvasElement;
+  mainScriptUrlOrBlob?: string;
   FS: {
     readFile(
       path: string,

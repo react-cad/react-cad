@@ -14,7 +14,7 @@ The viewer code is derived from the [Open CASCADE WebGL Sample application](http
   reactCadCore({ canvas: canvas }).then((core) => {
     const cube = core.createCADNode("box");
     cube.setProps({ x: 2:, y: 2, z: 2 });
-    core.getView().setNode(cube);
+    core.render(cube, true);
   });
 ```
 

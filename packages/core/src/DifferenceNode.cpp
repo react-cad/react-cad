@@ -11,7 +11,7 @@ DifferenceNode::~DifferenceNode()
 {
 }
 
-void DifferenceNode::renderChildren(const std::vector<TopoDS_Shape> &children)
+void DifferenceNode::computeChildren(const std::vector<TopoDS_Shape> &children)
 {
   m_childShape = cut(children);
 }

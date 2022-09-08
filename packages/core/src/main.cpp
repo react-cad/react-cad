@@ -1,8 +1,9 @@
+#include <forward_list>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <string>
 #include <type_traits>
-#include <vector>
 
 #include "ReactCADNode.hpp"
 #include "ReactCADView.hpp"
@@ -40,6 +41,8 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #include <emscripten/html5.h>
+
+#include <pthread.h>
 
 std::shared_ptr<ReactCADNode> createCADNode(std::string type)
 {
@@ -99,22 +102,76 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   return std::make_shared<BoxNode>();
 }
 
-void setNode(std::shared_ptr<ReactCADNode> node)
+struct RenderRequest
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->setNode(node);
+  std::shared_ptr<ReactCADNode> node;
+  bool reset;
+};
+
+std::list<RenderRequest> renderQueue;
+
+pthread_mutex_t render_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t render_cond = PTHREAD_COND_INITIALIZER;
+
+void *renderInternal(void *data)
+{
+  while (true)
+  {
+    pthread_mutex_lock(&render_mutex);
+    pthread_cond_wait(&render_cond, &render_mutex);
+
+    std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+
+    do
+    {
+      RenderRequest request = renderQueue.back();
+
+      std::list<RenderRequest>::reverse_iterator it;
+      for (it = renderQueue.rbegin(); it != renderQueue.rend(); ++it)
+      {
+        if (it->node != request.node)
+        {
+          break;
+        }
+        if (it->reset)
+        {
+          request.reset = true;
+        }
+      }
+      renderQueue.clear();
+      pthread_mutex_unlock(&render_mutex);
+
+      bool changed = request.node->computeGeometry();
+      if (changed)
+      {
+        view->render(request.node->shape, request.reset);
+      }
+      else if (request.reset)
+      {
+        view->resetView();
+      }
+
+      pthread_mutex_lock(&render_mutex);
+      // Catch requests that came in during render
+    } while (renderQueue.size());
+
+    pthread_mutex_unlock(&render_mutex);
+  }
+  return NULL;
 }
 
-void removeNode()
+void render(std::shared_ptr<ReactCADNode> node, bool reset = false)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->removeNode();
+  pthread_mutex_lock(&render_mutex);
+  renderQueue.push_back({node, reset});
+  pthread_cond_signal(&render_cond);
+  pthread_mutex_unlock(&render_mutex);
 }
 
-void render()
+void resetView()
 {
   std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->render();
+  view->resetView();
 }
 
 void setQuality(double deviationCoefficent, double angle)
@@ -133,12 +190,6 @@ void zoom(double delta)
 {
   std::shared_ptr<ReactCADView> view = ReactCADView::getView();
   view->zoom(delta);
-}
-
-void resetView()
-{
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->resetView();
 }
 
 void fit()
@@ -183,12 +234,6 @@ void showShaded(bool show)
   view->showShaded(show);
 }
 
-void updateView()
-{
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->updateView();
-}
-
 void onResize()
 {
   std::shared_ptr<ReactCADView> view = ReactCADView::getView();
@@ -199,7 +244,7 @@ Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::
                           const Standard_Real theLinDeflection, const Standard_Boolean isRelative,
                           const Standard_Real theAngDeflection)
 {
-  node->renderTree();
+  node->computeGeometry();
   BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
   return StlAPI::Write(node->shape, filename.c_str());
 }
@@ -208,7 +253,6 @@ Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::
 extern "C" void onMainLoop()
 {
   // do nothing here - viewer updates are handled on demand
-  emscripten_cancel_main_loop();
 }
 
 int main()
@@ -225,9 +269,14 @@ int main()
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
 #endif
 
-  // setup a dummy single-shot main loop callback just to shut up a useless Emscripten error message on calling
-  // eglSwapInterval()
-  emscripten_set_main_loop(onMainLoop, -1, 0);
+  ReactCADNode::initializeMutex();
+
+  pthread_t thread;
+  int data;
+  int iret1 = pthread_create(&thread, NULL, renderInternal, &data);
+  pthread_detach(thread);
+
+  emscripten_set_main_loop(onMainLoop, 1, 0);
 
   return 0;
 }
@@ -235,7 +284,6 @@ int main()
 extern "C" void shutdown()
 {
   ReactCADView::destroyView();
-  emscripten_force_exit(0);
 }
 
 namespace emscripten
@@ -277,8 +325,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("appendChild", &ReactCADNode::appendChild)
       .function("insertChildBefore", &ReactCADNode::insertChildBefore)
       .function("removeChild", &ReactCADNode::removeChild)
-      .function("hasParent", &ReactCADNode::hasParent)
-      .function("render", &ReactCADNode::renderTree);
+      .function("hasParent", &ReactCADNode::hasParent);
 
   emscripten::value_array<Point>("Point").element(&Point::x).element(&Point::y).element(&Point::z);
 
@@ -372,14 +419,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .value("BACK", ReactCADView::Viewpoint::Back);
 
   emscripten::function("createCADNode", &createCADNode);
-  emscripten::function("setNode", &setNode);
-  emscripten::function("removeNode", &removeNode);
   emscripten::function("render", &render);
   // emscripten::function("setColor", &setColor);
   emscripten::function("setQuality", &setQuality);
   emscripten::function("zoom", &zoom);
   emscripten::function("resetView", &resetView);
-  emscripten::function("updateView", &updateView);
   emscripten::function("fit", &fit);
   emscripten::function("setViewpoint", &setViewpoint);
   emscripten::function("setProjection", &setProjection);

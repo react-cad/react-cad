@@ -9,6 +9,8 @@
 
 #include <emscripten/bind.h>
 
+#include <pthread.h>
+
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADNode : public std::enable_shared_from_this<ReactCADNode>
 {
@@ -21,14 +23,18 @@ public:
   void removeChild(ReactCADNode &child);
   bool hasParent();
 
-  void renderTree();
+  static void initializeMutex();
+  static void lock();
+  static void unlock();
+
+  bool computeGeometry();
   TopoDS_Shape shape;
 
 protected:
   void propsChanged();
 
-  virtual void renderChildren(const std::vector<TopoDS_Shape> &children);
-  virtual void renderShape();
+  virtual void computeChildren(const std::vector<TopoDS_Shape> &children);
+  virtual void computeShape();
 
   TopoDS_Shape fuse(const std::vector<TopoDS_Shape> &children);
   TopoDS_Shape m_childShape;
@@ -39,6 +45,7 @@ protected:
 private:
   std::shared_ptr<ReactCADNode> m_parent;
   std::vector<std::shared_ptr<ReactCADNode>> m_children;
+  static pthread_mutex_t nodeMutex;
 
   bool m_propsChanged;
   bool m_childrenChanged;

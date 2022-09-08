@@ -10,7 +10,7 @@ public:
   virtual ~IntersectionNode();
 
 protected:
-  void renderChildren(const std::vector<TopoDS_Shape> &children) override;
+  void computeChildren(const std::vector<TopoDS_Shape> &children) override;
 
 private:
   TopoDS_Shape common(const std::vector<TopoDS_Shape> &children);

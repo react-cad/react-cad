@@ -11,7 +11,7 @@ TransformationNode::~TransformationNode()
 {
 }
 
-void TransformationNode::renderShape()
+void TransformationNode::computeShape()
 {
   BRepBuilderAPI_Transform theTransform(m_transform);
   theTransform.Perform(m_childShape, true);

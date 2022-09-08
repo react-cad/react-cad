@@ -13,7 +13,7 @@ public:
   virtual ~TransformationNode();
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 protected:
   gp_Trsf m_transform;

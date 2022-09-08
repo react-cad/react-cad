@@ -19,7 +19,7 @@ void TorusNode::setProps(const TorusProps &props)
   }
 }
 
-void TorusNode::renderShape()
+void TorusNode::computeShape()
 {
   BRepPrimAPI_MakeTorus torus(m_props.radius1, m_props.radius2);
   shape = torus.Solid();

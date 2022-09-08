@@ -16,7 +16,7 @@ public:
   void setProps(const SphereProps &prop);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   SphereProps m_props;

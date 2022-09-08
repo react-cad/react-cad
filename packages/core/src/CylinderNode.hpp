@@ -18,7 +18,7 @@ public:
   void setProps(const CylinderProps &props);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   CylinderProps m_props;

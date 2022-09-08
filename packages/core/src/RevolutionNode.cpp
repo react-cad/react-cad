@@ -22,7 +22,7 @@ void RevolutionNode::setProps(const RevolutionProps &props)
   }
 }
 
-void RevolutionNode::renderShape()
+void RevolutionNode::computeShape()
 {
   gp_Ax1 axis;
 

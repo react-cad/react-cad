@@ -7,6 +7,28 @@
 
 #include "PerformanceTimer.hpp"
 
+#include <pthread.h>
+
+pthread_mutex_t ReactCADNode::nodeMutex;
+
+void ReactCADNode::initializeMutex()
+{
+  pthread_mutexattr_t Attr;
+  pthread_mutexattr_init(&Attr);
+  pthread_mutexattr_settype(&Attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&ReactCADNode::nodeMutex, &Attr);
+}
+
+void ReactCADNode::lock()
+{
+  pthread_mutex_lock(&ReactCADNode::nodeMutex);
+}
+
+void ReactCADNode::unlock()
+{
+  pthread_mutex_unlock(&ReactCADNode::nodeMutex);
+}
+
 ReactCADNode::ReactCADNode()
     : m_parent(nullptr), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
       m_childShape(TopoDS_Shape())
@@ -19,14 +41,17 @@ ReactCADNode::~ReactCADNode()
 
 void ReactCADNode::appendChild(std::shared_ptr<ReactCADNode> child)
 {
+  lock();
   m_children.push_back(child);
   child->m_parent = shared_from_this();
   m_childrenChanged = true;
   notifyAncestors();
+  unlock();
 }
 
 void ReactCADNode::insertChildBefore(std::shared_ptr<ReactCADNode> child, const ReactCADNode &before)
 {
+  lock();
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
     if (it->get() == &before)
@@ -38,10 +63,12 @@ void ReactCADNode::insertChildBefore(std::shared_ptr<ReactCADNode> child, const 
       break;
     }
   }
+  unlock();
 }
 
 void ReactCADNode::removeChild(ReactCADNode &child)
 {
+  lock();
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
     if (it->get() == &child)
@@ -53,6 +80,7 @@ void ReactCADNode::removeChild(ReactCADNode &child)
       break;
     }
   }
+  unlock();
 }
 
 bool ReactCADNode::hasParent()
@@ -62,8 +90,10 @@ bool ReactCADNode::hasParent()
 
 void ReactCADNode::propsChanged()
 {
+  lock();
   m_propsChanged = true;
   notifyAncestors();
+  unlock();
 }
 
 void ReactCADNode::notifyAncestors()
@@ -76,8 +106,11 @@ void ReactCADNode::notifyAncestors()
   }
 }
 
-void ReactCADNode::renderTree()
+bool ReactCADNode::computeGeometry()
 {
+  bool changed = false;
+
+  lock();
   if (m_propsChanged || m_childrenChanged)
   {
     if (m_childrenChanged)
@@ -85,24 +118,29 @@ void ReactCADNode::renderTree()
       std::vector<TopoDS_Shape> shapes;
       for (auto child : m_children)
       {
-        child->renderTree();
+        child->computeGeometry();
         shapes.push_back(child->shape);
       }
-      renderChildren(shapes);
+      computeChildren(shapes);
       m_childrenChanged = false;
     }
 
-    renderShape();
+    computeShape();
     m_propsChanged = false;
+
+    changed = true;
   }
+  unlock();
+
+  return changed;
 }
 
-void ReactCADNode::renderChildren(const std::vector<TopoDS_Shape> &children)
+void ReactCADNode::computeChildren(const std::vector<TopoDS_Shape> &children)
 {
   m_childShape = fuse(children);
 }
 
-void ReactCADNode::renderShape()
+void ReactCADNode::computeShape()
 {
   shape = m_childShape;
 }

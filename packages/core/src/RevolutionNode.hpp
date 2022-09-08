@@ -17,7 +17,7 @@ public:
   void setProps(const RevolutionProps &props);
 
 protected:
-  void renderShape() override;
+  void computeShape() override;
 
 private:
   RevolutionProps m_props;

@@ -19,7 +19,7 @@ void SphereNode::setProps(const SphereProps &props)
   }
 }
 
-void SphereNode::renderShape()
+void SphereNode::computeShape()
 {
   BRepPrimAPI_MakeSphere sphere(m_props.radius);
   shape = sphere.Solid();

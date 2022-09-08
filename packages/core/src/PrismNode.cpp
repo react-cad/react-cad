@@ -21,7 +21,7 @@ void PrismNode::setProps(const PrismProps &props)
   }
 }
 
-void PrismNode::renderShape()
+void PrismNode::computeShape()
 {
   gp_Vec axis;
 

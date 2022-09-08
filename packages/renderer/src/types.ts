@@ -70,6 +70,7 @@ export type Container = {
   root: ReactCADNode;
   nodes: ReactCADNode[];
   rootNodes: ReactCADNode[];
+  reset: boolean;
 };
 
 export type HostContext = unknown;

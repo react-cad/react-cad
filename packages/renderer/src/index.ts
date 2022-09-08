@@ -103,9 +103,10 @@ export const HostConfig: ReactReconciler.HostConfig<
     return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { rootNodes, nodes, core } = rootContainerInstance;
+    const { root, rootNodes, nodes, core, reset } = rootContainerInstance;
 
-    core.render();
+    core.render(root, reset);
+    rootContainerInstance.reset = false;
 
     // Free memory of removed nodes
     const removedNodes = nodes.filter((node) => !node.hasParent());
@@ -177,7 +178,6 @@ const rendererConfigs: Map<ReactCADCore, RendererConfig> = new Map();
 
 function createConfig(core: ReactCADCore): RendererConfig {
   const root = core.createCADNode("union");
-  core.setNode(root);
 
   const isAsync = false;
   const hydrate = false;
@@ -187,6 +187,7 @@ function createConfig(core: ReactCADCore): RendererConfig {
     nodes: [],
     rootNodes: [],
     root,
+    reset: true,
   };
 
   const container = reconcilerInstance.createContainer(
@@ -200,7 +201,8 @@ function createConfig(core: ReactCADCore): RendererConfig {
 
 export function render(
   element: React.ReactElement,
-  core: ReactCADCore
+  core: ReactCADCore,
+  reset = false
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const existingContainer = rendererConfigs.get(core);
@@ -210,14 +212,13 @@ export function render(
       {};
 
     if (container) {
-      const start = performance.now();
+      if (reset) {
+        container.containerInfo.reset = true;
+      }
       reconcilerInstance.updateContainer(element, container, null, () => {
         if (!existingContainer) {
-          core.fit();
-          core.updateView();
+          core.resetView();
         }
-        const time = performance.now() - start;
-        console.log(`Renderer time: ${time}`);
         resolve();
       });
       return;
@@ -252,6 +253,7 @@ export function renderToSTL(
     nodes: [],
     rootNodes: [],
     root: core.createCADNode("union"),
+    reset: true,
   };
 
   const container = reconcilerInstance.createContainer(

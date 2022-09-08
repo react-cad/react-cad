@@ -8,7 +8,9 @@ set(APP_VERSION_MINOR 0)
 set(APP_TARGET react-cad-core)
 set(APP_TARGET_ES6 react-cad-core.esm.js)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+set(CMAKE_CXX_FLAGS "-pthread")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 file(GLOB SOURCES
@@ -34,26 +36,31 @@ add_executable(${APP_TARGET} ${SOURCES})
 target_compile_definitions(${APP_TARGET} PRIVATE $<$<CONFIG:Debug>:REACTCAD_DEBUG>)
 target_link_libraries(
   ${APP_TARGET}
+  PRIVATE
   ${OpenCASCADE_LIBS}
 )
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   --bind \
-  -s EXTRA_EXPORTED_RUNTIME_METHODS=['FS','ccall','cwrap'] \
+  -s EXPORTED_RUNTIME_METHODS=['FS','ccall','cwrap'] \
   -s EXPORTED_FUNCTIONS=['_main','_shutdown'] \
   -s WASM=1 \
   -s MODULARIZE=1 \
   -s USE_WEBGL2=1 \
   -s USE_FREETYPE=1 \
   -s ALLOW_MEMORY_GROWTH=1 \
-  -s EXIT_RUNTIME=1 \
+  -s EXIT_RUNTIME=0 \
+  -s PTHREAD_POOL_SIZE=1 \
+  -s USE_PTHREADS \
+  -s EXPORT_NAME=reactCad \
+  -s OFFSCREEN_FRAMEBUFFER=1 \
 ")
 
 add_custom_command(
   TARGET ${APP_TARGET}
   POST_BUILD
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  COMMAND echo 'export default Module\;' | cat ${APP_TARGET}.js - > ${APP_TARGET_ES6}
+  COMMAND echo 'export default reactCad\;' | cat ${APP_TARGET}.js - > ${APP_TARGET_ES6}
 )
 
 install(TARGETS ${APP_TARGET} DESTINATION lib)
-install(FILES "${CMAKE_BINARY_DIR}/${APP_TARGET}.wasm" "${CMAKE_BINARY_DIR}/${APP_TARGET_ES6}" DESTINATION lib)
+install(FILES "${CMAKE_BINARY_DIR}/${APP_TARGET}.worker.js" "${CMAKE_BINARY_DIR}/${APP_TARGET}.wasm" "${CMAKE_BINARY_DIR}/${APP_TARGET_ES6}" DESTINATION lib)
