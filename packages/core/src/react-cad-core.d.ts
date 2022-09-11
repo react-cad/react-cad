@@ -33,6 +33,7 @@ export interface CylinderProps {
   center: boolean;
   radius: number;
   height: number;
+  angle: number;
 }
 export class ReactCADCylinderNode extends ReactCADNode {
   public setProps(props: CylinderProps): void;
@@ -40,6 +41,9 @@ export class ReactCADCylinderNode extends ReactCADNode {
 
 export interface SphereProps {
   radius: number;
+  angle: number;
+  segmentAngle1: number;
+  segmentAngle2: number;
 }
 export class ReactCADSphereNode extends ReactCADNode {
   public setProps(props: SphereProps): void;
@@ -51,6 +55,10 @@ export interface TorusProps {
 }
 export class ReactCADTorusNode extends ReactCADNode {
   public setProps(props: TorusProps): void;
+}
+
+export class ReactCADPolyhedronNode extends ReactCADNode {
+  public setPointsAndFaces(points: Point[], faces: number[][]): void;
 }
 
 // Sweeps

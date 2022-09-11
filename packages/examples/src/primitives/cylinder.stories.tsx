@@ -5,6 +5,7 @@ interface Props {
   center: boolean;
   radius: number;
   height: number;
+  angle: number;
 }
 
 export const Cylinder: React.FC<Props> = (props) => <cylinder {...props} />;
@@ -25,6 +26,14 @@ export default {
     center: { control: "boolean" },
     radius: range,
     height: range,
+    angle: {
+      control: {
+        type: "range",
+        min: 0,
+        max: 2 * Math.PI,
+        step: Math.PI / 100,
+      },
+    },
   },
 } as Meta;
 
@@ -35,4 +44,5 @@ cylinder.args = {
   center: false,
   radius: 2,
   height: 5,
+  angle: 2 * Math.PI,
 };

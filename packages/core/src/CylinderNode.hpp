@@ -8,6 +8,7 @@ struct CylinderProps
   bool center;
   double radius;
   double height;
+  double angle;
 };
 
 class CylinderNode : public ReactCADNode

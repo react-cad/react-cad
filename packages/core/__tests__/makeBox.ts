@@ -6,6 +6,7 @@ describe("shape helpers", () => {
       const core = await reactCadCore();
       const box = core.createCADNode("box");
       expect(box).toBeInstanceOf(core.ReactCADNode);
+      box.delete();
     });
   });
 });

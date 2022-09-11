@@ -5,6 +5,7 @@ import {
   Axis,
   Polygon,
   Profile,
+  Point,
 } from "@react-cad/core";
 
 export interface Element<T extends Type = Type> {
@@ -26,13 +27,21 @@ export interface ReactCADElements {
     center?: boolean;
     radius: number;
     height: number;
+    angle?: number;
   };
   sphere: {
     radius: number;
+    angle?: number;
+    segmentAngle1?: number;
+    segmentAngle2?: number;
   };
   torus: {
     radius1: number;
     radius2: number;
+  };
+  polyhedron: {
+    points: Point[];
+    faces: number[][];
   };
 
   prism: {

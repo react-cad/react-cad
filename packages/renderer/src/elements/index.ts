@@ -4,6 +4,7 @@ import * as box from "./box";
 import * as cylinder from "./cylinder";
 import * as sphere from "./sphere";
 import * as torus from "./torus";
+import * as polyhedron from "./polyhedron";
 
 import * as helix from "./helix";
 import * as prism from "./prism";
@@ -22,6 +23,7 @@ const elements: Record<Type, Element> = {
   cylinder,
   sphere,
   torus,
+  polyhedron,
 
   helix,
   prism,
