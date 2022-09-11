@@ -19,11 +19,15 @@ RUN cd occt/build && emcmake cmake .. \
   -DCMAKE_INSTALL_PREFIX=/opt/occt
 RUN cd occt/build && emmake make -j`nproc` install
 
+RUN git clone https://github.com/memononen/nanosvg.git /tmp/nanosvg
+RUN cd /tmp/nanosvg && git checkout 3e403ec72a9145cbbcc6c63d94a4caf079aafec2
+
 FROM emscripten/emsdk:3.1.20
 
 RUN apt-get update && apt-get -y install tk-dev tcl-dev fswatch
 COPY --from=0 /opt/occt /opt/occt
 COPY --from=0 /emsdk/upstream/emscripten/cache /emsdk/upstream/emscripten/cache
+COPY --from=0 /tmp/nanosvg/src /usr/local/include
 
 RUN mkdir /react-cad
 WORKDIR /react-cad

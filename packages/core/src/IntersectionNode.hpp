@@ -3,6 +3,8 @@
 
 #include "ReactCADNode.hpp"
 
+#include <TopTools_ListOfShape.hxx>
+
 class IntersectionNode : public ReactCADNode
 {
 public:
@@ -10,10 +12,7 @@ public:
   virtual ~IntersectionNode();
 
 protected:
-  void computeChildren(const std::vector<TopoDS_Shape> &children) override;
-
-private:
-  TopoDS_Shape common(const std::vector<TopoDS_Shape> &children);
+  void computeChildren(TopTools_ListOfShape children) override;
 };
 
 #endif

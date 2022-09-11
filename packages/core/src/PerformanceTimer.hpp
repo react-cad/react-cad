@@ -8,7 +8,6 @@ class PerformanceTimer
 {
 public:
   PerformanceTimer(std::string name);
-  void start();
   void end();
 
 private:

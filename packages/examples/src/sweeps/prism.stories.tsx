@@ -1,7 +1,9 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Axis, Point } from "@react-cad/core";
+import { Axis, Point, Profile } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
+
+import reactIcon from "./react-icon";
 
 function makePolygon(sides: number) {
   return [...Array(sides)].map(
@@ -12,11 +14,12 @@ function makePolygon(sides: number) {
   );
 }
 
-const profiles: Record<string, Point[]> = {
+const profiles: Record<string, Profile> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
+  SVG: reactIcon,
 };
 
 export const Prism: React.FC<ReactCADElements["prism"]> = (props) => (
@@ -27,8 +30,8 @@ const range = {
   control: {
     type: "range",
     min: 1,
-    max: 10,
-    step: 0.1,
+    max: 5,
+    step: 1,
   },
 };
 

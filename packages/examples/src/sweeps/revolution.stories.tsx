@@ -1,6 +1,6 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Axis, Point } from "@react-cad/core";
+import { Axis, Polygon, Point } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
 
 function makePolygon(sides: number) {
@@ -12,7 +12,7 @@ function makePolygon(sides: number) {
   );
 }
 
-const profiles: Record<string, Point[]> = {
+const profiles: Record<string, Polygon> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),

@@ -51,6 +51,10 @@ export function commitUpdate(
   );
   const helix = instance.node as ReactCADHelixNode;
 
-  helix.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  if (typeof profile === "string") {
+    helix.setSVGProfile(profile);
+  } else {
+    helix.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  }
   helix.setProps(props);
 }

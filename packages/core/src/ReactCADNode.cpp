@@ -4,6 +4,7 @@
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
 
 #include "ReactCADNode.hpp"
+#include "operations.hpp"
 
 #include "PerformanceTimer.hpp"
 
@@ -115,11 +116,11 @@ bool ReactCADNode::computeGeometry()
   {
     if (m_childrenChanged)
     {
-      std::vector<TopoDS_Shape> shapes;
+      TopTools_ListOfShape shapes;
       for (auto child : m_children)
       {
         child->computeGeometry();
-        shapes.push_back(child->shape);
+        shapes.Append(child->shape);
       }
       computeChildren(shapes);
       m_childrenChanged = false;
@@ -135,9 +136,11 @@ bool ReactCADNode::computeGeometry()
   return changed;
 }
 
-void ReactCADNode::computeChildren(const std::vector<TopoDS_Shape> &children)
+void ReactCADNode::computeChildren(TopTools_ListOfShape children)
 {
-  m_childShape = fuse(children);
+  PerformanceTimer timer("Calculate union");
+  m_childShape = unionOp(children);
+  timer.end();
 }
 
 void ReactCADNode::computeShape()
@@ -149,39 +152,6 @@ bool ReactCADNode::isType(const emscripten::val &value, const std::string &type)
 {
   std::string valType = value.typeOf().as<std::string>();
   return valType == type;
-}
-
-TopoDS_Shape ReactCADNode::fuse(const std::vector<TopoDS_Shape> &children)
-{
-  switch (children.size())
-  {
-  case 0:
-    return TopoDS_Shape();
-  case 1:
-    return children[0];
-  default: {
-    PerformanceTimer timer("Union render time");
-    timer.start();
-    BRepAlgoAPI_BuilderAlgo aBuilder;
-
-    TopTools_ListOfShape aLS;
-    for (TopoDS_Shape shape : children)
-    {
-      aLS.Append(shape);
-    }
-
-    aBuilder.SetArguments(aLS);
-
-    aBuilder.Build();
-    if (aBuilder.HasErrors())
-    {
-      TopoDS_Shape nullShape;
-      return nullShape;
-    }
-    timer.end();
-    return aBuilder.Shape();
-  }
-  }
 }
 
 bool ReactCADNode::doubleEquals(double a, double b)
