@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/react-cad/react-cad/compare/v0.6.1...v0.7.0) (2022-09-11)
+
+
+### Features
+
+* **core:** finalise polygon type ([dffe933](https://github.com/react-cad/react-cad/commit/dffe93336a03376648335782bf1848be0676bff1))
+* svg profile support ([fa7d9a9](https://github.com/react-cad/react-cad/commit/fa7d9a9869205d5d686d0f930d2275ef95005540))
+
+
+
+
+
 ## [0.6.1](https://github.com/react-cad/react-cad/compare/v0.6.0...v0.6.1) (2022-09-08)
 
 
