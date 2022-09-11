@@ -1,6 +1,6 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Point, Profile } from "@react-cad/core";
+import { Point, Polygon, Profile } from "@react-cad/core";
 import { ReactCADElements } from "@react-cad/renderer/src/types";
 
 import reactIcon from "./react-icon";
@@ -14,11 +14,11 @@ function makePolygon(sides: number) {
   );
 }
 
-function offsetPolygon(polygon: Point[]): Point[] {
+function offsetPolygon(polygon: Polygon): Polygon {
   return polygon.map(([x, y, z]) => [x + 1.5, y, z]);
 }
 
-function rotatePolygon(polygon: Point[]): Point[] {
+function rotatePolygon(polygon: Polygon): Polygon {
   return polygon.map(([x, y, z]) => [x, z, y]);
 }
 
@@ -72,12 +72,12 @@ interface StoryProps {
 }
 
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
-  let points = profiles[profileName];
-  if (rotated && typeof points !== "string") {
-    points = offsetPolygon(rotatePolygon(points));
+  let profile = profiles[profileName];
+  if (rotated && typeof profile !== "string") {
+    profile = offsetPolygon(rotatePolygon(profile));
   }
 
-  return <Helix profile={points} {...args} />;
+  return <Helix profile={profile} {...args} />;
 };
 
 export const helix = Template.bind({});

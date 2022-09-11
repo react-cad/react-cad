@@ -11,7 +11,8 @@ export class ReactCADNode extends EmClass {
 
 export type Vector = [number, number, number];
 export type Point = [number, number, number];
-export type Profile = Point[];
+export type Polygon = Point[];
+export type Profile = Polygon | string;
 export type Axis = "x" | "y" | "z";
 
 export type Projection = number & { _opaque: typeof Projection };
@@ -54,7 +55,7 @@ export class ReactCADTorusNode extends ReactCADNode {
 
 // Sweeps
 export class ReactCADSweepNode extends ReactCADNode {
-  public setProfile(path: Profile): void;
+  public setProfile(path: Polygon): void;
   public setSVGProfile(svg: string): void;
 }
 

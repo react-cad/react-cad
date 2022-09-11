@@ -3,8 +3,8 @@ import {
   ReactCADCore,
   ReactCADNode,
   Axis,
+  Polygon,
   Profile,
-  Point,
 } from "@react-cad/core";
 
 export interface Element<T extends Type = Type> {
@@ -41,7 +41,7 @@ export interface ReactCADElements {
     height: number;
   };
   revolution: {
-    profile: Point[];
+    profile: Polygon;
     axis: Axis;
     angle: number;
   };
