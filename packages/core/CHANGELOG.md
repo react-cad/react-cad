@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/react-cad/react-cad/compare/v0.7.0...v0.8.0) (2022-09-13)
+
+
+### Features
+
+* add angle prop to torus ([9dfa89b](https://github.com/react-cad/react-cad/commit/9dfa89b037e47cf39a26546a33117cd2b487571f))
+* add cone primitive ([8c31454](https://github.com/react-cad/react-cad/commit/8c31454b8611ed7686925f856dcad9b629632e0e))
+* add polyhedron, add props to cylinder, sphere ([e365692](https://github.com/react-cad/react-cad/commit/e365692dbf04c96c3e5e0d38249e6f2e61d0ac55))
+* add wedge ([1b58acf](https://github.com/react-cad/react-cad/commit/1b58acf4f2233fb1ab54e957e285d62543593bfb))
+
+
+
+
+
 # [0.7.0](https://github.com/react-cad/react-cad/compare/v0.6.1...v0.7.0) (2022-09-11)
 
 

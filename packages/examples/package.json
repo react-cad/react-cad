@@ -1,13 +1,13 @@
 {
   "name": "@react-cad/examples",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "main": "lib/index.js",
   "license": "MIT",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.12.10",
-    "@react-cad/renderer": "^0.7.0",
-    "@react-cad/storybook-framework": "^0.7.0",
+    "@react-cad/renderer": "^0.8.0",
+    "@react-cad/storybook-framework": "^0.8.0",
     "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.10",
     "@storybook/addon-links": "^6.5.10",

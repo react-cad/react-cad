@@ -1,6 +1,6 @@
 {
   "name": "@react-cad/viewer",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "React component to view @react-cad projects in the browser",
   "main": "lib/index.js",
   "files": [
@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
-    "@react-cad/core": "^0.7.0",
-    "@react-cad/renderer": "^0.7.0",
+    "@react-cad/core": "^0.8.0",
+    "@react-cad/renderer": "^0.8.0",
     "react-icons": "^4.4.0"
   },
   "scripts": {
