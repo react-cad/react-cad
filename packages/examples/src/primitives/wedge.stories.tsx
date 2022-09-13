@@ -1,16 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  x: number;
-  y: number;
-  z: number;
-  ltx?: number;
-  xmin?: number;
-  xmax?: number;
-  zmin?: number;
-  zmax?: number;
-}
+type Props = JSX.IntrinsicElements["wedge"];
 
 export const Wedge: React.FC<Props> = (props) => <wedge {...props} />;
 
@@ -71,7 +62,7 @@ wedge.args = {
   y: 5,
   z: 5,
   useLtx: true,
-  ltx: 5,
+  ltx: 2.5,
   xmin: 0,
   xmax: 0,
   zmin: 0,

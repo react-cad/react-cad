@@ -61,6 +61,7 @@ export interface ReactCADElements {
   torus: {
     radius1: number;
     radius2: number;
+    angle?: number;
   };
   polyhedron: {
     points: Point[];

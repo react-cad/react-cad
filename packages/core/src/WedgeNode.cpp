@@ -39,13 +39,17 @@ void WedgeNode::setPropsMinMax(const WedgePropsMinMax &props)
 
 void WedgeNode::computeShape()
 {
+  TopoDS_Solid wedge;
+
   if (useLtx)
   {
-    shape = BRepPrimAPI_MakeWedge(m_propsLtx.x, m_propsLtx.y, m_propsLtx.z, m_propsLtx.ltx);
+    wedge = BRepPrimAPI_MakeWedge(m_propsLtx.x, m_propsLtx.y, m_propsLtx.z, m_propsLtx.ltx);
   }
   else
   {
-    shape = BRepPrimAPI_MakeWedge(m_propsMinMax.x, m_propsMinMax.y, m_propsMinMax.z, m_propsMinMax.xmin,
+    wedge = BRepPrimAPI_MakeWedge(m_propsMinMax.x, m_propsMinMax.y, m_propsMinMax.z, m_propsMinMax.xmin,
                                   m_propsMinMax.zmin, m_propsMinMax.xmax, m_propsMinMax.zmax);
   }
+
+  shape = wedge;
 }

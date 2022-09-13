@@ -1,10 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  radius1: number;
-  radius2: number;
-}
+type Props = JSX.IntrinsicElements["torus"];
 
 export const Torus: React.FC<Props> = (props) => <torus {...props} />;
 
@@ -17,12 +14,22 @@ const range = {
   },
 };
 
+const angleControl = (min: number, max: number) => ({
+  control: {
+    type: "range",
+    min,
+    max,
+    step: Math.PI / 100,
+  },
+});
+
 export default {
   title: "Primitives/Torus",
   component: Torus,
   argTypes: {
     radius1: range,
     radius2: range,
+    angle: angleControl(0, 2 * Math.PI),
   },
 } as Meta;
 
@@ -32,4 +39,5 @@ export const torus = Template.bind({});
 torus.args = {
   radius1: 6,
   radius2: 2,
+  angle: 0,
 };

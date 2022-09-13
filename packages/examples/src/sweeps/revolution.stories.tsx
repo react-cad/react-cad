@@ -1,7 +1,8 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 import { Axis, Polygon, Point } from "@react-cad/core";
-import { ReactCADElements } from "@react-cad/renderer/src/types";
+
+type Props = JSX.IntrinsicElements["revolution"];
 
 function makePolygon(sides: number) {
   return [...Array(sides)].map(
@@ -19,9 +20,7 @@ const profiles: Record<string, Polygon> = {
   Hexagon: makePolygon(6),
 };
 
-export const Revolution: React.FC<ReactCADElements["revolution"]> = (props) => (
-  <revolution {...props} />
-);
+export const Revolution: React.FC<Props> = (props) => <revolution {...props} />;
 
 export default {
   title: "Sweeps/Revolution",
@@ -50,13 +49,13 @@ export default {
   },
 } as Meta;
 
-interface Props {
+interface StoryProps {
   profileName: keyof typeof profiles;
   axis: Axis;
   angle: number;
 }
 
-const Template: Story<Props> = ({ profileName, ...args }) => (
+const Template: Story<StoryProps> = ({ profileName, ...args }) => (
   <Revolution profile={profiles[profileName]} {...args} />
 );
 

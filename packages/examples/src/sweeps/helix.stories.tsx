@@ -1,9 +1,10 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 import { Point, Polygon, Profile } from "@react-cad/core";
-import { ReactCADElements } from "@react-cad/renderer/src/types";
 
 import reactIcon from "./react-icon";
+
+type Props = JSX.IntrinsicElements["helix"];
 
 function makePolygon(sides: number) {
   return [...Array(sides)].map(
@@ -30,9 +31,7 @@ const profiles: Record<string, Profile> = {
   SVG: reactIcon,
 };
 
-export const Helix: React.FC<ReactCADElements["helix"]> = (props) => (
-  <helix {...props} />
-);
+export const Helix: React.FC<Props> = (props) => <helix {...props} />;
 
 export default {
   title: "Sweeps/Helix",

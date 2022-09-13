@@ -1,13 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  center: boolean;
-  radius1: number;
-  radius2: number;
-  height: number;
-  angle: number;
-}
+type Props = JSX.IntrinsicElements["cone"];
 
 export const Cone: React.FC<Props> = (props) => <cone {...props} />;
 

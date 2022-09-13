@@ -1,12 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  center: boolean;
-  radius: number;
-  height: number;
-  angle: number;
-}
+type Props = JSX.IntrinsicElements["cylinder"];
 
 export const Cylinder: React.FC<Props> = (props) => <cylinder {...props} />;
 

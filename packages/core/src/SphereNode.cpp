@@ -25,15 +25,17 @@ void SphereNode::computeShape()
 {
   double angle = fmin(fmax(m_props.angle, 0), 2 * M_PI);
 
+  TopoDS_Solid sphere;
+
   if (m_props.segmentAngle1 == 0 && m_props.segmentAngle2 == 0)
   {
     if (m_props.angle == 0)
     {
-      shape = BRepPrimAPI_MakeSphere(m_props.radius);
+      sphere = BRepPrimAPI_MakeSphere(m_props.radius);
     }
     else
     {
-      shape = BRepPrimAPI_MakeSphere(m_props.radius, angle);
+      sphere = BRepPrimAPI_MakeSphere(m_props.radius, angle);
     }
   }
   else
@@ -43,12 +45,14 @@ void SphereNode::computeShape()
 
     if (m_props.angle == 0)
     {
-      shape = BRepPrimAPI_MakeSphere(m_props.radius, segmentAngle2, segmentAngle1);
+      sphere = BRepPrimAPI_MakeSphere(m_props.radius, segmentAngle2, segmentAngle1);
     }
     else
     {
 
-      shape = BRepPrimAPI_MakeSphere(m_props.radius, segmentAngle2, segmentAngle1, angle);
+      sphere = BRepPrimAPI_MakeSphere(m_props.radius, segmentAngle2, segmentAngle1, angle);
     }
   }
+
+  shape = sphere;
 }

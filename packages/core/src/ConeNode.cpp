@@ -23,7 +23,7 @@ void ConeNode::setProps(const ConeProps &props)
 
 void ConeNode::computeShape()
 {
-  TopoDS_Shape cone;
+  TopoDS_Solid cone;
 
   if (m_props.angle == 0)
   {
@@ -41,5 +41,6 @@ void ConeNode::computeShape()
     translation.SetTranslation(gp_Vec(0, 0, -m_props.height / 2));
     cone.Move(translation);
   }
+
   shape = cone;
 }

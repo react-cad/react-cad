@@ -1,12 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-type Axis = "x" | "y" | "z";
-
-interface Props {
-  axis: Axis;
-  angle: number;
-}
+type Props = JSX.IntrinsicElements["rotation"];
 
 export const Rotation: React.FC<Props> = ({ axis, angle }) => (
   <rotation axis={axis} angle={angle}>

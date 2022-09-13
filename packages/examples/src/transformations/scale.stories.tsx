@@ -1,9 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  factor: number;
-}
+type Props = JSX.IntrinsicElements["scale"];
 
 export const Scale: React.FC<Props> = (props) => (
   <scale {...props}>

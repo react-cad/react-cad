@@ -394,7 +394,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   emscripten::value_object<TorusProps>("TorusProps")
       .field("radius1", &TorusProps::radius1)
-      .field("radius2", &TorusProps::radius2);
+      .field("radius2", &TorusProps::radius2)
+      .field("angle", &TorusProps::angle);
   emscripten::class_<TorusNode, emscripten::base<ReactCADNode>>("ReactCADTorusNode")
       .smart_ptr<std::shared_ptr<TorusNode>>("ReactCADTorusNode")
       .function("setProps", &TorusNode::setProps);

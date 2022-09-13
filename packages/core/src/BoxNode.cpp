@@ -23,13 +23,14 @@ void BoxNode::setProps(const BoxProps &props)
 
 void BoxNode::computeShape()
 {
+  TopoDS_Solid box;
   if (m_props.center)
   {
-    shape =
-        BRepPrimAPI_MakeBox(gp_Pnt(-m_props.x / 2, -m_props.y / 2, -m_props.z / 2), m_props.x, m_props.y, m_props.z);
+    box = BRepPrimAPI_MakeBox(gp_Pnt(-m_props.x / 2, -m_props.y / 2, -m_props.z / 2), m_props.x, m_props.y, m_props.z);
   }
   else
   {
-    shape = BRepPrimAPI_MakeBox(m_props.x, m_props.y, m_props.z);
+    box = BRepPrimAPI_MakeBox(m_props.x, m_props.y, m_props.z);
   }
+  shape = box;
 }

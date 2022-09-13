@@ -22,7 +22,7 @@ void CylinderNode::setProps(const CylinderProps &props)
 
 void CylinderNode::computeShape()
 {
-  TopoDS_Shape cylinder;
+  TopoDS_Solid cylinder;
 
   if (m_props.angle == 0)
   {

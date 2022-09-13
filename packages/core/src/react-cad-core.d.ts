@@ -83,6 +83,7 @@ export class ReactCADSphereNode extends ReactCADNode {
 export interface TorusProps {
   radius1: number;
   radius2: number;
+  angle: number;
 }
 export class ReactCADTorusNode extends ReactCADNode {
   public setProps(props: TorusProps): void;

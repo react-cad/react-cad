@@ -7,6 +7,7 @@ struct TorusProps
 {
   double radius1;
   double radius2;
+  double angle;
 };
 
 class TorusNode : public ReactCADNode

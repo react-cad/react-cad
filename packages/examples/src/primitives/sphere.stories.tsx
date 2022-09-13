@@ -1,9 +1,9 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-export const Sphere: React.FC<JSX.IntrinsicElements["sphere"]> = (props) => (
-  <sphere {...props} />
-);
+type Props = JSX.IntrinsicElements["sphere"];
+
+export const Sphere: React.FC<Props> = (props) => <sphere {...props} />;
 
 const positiveIntegerControl = {
   control: {
@@ -33,9 +33,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<JSX.IntrinsicElements["sphere"]> = (args) => (
-  <sphere {...args} />
-);
+const Template: Story<Props> = (args) => <sphere {...args} />;
 
 export const sphere = Template.bind({});
 sphere.args = {

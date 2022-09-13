@@ -1,11 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Point } from "@react-cad/core";
 
-interface Props {
-  points: Point[];
-  faces: number[][];
-}
+type Props = JSX.IntrinsicElements["polyhedron"];
 
 export const Polyhedron: React.FC<Props> = (props) => <polyhedron {...props} />;
 
