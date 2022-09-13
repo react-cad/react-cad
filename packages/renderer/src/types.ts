@@ -39,6 +39,13 @@ export interface ReactCADElements {
         zmin: number;
         zmax: number;
       };
+  cone: {
+    center?: boolean;
+    radius1: number;
+    radius2: number;
+    height: number;
+    angle?: number;
+  };
   cylinder: {
     center?: boolean;
     radius: number;

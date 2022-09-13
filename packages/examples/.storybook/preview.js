@@ -4,7 +4,7 @@ export const parameters = {
     storySort: {
       order: [
         "Primitives",
-        ["Box", "Sphere", "Cylinder", "Torus", "Wedge", "Polyhedron"],
+        ["Box", "Wedge", "Cylinder", "Cone", "Sphere", "Torus", "Polyhedron"],
         "Sweeps",
         ["Prism", "Revolution", "Helix"],
         "Transformations",

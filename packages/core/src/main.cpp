@@ -11,6 +11,7 @@
 #include "Geometry.hpp"
 
 #include "BoxNode.hpp"
+#include "ConeNode.hpp"
 #include "CylinderNode.hpp"
 #include "PolyhedronNode.hpp"
 #include "SphereNode.hpp"
@@ -55,6 +56,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "wedge")
   {
     return std::make_shared<WedgeNode>();
+  }
+  if (type == "cone")
+  {
+    return std::make_shared<ConeNode>();
   }
   if (type == "cylinder")
   {
@@ -367,6 +372,16 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<std::shared_ptr<WedgeNode>>("ReactCADWedgeNode")
       .function("setPropsLtx", &WedgeNode::setPropsLtx)
       .function("setPropsMinMax", &WedgeNode::setPropsMinMax);
+
+  emscripten::value_object<ConeProps>("ConeProps")
+      .field("center", &ConeProps::center)
+      .field("radius1", &ConeProps::radius1)
+      .field("radius2", &ConeProps::radius2)
+      .field("height", &ConeProps::height)
+      .field("angle", &ConeProps::angle);
+  emscripten::class_<ConeNode, emscripten::base<ReactCADNode>>("ReactCADConeNode")
+      .smart_ptr<std::shared_ptr<ConeNode>>("ReactCADConeNode")
+      .function("setProps", &ConeNode::setProps);
 
   emscripten::value_object<CylinderProps>("CylinderProps")
       .field("center", &CylinderProps::center)

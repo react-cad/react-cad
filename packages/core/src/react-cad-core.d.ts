@@ -49,6 +49,17 @@ export class ReactCADWedgeNode extends ReactCADNode {
   public setPropsMinMax(props: WedgePropsMinMax): void;
 }
 
+export interface ConeProps {
+  center: boolean;
+  radius1: number;
+  radius2: number;
+  height: number;
+  angle: number;
+}
+export class ReactCADConeNode extends ReactCADNode {
+  public setProps(props: ConeProps): void;
+}
+
 export interface CylinderProps {
   center: boolean;
   radius: number;

@@ -26,12 +26,12 @@ void CylinderNode::computeShape()
 
   if (m_props.angle == 0)
   {
-    cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height).Shape();
+    cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height);
   }
   else
   {
     Standard_Real a = fmin(fmax(m_props.angle, 0), 2 * M_PI);
-    cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height, a).Shape();
+    cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height, a);
   }
 
   if (m_props.center)
