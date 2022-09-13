@@ -29,10 +29,42 @@ export class ReactCADBoxNode extends ReactCADNode {
   public setProps(props: BoxProps): void;
 }
 
+export interface WedgePropsLtx {
+  x: number;
+  y: number;
+  z: number;
+  ltx: number;
+}
+export interface WedgePropsMinMax {
+  x: number;
+  y: number;
+  z: number;
+  xmin: number;
+  xmax: number;
+  zmin: number;
+  zmax: number;
+}
+export class ReactCADWedgeNode extends ReactCADNode {
+  public setPropsLtx(props: WedgePropsLtx): void;
+  public setPropsMinMax(props: WedgePropsMinMax): void;
+}
+
+export interface ConeProps {
+  center: boolean;
+  radius1: number;
+  radius2: number;
+  height: number;
+  angle: number;
+}
+export class ReactCADConeNode extends ReactCADNode {
+  public setProps(props: ConeProps): void;
+}
+
 export interface CylinderProps {
   center: boolean;
   radius: number;
   height: number;
+  angle: number;
 }
 export class ReactCADCylinderNode extends ReactCADNode {
   public setProps(props: CylinderProps): void;
@@ -40,6 +72,9 @@ export class ReactCADCylinderNode extends ReactCADNode {
 
 export interface SphereProps {
   radius: number;
+  angle: number;
+  segmentAngle1: number;
+  segmentAngle2: number;
 }
 export class ReactCADSphereNode extends ReactCADNode {
   public setProps(props: SphereProps): void;
@@ -48,9 +83,14 @@ export class ReactCADSphereNode extends ReactCADNode {
 export interface TorusProps {
   radius1: number;
   radius2: number;
+  angle: number;
 }
 export class ReactCADTorusNode extends ReactCADNode {
   public setProps(props: TorusProps): void;
+}
+
+export class ReactCADPolyhedronNode extends ReactCADNode {
+  public setPointsAndFaces(points: Point[], faces: number[][]): void;
 }
 
 // Sweeps

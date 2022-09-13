@@ -1,9 +1,9 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-type Props = JSX.IntrinsicElements["cylinder"];
+type Props = JSX.IntrinsicElements["cone"];
 
-export const Cylinder: React.FC<Props> = (props) => <cylinder {...props} />;
+export const Cone: React.FC<Props> = (props) => <cone {...props} />;
 
 const range = {
   control: {
@@ -15,11 +15,12 @@ const range = {
 };
 
 export default {
-  title: "Primitives/Cylinder",
-  component: Cylinder,
+  title: "Primitives/Cone",
+  component: Cone,
   argTypes: {
     center: { control: "boolean" },
-    radius: range,
+    radius1: range,
+    radius2: range,
     height: range,
     angle: {
       control: {
@@ -32,12 +33,13 @@ export default {
   },
 } as Meta;
 
-const Template: Story<Props> = (args) => <Cylinder {...args} />;
+const Template: Story<Props> = (args) => <Cone {...args} />;
 
-export const cylinder = Template.bind({});
-cylinder.args = {
+export const cone = Template.bind({});
+cone.args = {
   center: false,
-  radius: 2,
+  radius1: 2,
+  radius2: 1,
   height: 5,
   angle: 2 * Math.PI,
 };

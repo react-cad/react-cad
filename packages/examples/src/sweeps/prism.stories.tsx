@@ -1,9 +1,10 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 import { Axis, Point, Profile } from "@react-cad/core";
-import { ReactCADElements } from "@react-cad/renderer/src/types";
 
 import reactIcon from "./react-icon";
+
+type Props = JSX.IntrinsicElements["prism"];
 
 function makePolygon(sides: number) {
   return [...Array(sides)].map(
@@ -22,9 +23,7 @@ const profiles: Record<string, Profile> = {
   SVG: reactIcon,
 };
 
-export const Prism: React.FC<ReactCADElements["prism"]> = (props) => (
-  <prism {...props} />
-);
+export const Prism: React.FC<Props> = (props) => <prism {...props} />;
 
 const range = {
   control: {
@@ -55,13 +54,13 @@ export default {
   },
 } as Meta;
 
-interface Props {
+interface StoryProps {
   profileName: keyof typeof profiles;
   axis: Axis;
   height: number;
 }
 
-const Template: Story<Props> = ({ profileName, ...args }) => (
+const Template: Story<StoryProps> = ({ profileName, ...args }) => (
   <Prism profile={profiles[profileName]} {...args} />
 );
 

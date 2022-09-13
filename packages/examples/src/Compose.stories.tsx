@@ -1,7 +1,6 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-
-type Axis = "x" | "y" | "z";
+import { Axis } from "@react-cad/core";
 
 interface Props {
   x: number;

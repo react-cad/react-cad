@@ -11,9 +11,12 @@
 #include "Geometry.hpp"
 
 #include "BoxNode.hpp"
+#include "ConeNode.hpp"
 #include "CylinderNode.hpp"
+#include "PolyhedronNode.hpp"
 #include "SphereNode.hpp"
 #include "TorusNode.hpp"
+#include "WedgeNode.hpp"
 
 #include "DifferenceNode.hpp"
 #include "IntersectionNode.hpp"
@@ -50,6 +53,14 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   {
     return std::make_shared<BoxNode>();
   }
+  if (type == "wedge")
+  {
+    return std::make_shared<WedgeNode>();
+  }
+  if (type == "cone")
+  {
+    return std::make_shared<ConeNode>();
+  }
   if (type == "cylinder")
   {
     return std::make_shared<CylinderNode>();
@@ -65,6 +76,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "intersection")
   {
     return std::make_shared<IntersectionNode>();
+  }
+  if (type == "polyhedron")
+  {
+    return std::make_shared<PolyhedronNode>();
   }
   if (type == "prism")
   {
@@ -319,6 +334,7 @@ struct TypeID<
 
 EMSCRIPTEN_BINDINGS(react_cad)
 {
+
   // Base node
   emscripten::class_<ReactCADNode>("ReactCADNode")
       .smart_ptr<std::shared_ptr<ReactCADNode>>("ReactCADNode")
@@ -339,25 +355,63 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<std::shared_ptr<BoxNode>>("ReactCADBoxNode")
       .function("setProps", &BoxNode::setProps);
 
+  emscripten::value_object<WedgePropsLtx>("WedgePropsLtx")
+      .field("x", &WedgePropsLtx::x)
+      .field("y", &WedgePropsLtx::y)
+      .field("z", &WedgePropsLtx::z)
+      .field("ltx", &WedgePropsLtx::ltx);
+  emscripten::value_object<WedgePropsMinMax>("WedgePropsMinMax")
+      .field("x", &WedgePropsMinMax::x)
+      .field("y", &WedgePropsMinMax::y)
+      .field("z", &WedgePropsMinMax::z)
+      .field("xmin", &WedgePropsMinMax::xmin)
+      .field("xmax", &WedgePropsMinMax::xmax)
+      .field("zmin", &WedgePropsMinMax::zmin)
+      .field("zmax", &WedgePropsMinMax::zmax);
+  emscripten::class_<WedgeNode, emscripten::base<ReactCADNode>>("ReactCADWedgeNode")
+      .smart_ptr<std::shared_ptr<WedgeNode>>("ReactCADWedgeNode")
+      .function("setPropsLtx", &WedgeNode::setPropsLtx)
+      .function("setPropsMinMax", &WedgeNode::setPropsMinMax);
+
+  emscripten::value_object<ConeProps>("ConeProps")
+      .field("center", &ConeProps::center)
+      .field("radius1", &ConeProps::radius1)
+      .field("radius2", &ConeProps::radius2)
+      .field("height", &ConeProps::height)
+      .field("angle", &ConeProps::angle);
+  emscripten::class_<ConeNode, emscripten::base<ReactCADNode>>("ReactCADConeNode")
+      .smart_ptr<std::shared_ptr<ConeNode>>("ReactCADConeNode")
+      .function("setProps", &ConeNode::setProps);
+
   emscripten::value_object<CylinderProps>("CylinderProps")
       .field("center", &CylinderProps::center)
       .field("radius", &CylinderProps::radius)
-      .field("height", &CylinderProps::height);
+      .field("height", &CylinderProps::height)
+      .field("angle", &CylinderProps::angle);
   emscripten::class_<CylinderNode, emscripten::base<ReactCADNode>>("ReactCADCylinderNode")
       .smart_ptr<std::shared_ptr<CylinderNode>>("ReactCADCylinderNode")
       .function("setProps", &CylinderNode::setProps);
 
   emscripten::value_object<TorusProps>("TorusProps")
       .field("radius1", &TorusProps::radius1)
-      .field("radius2", &TorusProps::radius2);
+      .field("radius2", &TorusProps::radius2)
+      .field("angle", &TorusProps::angle);
   emscripten::class_<TorusNode, emscripten::base<ReactCADNode>>("ReactCADTorusNode")
       .smart_ptr<std::shared_ptr<TorusNode>>("ReactCADTorusNode")
       .function("setProps", &TorusNode::setProps);
 
-  emscripten::value_object<SphereProps>("SphereProps").field("radius", &SphereProps::radius);
+  emscripten::value_object<SphereProps>("SphereProps")
+      .field("radius", &SphereProps::radius)
+      .field("angle", &SphereProps::angle)
+      .field("segmentAngle1", &SphereProps::segmentAngle1)
+      .field("segmentAngle2", &SphereProps::segmentAngle2);
   emscripten::class_<SphereNode, emscripten::base<ReactCADNode>>("ReactCADSphereNode")
       .smart_ptr<std::shared_ptr<SphereNode>>("ReactCADSphereNode")
       .function("setProps", &SphereNode::setProps);
+
+  emscripten::class_<PolyhedronNode, emscripten::base<ReactCADNode>>("ReactCADPolyhedronNode")
+      .smart_ptr<std::shared_ptr<PolyhedronNode>>("ReactCADPolyhedronNode")
+      .function("setPointsAndFaces", &PolyhedronNode::setPointsAndFaces);
 
   // Sweeps
   emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")

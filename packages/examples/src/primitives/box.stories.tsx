@@ -1,12 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  center: boolean;
-  x: number;
-  y: number;
-  z: number;
-}
+type Props = JSX.IntrinsicElements["box"];
 
 export const Box: React.FC<Props> = (props) => <box {...props} />;
 

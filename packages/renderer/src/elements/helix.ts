@@ -4,6 +4,9 @@ import { Props, Instance, UpdatePayload } from "../types";
 type Helix = "helix";
 
 function validateProps(props: Props<Helix>): boolean {
+  if (typeof props.profile != "string" && props.profile.length < 3) {
+    throw new Error(`helix: "profile" prop must be contain at least 3 points`);
+  }
   if (props.pitch <= 0) {
     throw new Error(`helix: "pitch" prop must be greater than or equal to 0`);
   }

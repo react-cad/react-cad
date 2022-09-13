@@ -6,6 +6,9 @@
 struct SphereProps
 {
   double radius;
+  double angle;
+  double segmentAngle1;
+  double segmentAngle2;
 };
 
 class SphereNode : public ReactCADNode

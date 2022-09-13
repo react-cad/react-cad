@@ -10,6 +10,11 @@ function validateProps(props: Props<Torus>): boolean {
   if (!props.radius2 || props.radius2 <= 0) {
     throw new Error(`torus: "radius2" prop must be greater than 0`);
   }
+  if (props.angle && (props.angle <= 0 || props.angle > 2 * Math.PI)) {
+    throw new Error(
+      `torus: "angle" prop must be greater than 0 and less than or equal to 2π`
+    );
+  }
 
   return true;
 }
@@ -20,7 +25,8 @@ export function prepareUpdate(
 ): UpdatePayload<Torus> | null {
   if (
     oldProps.radius1 !== newProps.radius2 ||
-    oldProps.radius2 !== newProps.radius2
+    oldProps.radius2 !== newProps.radius2 ||
+    oldProps.angle !== newProps.angle
   ) {
     validateProps(newProps);
     return newProps;
@@ -37,6 +43,7 @@ export function commitUpdate(
     {
       radius1: 1,
       radius2: 2,
+      angle: 0,
     },
     updatePayload
   );

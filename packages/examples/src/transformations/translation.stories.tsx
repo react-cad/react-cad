@@ -1,11 +1,7 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-interface Props {
-  x: number;
-  y: number;
-  z: number;
-}
+type Props = JSX.IntrinsicElements["translation"];
 
 export const Translation: React.FC<Props> = (props) => (
   <translation {...props}>
