@@ -1,6 +1,7 @@
 import { Element, Props, Instance, Type, UpdatePayload } from "../types";
 
 import * as box from "./box";
+import * as wedge from "./wedge";
 import * as cylinder from "./cylinder";
 import * as sphere from "./sphere";
 import * as torus from "./torus";
@@ -20,6 +21,7 @@ import * as intersection from "./intersection";
 
 const elements: Record<Type, Element> = {
   box,
+  wedge,
   cylinder,
   sphere,
   torus,

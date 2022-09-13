@@ -15,6 +15,7 @@
 #include "PolyhedronNode.hpp"
 #include "SphereNode.hpp"
 #include "TorusNode.hpp"
+#include "WedgeNode.hpp"
 
 #include "DifferenceNode.hpp"
 #include "IntersectionNode.hpp"
@@ -50,6 +51,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "box")
   {
     return std::make_shared<BoxNode>();
+  }
+  if (type == "wedge")
+  {
+    return std::make_shared<WedgeNode>();
   }
   if (type == "cylinder")
   {
@@ -344,6 +349,24 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<BoxNode, emscripten::base<ReactCADNode>>("ReactCADBoxNode")
       .smart_ptr<std::shared_ptr<BoxNode>>("ReactCADBoxNode")
       .function("setProps", &BoxNode::setProps);
+
+  emscripten::value_object<WedgePropsLtx>("WedgePropsLtx")
+      .field("x", &WedgePropsLtx::x)
+      .field("y", &WedgePropsLtx::y)
+      .field("z", &WedgePropsLtx::z)
+      .field("ltx", &WedgePropsLtx::ltx);
+  emscripten::value_object<WedgePropsMinMax>("WedgePropsMinMax")
+      .field("x", &WedgePropsMinMax::x)
+      .field("y", &WedgePropsMinMax::y)
+      .field("z", &WedgePropsMinMax::z)
+      .field("xmin", &WedgePropsMinMax::xmin)
+      .field("xmax", &WedgePropsMinMax::xmax)
+      .field("zmin", &WedgePropsMinMax::zmin)
+      .field("zmax", &WedgePropsMinMax::zmax);
+  emscripten::class_<WedgeNode, emscripten::base<ReactCADNode>>("ReactCADWedgeNode")
+      .smart_ptr<std::shared_ptr<WedgeNode>>("ReactCADWedgeNode")
+      .function("setPropsLtx", &WedgeNode::setPropsLtx)
+      .function("setPropsMinMax", &WedgeNode::setPropsMinMax);
 
   emscripten::value_object<CylinderProps>("CylinderProps")
       .field("center", &CylinderProps::center)

@@ -29,6 +29,26 @@ export class ReactCADBoxNode extends ReactCADNode {
   public setProps(props: BoxProps): void;
 }
 
+export interface WedgePropsLtx {
+  x: number;
+  y: number;
+  z: number;
+  ltx: number;
+}
+export interface WedgePropsMinMax {
+  x: number;
+  y: number;
+  z: number;
+  xmin: number;
+  xmax: number;
+  zmin: number;
+  zmax: number;
+}
+export class ReactCADWedgeNode extends ReactCADNode {
+  public setPropsLtx(props: WedgePropsLtx): void;
+  public setPropsMinMax(props: WedgePropsMinMax): void;
+}
+
 export interface CylinderProps {
   center: boolean;
   radius: number;

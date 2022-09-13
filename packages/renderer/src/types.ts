@@ -23,6 +23,22 @@ export interface ReactCADElements {
     y: number;
     z: number;
   };
+  wedge:
+    | {
+        x: number;
+        y: number;
+        z: number;
+        ltx: number;
+      }
+    | {
+        x: number;
+        y: number;
+        z: number;
+        xmin: number;
+        xmax: number;
+        zmin: number;
+        zmax: number;
+      };
   cylinder: {
     center?: boolean;
     radius: number;
