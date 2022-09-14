@@ -28,6 +28,7 @@
 #include "SweepNode.hpp"
 
 #include "ImportNode.hpp"
+#include "ObjImportNode.hpp"
 #include "STEPImportNode.hpp"
 #include "STLImportNode.hpp"
 
@@ -121,6 +122,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "step")
   {
     return std::make_shared<STEPImportNode>();
+  }
+  if (type == "obj")
+  {
+    return std::make_shared<ObjImportNode>();
   }
   if (type == "stl")
   {
@@ -464,6 +469,9 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   emscripten::class_<STLImportNode, emscripten::base<ImportNode>>("ReactCADSTLImportNode")
       .smart_ptr<std::shared_ptr<STLImportNode>>("ReactCADSTLImportNode");
+
+  emscripten::class_<ObjImportNode, emscripten::base<ImportNode>>("ReactCADObjImportNode")
+      .smart_ptr<std::shared_ptr<ObjImportNode>>("ReactCADObjImportNode");
 
   // Transformations
   emscripten::value_object<TranslationProps>("TranslationProps")

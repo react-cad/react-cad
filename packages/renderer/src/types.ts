@@ -98,6 +98,9 @@ export interface ReactCADElements {
     factor: number;
   }>;
 
+  obj: {
+    data: string | ArrayBuffer;
+  };
   step: {
     data: string | ArrayBuffer;
   };

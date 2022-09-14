@@ -27,6 +27,15 @@ module.exports = {
         },
       },
     });
+    config.module.rules.push({
+      test: /\.obj$/,
+      type: "asset/inline",
+      generator: {
+        dataUrl: {
+          mimetype: "application/octet-stream",
+        },
+      },
+    });
 
     return config;
   },

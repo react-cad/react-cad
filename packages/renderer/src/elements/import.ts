@@ -2,16 +2,16 @@ import { nanoid } from "nanoid";
 
 import { Props, Instance, UpdatePayload } from "../types";
 
-type STEPImport = "step";
+type Import = "stl" | "step" | "obj";
 
-export function validateProps(props: Props<STEPImport>): boolean {
+export function validateProps(props: Props<Import>): boolean {
   if (
     !props.data ||
     (typeof props.data === "string" && props.data.length === 0) ||
     (typeof props.data !== "string" && props.data.byteLength === 0)
   ) {
     throw new Error(
-      `step: "data" prop must be a string or ArrayBuffer with content`
+      `import: "data" prop must be a string or ArrayBuffer with content`
     );
   }
 
@@ -19,9 +19,9 @@ export function validateProps(props: Props<STEPImport>): boolean {
 }
 
 export function prepareUpdate(
-  oldProps: Props<STEPImport>,
-  newProps: Props<STEPImport>
-): UpdatePayload<STEPImport> | null {
+  oldProps: Props<Import>,
+  newProps: Props<Import>
+): UpdatePayload<Import> | null {
   if (oldProps.data !== newProps.data) {
     validateProps(newProps);
     return newProps;
@@ -31,8 +31,8 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<STEPImport>,
-  updatePayload: UpdatePayload<STEPImport>
+  instance: Instance<Import>,
+  updatePayload: UpdatePayload<Import>
 ): void {
   let filename = instance.node.getFilename();
   if (filename.length === 0) {

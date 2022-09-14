@@ -133,6 +133,8 @@ export class ReactCADSTEPImportNode extends ReactCADImportNode {}
 
 export class ReactCADSTLImportNode extends ReactCADImportNode {}
 
+export class ReactCADObjImportNode extends ReactCADImportNode {}
+
 // Transformations
 export interface TranslationProps {
   x: number;
@@ -173,6 +175,7 @@ export interface ReactCADNodeTypes {
   revolution: ReactCADRevolutionNode;
   step: ReactCADSTEPImportNode;
   stl: ReactCADSTLImportNode;
+  obj: ReactCADObjImportNode;
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
