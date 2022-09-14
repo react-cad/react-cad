@@ -1,4 +1,4 @@
-import { ReactCADPolyhedronNode, Point } from "@react-cad/core";
+import { Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Polyhedron = "polyhedron";
@@ -86,6 +86,5 @@ export function commitUpdate(
   updatePayload: UpdatePayload<Polyhedron>
 ): void {
   const { points = defaultPoints, faces = defaultFaces } = updatePayload;
-  const polyhedron = instance.node as ReactCADPolyhedronNode;
-  polyhedron.setPointsAndFaces(points, faces);
+  instance.node.setPointsAndFaces(points, faces);
 }

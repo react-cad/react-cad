@@ -1,4 +1,4 @@
-import { ReactCADTranslationNode, TranslationProps } from "@react-cad/core";
+import { TranslationProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Translation = "translation";
@@ -29,5 +29,6 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADTranslationNode).setProps(props);
+
+  instance.node.setProps(props);
 }

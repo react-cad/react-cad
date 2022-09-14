@@ -1,4 +1,4 @@
-import { ReactCADConeNode, ConeProps } from "@react-cad/core";
+import { ConeProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Cone = "cone";
@@ -56,5 +56,5 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADConeNode).setProps(props);
+  instance.node.setProps(props);
 }

@@ -16,6 +16,8 @@ import * as rotation from "./rotation";
 import * as translation from "./translation";
 import * as scale from "./scale";
 
+import * as step from "./step";
+
 import * as union from "./union";
 import * as difference from "./difference";
 import * as intersection from "./intersection";
@@ -37,6 +39,8 @@ const elements: Record<Type, Element> = {
   translation,
   scale,
 
+  step,
+
   union,
   difference,
   intersection,
@@ -57,7 +61,7 @@ export function prepareUpdate<T extends Type>(
 
 export function commitUpdate<T extends Type>(
   instance: Instance<T>,
-  updatePayload: UpdatePayload,
+  updatePayload: UpdatePayload<T>,
   type: T
 ): void {
   const element = elements[type];

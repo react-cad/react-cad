@@ -1,8 +1,4 @@
-import {
-  ReactCADRevolutionNode,
-  RevolutionProps,
-  Point,
-} from "@react-cad/core";
+import { RevolutionProps, Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Revolution = "revolution";
@@ -51,8 +47,7 @@ export function commitUpdate(
     },
     revolutionProps
   );
-  const revolution = instance.node as ReactCADRevolutionNode;
 
-  revolution.setProfile(profile?.length > 2 ? profile : defaultProfile);
-  revolution.setProps(props);
+  instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  instance.node.setProps(props);
 }

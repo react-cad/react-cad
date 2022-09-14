@@ -25,6 +25,10 @@
 #include "HelixNode.hpp"
 #include "PrismNode.hpp"
 #include "RevolutionNode.hpp"
+#include "SweepNode.hpp"
+
+#include "ImportNode.hpp"
+#include "STEPImportNode.hpp"
 
 #include "RotationNode.hpp"
 #include "ScaleNode.hpp"
@@ -112,6 +116,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "union")
   {
     return std::make_shared<UnionNode>();
+  }
+  if (type == "step")
+  {
+    return std::make_shared<STEPImportNode>();
   }
 
   return std::make_shared<BoxNode>();
@@ -439,6 +447,14 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
       .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
       .function("setProps", &HelixNode::setProps);
+
+  // Imports
+  emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
+      .smart_ptr<std::shared_ptr<ImportNode>>("ReactCADImportNode")
+      .function("setSrc", &ImportNode::setSrc);
+
+  emscripten::class_<STEPImportNode, emscripten::base<ImportNode>>("ReactCADSTEPImportNode")
+      .smart_ptr<std::shared_ptr<STEPImportNode>>("ReactCADSTEPImportNode");
 
   // Transformations
   emscripten::value_object<TranslationProps>("TranslationProps")

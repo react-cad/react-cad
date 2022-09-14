@@ -1,4 +1,4 @@
-import { ReactCADTorusNode, TorusProps } from "@react-cad/core";
+import { TorusProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Torus = "torus";
@@ -47,5 +47,6 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADTorusNode).setProps(props);
+
+  instance.node.setProps(props);
 }

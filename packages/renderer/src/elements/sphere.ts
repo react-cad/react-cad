@@ -1,4 +1,4 @@
-import { ReactCADSphereNode, SphereProps } from "@react-cad/core";
+import { SphereProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Sphere = "sphere";
@@ -65,5 +65,6 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADSphereNode).setProps(props);
+
+  instance.node.setProps(props);
 }

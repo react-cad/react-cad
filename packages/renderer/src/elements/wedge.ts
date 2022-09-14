@@ -1,8 +1,4 @@
-import {
-  ReactCADWedgeNode,
-  WedgePropsLtx,
-  WedgePropsMinMax,
-} from "@react-cad/core";
+import { WedgePropsLtx, WedgePropsMinMax } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Wedge = "wedge";
@@ -77,7 +73,8 @@ export function commitUpdate(
       },
       updatePayload
     );
-    (instance.node as ReactCADWedgeNode).setPropsLtx(props);
+
+    instance.node.setPropsLtx(props);
   } else {
     const props: WedgePropsMinMax = Object.assign(
       {
@@ -91,6 +88,7 @@ export function commitUpdate(
       },
       updatePayload
     );
-    (instance.node as ReactCADWedgeNode).setPropsMinMax(props);
+
+    instance.node.setPropsMinMax(props);
   }
 }

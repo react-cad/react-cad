@@ -8,6 +8,8 @@ export const parameters = {
         "Sweeps",
         ["Prism", "Revolution", "Helix"],
         "Transformations",
+        "Import",
+        ["STEP"],
         "Operations",
         ["Union", "Intersection", "Difference"],
         "Examples",
