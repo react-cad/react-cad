@@ -8,4 +8,26 @@ module.exports = {
   reactOptions: {
     fastRefresh: true,
   },
+  webpackFinal: async (config, { configType }) => {
+    config.module.rules.push({
+      test: /\.step$/,
+      type: "asset/inline",
+      generator: {
+        dataUrl: {
+          mimetype: "application/STEP",
+        },
+      },
+    });
+    config.module.rules.push({
+      test: /\.stl$/,
+      type: "asset/inline",
+      generator: {
+        dataUrl: {
+          mimetype: "application/sla",
+        },
+      },
+    });
+
+    return config;
+  },
 };

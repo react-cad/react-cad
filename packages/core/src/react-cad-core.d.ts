@@ -125,10 +125,13 @@ export class ReactCADHelixNode extends ReactCADSweepNode {
 
 // Imports
 export class ReactCADImportNode extends ReactCADNode {
-  public setSrc(src: string): void;
+  public setFilename(src: string, ownFile: boolean): void;
+  public getFilename(): string;
 }
 
 export class ReactCADSTEPImportNode extends ReactCADImportNode {}
+
+export class ReactCADSTLImportNode extends ReactCADImportNode {}
 
 // Transformations
 export interface TranslationProps {
@@ -169,6 +172,7 @@ export interface ReactCADNodeTypes {
   prism: ReactCADPrismNode;
   revolution: ReactCADRevolutionNode;
   step: ReactCADSTEPImportNode;
+  stl: ReactCADSTLImportNode;
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
@@ -223,6 +227,11 @@ export interface ReactCADCore extends EmscriptenModule {
     ): Uint8Array;
     readFile(path: string, opts: { encoding: "utf8"; flags?: string }): string;
     readFile(path: string, opts?: { flags?: string }): Uint8Array;
+    writeFile(
+      path: string,
+      data: string | ArrayBufferView,
+      opts?: { flags?: string }
+    ): void;
     unlink(path: string): void;
   };
   _shutdown(): void;

@@ -10,14 +10,18 @@ class ImportNode : public ReactCADNode
 public:
   ImportNode();
   virtual ~ImportNode();
-  void setSrc(const std::string &src);
+
+  void setFilename(const std::string &filename, bool ownFile = false);
+  std::string getFilename();
 
 protected:
+  std::string m_filename;
   void computeShape() override;
-  virtual void parseSrc(std::string &src) = 0;
+  virtual void importFile() = 0;
 
 private:
-  std::string m_src;
+  bool m_ownFile = false;
+  void removeFile();
 };
 
 #endif

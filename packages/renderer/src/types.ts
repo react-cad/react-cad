@@ -99,7 +99,10 @@ export interface ReactCADElements {
   }>;
 
   step: {
-    src: string;
+    data: string | ArrayBuffer;
+  };
+  stl: {
+    data: string | ArrayBuffer;
   };
 
   union: React.PropsWithChildren<unknown>;
@@ -121,6 +124,7 @@ export type HostContext = unknown;
 export type Type = keyof ElementProps;
 export type Props<T extends Type = Type> = ElementProps[T];
 export interface Instance<T extends Type = Type> {
+  core: ReactCADCore;
   type: T;
   node: ReactCADNodeTypes[T];
 }

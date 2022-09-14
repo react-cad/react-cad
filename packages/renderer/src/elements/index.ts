@@ -17,6 +17,7 @@ import * as translation from "./translation";
 import * as scale from "./scale";
 
 import * as step from "./step";
+import * as stl from "./stl";
 
 import * as union from "./union";
 import * as difference from "./difference";
@@ -40,6 +41,7 @@ const elements: Record<Type, Element> = {
   scale,
 
   step,
+  stl,
 
   union,
   difference,

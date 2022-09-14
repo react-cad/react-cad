@@ -1,25 +1,44 @@
 #include "ImportNode.hpp"
 
+#include <OSD_File.hxx>
+#include <OSD_Path.hxx>
+
 ImportNode::ImportNode()
 {
 }
 
 ImportNode::~ImportNode()
 {
+  if (m_ownFile)
+  {
+    removeFile();
+  }
 }
 
-void ImportNode::setSrc(const std::string &src)
+void ImportNode::removeFile()
 {
-  if (src == m_src)
-  {
-    return;
-  }
+  OSD_Path path(m_filename.c_str());
+  OSD_File file(path);
+  file.Remove();
+}
 
-  m_src = src;
+void ImportNode::setFilename(const std::string &filename, bool ownFile)
+{
+  m_ownFile = ownFile;
+  if (m_ownFile && filename != m_filename)
+  {
+    removeFile();
+  }
+  m_filename = filename;
   propsChanged();
+}
+
+std::string ImportNode::getFilename()
+{
+  return m_filename;
 }
 
 void ImportNode::computeShape()
 {
-  parseSrc(m_src);
+  importFile();
 }

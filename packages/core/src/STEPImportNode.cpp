@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "PerformanceTimer.hpp"
+
 STEPImportNode::STEPImportNode()
 {
 }
@@ -13,12 +15,12 @@ STEPImportNode::~STEPImportNode()
 {
 }
 
-void STEPImportNode::parseSrc(std::string &src)
+void STEPImportNode::importFile()
 {
-  std::stringstream stream(src);
+  PerformanceTimer timer("Import STEP");
 
   STEPControl_Reader reader;
-  IFSelect_ReturnStatus status = reader.ReadStream("imported.stp", stream);
+  IFSelect_ReturnStatus status = reader.ReadFile(m_filename.c_str());
 
   if (status != IFSelect_RetDone)
   {
@@ -33,10 +35,6 @@ void STEPImportNode::parseSrc(std::string &src)
 
   Standard_Integer num = reader.TransferRoots();
 
-  std::stringstream message;
-  message << "STEP entities imported: " << num;
-  Message::DefaultMessenger()->Send(message);
-
   if (num == 0)
   {
     std::stringstream errors;
@@ -49,4 +47,6 @@ void STEPImportNode::parseSrc(std::string &src)
   }
 
   shape = reader.OneShape();
+
+  timer.end();
 }

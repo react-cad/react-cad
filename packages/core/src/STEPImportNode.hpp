@@ -10,7 +10,7 @@ public:
   ~STEPImportNode();
 
 protected:
-  void parseSrc(std::string &src) override;
+  void importFile() override;
 };
 
 #endif

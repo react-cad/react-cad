@@ -29,6 +29,7 @@
 
 #include "ImportNode.hpp"
 #include "STEPImportNode.hpp"
+#include "STLImportNode.hpp"
 
 #include "RotationNode.hpp"
 #include "ScaleNode.hpp"
@@ -120,6 +121,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "step")
   {
     return std::make_shared<STEPImportNode>();
+  }
+  if (type == "stl")
+  {
+    return std::make_shared<STLImportNode>();
   }
 
   return std::make_shared<BoxNode>();
@@ -451,10 +456,14 @@ EMSCRIPTEN_BINDINGS(react_cad)
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
       .smart_ptr<std::shared_ptr<ImportNode>>("ReactCADImportNode")
-      .function("setSrc", &ImportNode::setSrc);
+      .function("setFilename", &ImportNode::setFilename)
+      .function("getFilename", &ImportNode::getFilename);
 
   emscripten::class_<STEPImportNode, emscripten::base<ImportNode>>("ReactCADSTEPImportNode")
       .smart_ptr<std::shared_ptr<STEPImportNode>>("ReactCADSTEPImportNode");
+
+  emscripten::class_<STLImportNode, emscripten::base<ImportNode>>("ReactCADSTLImportNode")
+      .smart_ptr<std::shared_ptr<STLImportNode>>("ReactCADSTLImportNode");
 
   // Transformations
   emscripten::value_object<TranslationProps>("TranslationProps")
