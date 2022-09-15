@@ -1,11 +1,21 @@
 #ifndef Geometry_HeaderFile
 #define Geometry_HeaderFile
 
+#include <Standard_TypeDef.hxx>
+
 struct Point
 {
-  double x;
-  double y;
-  double z;
+  Standard_Real x;
+  Standard_Real y;
+  Standard_Real z;
+};
+
+struct Quaternion
+{
+  Standard_Real x;
+  Standard_Real y;
+  Standard_Real z;
+  Standard_Real w;
 };
 
 #endif

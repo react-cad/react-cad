@@ -367,6 +367,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("hasParent", &ReactCADNode::hasParent);
 
   emscripten::value_array<Point>("Point").element(&Point::x).element(&Point::y).element(&Point::z);
+  emscripten::value_array<Quaternion>("Quaternion")
+      .element(&Quaternion::x)
+      .element(&Quaternion::y)
+      .element(&Quaternion::z)
+      .element(&Quaternion::w);
 
   // Primitives
   emscripten::value_object<BoxProps>("BoxProps")
@@ -490,12 +495,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<std::shared_ptr<TranslationNode>>("ReactCADTranslationNode")
       .function("setProps", &TranslationNode::setProps);
 
-  emscripten::value_object<RotationProps>("RotationProps")
-      .field("axis", &RotationProps::axis)
-      .field("angle", &RotationProps::angle);
   emscripten::class_<RotationNode, emscripten::base<ReactCADNode>>("ReactCADRotationNode")
       .smart_ptr<std::shared_ptr<RotationNode>>("ReactCADRotationNode")
-      .function("setProps", &RotationNode::setProps);
+      .function("setAxisAngle", &RotationNode::setAxisAngle)
+      .function("setAxisNameAngle", &RotationNode::setAxisNameAngle)
+      .function("setRotation", &RotationNode::setRotation);
 
   emscripten::value_object<ScaleProps>("ScaleProps").field("factor", &ScaleProps::factor);
   emscripten::class_<ScaleNode, emscripten::base<ReactCADNode>>("ReactCADScaleNode")

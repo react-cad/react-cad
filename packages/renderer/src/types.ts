@@ -2,12 +2,16 @@ import { Fiber } from "react-reconciler";
 import {
   ReactCADCore,
   ReactCADNode,
-  Axis,
   Polygon,
   Profile,
   Point,
   ReactCADNodeTypes,
+  AxisName,
+  Vector,
+  Quaternion,
 } from "@react-cad/core";
+
+export type Axis = AxisName | Vector;
 
 export interface Element<T extends Type = Type> {
   prepareUpdate(
@@ -71,12 +75,12 @@ export interface ReactCADElements {
 
   prism: {
     profile: Profile;
-    axis: Axis;
+    axis: AxisName;
     height: number;
   };
   revolution: {
     profile: Polygon;
-    axis: Axis;
+    axis: AxisName;
     angle: number;
   };
   helix: {
@@ -85,10 +89,13 @@ export interface ReactCADElements {
     height: number;
   };
 
-  rotation: React.PropsWithChildren<{
-    axis: Axis;
-    angle: number;
-  }>;
+  rotation: React.PropsWithChildren<
+    | {
+        axis: Axis;
+        angle: number;
+      }
+    | { quaternion: Quaternion }
+  >;
   translation: React.PropsWithChildren<{
     x: number;
     y: number;

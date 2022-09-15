@@ -1,6 +1,8 @@
 import { Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
+import { arrayEqual } from "./helpers";
+
 type Polyhedron = "polyhedron";
 
 function validateProps(props: Props<Polyhedron>): boolean {
@@ -28,15 +30,6 @@ function pointsEqual(point1: Point, point2: Point) {
 function pointsArrayEqual(points1: Point[], points2: Point[]) {
   for (let i = 0; i < points1.length; i++) {
     if (!pointsEqual(points1[i], points2[i])) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function arrayEqual(a: number[], b: number[]) {
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) {
       return false;
     }
   }

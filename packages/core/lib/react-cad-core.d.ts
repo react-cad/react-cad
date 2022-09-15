@@ -11,9 +11,10 @@ export class ReactCADNode extends EmClass {
 
 export type Vector = [number, number, number];
 export type Point = [number, number, number];
+export type Quaternion = [number, number, number, number];
 export type Polygon = Point[];
 export type Profile = Polygon | string;
-export type Axis = "x" | "y" | "z";
+export type AxisName = "x" | "y" | "z";
 
 export type Projection = number & { _opaque: typeof Projection };
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
@@ -147,12 +148,10 @@ export class ReactCADTranslationNode extends ReactCADNode {
   public setProps(props: TranslationProps): void;
 }
 
-export interface RotationProps {
-  axis: Axis;
-  angle: number;
-}
 export class ReactCADRotationNode extends ReactCADNode {
-  public setProps(props: RotationProps): void;
+  public setAxisAngle(direction: Vector, angle: number): void;
+  public setAxisNameAngle(name: AxisName, angle: number): void;
+  public setRotation(quaternion: Quaternion): void;
 }
 export interface ScaleProps {
   factor: number;

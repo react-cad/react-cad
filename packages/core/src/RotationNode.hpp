@@ -3,23 +3,27 @@
 
 #include <string>
 
-#include "TransformationNode.hpp"
+#include <Standard_Real.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Quaternion.hxx>
 
-struct RotationProps
-{
-  std::string axis;
-  double angle;
-};
+#include "Geometry.hpp"
+#include "TransformationNode.hpp"
 
 class RotationNode : public TransformationNode
 {
 public:
   RotationNode();
   virtual ~RotationNode();
-  void setProps(const RotationProps &props);
+  void setAxisAngle(Point direction, Standard_Real angle);
+  void setAxisNameAngle(std::string axis, Standard_Real angle);
+  void setRotation(Quaternion quaternion);
 
 private:
-  RotationProps m_props;
+  void setDirectionAngle(gp_Dir direction, Standard_Real angle);
+  Standard_Real m_angle;
+  gp_Dir m_axis;
+  gp_Quaternion m_quaternion;
 };
 
 #endif
