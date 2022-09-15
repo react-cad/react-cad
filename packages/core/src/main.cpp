@@ -501,10 +501,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("setAxisNameAngle", &RotationNode::setAxisNameAngle)
       .function("setRotation", &RotationNode::setRotation);
 
-  emscripten::value_object<ScaleProps>("ScaleProps").field("factor", &ScaleProps::factor);
   emscripten::class_<ScaleNode, emscripten::base<ReactCADNode>>("ReactCADScaleNode")
       .smart_ptr<std::shared_ptr<ScaleNode>>("ReactCADScaleNode")
-      .function("setProps", &ScaleNode::setProps);
+      .function("setCenter", &ScaleNode::setCenter)
+      .function("setScaleFactor", &ScaleNode::setScaleFactor)
+      .function("setScale", &ScaleNode::setScale);
 
   emscripten::enum_<Graphic3d_Camera::Projection>("Projection")
       .value("ORTHOGRAPHIC", Graphic3d_Camera::Projection_Orthographic)

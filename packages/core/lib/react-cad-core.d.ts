@@ -153,11 +153,10 @@ export class ReactCADRotationNode extends ReactCADNode {
   public setAxisNameAngle(name: AxisName, angle: number): void;
   public setRotation(quaternion: Quaternion): void;
 }
-export interface ScaleProps {
-  factor: number;
-}
 export class ReactCADScaleNode extends ReactCADNode {
-  public setProps(props: ScaleProps): void;
+  public setCenter(center: Point): void;
+  public setScaleFactor(scaleFactor: number): void;
+  public setScale(scale: Vector): void;
 }
 
 export interface ReactCADNodeTypes {

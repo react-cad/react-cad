@@ -15,7 +15,7 @@ class RotationNode : public TransformationNode
 public:
   RotationNode();
   virtual ~RotationNode();
-  void setAxisAngle(Point direction, Standard_Real angle);
+  void setAxisAngle(Vector direction, Standard_Real angle);
   void setAxisNameAngle(std::string axis, Standard_Real angle);
   void setRotation(Quaternion quaternion);
 

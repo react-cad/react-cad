@@ -101,9 +101,14 @@ export interface ReactCADElements {
     y: number;
     z: number;
   }>;
-  scale: React.PropsWithChildren<{
-    factor: number;
-  }>;
+  scale: React.PropsWithChildren<
+    { center?: Point } & (
+      | {
+          factor: number;
+        }
+      | { scale: Vector }
+    )
+  >;
 
   brep: {
     data: string | ArrayBuffer;

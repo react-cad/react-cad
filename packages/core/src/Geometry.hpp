@@ -10,6 +10,8 @@ struct Point
   Standard_Real z;
 };
 
+typedef Point Vector;
+
 struct Quaternion
 {
   Standard_Real x;

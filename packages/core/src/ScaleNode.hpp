@@ -3,20 +3,28 @@
 
 #include "TransformationNode.hpp"
 
-struct ScaleProps
-{
-  double factor;
-};
+#include "Geometry.hpp"
+
+#include <Standard_Boolean.hxx>
+#include <Standard_Real.hxx>
 
 class ScaleNode : public TransformationNode
 {
 public:
   ScaleNode();
   virtual ~ScaleNode();
-  void setProps(const ScaleProps &props);
+  void setScaleFactor(Standard_Real scaleFactor);
+  void setScale(Vector scale);
+  void setCenter(Point center);
 
 protected:
-  ScaleProps m_props;
+  void computeShape() override;
+
+private:
+  gp_Pnt m_center;
+  Standard_Real m_scaleX = 1;
+  Standard_Real m_scaleY = 1;
+  Standard_Real m_scaleZ = 1;
 };
 
 #endif

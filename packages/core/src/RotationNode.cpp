@@ -23,7 +23,7 @@ void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
   }
 }
 
-void RotationNode::setAxisAngle(Point direction, Standard_Real angle)
+void RotationNode::setAxisAngle(Vector direction, Standard_Real angle)
 {
   gp_Dir newDirection(direction.x, direction.y, direction.z);
   setDirectionAngle(newDirection, angle);
