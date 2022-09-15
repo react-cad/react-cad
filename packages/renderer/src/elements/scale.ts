@@ -7,8 +7,16 @@ function validateProps(props: Props<Scale>): boolean {
   if ("factor" in props && props.factor <= 0) {
     throw new Error(`scale: "factor" prop must be greater than 0`);
   }
-  if ("scale" in props && props.scale.length !== 3) {
-    throw new Error(`scale: "scale" prop must be an an array with 3 values`);
+  if (!("factor" in props)) {
+    if (props.x && props.x <= 0) {
+      throw new Error(`scale: "x" must be greater than 0`);
+    }
+    if (props.y && props.y <= 0) {
+      throw new Error(`scale: "y" must be greater than 0`);
+    }
+    if (props.z && props.z <= 0) {
+      throw new Error(`scale: "z" must be greater than 0`);
+    }
   }
   if (props.center && props.center.length !== 3) {
     throw new Error(`scale: "center" prop must be an an array with 3 values`);
@@ -26,9 +34,11 @@ export function prepareUpdate(
     ("factor" in oldProps &&
       "factor" in newProps &&
       oldProps.factor !== newProps.factor) ||
-    ("scale" in oldProps &&
-      "scale" in newProps &&
-      !arrayEqual(oldProps.scale, newProps.scale)) ||
+    (!("factor" in oldProps) &&
+      !("factor" in newProps) &&
+      (oldProps.x !== newProps.x ||
+        oldProps.y !== newProps.y ||
+        oldProps.z !== newProps.z)) ||
     Boolean(oldProps.center) != Boolean(newProps.center) ||
     (oldProps.center &&
       newProps.center &&
@@ -48,6 +58,10 @@ export function commitUpdate(
   if ("factor" in updatePayload) {
     instance.node.setScaleFactor(updatePayload.factor || 1);
   } else {
-    instance.node.setScale(updatePayload.scale || [1, 1, 1]);
+    instance.node.setScale([
+      updatePayload.x || 1,
+      updatePayload.y || 1,
+      updatePayload.z || 1,
+    ]);
   }
 }

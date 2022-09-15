@@ -159,7 +159,7 @@ export class ReactCADAffineNode extends ReactCADNode {
 }
 export class ReactCADRotationNode extends ReactCADNode {
   public setAxisAngle(direction: Vector, angle: number): void;
-  public setAxisNameAngle(name: AxisName, angle: number): void;
+  public setEulerAngles(x: number, y: number, z: number): void;
   public setRotation(quaternion: Quaternion): void;
 }
 export class ReactCADScaleNode extends ReactCADNode {

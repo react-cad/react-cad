@@ -1,6 +1,6 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Point, Vector } from "@react-cad/core";
+import { Point } from "@react-cad/core";
 
 type Props = JSX.IntrinsicElements["scale"];
 
@@ -35,6 +35,9 @@ export default {
       },
     },
     factor: range,
+    x: range,
+    y: range,
+    z: range,
   },
 } as Meta;
 
@@ -42,19 +45,23 @@ interface StoryProps {
   center: Point;
   useScaleFactor: boolean;
   factor: number;
-  scale: Vector;
+  x: number;
+  y: number;
+  z: number;
 }
 
 const Template: Story<StoryProps> = ({
   center,
   useScaleFactor,
   factor,
-  scale,
+  x,
+  y,
+  z,
 }) => {
   if (useScaleFactor) {
     return <Scale factor={factor} center={center} />;
   } else {
-    return <Scale scale={scale} center={center} />;
+    return <Scale x={x} y={y} z={z} center={center} />;
   }
 };
 
@@ -62,6 +69,8 @@ export const scale = Template.bind({});
 scale.args = {
   useScaleFactor: true,
   factor: 1,
-  scale: [1, 1, 1],
+  x: 1,
+  y: 1,
+  z: 1,
   center: [0, 0, 0],
 };

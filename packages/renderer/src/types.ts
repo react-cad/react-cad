@@ -12,8 +12,6 @@ import {
   Matrix,
 } from "@react-cad/core";
 
-export type Axis = AxisName | Vector;
-
 export interface Element<T extends Type = Type> {
   prepareUpdate(
     oldProps: Props<T>,
@@ -95,22 +93,27 @@ export interface ReactCADElements {
   }>;
   rotation: React.PropsWithChildren<
     | {
-        axis: Axis;
+        axis: Vector;
         angle: number;
+      }
+    | {
+        x?: number;
+        y?: number;
+        z?: number;
       }
     | { quaternion: Quaternion }
   >;
   translation: React.PropsWithChildren<{
-    x: number;
-    y: number;
-    z: number;
+    x?: number;
+    y?: number;
+    z?: number;
   }>;
   scale: React.PropsWithChildren<
     { center?: Point } & (
       | {
           factor: number;
         }
-      | { scale: Vector }
+      | { x?: number; y?: number; z?: number }
     )
   >;
 

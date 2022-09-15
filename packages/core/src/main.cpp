@@ -517,7 +517,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<RotationNode, emscripten::base<ReactCADNode>>("ReactCADRotationNode")
       .smart_ptr<std::shared_ptr<RotationNode>>("ReactCADRotationNode")
       .function("setAxisAngle", &RotationNode::setAxisAngle)
-      .function("setAxisNameAngle", &RotationNode::setAxisNameAngle)
+      .function("setEulerAngles", &RotationNode::setEulerAngles)
       .function("setRotation", &RotationNode::setRotation);
 
   emscripten::class_<ScaleNode, emscripten::base<ReactCADNode>>("ReactCADScaleNode")
