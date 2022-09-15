@@ -1,14 +1,14 @@
 #ifndef ScaleNode_HeaderFile
 #define ScaleNode_HeaderFile
 
-#include "TransformationNode.hpp"
+#include "ReactCADNode.hpp"
 
 #include "Geometry.hpp"
 
 #include <Standard_Boolean.hxx>
 #include <Standard_Real.hxx>
 
-class ScaleNode : public TransformationNode
+class ScaleNode : public ReactCADNode
 {
 public:
   ScaleNode();

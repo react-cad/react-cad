@@ -2,14 +2,22 @@
 #define AffineNode_HeaderFile
 
 #include "Geometry.hpp"
-#include "TransformationNode.hpp"
+#include "ReactCADNode.hpp"
 
-class AffineNode : public TransformationNode
+#include <gp_GTrsf.hxx>
+
+class AffineNode : public ReactCADNode
 {
 public:
   AffineNode();
   virtual ~AffineNode();
   void setMatrix(Matrix matrix);
+
+protected:
+  void computeShape() override;
+
+private:
+  gp_GTrsf m_transform;
 };
 
 #endif

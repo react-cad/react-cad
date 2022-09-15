@@ -1,5 +1,6 @@
 #include "RotationNode.hpp"
 
+#include <BRepBuilderAPI_Transform.hxx>
 #include <Standard_Real.hxx>
 #include <gp.hxx>
 #include <gp_Trsf.hxx>
@@ -14,9 +15,6 @@ RotationNode::~RotationNode()
 
 void RotationNode::setTransform()
 {
-  gp_Trsf transform;
-  transform.SetRotation(m_quaternion);
-  m_transform = gp_GTrsf(transform);
 }
 
 void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
@@ -32,7 +30,7 @@ void RotationNode::setAxisAngle(Vector direction, Standard_Real angle)
     m_angle = angle;
     m_axis = newDirection;
     m_quaternion = gp_Quaternion(m_axis, m_angle);
-    setTransform();
+    m_transform.SetRotation(m_quaternion);
     propsChanged();
   }
 }
@@ -54,7 +52,14 @@ void RotationNode::setRotation(Quaternion quaternion)
     gp_Vec vector;
     m_quaternion.GetVectorAndAngle(vector, m_angle);
     m_axis = vector;
-    setTransform();
+    m_transform.SetRotation(m_quaternion);
     propsChanged();
   }
+}
+
+void RotationNode::computeShape()
+{
+  BRepBuilderAPI_Transform theTransform(m_transform);
+  theTransform.Perform(m_childShape, true);
+  shape = theTransform.Shape();
 }

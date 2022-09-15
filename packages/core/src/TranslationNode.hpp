@@ -1,7 +1,7 @@
 #ifndef TranslationNode_HeaderFile
 #define TranslationNode_HeaderFile
 
-#include "TransformationNode.hpp"
+#include "ReactCADNode.hpp"
 
 struct TranslationProps
 {
@@ -10,7 +10,7 @@ struct TranslationProps
   double z;
 };
 
-class TranslationNode : public TransformationNode
+class TranslationNode : public ReactCADNode
 {
 public:
   TranslationNode();
@@ -18,6 +18,9 @@ public:
   void setProps(const TranslationProps &props);
 
 protected:
+  void computeShape() override;
+
+private:
   TranslationProps m_props;
 };
 

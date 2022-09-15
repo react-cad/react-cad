@@ -1,5 +1,6 @@
 #include "AffineNode.hpp"
 
+#include <BRepBuilderAPI_GTransform.hxx>
 #include <gp_GTrsf.hxx>
 #include <gp_Mat.hxx>
 #include <gp_XYZ.hxx>
@@ -21,4 +22,11 @@ void AffineNode::setMatrix(Matrix matrix)
   m_transform.SetVectorialPart(vectorial);
   m_transform.SetTranslationPart(translation);
   propsChanged();
+}
+
+void AffineNode::computeShape()
+{
+  BRepBuilderAPI_GTransform theTransform(m_transform);
+  theTransform.Perform(m_childShape, true);
+  shape = theTransform.Shape();
 }

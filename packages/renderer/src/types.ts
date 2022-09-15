@@ -116,6 +116,10 @@ export interface ReactCADElements {
       | { x?: number; y?: number; z?: number }
     )
   >;
+  mirror: React.PropsWithChildren<{
+    origin: Point;
+    normal: Vector;
+  }>;
 
   brep: {
     data: string | ArrayBuffer;

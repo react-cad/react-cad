@@ -154,6 +154,9 @@ export class ReactCADTranslationNode extends ReactCADNode {
   public setProps(props: TranslationProps): void;
 }
 
+export class ReactCADMirrorNode extends ReactCADNode {
+  public setPlane(origin: Point, normal: Vector): void;
+}
 export class ReactCADAffineNode extends ReactCADNode {
   public setMatrix(matrix: Matrix): void;
 }
@@ -187,6 +190,7 @@ export interface ReactCADNodeTypes {
   stl: ReactCADSTLImportNode;
   obj: ReactCADObjImportNode;
   affine: ReactCADAffineNode;
+  mirror: ReactCADMirrorNode;
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;

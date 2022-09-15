@@ -48,23 +48,35 @@ TopoDS_Shape scaleAxis(TopoDS_Shape shape, gp_Pnt center, gp_Dir direction, Stan
   gp_GTrsf affinity;
   affinity.SetAffinity(axis, scale);
   BRepBuilderAPI_GTransform aBRepGTrsf(shape, affinity, Standard_False);
+  aBRepGTrsf.Build();
   return aBRepGTrsf.Shape();
 }
 
 void ScaleNode::computeShape()
 {
   TopoDS_Shape tmp = m_childShape;
-  if (!IsEqual(m_scaleX, 1.0))
+  if (IsEqual(m_scaleX, m_scaleY) && IsEqual(m_scaleY, m_scaleZ))
   {
-    tmp = scaleAxis(tmp, m_center, gp::DX(), m_scaleX);
+    gp_Trsf transform;
+    transform.SetScale(m_center, m_scaleX);
+    BRepBuilderAPI_Transform aBRepTrsf(tmp, transform);
+    aBRepTrsf.Build();
+    shape = aBRepTrsf.Shape();
   }
-  if (!IsEqual(m_scaleY, 1.0))
+  else
   {
-    tmp = scaleAxis(tmp, m_center, gp::DY(), m_scaleY);
+    if (!IsEqual(m_scaleX, 1.0))
+    {
+      tmp = scaleAxis(tmp, m_center, gp::DX(), m_scaleX);
+    }
+    if (!IsEqual(m_scaleY, 1.0))
+    {
+      tmp = scaleAxis(tmp, m_center, gp::DY(), m_scaleY);
+    }
+    if (!IsEqual(m_scaleZ, 1.0))
+    {
+      tmp = scaleAxis(tmp, m_center, gp::DZ(), m_scaleZ);
+    }
+    shape = tmp;
   }
-  if (!IsEqual(m_scaleZ, 1.0))
-  {
-    tmp = scaleAxis(tmp, m_center, gp::DZ(), m_scaleZ);
-  }
-  shape = tmp;
 }

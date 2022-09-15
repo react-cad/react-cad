@@ -16,6 +16,7 @@ import * as affine from "./affine";
 import * as rotation from "./rotation";
 import * as translation from "./translation";
 import * as scale from "./scale";
+import * as mirror from "./mirror";
 
 import * as importElement from "./import";
 
@@ -40,6 +41,7 @@ const elements: Record<Type, Element> = {
   rotation,
   translation,
   scale,
+  mirror,
 
   brep: importElement,
   step: importElement,

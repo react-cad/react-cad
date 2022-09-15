@@ -34,6 +34,7 @@
 #include "STLImportNode.hpp"
 
 #include "AffineNode.hpp"
+#include "MirrorNode.hpp"
 #include "RotationNode.hpp"
 #include "ScaleNode.hpp"
 #include "TranslationNode.hpp"
@@ -96,6 +97,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "revolution")
   {
     return std::make_shared<RevolutionNode>();
+  }
+  if (type == "mirror")
+  {
+    return std::make_shared<MirrorNode>();
   }
   if (type == "affine")
   {
@@ -509,6 +514,10 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<TranslationNode, emscripten::base<ReactCADNode>>("ReactCADTranslationNode")
       .smart_ptr<std::shared_ptr<TranslationNode>>("ReactCADTranslationNode")
       .function("setProps", &TranslationNode::setProps);
+
+  emscripten::class_<MirrorNode, emscripten::base<ReactCADNode>>("ReactCADMirrorNode")
+      .smart_ptr<std::shared_ptr<MirrorNode>>("ReactCADMirrorNode")
+      .function("setPlane", &MirrorNode::setPlane);
 
   emscripten::class_<AffineNode, emscripten::base<ReactCADNode>>("ReactCADAffineNode")
       .smart_ptr<std::shared_ptr<AffineNode>>("ReactCADAffineNode")
