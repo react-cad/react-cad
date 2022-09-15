@@ -24,11 +24,11 @@ void ImportNode::removeFile()
 
 void ImportNode::setFilename(const std::string &filename, bool ownFile)
 {
-  m_ownFile = ownFile;
   if (m_ownFile && filename != m_filename)
   {
     removeFile();
   }
+  m_ownFile = ownFile;
   m_filename = filename;
   propsChanged();
 }
