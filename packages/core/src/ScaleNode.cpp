@@ -42,12 +42,29 @@ void ScaleNode::setScale(Vector scale)
   }
 }
 
+TopoDS_Shape scaleAxis(TopoDS_Shape shape, gp_Pnt center, gp_Dir direction, Standard_Real scale)
+{
+  gp_Ax2 axis(center, direction);
+  gp_GTrsf affinity;
+  affinity.SetAffinity(axis, scale);
+  BRepBuilderAPI_GTransform aBRepGTrsf(shape, affinity, Standard_False);
+  return aBRepGTrsf.Shape();
+}
+
 void ScaleNode::computeShape()
 {
   TopoDS_Shape tmp = m_childShape;
-  gp_GTrsf affinity;
-  gp_Mat matrix(m_scaleX, 0, 0, 0, m_scaleY, 0, 0, 0, m_scaleZ);
-  affinity.SetVectorialPart(matrix);
-  BRepBuilderAPI_GTransform aBRepGTrsf(tmp, affinity, Standard_False);
-  shape = aBRepGTrsf.Shape();
+  if (!IsEqual(m_scaleX, 1.0))
+  {
+    tmp = scaleAxis(tmp, m_center, gp::DX(), m_scaleX);
+  }
+  if (!IsEqual(m_scaleY, 1.0))
+  {
+    tmp = scaleAxis(tmp, m_center, gp::DY(), m_scaleY);
+  }
+  if (!IsEqual(m_scaleZ, 1.0))
+  {
+    tmp = scaleAxis(tmp, m_center, gp::DZ(), m_scaleZ);
+  }
+  shape = tmp;
 }

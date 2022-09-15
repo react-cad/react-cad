@@ -12,6 +12,7 @@ import * as helix from "./helix";
 import * as prism from "./prism";
 import * as revolution from "./revolution";
 
+import * as affine from "./affine";
 import * as rotation from "./rotation";
 import * as translation from "./translation";
 import * as scale from "./scale";
@@ -35,6 +36,7 @@ const elements: Record<Type, Element> = {
   prism,
   revolution,
 
+  affine,
   rotation,
   translation,
   scale,

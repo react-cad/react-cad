@@ -4,7 +4,7 @@
 #include "ReactCADNode.hpp"
 
 #include <gp.hxx>
-#include <gp_Trsf.hxx>
+#include <gp_GTrsf.hxx>
 
 class TransformationNode : public ReactCADNode
 {
@@ -16,7 +16,7 @@ protected:
   void computeShape() override;
 
 protected:
-  gp_Trsf m_transform;
+  gp_GTrsf m_transform;
 };
 
 #endif

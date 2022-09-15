@@ -9,6 +9,7 @@ import {
   AxisName,
   Vector,
   Quaternion,
+  Matrix,
 } from "@react-cad/core";
 
 export type Axis = AxisName | Vector;
@@ -89,6 +90,9 @@ export interface ReactCADElements {
     height: number;
   };
 
+  affine: React.PropsWithChildren<{
+    matrix: Matrix;
+  }>;
   rotation: React.PropsWithChildren<
     | {
         axis: Axis;

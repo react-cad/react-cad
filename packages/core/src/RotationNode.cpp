@@ -2,6 +2,7 @@
 
 #include <Standard_Real.hxx>
 #include <gp.hxx>
+#include <gp_Trsf.hxx>
 
 RotationNode::RotationNode() : m_angle(0), m_axis(gp::DX()), m_quaternion(gp::DX(), 0)
 {
@@ -11,6 +12,13 @@ RotationNode::~RotationNode()
 {
 }
 
+void RotationNode::setTransform()
+{
+  gp_Trsf transform;
+  transform.SetRotation(m_quaternion);
+  m_transform = gp_GTrsf(transform);
+}
+
 void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
 {
   if (!IsEqual(angle, m_angle) || !direction.IsParallel(m_axis, RealEpsilon()))
@@ -18,7 +26,7 @@ void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
     m_angle = angle;
     m_axis = direction;
     m_quaternion = gp_Quaternion(m_axis, m_angle);
-    m_transform.SetRotation(m_quaternion);
+    setTransform();
     propsChanged();
   }
 }
@@ -55,7 +63,7 @@ void RotationNode::setRotation(Quaternion quaternion)
     gp_Vec vector;
     m_quaternion.GetVectorAndAngle(vector, m_angle);
     m_axis = vector;
-    m_transform.SetRotation(m_quaternion);
+    setTransform();
     propsChanged();
   }
 }

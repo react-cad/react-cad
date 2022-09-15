@@ -33,6 +33,7 @@
 #include "STEPImportNode.hpp"
 #include "STLImportNode.hpp"
 
+#include "AffineNode.hpp"
 #include "RotationNode.hpp"
 #include "ScaleNode.hpp"
 #include "TranslationNode.hpp"
@@ -95,6 +96,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "revolution")
   {
     return std::make_shared<RevolutionNode>();
+  }
+  if (type == "affine")
+  {
+    return std::make_shared<AffineNode>();
   }
   if (type == "rotation")
   {
@@ -372,6 +377,16 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .element(&Quaternion::y)
       .element(&Quaternion::z)
       .element(&Quaternion::w);
+  emscripten::value_array<MatrixRow>("MatrixRow")
+      .element(&MatrixRow::a1)
+      .element(&MatrixRow::a2)
+      .element(&MatrixRow::a3)
+      .element(&MatrixRow::a4);
+  emscripten::value_array<Matrix>("Matrix")
+      .element(&Matrix::a1)
+      .element(&Matrix::a2)
+      .element(&Matrix::a3)
+      .element(&Matrix::a4);
 
   // Primitives
   emscripten::value_object<BoxProps>("BoxProps")
@@ -494,6 +509,10 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<TranslationNode, emscripten::base<ReactCADNode>>("ReactCADTranslationNode")
       .smart_ptr<std::shared_ptr<TranslationNode>>("ReactCADTranslationNode")
       .function("setProps", &TranslationNode::setProps);
+
+  emscripten::class_<AffineNode, emscripten::base<ReactCADNode>>("ReactCADAffineNode")
+      .smart_ptr<std::shared_ptr<AffineNode>>("ReactCADAffineNode")
+      .function("setMatrix", &AffineNode::setMatrix);
 
   emscripten::class_<RotationNode, emscripten::base<ReactCADNode>>("ReactCADRotationNode")
       .smart_ptr<std::shared_ptr<RotationNode>>("ReactCADRotationNode")

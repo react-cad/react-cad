@@ -20,6 +20,7 @@ public:
   void setRotation(Quaternion quaternion);
 
 private:
+  void setTransform();
   void setDirectionAngle(gp_Dir direction, Standard_Real angle);
   Standard_Real m_angle;
   gp_Dir m_axis;

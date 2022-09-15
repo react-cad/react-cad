@@ -15,6 +15,12 @@ export type Quaternion = [number, number, number, number];
 export type Polygon = Point[];
 export type Profile = Polygon | string;
 export type AxisName = "x" | "y" | "z";
+export type Matrix = [
+  [number, number, number, number],
+  [number, number, number, number],
+  [number, number, number, number],
+  [0, 0, 0, 1],
+];
 
 export type Projection = number & { _opaque: typeof Projection };
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
@@ -148,6 +154,9 @@ export class ReactCADTranslationNode extends ReactCADNode {
   public setProps(props: TranslationProps): void;
 }
 
+export class ReactCADAffineNode extends ReactCADNode {
+  public setMatrix(matrix: Matrix): void;
+}
 export class ReactCADRotationNode extends ReactCADNode {
   public setAxisAngle(direction: Vector, angle: number): void;
   public setAxisNameAngle(name: AxisName, angle: number): void;
@@ -177,6 +186,7 @@ export interface ReactCADNodeTypes {
   step: ReactCADSTEPImportNode;
   stl: ReactCADSTLImportNode;
   obj: ReactCADObjImportNode;
+  affine: ReactCADAffineNode;
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
