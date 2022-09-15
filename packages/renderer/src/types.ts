@@ -98,6 +98,9 @@ export interface ReactCADElements {
     factor: number;
   }>;
 
+  brep: {
+    data: string | ArrayBuffer;
+  };
   obj: {
     data: string | ArrayBuffer;
   };

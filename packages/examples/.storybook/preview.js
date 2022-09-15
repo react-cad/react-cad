@@ -9,7 +9,7 @@ export const parameters = {
         ["Prism", "Revolution", "Helix"],
         "Transformations",
         "Import",
-        ["STEP", "STL", "Obj"],
+        ["BREP", "STEP", "STL", "OBJ"],
         "Operations",
         ["Union", "Intersection", "Difference"],
         "Examples",

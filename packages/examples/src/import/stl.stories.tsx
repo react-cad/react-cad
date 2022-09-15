@@ -2,6 +2,7 @@ import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
 import model from "./model.stl";
+import useArrayBuffer from "./useArrayBuffer";
 
 export type Props = JSX.IntrinsicElements["stl"];
 
@@ -9,27 +10,8 @@ interface StoryProps {
   files: string[];
 }
 
-export const Stl: React.FC<StoryProps> = ({ files }) => {
-  const [data, setData] = React.useState<ArrayBuffer>();
-  React.useEffect(() => {
-    if (!files.length) {
-      return;
-    }
-
-    let cancelled = false;
-
-    fetch(files[0])
-      .then((res) => res.arrayBuffer())
-      .then((buffer) => {
-        if (!cancelled) {
-          setData(buffer);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [files]);
+const Stl: React.FC<StoryProps> = ({ files }) => {
+  const data = useArrayBuffer(files[0]);
 
   return data ? <stl data={data} /> : null;
 };

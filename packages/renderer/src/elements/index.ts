@@ -39,6 +39,7 @@ const elements: Record<Type, Element> = {
   translation,
   scale,
 
+  brep: importElement,
   step: importElement,
   stl: importElement,
   obj: importElement,

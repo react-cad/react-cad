@@ -1,24 +1,24 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-import model from "./model.obj";
+import model from "./model.brep";
 import useArrayBuffer from "./useArrayBuffer";
 
-export type Props = JSX.IntrinsicElements["obj"];
+export type Props = JSX.IntrinsicElements["brep"];
 
 interface StoryProps {
   files: string[];
 }
 
-const Obj: React.FC<StoryProps> = ({ files }) => {
+const BRep: React.FC<StoryProps> = ({ files }) => {
   const data = useArrayBuffer(files[0]);
 
-  return data ? <obj data={data} /> : null;
+  return data ? <brep data={data} /> : null;
 };
 
 export default {
-  title: "Import/OBJ",
-  component: Obj,
+  title: "Import/BREP",
+  component: BRep,
   argTypes: {
     files: {
       control: {
@@ -29,10 +29,10 @@ export default {
   },
 } as Meta;
 
-const Template: Story<StoryProps> = (args) => <Obj {...args} />;
+const Template: Story<StoryProps> = (args) => <BRep {...args} />;
 
-export const obj = Template.bind({});
-obj.storyName = "OBJ";
-obj.args = {
+export const brep = Template.bind({});
+brep.storyName = "BREP";
+brep.args = {
   files: [model],
 };

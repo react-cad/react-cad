@@ -27,6 +27,7 @@
 #include "RevolutionNode.hpp"
 #include "SweepNode.hpp"
 
+#include "BRepImportNode.hpp"
 #include "ImportNode.hpp"
 #include "ObjImportNode.hpp"
 #include "STEPImportNode.hpp"
@@ -118,6 +119,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "union")
   {
     return std::make_shared<UnionNode>();
+  }
+  if (type == "brep")
+  {
+    return std::make_shared<BRepImportNode>();
   }
   if (type == "step")
   {
@@ -463,6 +468,9 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<std::shared_ptr<ImportNode>>("ReactCADImportNode")
       .function("setFilename", &ImportNode::setFilename)
       .function("getFilename", &ImportNode::getFilename);
+
+  emscripten::class_<BRepImportNode, emscripten::base<ImportNode>>("ReactCADBRepImportNode")
+      .smart_ptr<std::shared_ptr<BRepImportNode>>("ReactCADBRepImportNode");
 
   emscripten::class_<STEPImportNode, emscripten::base<ImportNode>>("ReactCADSTEPImportNode")
       .smart_ptr<std::shared_ptr<STEPImportNode>>("ReactCADSTEPImportNode");

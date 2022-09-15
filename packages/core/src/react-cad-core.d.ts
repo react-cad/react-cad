@@ -129,6 +129,8 @@ export class ReactCADImportNode extends ReactCADNode {
   public getFilename(): string;
 }
 
+export class ReactCADBRepImportNode extends ReactCADImportNode {}
+
 export class ReactCADSTEPImportNode extends ReactCADImportNode {}
 
 export class ReactCADSTLImportNode extends ReactCADImportNode {}
@@ -173,6 +175,7 @@ export interface ReactCADNodeTypes {
   helix: ReactCADHelixNode;
   prism: ReactCADPrismNode;
   revolution: ReactCADRevolutionNode;
+  brep: ReactCADBRepImportNode;
   step: ReactCADSTEPImportNode;
   stl: ReactCADSTLImportNode;
   obj: ReactCADObjImportNode;
