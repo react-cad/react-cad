@@ -151,6 +151,7 @@ export const HostConfig: ReactReconciler.HostConfig<
     const node = core.createCADNode(type);
     nodes.push(node);
     const instance = {
+      core,
       type,
       node,
     };

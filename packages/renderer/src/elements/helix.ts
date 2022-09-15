@@ -1,4 +1,4 @@
-import { ReactCADHelixNode, HelixProps, Point } from "@react-cad/core";
+import { HelixProps, Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Helix = "helix";
@@ -52,12 +52,12 @@ export function commitUpdate(
     },
     helixProps
   );
-  const helix = instance.node as ReactCADHelixNode;
 
   if (typeof profile === "string") {
-    helix.setSVGProfile(profile);
+    instance.node.setSVGProfile(profile);
   } else {
-    helix.setProfile(profile?.length > 2 ? profile : defaultProfile);
+    instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
   }
-  helix.setProps(props);
+
+  instance.node.setProps(props);
 }

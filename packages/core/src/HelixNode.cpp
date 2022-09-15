@@ -10,8 +10,6 @@
 #include <TopoDS_Face.hxx>
 #include <gp_Lin2d.hxx>
 
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 #include <math.h>
 
 #include "HelixNode.hpp"
@@ -67,8 +65,6 @@ TopoDS_Shape HelixNode::makeHelix(TopoDS_Wire profile)
 void HelixNode::computeShape()
 {
   makeProfile();
-
-  Message::DefaultMessenger()->Send("About to calculate helix");
 
   PerformanceTimer timer("Calculate helix");
 

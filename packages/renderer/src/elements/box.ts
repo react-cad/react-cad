@@ -1,4 +1,4 @@
-import { ReactCADBoxNode, BoxProps } from "@react-cad/core";
+import { BoxProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Box = "box";
@@ -47,5 +47,5 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADBoxNode).setProps(props);
+  instance.node.setProps(props);
 }

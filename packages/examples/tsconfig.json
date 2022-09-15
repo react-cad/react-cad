@@ -1,13 +1,15 @@
 {
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
+    "target": "ES2015",
     "rootDir": "./src",
     "outDir": "./lib",
     "typeRoots": [
       "node_modules/@types",
       "node_modules/@react-cad/renderer/types",
       "../renderer/types"
-    ]
+    ],
+    "lib": ["DOM"]
   },
   "include": ["./src/**/*"]
 }

@@ -9,4 +9,13 @@ describe("shape helpers", () => {
       box.delete();
     });
   });
+
+  describe("step importer", () => {
+    it("should create a node", async () => {
+      const core = await reactCadCore();
+      const step = core.createCADNode("step");
+      expect(step).toBeInstanceOf(core.ReactCADNode);
+      step.delete();
+    });
+  });
 });

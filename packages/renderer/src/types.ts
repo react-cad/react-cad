@@ -6,6 +6,7 @@ import {
   Polygon,
   Profile,
   Point,
+  ReactCADNodeTypes,
 } from "@react-cad/core";
 
 export interface Element<T extends Type = Type> {
@@ -97,6 +98,19 @@ export interface ReactCADElements {
     factor: number;
   }>;
 
+  brep: {
+    data: string | ArrayBuffer;
+  };
+  obj: {
+    data: string | ArrayBuffer;
+  };
+  step: {
+    data: string | ArrayBuffer;
+  };
+  stl: {
+    data: string | ArrayBuffer;
+  };
+
   union: React.PropsWithChildren<unknown>;
   difference: React.PropsWithChildren<unknown>;
   intersection: React.PropsWithChildren<unknown>;
@@ -116,8 +130,9 @@ export type HostContext = unknown;
 export type Type = keyof ElementProps;
 export type Props<T extends Type = Type> = ElementProps[T];
 export interface Instance<T extends Type = Type> {
+  core: ReactCADCore;
   type: T;
-  node: ReactCADNode;
+  node: ReactCADNodeTypes[T];
 }
 export type TextInstance = Instance;
 export type HydratableInstance = never;

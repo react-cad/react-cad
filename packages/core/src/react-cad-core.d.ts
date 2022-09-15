@@ -123,6 +123,20 @@ export class ReactCADHelixNode extends ReactCADSweepNode {
   public setProps(props: HelixProps): void;
 }
 
+// Imports
+export class ReactCADImportNode extends ReactCADNode {
+  public setFilename(src: string, ownFile: boolean): void;
+  public getFilename(): string;
+}
+
+export class ReactCADBRepImportNode extends ReactCADImportNode {}
+
+export class ReactCADSTEPImportNode extends ReactCADImportNode {}
+
+export class ReactCADSTLImportNode extends ReactCADImportNode {}
+
+export class ReactCADObjImportNode extends ReactCADImportNode {}
+
 // Transformations
 export interface TranslationProps {
   x: number;
@@ -147,6 +161,29 @@ export class ReactCADScaleNode extends ReactCADNode {
   public setProps(props: ScaleProps): void;
 }
 
+export interface ReactCADNodeTypes {
+  box: ReactCADBoxNode;
+  cone: ReactCADConeNode;
+  cylinder: ReactCADCylinderNode;
+  polyhedron: ReactCADPolyhedronNode;
+  sphere: ReactCADSphereNode;
+  torus: ReactCADTorusNode;
+  wedge: ReactCADWedgeNode;
+  difference: ReactCADNode;
+  intersection: ReactCADNode;
+  union: ReactCADNode;
+  helix: ReactCADHelixNode;
+  prism: ReactCADPrismNode;
+  revolution: ReactCADRevolutionNode;
+  brep: ReactCADBRepImportNode;
+  step: ReactCADSTEPImportNode;
+  stl: ReactCADSTLImportNode;
+  obj: ReactCADObjImportNode;
+  rotation: ReactCADRotationNode;
+  scale: ReactCADScaleNode;
+  translation: ReactCADTranslationNode;
+}
+
 export interface ReactCADCore extends EmscriptenModule {
   ReactCADNode: typeof ReactCADNode;
   ReactCADView: typeof ReactCADView;
@@ -162,7 +199,9 @@ export interface ReactCADCore extends EmscriptenModule {
     FRONT: Viewpoint;
     BACK: Viewpoint;
   };
-  createCADNode(type: string): ReactCADNode;
+  createCADNode<T extends keyof ReactCADNodeTypes = "union">(
+    type: T
+  ): ReactCADNodeTypes[T];
   render(node: ReactCADNode, reset = false): void;
   // setColor(color: string): void;
   zoom(delta: number): void;
@@ -194,6 +233,11 @@ export interface ReactCADCore extends EmscriptenModule {
     ): Uint8Array;
     readFile(path: string, opts: { encoding: "utf8"; flags?: string }): string;
     readFile(path: string, opts?: { flags?: string }): Uint8Array;
+    writeFile(
+      path: string,
+      data: string | ArrayBufferView,
+      opts?: { flags?: string }
+    ): void;
     unlink(path: string): void;
   };
   _shutdown(): void;

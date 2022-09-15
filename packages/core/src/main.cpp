@@ -25,6 +25,13 @@
 #include "HelixNode.hpp"
 #include "PrismNode.hpp"
 #include "RevolutionNode.hpp"
+#include "SweepNode.hpp"
+
+#include "BRepImportNode.hpp"
+#include "ImportNode.hpp"
+#include "ObjImportNode.hpp"
+#include "STEPImportNode.hpp"
+#include "STLImportNode.hpp"
 
 #include "RotationNode.hpp"
 #include "ScaleNode.hpp"
@@ -112,6 +119,22 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "union")
   {
     return std::make_shared<UnionNode>();
+  }
+  if (type == "brep")
+  {
+    return std::make_shared<BRepImportNode>();
+  }
+  if (type == "step")
+  {
+    return std::make_shared<STEPImportNode>();
+  }
+  if (type == "obj")
+  {
+    return std::make_shared<ObjImportNode>();
+  }
+  if (type == "stl")
+  {
+    return std::make_shared<STLImportNode>();
   }
 
   return std::make_shared<BoxNode>();
@@ -439,6 +462,24 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
       .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
       .function("setProps", &HelixNode::setProps);
+
+  // Imports
+  emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
+      .smart_ptr<std::shared_ptr<ImportNode>>("ReactCADImportNode")
+      .function("setFilename", &ImportNode::setFilename)
+      .function("getFilename", &ImportNode::getFilename);
+
+  emscripten::class_<BRepImportNode, emscripten::base<ImportNode>>("ReactCADBRepImportNode")
+      .smart_ptr<std::shared_ptr<BRepImportNode>>("ReactCADBRepImportNode");
+
+  emscripten::class_<STEPImportNode, emscripten::base<ImportNode>>("ReactCADSTEPImportNode")
+      .smart_ptr<std::shared_ptr<STEPImportNode>>("ReactCADSTEPImportNode");
+
+  emscripten::class_<STLImportNode, emscripten::base<ImportNode>>("ReactCADSTLImportNode")
+      .smart_ptr<std::shared_ptr<STLImportNode>>("ReactCADSTLImportNode");
+
+  emscripten::class_<ObjImportNode, emscripten::base<ImportNode>>("ReactCADObjImportNode")
+      .smart_ptr<std::shared_ptr<ObjImportNode>>("ReactCADObjImportNode");
 
   // Transformations
   emscripten::value_object<TranslationProps>("TranslationProps")

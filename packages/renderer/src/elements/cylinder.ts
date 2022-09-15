@@ -1,4 +1,4 @@
-import { ReactCADCylinderNode, CylinderProps } from "@react-cad/core";
+import { CylinderProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Cylinder = "cylinder";
@@ -49,5 +49,5 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADCylinderNode).setProps(props);
+  instance.node.setProps(props);
 }

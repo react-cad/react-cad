@@ -1,4 +1,4 @@
-import { ReactCADRotationNode, RotationProps } from "@react-cad/core";
+import { RotationProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Rotation = "rotation";
@@ -37,5 +37,6 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADRotationNode).setProps(props);
+
+  instance.node.setProps(props);
 }

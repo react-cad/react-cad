@@ -1,4 +1,4 @@
-import { ReactCADScaleNode, ScaleProps } from "@react-cad/core";
+import { ScaleProps } from "@react-cad/core";
 
 import { Props, Instance, UpdatePayload } from "../types";
 
@@ -33,5 +33,6 @@ export function commitUpdate(
     },
     updatePayload
   );
-  (instance.node as ReactCADScaleNode).setProps(props);
+
+  instance.node.setProps(props);
 }

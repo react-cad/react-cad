@@ -1,4 +1,4 @@
-import { ReactCADPrismNode, PrismProps, Point } from "@react-cad/core";
+import { PrismProps, Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Prism = "prism";
@@ -51,12 +51,12 @@ export function commitUpdate(
     },
     prismProps
   );
-  const prism = instance.node as ReactCADPrismNode;
 
   if (typeof profile === "string") {
-    prism.setSVGProfile(profile);
+    instance.node.setSVGProfile(profile);
   } else {
-    prism.setProfile(profile?.length > 2 ? profile : defaultProfile);
+    instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
   }
-  prism.setProps(props);
+
+  instance.node.setProps(props);
 }
