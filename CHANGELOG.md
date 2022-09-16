@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/react-cad/react-cad/compare/v0.9.0...v0.10.0) (2022-09-16)
+
+
+### Features
+
+* add affine transformation component ([41c0652](https://github.com/react-cad/react-cad/commit/41c06521ab5253d0e67072372291d8c8bf865f7d))
+* add mirror component ([9422634](https://github.com/react-cad/react-cad/commit/9422634a53124b1a4587e04e764b556e2ffb86c6))
+* finish rotation api ([beea23c](https://github.com/react-cad/react-cad/commit/beea23c489a01541b4897a9f75ea1536bf74d233))
+* finish scale component api ([db53d44](https://github.com/react-cad/react-cad/commit/db53d446337181cff3eb011bbfc91119e5100f25))
+* use euler angles for rotation ([29540ef](https://github.com/react-cad/react-cad/commit/29540eff622f2b0d361fe3e71b48d424772fc26d))
+
+
+
+
+
 # [0.9.0](https://github.com/react-cad/react-cad/compare/v0.8.0...v0.9.0) (2022-09-15)
 
 
