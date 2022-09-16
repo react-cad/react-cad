@@ -11,9 +11,16 @@ export class ReactCADNode extends EmClass {
 
 export type Vector = [number, number, number];
 export type Point = [number, number, number];
+export type Quaternion = [number, number, number, number];
 export type Polygon = Point[];
 export type Profile = Polygon | string;
-export type Axis = "x" | "y" | "z";
+export type AxisName = "x" | "y" | "z";
+export type Matrix = [
+  [number, number, number, number],
+  [number, number, number, number],
+  [number, number, number, number],
+  [0, 0, 0, 1],
+];
 
 export type Projection = number & { _opaque: typeof Projection };
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
@@ -147,18 +154,21 @@ export class ReactCADTranslationNode extends ReactCADNode {
   public setProps(props: TranslationProps): void;
 }
 
-export interface RotationProps {
-  axis: Axis;
-  angle: number;
+export class ReactCADMirrorNode extends ReactCADNode {
+  public setPlane(origin: Point, normal: Vector): void;
+}
+export class ReactCADAffineNode extends ReactCADNode {
+  public setMatrix(matrix: Matrix): void;
 }
 export class ReactCADRotationNode extends ReactCADNode {
-  public setProps(props: RotationProps): void;
-}
-export interface ScaleProps {
-  factor: number;
+  public setAxisAngle(direction: Vector, angle: number): void;
+  public setEulerAngles(x: number, y: number, z: number): void;
+  public setRotation(quaternion: Quaternion): void;
 }
 export class ReactCADScaleNode extends ReactCADNode {
-  public setProps(props: ScaleProps): void;
+  public setCenter(center: Point): void;
+  public setScaleFactor(scaleFactor: number): void;
+  public setScale(scale: Vector): void;
 }
 
 export interface ReactCADNodeTypes {
@@ -179,6 +189,8 @@ export interface ReactCADNodeTypes {
   step: ReactCADSTEPImportNode;
   stl: ReactCADSTLImportNode;
   obj: ReactCADObjImportNode;
+  affine: ReactCADAffineNode;
+  mirror: ReactCADMirrorNode;
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;

@@ -1,11 +1,12 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
+import { Point } from "@react-cad/core";
 
 type Props = JSX.IntrinsicElements["scale"];
 
 export const Scale: React.FC<Props> = (props) => (
   <scale {...props}>
-    <box center x={1} y={1} z={1} />
+    <box x={1} y={1} z={1} />
   </scale>
 );
 
@@ -22,13 +23,54 @@ export default {
   title: "Transformations/Scale",
   component: Scale,
   argTypes: {
+    useScaleFactor: {
+      options: [true, false],
+      name: "use",
+      control: {
+        type: "inline-radio",
+        labels: {
+          true: "scale factor",
+          false: "separate scale per axis",
+        },
+      },
+    },
     factor: range,
+    x: range,
+    y: range,
+    z: range,
   },
 } as Meta;
 
-const Template: Story<Props> = (args) => <Scale {...args} />;
+interface StoryProps {
+  center: Point;
+  useScaleFactor: boolean;
+  factor: number;
+  x: number;
+  y: number;
+  z: number;
+}
+
+const Template: Story<StoryProps> = ({
+  center,
+  useScaleFactor,
+  factor,
+  x,
+  y,
+  z,
+}) => {
+  if (useScaleFactor) {
+    return <Scale factor={factor} center={center} />;
+  } else {
+    return <Scale x={x} y={y} z={z} center={center} />;
+  }
+};
 
 export const scale = Template.bind({});
 scale.args = {
+  useScaleFactor: true,
   factor: 1,
+  x: 1,
+  y: 1,
+  z: 1,
+  center: [0, 0, 0],
 };

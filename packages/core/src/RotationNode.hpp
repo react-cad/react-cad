@@ -3,23 +3,33 @@
 
 #include <string>
 
-#include "TransformationNode.hpp"
+#include <Standard_Real.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Quaternion.hxx>
+#include <gp_Trsf.hxx>
 
-struct RotationProps
-{
-  std::string axis;
-  double angle;
-};
+#include "Geometry.hpp"
+#include "ReactCADNode.hpp"
 
-class RotationNode : public TransformationNode
+class RotationNode : public ReactCADNode
 {
 public:
   RotationNode();
   virtual ~RotationNode();
-  void setProps(const RotationProps &props);
+  void setAxisAngle(Vector direction, Standard_Real angle);
+  void setEulerAngles(Standard_Real xAngle, Standard_Real yAngle, Standard_Real zAngle);
+  void setRotation(Quaternion quaternion);
+
+protected:
+  void computeShape() override;
 
 private:
-  RotationProps m_props;
+  void setTransform();
+  void setDirectionAngle(gp_Dir direction, Standard_Real angle);
+  Standard_Real m_angle;
+  gp_Dir m_axis;
+  gp_Quaternion m_quaternion;
+  gp_Trsf m_transform;
 };
 
 #endif

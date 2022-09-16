@@ -16,9 +16,8 @@
   },
   "license": "LGPL-2.1-only",
   "scripts": {
-    "start": "nps",
-    "build:ts-only": "nps ts.build",
-    "build": "nps build",
+    "start": "docker-compose up",
+    "build": "docker-compose run --rm react_cad_core -b /react-cad-build -s /react-cad/src -d /react-cad -f ci",
     "version": "echo DOCKER_TAG=\\\"v$npm_package_version\\\" > .env && git add .env"
   },
   "publishConfig": {

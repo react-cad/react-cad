@@ -2,3 +2,4 @@
 *
 !.npmignore
 !.gitignore
+!react-cad-core.d.ts
