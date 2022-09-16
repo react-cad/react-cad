@@ -1,6 +1,6 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Axis, Polygon, Point } from "@react-cad/core";
+import { AxisName, Polygon, Point } from "@react-cad/core";
 
 type Props = JSX.IntrinsicElements["revolution"];
 
@@ -51,7 +51,7 @@ export default {
 
 interface StoryProps {
   profileName: keyof typeof profiles;
-  axis: Axis;
+  axis: AxisName;
   angle: number;
 }
 

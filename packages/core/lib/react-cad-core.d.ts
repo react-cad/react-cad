@@ -107,7 +107,7 @@ export class ReactCADSweepNode extends ReactCADNode {
 }
 
 export interface RevolutionProps {
-  axis: Axis;
+  axis: AxisName;
   angle: number;
 }
 export class ReactCADRevolutionNode extends ReactCADSweepNode {
@@ -115,11 +115,18 @@ export class ReactCADRevolutionNode extends ReactCADSweepNode {
 }
 
 export interface PrismProps {
-  axis: Axis;
+  axis: AxisName;
   height: number;
 }
 export class ReactCADPrismNode extends ReactCADSweepNode {
   public setProps(props: PrismProps): void;
+}
+
+export class ReactCADEvolutionNode extends ReactCADNode {
+  public setProfile(profile: Point[]): void;
+  public setProfileSVG(pathData: string): void;
+  public setSpine(spine: Point[]): void;
+  public setSpineSVG(pathData: string): void;
 }
 
 export interface HelixProps {
@@ -184,6 +191,7 @@ export interface ReactCADNodeTypes {
   union: ReactCADNode;
   helix: ReactCADHelixNode;
   prism: ReactCADPrismNode;
+  evolution: ReactCADEvolutionNode;
   revolution: ReactCADRevolutionNode;
   brep: ReactCADBRepImportNode;
   step: ReactCADSTEPImportNode;

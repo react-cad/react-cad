@@ -22,6 +22,7 @@
 #include "IntersectionNode.hpp"
 #include "UnionNode.hpp"
 
+#include "EvolutionNode.hpp"
 #include "HelixNode.hpp"
 #include "PrismNode.hpp"
 #include "RevolutionNode.hpp"
@@ -89,6 +90,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "polyhedron")
   {
     return std::make_shared<PolyhedronNode>();
+  }
+  if (type == "evolution")
+  {
+    return std::make_shared<EvolutionNode>();
   }
   if (type == "prism")
   {
@@ -473,6 +478,13 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
       .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
       .function("setProps", &PrismNode::setProps);
+
+  emscripten::class_<EvolutionNode, emscripten::base<ReactCADNode>>("ReactCADEvolutionNode")
+      .smart_ptr<std::shared_ptr<EvolutionNode>>("ReactCADEvolutionNode")
+      .function("setProfile", &EvolutionNode::setProfile)
+      .function("setProfileSVG", &EvolutionNode::setProfileSVG)
+      .function("setSpine", &EvolutionNode::setSpine)
+      .function("setSpineSVG", &EvolutionNode::setSpineSVG);
 
   emscripten::value_object<RevolutionProps>("RevolutionProps")
       .field("axis", &RevolutionProps::axis)

@@ -72,6 +72,10 @@ export interface ReactCADElements {
     faces: number[][];
   };
 
+  evolution: {
+    profile: Profile;
+    spine: Point[] | string;
+  };
   prism: {
     profile: Profile;
     axis: AxisName;

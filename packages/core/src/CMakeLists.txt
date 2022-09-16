@@ -54,6 +54,7 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s USE_PTHREADS \
   -s EXPORT_NAME=reactCad \
   -s OFFSCREEN_FRAMEBUFFER=1 \
+  -s NO_DISABLE_EXCEPTION_CATCHING \
 ")
 
 add_custom_command(
