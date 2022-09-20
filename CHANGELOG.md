@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/react-cad/react-cad/compare/v0.10.0...v0.11.0) (2022-09-20)
+
+
+### Features
+
+* add evolved solid component ([5b94e5a](https://github.com/react-cad/react-cad/commit/5b94e5ad3417f7d74ecee8863b77d479bc64b436))
+
+
+
+
+
 # [0.10.0](https://github.com/react-cad/react-cad/compare/v0.9.0...v0.10.0) (2022-09-16)
 
 
