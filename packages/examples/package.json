@@ -6,6 +6,7 @@
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.12.10",
+    "@react-cad/core": "^0.10.0",
     "@react-cad/renderer": "^0.10.0",
     "@react-cad/storybook-framework": "^0.10.0",
     "@storybook/addon-actions": "^6.5.10",

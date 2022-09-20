@@ -284,6 +284,16 @@ void ReactCADView::showAxes(bool show)
 {
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
+
+  if (show)
+  {
+    myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.1, V3d_WIREFRAME);
+  }
+  else
+  {
+    myView->TriedronErase();
+  }
+
   myView->Invalidate();
   updateView();
 }

@@ -4,20 +4,24 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
+#include <BRepLib.hxx>
 #include <BRep_Builder.hxx>
-#include <GCE2d_MakeSegment.hxx>
-#include <GeomConvert.hxx>
-#include <GeomConvert_CompCurveToBSplineCurve.hxx>
+#include <Geom2dConvert.hxx>
+#include <Geom2dConvert_CompCurveToBSplineCurve.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <Geom_BezierCurve.hxx>
 #include <Geom_Plane.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Compound.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Vec.hxx>
 
 #include <string.h>
 
-#define NANOSVG_IMPLEMENTATION
-#include <nanosvg.h>
+#include "SVGImage.hpp"
 
 SweepNode::SweepNode()
 {
@@ -54,44 +58,35 @@ void SweepNode::makeProfileFromSVG()
 
   wires.clear();
 
-  Handle(Geom_Surface) plane = new Geom_Plane(gp::Origin(), gp::DZ());
+  SVGImage image(m_svg);
 
-  char *tmp = strdup(m_svg.c_str());
-  struct NSVGimage *image = nsvgParse(tmp, "px", 96);
-  free(tmp);
-  NSVGshape *svgShape = nullptr;
-  NSVGpath *svgPath = nullptr;
+  Handle(Geom_Plane) surface = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()));
 
-  for (svgShape = image->shapes; svgShape != NULL; svgShape = svgShape->next)
+  for (auto shape = image.begin(); shape != image.end(); ++shape)
   {
     std::vector<TopoDS_Wire> positivePaths;
     std::vector<TopoDS_Wire> negativePaths;
 
-    for (svgPath = svgShape->paths; svgPath != NULL; svgPath = svgPath->next)
+    for (auto path = shape.begin(); path != shape.end(); ++path)
     {
-
-      GeomConvert_CompCurveToBSplineCurve curve;
       int orientation = 0;
+      Geom2dConvert_CompCurveToBSplineCurve pathCurve;
 
-      for (int i = 0; i < svgPath->npts - 1; i += 3)
+      for (auto curve = path.begin(); curve != path.end(); ++curve)
       {
-        float *p = &svgPath->pts[i * 2];
+        Handle(Geom2d_Curve) c = curve;
+        if (!c.IsNull())
+        {
+          Handle(Geom2d_BSplineCurve) bspline = Geom2dConvert::CurveToBSplineCurve(curve);
+          pathCurve.Add(bspline, 1.0e-6, Standard_True);
 
-        NCollection_Array1<gp_Pnt> poles(0, 3);
-        poles.SetValue(0, gp_Pnt(p[0], -p[1], 0));
-        poles.SetValue(1, gp_Pnt(p[2], -p[3], 0));
-        poles.SetValue(2, gp_Pnt(p[4], -p[5], 0));
-        poles.SetValue(3, gp_Pnt(p[6], -p[7], 0));
-
-        orientation += (p[6] - p[0]) * (-p[7] + -p[1]);
-
-        Handle(Geom_Curve) bezier = new Geom_BezierCurve(poles);
-        Handle(Geom_BSplineCurve) bspline = GeomConvert::CurveToBSplineCurve(bezier);
-        curve.Add(bspline, 0.01);
+          orientation += curve.orientation();
+        }
       }
 
-      BRepBuilderAPI_MakeEdge edge(curve.BSplineCurve());
+      BRepBuilderAPI_MakeEdge edge(pathCurve.BSplineCurve(), surface);
       BRepBuilderAPI_MakeWire wire(edge);
+      BRepLib::BuildCurves3d(wire);
 
       if (orientation >= 0)
       {
@@ -105,7 +100,6 @@ void SweepNode::makeProfileFromSVG()
 
     wires.push_back(ShapeWires(positivePaths, negativePaths));
   }
-  nsvgDelete(image);
 
   m_svgChanged = false;
 
@@ -156,14 +150,15 @@ void SweepNode::makeProfileFromPoints()
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : m_points)
   {
-    polygon.Add(gp_Pnt(point.x, point.y, point.z));
+    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z));
+    polygon.Add(vertex);
   }
   polygon.Close();
 
   std::vector<TopoDS_Wire> positivePaths;
   std::vector<TopoDS_Wire> negativePaths;
 
-  positivePaths.push_back(polygon);
+  positivePaths.push_back(polygon.Wire());
 
   wires.push_back(ShapeWires(positivePaths, negativePaths));
 

@@ -10,6 +10,7 @@ import * as polyhedron from "./polyhedron";
 
 import * as helix from "./helix";
 import * as prism from "./prism";
+import * as evolution from "./evolution";
 import * as revolution from "./revolution";
 
 import * as affine from "./affine";
@@ -35,6 +36,7 @@ const elements: Record<Type, Element> = {
 
   helix,
   prism,
+  evolution,
   revolution,
 
   affine,

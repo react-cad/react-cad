@@ -1,19 +1,12 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Axis, Point, Profile } from "@react-cad/core";
+import { AxisName, Profile } from "@react-cad/core";
 
 import reactIcon from "./react-icon";
 
-type Props = JSX.IntrinsicElements["prism"];
+import { makePolygon } from "./helpers";
 
-function makePolygon(sides: number) {
-  return [...Array(sides)].map(
-    (_, i): Point => {
-      const theta = (i / sides) * 2 * Math.PI;
-      return [Math.sin(theta), Math.cos(theta), 0];
-    }
-  );
-}
+type Props = JSX.IntrinsicElements["prism"];
 
 const profiles: Record<string, Profile> = {
   Triangle: makePolygon(3),
@@ -56,7 +49,7 @@ export default {
 
 interface StoryProps {
   profileName: keyof typeof profiles;
-  axis: Axis;
+  axis: AxisName;
   height: number;
 }
 
