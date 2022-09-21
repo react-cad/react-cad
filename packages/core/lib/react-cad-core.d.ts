@@ -118,8 +118,10 @@ export interface PrismProps {
   axis: AxisName;
   height: number;
 }
-export class ReactCADPrismNode extends ReactCADSweepNode {
+export class ReactCADPrismNode extends ReactCADNode {
   public setProps(props: PrismProps): void;
+  public setProfile(profile: Point[]): void;
+  public setProfileSVG(pathData: string): void;
 }
 
 export class ReactCADEvolutionNode extends ReactCADNode {

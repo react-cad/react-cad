@@ -6,7 +6,6 @@
 #include <BRepOffsetAPI_MakeEvolved.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
-#include <Message.hxx>
 #include <ShapeFix_Shape.hxx>
 #include <ShapeFix_Wireframe.hxx>
 #include <TopoDS.hxx>
@@ -19,7 +18,6 @@
 #include <gp_Quaternion.hxx>
 
 #include <BRepTools.hxx>
-#include <Message.hxx>
 
 #include <math.h>
 

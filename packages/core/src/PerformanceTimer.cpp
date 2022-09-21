@@ -4,7 +4,6 @@
 #include <string>
 
 #include <Message.hxx>
-#include <Message_Messenger.hxx>
 
 PerformanceTimer::PerformanceTimer(std::string name) : name(name)
 {

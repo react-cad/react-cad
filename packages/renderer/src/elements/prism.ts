@@ -53,7 +53,7 @@ export function commitUpdate(
   );
 
   if (typeof profile === "string") {
-    instance.node.setSVGProfile(profile);
+    instance.node.setProfileSVG(profile);
   } else {
     instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
   }

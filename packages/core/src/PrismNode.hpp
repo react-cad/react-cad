@@ -9,17 +9,21 @@ struct PrismProps
   double height;
 };
 
-class PrismNode : public SweepNode
+class PrismNode : public ReactCADNode
 {
 public:
   PrismNode();
   virtual ~PrismNode();
   void setProps(const PrismProps &props);
+  void setProfile(const std::vector<Point> &points);
+  void setProfileSVG(const std::string &svg);
 
 protected:
   void computeShape() override;
 
 private:
+  TopoDS_Shape m_profile;
+  Standard_Boolean m_profileChanged;
   double m_sectionHeight;
   PrismProps m_props;
   bool m_heightChanged = false;

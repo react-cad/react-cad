@@ -5,6 +5,7 @@
 #include <Geom2d_BezierCurve.hxx>
 #include <Geom2d_BoundedCurve.hxx>
 #include <NCollection_Array1.hxx>
+#include <Standard_Transient.hxx>
 #include <gp_Pnt2d.hxx>
 
 #include <limits>
@@ -21,7 +22,7 @@
 
 #include <nanosvg.h>
 
-class SVGImage
+class SVGImage : public Standard_Transient
 {
 public:
   SVGImage(const std::string &svg);
@@ -44,26 +45,10 @@ public:
 
     SVGBezierCurve(pointer ptr) : m_ptr(ptr){};
 
-    reference operator*() const
-    {
-      return *m_ptr;
-    }
-    pointer operator->()
-    {
-      return m_ptr;
-    }
-
     SVGBezierCurve &operator++()
     {
       m_ptr += 6;
       return *this;
-    }
-
-    SVGBezierCurve operator++(int)
-    {
-      SVGBezierCurve tmp = *this;
-      ++(*this);
-      return tmp;
     }
 
     friend bool operator==(const SVGBezierCurve &a, const SVGBezierCurve &b)

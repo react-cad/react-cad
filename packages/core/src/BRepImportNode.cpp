@@ -2,7 +2,6 @@
 
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
-#include <Message.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <string>

@@ -475,9 +475,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::value_object<PrismProps>("PrismProps")
       .field("axis", &PrismProps::axis)
       .field("height", &PrismProps::height);
-  emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
+  emscripten::class_<PrismNode, emscripten::base<ReactCADNode>>("ReactCADPrismNode")
       .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
-      .function("setProps", &PrismNode::setProps);
+      .function("setProps", &PrismNode::setProps)
+      .function("setProfile", &PrismNode::setProfile)
+      .function("setProfileSVG", &PrismNode::setProfileSVG);
 
   emscripten::class_<EvolutionNode, emscripten::base<ReactCADNode>>("ReactCADEvolutionNode")
       .smart_ptr<std::shared_ptr<EvolutionNode>>("ReactCADEvolutionNode")

@@ -1,5 +1,6 @@
 #include <BRepBuilderAPI_GTransform.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 
 #include <gp_Ax2.hxx>
@@ -7,9 +8,11 @@
 
 #include "PerformanceTimer.hpp"
 #include "PrismNode.hpp"
+#include "SVGBuilder.hpp"
+#include "SVGImage.hpp"
 #include "operations.hpp"
 
-PrismNode::PrismNode() : m_props({.axis = "z", .height = 1}), m_sectionHeight(1)
+PrismNode::PrismNode() : m_props({.axis = "z", .height = 1}), m_sectionHeight(1), m_profileChanged(Standard_True)
 {
 }
 
@@ -36,79 +39,61 @@ void PrismNode::setProps(const PrismProps &props)
   }
 }
 
-void PrismNode::computeSection()
+void PrismNode::setProfile(const std::vector<Point> &points)
+{
+  BRepBuilderAPI_MakePolygon polygon;
+  for (auto point : points)
+  {
+    polygon.Add(gp_Pnt(point.x, point.y, point.z));
+  }
+  polygon.Close();
+  BRepBuilderAPI_MakeFace face(polygon);
+  m_profile = face;
+  propsChanged();
+  m_profileChanged = Standard_True;
+}
+
+void PrismNode::setProfileSVG(const std::string &svg)
 {
   PerformanceTimer timer1("Compute profile");
-  makeProfile();
+  SVGImage image(svg);
+  SVGBuilder builder(image);
+  m_profile = builder.Shape();
+  propsChanged();
+  m_profileChanged = Standard_True;
   timer1.end();
+}
 
-  if (m_profileChanged || m_axisChanged)
+void PrismNode::computeSection()
+{
+  PerformanceTimer timer2("Compute prism section");
+  m_sectionHeight = m_props.height;
+
+  gp_Vec axis;
+
+  if (m_props.axis == "x")
   {
-    PerformanceTimer timer2("Compute prism section");
-    m_sectionHeight = m_props.height;
-
-    gp_Vec axis;
-
-    if (m_props.axis == "x")
-    {
-      axis.SetX(m_sectionHeight);
-    }
-    if (m_props.axis == "y")
-    {
-      axis.SetY(m_sectionHeight);
-    }
-    if (m_props.axis == "z")
-    {
-      axis.SetZ(m_sectionHeight);
-    }
-
-    BRep_Builder builder;
-    TopoDS_Compound compound;
-    builder.MakeCompound(compound);
-
-    std::vector<ShapeWires>::iterator it;
-    for (it = wires.begin(); it != wires.end(); ++it)
-    {
-      BRep_Builder positiveBuilder;
-      TopoDS_Compound positiveCompound;
-      positiveBuilder.MakeCompound(positiveCompound);
-
-      BRep_Builder negativeBuilder;
-      TopoDS_Compound negativeCompound;
-      negativeBuilder.MakeCompound(negativeCompound);
-
-      for (std::vector<TopoDS_Wire>::iterator pos = it->first.begin(); pos != it->first.end(); ++pos)
-      {
-        BRepBuilderAPI_MakeFace face(*pos);
-        positiveBuilder.Add(positiveCompound, face);
-      }
-      BRepPrimAPI_MakePrism prism(positiveCompound, axis);
-
-      if (it->second.size() == 0)
-      {
-        builder.Add(compound, prism);
-      }
-      else
-      {
-        for (std::vector<TopoDS_Wire>::iterator neg = it->second.begin(); neg != it->second.end(); ++neg)
-        {
-          BRepBuilderAPI_MakeFace face(*neg);
-          negativeBuilder.Add(negativeCompound, face);
-        }
-        BRepPrimAPI_MakePrism negativePrism(negativeCompound, axis);
-        builder.Add(compound, differenceOp(prism, negativePrism));
-      }
-    }
-
-    m_section = compound;
-
-    m_profileChanged = false;
-    m_axisChanged = false;
-    m_heightChanged = false;
-
-    m_sectionChanged = true;
-    timer2.end();
+    axis.SetX(m_sectionHeight);
   }
+  if (m_props.axis == "y")
+  {
+    axis.SetY(m_sectionHeight);
+  }
+  if (m_props.axis == "z")
+  {
+    axis.SetZ(m_sectionHeight);
+  }
+
+  BRepPrimAPI_MakePrism prism(m_profile, axis);
+
+  m_section = prism;
+
+  m_profileChanged = false;
+  m_axisChanged = false;
+  m_heightChanged = false;
+
+  m_sectionChanged = true;
+  timer2.end();
 }
 
 void PrismNode::computeShape()
