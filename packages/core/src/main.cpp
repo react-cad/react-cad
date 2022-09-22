@@ -470,16 +470,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
       .smart_ptr<std::shared_ptr<SweepNode>>("ReactCADSweepNode")
       .function("setProfile", &SweepNode::setProfile)
-      .function("setSVGProfile", &SweepNode::setSVGProfile);
+      .function("setProfileSVG", &SweepNode::setProfileSVG);
 
-  emscripten::value_object<PrismProps>("PrismProps")
-      .field("axis", &PrismProps::axis)
-      .field("height", &PrismProps::height);
-  emscripten::class_<PrismNode, emscripten::base<ReactCADNode>>("ReactCADPrismNode")
+  emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
       .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
-      .function("setProps", &PrismNode::setProps)
-      .function("setProfile", &PrismNode::setProfile)
-      .function("setProfileSVG", &PrismNode::setProfileSVG);
+      .function("setVector", &PrismNode::setVector);
 
   emscripten::class_<EvolutionNode, emscripten::base<ReactCADNode>>("ReactCADEvolutionNode")
       .smart_ptr<std::shared_ptr<EvolutionNode>>("ReactCADEvolutionNode")
@@ -500,9 +495,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::value_object<HelixProps>("HelixProps")
       .field("pitch", &HelixProps::pitch)
       .field("height", &HelixProps::height);
-  emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
+  emscripten::class_<HelixNode, emscripten::base<ReactCADNode>>("ReactCADHelixNode")
       .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
-      .function("setProps", &HelixNode::setProps);
+      .function("setProps", &HelixNode::setProps)
+      .function("setProfile", &HelixNode::setProfile)
+      .function("setProfileSVG", &HelixNode::setProfileSVG);
 
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")

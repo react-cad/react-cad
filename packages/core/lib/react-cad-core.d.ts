@@ -103,7 +103,7 @@ export class ReactCADPolyhedronNode extends ReactCADNode {
 // Sweeps
 export class ReactCADSweepNode extends ReactCADNode {
   public setProfile(path: Polygon): void;
-  public setSVGProfile(svg: string): void;
+  public setProfileSVG(svg: string): void;
 }
 
 export interface RevolutionProps {
@@ -116,29 +116,25 @@ export class ReactCADRevolutionNode extends ReactCADNode {
   public setProfileSVG(svg: string): void;
 }
 
-export interface PrismProps {
-  axis: AxisName;
-  height: number;
-}
-export class ReactCADPrismNode extends ReactCADNode {
-  public setProps(props: PrismProps): void;
-  public setProfile(profile: Point[]): void;
-  public setProfileSVG(pathData: string): void;
+export class ReactCADPrismNode extends ReactCADSweepNode {
+  public setVector(vector: Vector): void;
 }
 
 export class ReactCADEvolutionNode extends ReactCADNode {
   public setProfile(profile: Point[]): void;
   public setProfileSVG(pathData: string): void;
   public setSpine(spine: Point[]): void;
-  public setSpineSVG(pathData: string): void;
+  public setSpineSVG(svg: string): void;
 }
 
 export interface HelixProps {
   pitch: number;
   height: number;
 }
-export class ReactCADHelixNode extends ReactCADSweepNode {
+export class ReactCADHelixNode extends ReactCADNode {
   public setProps(props: HelixProps): void;
+  public setProfile(profile: Point[]): void;
+  public setProfileSVG(svg: string): void;
 }
 
 // Imports

@@ -77,9 +77,16 @@ export interface ReactCADElements {
   };
   prism: {
     profile: Profile;
-    axis: AxisName;
-    height: number;
-  };
+  } & (
+    | {
+        x?: number;
+        y?: number;
+        z?: number;
+      }
+    | {
+        vector: Vector;
+      }
+  );
   revolution: {
     profile: Profile;
     axis: AxisName;
