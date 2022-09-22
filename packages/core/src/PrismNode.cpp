@@ -17,10 +17,6 @@ PrismNode::PrismNode() : m_vector(0, 0, 1)
 {
 }
 
-PrismNode::~PrismNode()
-{
-}
-
 void PrismNode::setVector(Point point)
 {
   gp_Vec newVector(point.x, point.y, point.z);

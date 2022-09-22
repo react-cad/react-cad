@@ -20,67 +20,51 @@
 #include "PerformanceTimer.hpp"
 #include "operations.hpp"
 
-#include "SVGBuilder.hpp"
-#include "SVGImage.hpp"
-
-HelixNode::HelixNode() : m_props({.pitch = 0, .height = 0}), m_profile()
+HelixNode::HelixNode() : m_pitch(10), m_height(10)
 {
-  setProps({.pitch = 1, .height = 1});
 }
 
 HelixNode::~HelixNode()
 {
 }
 
-void HelixNode::setProps(const HelixProps &props)
+void HelixNode::setPitch(Standard_Real pitch)
 {
-  if (!doubleEquals(props.pitch, m_props.pitch) || !doubleEquals(props.height, m_props.height))
+  if (!IsEqual(pitch, m_pitch))
   {
-    m_props = props;
-
-    BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_props.height));
-    BRepBuilderAPI_MakeWire makeSpine(edge);
-    m_spine = makeSpine;
-
-    Standard_Real radius = 1.0;
-    Standard_Real circumference = 2 * M_PI * radius;
-    Standard_Real length = m_props.height * sqrt((m_props.pitch * m_props.pitch) + (circumference * circumference));
-
-    gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(circumference, m_props.pitch));
-    Handle_Geom2d_TrimmedCurve aSegment = GCE2d_MakeSegment(aLine2d, 0.0, length);
-
-    Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(gp::XOY(), radius);
-    TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length);
-    BRepLib::BuildCurve3d(aHelixEdge);
-
-    BRepBuilderAPI_MakeWire makeGuide(aHelixEdge);
-    m_guide = makeGuide;
-
+    m_pitch = pitch;
     propsChanged();
   }
 }
 
-void HelixNode::setProfile(const std::vector<Point> &points)
+void HelixNode::setHeight(Standard_Real height)
 {
-  BRepBuilderAPI_MakePolygon polygon;
-  for (auto point : points)
+  if (!IsEqual(height, m_height))
   {
-    polygon.Add(gp_Pnt(point.x, point.y, point.z));
+    m_height = height;
+    propsChanged();
   }
-  polygon.Close();
-  BRepBuilderAPI_MakeFace face(polygon);
-  m_profile = face;
-  propsChanged();
 }
 
-void HelixNode::setProfileSVG(const std::string &svg)
+void HelixNode::buildSpineAndGuide()
 {
-  PerformanceTimer timer1("Compute profile");
-  Handle(SVGImage) image = new SVGImage(svg);
-  SVGBuilder builder(image);
-  m_profile = builder.Shape();
-  propsChanged();
-  timer1.end();
+  BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_height));
+  BRepBuilderAPI_MakeWire makeSpine(edge);
+  m_spine = makeSpine;
+
+  Standard_Real radius = 1.0;
+  Standard_Real circumference = 2 * M_PI * radius;
+  Standard_Real length = m_height * sqrt((m_pitch * m_pitch) + (circumference * circumference));
+
+  gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(circumference, m_pitch));
+  Handle_Geom2d_TrimmedCurve aSegment = GCE2d_MakeSegment(aLine2d, 0.0, length);
+
+  Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(gp::XOY(), radius);
+  TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length);
+  BRepLib::BuildCurve3d(aHelixEdge);
+
+  BRepBuilderAPI_MakeWire makeGuide(aHelixEdge);
+  m_guide = makeGuide;
 }
 
 TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
@@ -98,6 +82,7 @@ TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
 void HelixNode::computeShape()
 {
   PerformanceTimer timer("Calculate helix");
+  buildSpineAndGuide();
 
   BRep_Builder builder;
   TopoDS_Compound compound;

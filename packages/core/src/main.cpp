@@ -483,23 +483,14 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("setSpine", &EvolutionNode::setSpine)
       .function("setSpineSVG", &EvolutionNode::setSpineSVG);
 
-  emscripten::value_object<RevolutionProps>("RevolutionProps")
-      .field("axis", &RevolutionProps::axis)
-      .field("angle", &RevolutionProps::angle);
-  emscripten::class_<RevolutionNode, emscripten::base<ReactCADNode>>("ReactCADRevolutionNode")
+  emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
       .smart_ptr<std::shared_ptr<RevolutionNode>>("ReactCADRevolutionNode")
-      .function("setProps", &RevolutionNode::setProps)
-      .function("setProfile", &RevolutionNode::setProfile)
-      .function("setProfileSVG", &RevolutionNode::setProfileSVG);
+      .function("setAxisAngle", &RevolutionNode::setAxisAngle);
 
-  emscripten::value_object<HelixProps>("HelixProps")
-      .field("pitch", &HelixProps::pitch)
-      .field("height", &HelixProps::height);
-  emscripten::class_<HelixNode, emscripten::base<ReactCADNode>>("ReactCADHelixNode")
+  emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
       .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
-      .function("setProps", &HelixNode::setProps)
-      .function("setProfile", &HelixNode::setProfile)
-      .function("setProfileSVG", &HelixNode::setProfileSVG);
+      .function("setPitch", &HelixNode::setPitch)
+      .function("setHeight", &HelixNode::setHeight);
 
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")

@@ -2,34 +2,25 @@
 #define RevolutionNode_HeaderFile
 
 #include "Geometry.hpp"
-#include "ReactCADNode.hpp"
+#include "SweepNode.hpp"
 
 #include <string>
 
 #include <TopoDS_Shape.hxx>
+#include <gp_Vec.hxx>
 
-struct RevolutionProps
-{
-  std::string axis;
-  double angle;
-};
-
-class RevolutionNode : public ReactCADNode
+class RevolutionNode : public SweepNode
 {
 public:
   RevolutionNode();
-  virtual ~RevolutionNode();
-  void setProps(const RevolutionProps &props);
-  void setProfile(const std::vector<Point> &points);
-  void setProfileSVG(const std::string &svg);
+  void setAxisAngle(Vector direction, Standard_Real angle);
 
 protected:
   void computeShape() override;
 
 private:
-  RevolutionProps m_props;
-  TopoDS_Shape m_profile;
-  Standard_Boolean m_profileChanged;
+  gp_Vec m_axis;
+  Standard_Real m_angle;
 };
 
 #endif

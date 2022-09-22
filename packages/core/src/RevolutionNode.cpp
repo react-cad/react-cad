@@ -1,6 +1,7 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
+#include <Precision.hxx>
 
 #include <StdFail_NotDone.hxx>
 
@@ -13,67 +14,28 @@
 #include "SVGImage.hpp"
 #include "operations.hpp"
 
-RevolutionNode::RevolutionNode()
-    : m_props({.axis = "z", .angle = 2 * M_PI}), m_profile(), m_profileChanged(Standard_False)
+RevolutionNode::RevolutionNode() : m_axis(0, 0, 1), m_angle(0)
 {
+  setAxisAngle({.x = 0, .y = 0, .z = 1}, M_PI);
 }
 
-RevolutionNode::~RevolutionNode()
+void RevolutionNode::setAxisAngle(Vector direction, Standard_Real angle)
 {
-}
+  gp_Vec newAxis(direction.x, direction.y, direction.z);
 
-void RevolutionNode::setProps(const RevolutionProps &props)
-{
-  if (props.axis != m_props.axis || !doubleEquals(props.angle, m_props.angle))
+  if (!IsEqual(angle, m_angle) || !newAxis.IsEqual(m_axis, Precision::Confusion(), Precision::Angular()))
   {
-    m_props = props;
+    m_angle = angle;
+    m_axis = newAxis;
     propsChanged();
   }
 }
 
-void RevolutionNode::setProfile(const std::vector<Point> &points)
-{
-  BRepBuilderAPI_MakePolygon polygon;
-  for (auto point : points)
-  {
-    polygon.Add(gp_Pnt(point.x, point.y, point.z));
-  }
-  polygon.Close();
-  BRepBuilderAPI_MakeFace face(polygon);
-  m_profile = face;
-  propsChanged();
-  m_profileChanged = Standard_True;
-}
-
-void RevolutionNode::setProfileSVG(const std::string &svg)
-{
-  PerformanceTimer timer1("Compute profile");
-  Handle(SVGImage) image = new SVGImage(svg);
-  SVGBuilder builder(image);
-  m_profile = builder.Shape();
-  propsChanged();
-  m_profileChanged = Standard_True;
-  timer1.end();
-}
-
 void RevolutionNode::computeShape()
 {
-  gp_Ax1 axis;
+  gp_Ax1 axis(gp::Origin(), m_axis);
 
-  if (m_props.axis == "x")
-  {
-    axis = gp::OX();
-  }
-  if (m_props.axis == "y")
-  {
-    axis = gp::OY();
-  }
-  if (m_props.axis == "z")
-  {
-    axis = gp::OZ();
-  }
-
-  double angle = fmin(fmax(m_props.angle, 0), 2 * M_PI);
+  Standard_Real angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
   try
   {

@@ -1,4 +1,4 @@
-import { HelixProps, Point } from "@react-cad/core";
+import { Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Helix = "helix";
@@ -44,14 +44,7 @@ export function commitUpdate(
   instance: Instance<Helix>,
   updatePayload: UpdatePayload<Helix>
 ): void {
-  const { profile, ...helixProps } = updatePayload;
-  const props: HelixProps = Object.assign(
-    {
-      pitch: 1,
-      height: 1,
-    },
-    helixProps
-  );
+  const { profile = defaultProfile, height = 10, pitch = 10 } = updatePayload;
 
   if (typeof profile === "string") {
     instance.node.setProfileSVG(profile);
@@ -59,5 +52,6 @@ export function commitUpdate(
     instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
   }
 
-  instance.node.setProps(props);
+  instance.node.setPitch(pitch);
+  instance.node.setHeight(height);
 }

@@ -4,7 +4,7 @@ import { Profile } from "@react-cad/core";
 
 import reactIcon from "./react-icon";
 
-import { makePolygon } from "./helpers";
+import { makePolygon, offsetPolygon, rotatePolygon } from "./helpers";
 
 type Props = JSX.IntrinsicElements["helix"];
 
@@ -32,7 +32,7 @@ export default {
     pitch: {
       control: {
         type: "range",
-        min: 1,
+        min: 10,
         max: 50,
         step: 5,
       },
@@ -68,6 +68,6 @@ export const helix = Template.bind({});
 helix.args = {
   profileName: "Square",
   rotated: false,
-  pitch: 5,
+  pitch: 10,
   height: 5,
 };

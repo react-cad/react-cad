@@ -10,7 +10,6 @@ class PrismNode : public SweepNode
 {
 public:
   PrismNode();
-  virtual ~PrismNode();
   void setVector(Point point);
 
 protected:

@@ -2,33 +2,27 @@
 #define HelixNode_HeaderFile
 
 #include "Geometry.hpp"
-#include "ReactCADNode.hpp"
+#include "SweepNode.hpp"
 
 #include <TopoDS_Wire.hxx>
 
-struct HelixProps
-{
-  double pitch;
-  double height;
-};
-
-class HelixNode : public ReactCADNode
+class HelixNode : public SweepNode
 {
 public:
   HelixNode();
   virtual ~HelixNode();
-  void setProps(const HelixProps &props);
-  void setProfile(const std::vector<Point> &points);
-  void setProfileSVG(const std::string &svg);
+  void setPitch(Standard_Real pitch);
+  void setHeight(Standard_Real height);
 
 protected:
   void computeShape() override;
 
 private:
-  HelixProps m_props;
-  bool m_pitchOrHeightChanged = false;
+  void buildSpineAndGuide();
 
-  TopoDS_Shape m_profile;
+  Standard_Real m_pitch;
+  Standard_Real m_height;
+
   TopoDS_Wire m_spine;
   TopoDS_Wire m_guide;
 

@@ -5,7 +5,6 @@ import {
   Profile,
   Point,
   ReactCADNodeTypes,
-  AxisName,
   Vector,
   Quaternion,
   Matrix,
@@ -89,7 +88,7 @@ export interface ReactCADElements {
   );
   revolution: {
     profile: Profile;
-    axis: AxisName;
+    axis: Vector;
     angle: number;
   };
   helix: {
