@@ -6,6 +6,7 @@
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <IntTools_Context.hxx>
+#include <Precision.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
@@ -185,7 +186,7 @@ Standard_Boolean SVGSubPath::IsInside(const Handle(SVGSubPath) & other)
 
   IntTools_Context intTools;
 
-  return intTools.IsPointInFace(point, other->m_face, 1.0e-6);
+  return intTools.IsPointInFace(point, other->m_face, Precision::Confusion());
 }
 
 SVGSubPath::Inspector::Inspector(const Target &thePath) : m_subpath(thePath)

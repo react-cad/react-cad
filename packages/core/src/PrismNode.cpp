@@ -56,7 +56,7 @@ void PrismNode::setProfile(const std::vector<Point> &points)
 void PrismNode::setProfileSVG(const std::string &svg)
 {
   PerformanceTimer timer1("Compute profile");
-  SVGImage image(svg);
+  Handle(SVGImage) image = new SVGImage(svg);
   SVGBuilder builder(image);
   m_profile = builder.Shape();
   propsChanged();

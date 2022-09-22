@@ -1,12 +1,20 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
 
+#include <StdFail_NotDone.hxx>
+
+#include <exception>
 #include <math.h>
 
+#include "PerformanceTimer.hpp"
 #include "RevolutionNode.hpp"
+#include "SVGBuilder.hpp"
+#include "SVGImage.hpp"
 #include "operations.hpp"
 
-RevolutionNode::RevolutionNode() : m_props({.axis = "z", .angle = 2 * M_PI})
+RevolutionNode::RevolutionNode()
+    : m_props({.axis = "z", .angle = 2 * M_PI}), m_profile(), m_profileChanged(Standard_False)
 {
 }
 
@@ -23,10 +31,33 @@ void RevolutionNode::setProps(const RevolutionProps &props)
   }
 }
 
+void RevolutionNode::setProfile(const std::vector<Point> &points)
+{
+  BRepBuilderAPI_MakePolygon polygon;
+  for (auto point : points)
+  {
+    polygon.Add(gp_Pnt(point.x, point.y, point.z));
+  }
+  polygon.Close();
+  BRepBuilderAPI_MakeFace face(polygon);
+  m_profile = face;
+  propsChanged();
+  m_profileChanged = Standard_True;
+}
+
+void RevolutionNode::setProfileSVG(const std::string &svg)
+{
+  PerformanceTimer timer1("Compute profile");
+  Handle(SVGImage) image = new SVGImage(svg);
+  SVGBuilder builder(image);
+  m_profile = builder.Shape();
+  propsChanged();
+  m_profileChanged = Standard_True;
+  timer1.end();
+}
+
 void RevolutionNode::computeShape()
 {
-  makeProfile();
-
   gp_Ax1 axis;
 
   if (m_props.axis == "x")
@@ -44,53 +75,13 @@ void RevolutionNode::computeShape()
 
   double angle = fmin(fmax(m_props.angle, 0), 2 * M_PI);
 
-  BRepBuilderAPI_MakeFace face(wires.at(0).first.at(0));
-  BRepPrimAPI_MakeRevol revolution(face, axis, angle);
-  shape = revolution;
-
-  return;
-
-  // WIP SVG support
-
-  BRep_Builder builder;
-  TopoDS_Compound compound;
-  builder.MakeCompound(compound);
-
-  std::vector<ShapeWires>::iterator it;
-  for (it = wires.begin(); it != wires.end(); ++it)
+  try
   {
-    BRep_Builder positiveBuilder;
-    TopoDS_Compound positiveCompound;
-    positiveBuilder.MakeCompound(positiveCompound);
-
-    BRep_Builder negativeBuilder;
-    TopoDS_Compound negativeCompound;
-    negativeBuilder.MakeCompound(negativeCompound);
-
-    for (std::vector<TopoDS_Wire>::iterator pos = it->first.begin(); pos != it->first.end(); ++pos)
-    {
-      BRepBuilderAPI_MakeFace face(*pos);
-      BRepPrimAPI_MakeRevol revolution(face, axis, angle);
-      shape = revolution;
-      return;
-      positiveBuilder.Add(positiveCompound, revolution);
-    }
-
-    if (it->second.size() == 0)
-    {
-      builder.Add(compound, positiveCompound);
-    }
-    else
-    {
-      for (std::vector<TopoDS_Wire>::iterator neg = it->second.begin(); neg != it->second.end(); ++neg)
-      {
-        BRepBuilderAPI_MakeFace face(*neg);
-        BRepPrimAPI_MakeRevol negativeRevolution(face, axis, angle);
-        negativeBuilder.Add(negativeCompound, negativeRevolution);
-      }
-      builder.Add(compound, differenceOp(positiveCompound, negativeCompound));
-    }
+    BRepPrimAPI_MakeRevol revolution(m_profile, axis, angle);
+    shape = revolution;
   }
-
-  shape = compound;
+  catch (const StdFail_NotDone &e)
+  {
+    shape = TopoDS_Solid();
+  }
 }

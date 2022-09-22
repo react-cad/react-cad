@@ -1,6 +1,8 @@
 #define NANOSVG_IMPLEMENTATION
 #include "SVGImage.hpp"
 
+#include <Precision.hxx>
+
 #include <cstring>
 #include <memory>
 
@@ -185,7 +187,8 @@ gp_Pnt2d SVGImage::SVGBezierCurve::p3()
 
 Standard_Boolean SVGImage::SVGBezierCurve::IsZeroLength()
 {
-  return p0().IsEqual(p1(), 1.0e-6) && p1().IsEqual(p2(), 1.0e-6) && p2().IsEqual(p3(), 1.0e-6);
+  return p0().IsEqual(p1(), Precision::Confusion()) && p1().IsEqual(p2(), Precision::Confusion()) &&
+         p2().IsEqual(p3(), Precision::Confusion());
 }
 
 constexpr Standard_Boolean SVGImage::SVGBezierCurve::floatEqual(float x, float y)

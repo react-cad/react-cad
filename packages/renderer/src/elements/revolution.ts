@@ -48,6 +48,10 @@ export function commitUpdate(
     revolutionProps
   );
 
-  instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  if (typeof profile === "string") {
+    instance.node.setProfileSVG(profile);
+  } else {
+    instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  }
   instance.node.setProps(props);
 }

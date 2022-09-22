@@ -2,7 +2,6 @@ import { Fiber } from "react-reconciler";
 import {
   ReactCADCore,
   ReactCADNode,
-  Polygon,
   Profile,
   Point,
   ReactCADNodeTypes,
@@ -82,7 +81,7 @@ export interface ReactCADElements {
     height: number;
   };
   revolution: {
-    profile: Polygon;
+    profile: Profile;
     axis: AxisName;
     angle: number;
   };

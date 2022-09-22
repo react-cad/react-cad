@@ -110,8 +110,10 @@ export interface RevolutionProps {
   axis: AxisName;
   angle: number;
 }
-export class ReactCADRevolutionNode extends ReactCADSweepNode {
+export class ReactCADRevolutionNode extends ReactCADNode {
   public setProps(props: RevolutionProps): void;
+  public setProfile(path: Polygon): void;
+  public setProfileSVG(svg: string): void;
 }
 
 export interface PrismProps {

@@ -1,4 +1,5 @@
 **/lib
+!packages/core/lib/react-cad-core.d.ts
 **/storybook-static
 **/react-cad-core.js
 **/react-cad-core.esm.js

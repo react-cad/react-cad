@@ -13,7 +13,7 @@ const profiles: Record<string, Profile> = {
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
-  SVG: reactIcon,
+  SVG: reactIcon([0, 0]),
 };
 
 export const Helix: React.FC<Props> = (props) => <helix {...props} />;

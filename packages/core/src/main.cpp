@@ -491,9 +491,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::value_object<RevolutionProps>("RevolutionProps")
       .field("axis", &RevolutionProps::axis)
       .field("angle", &RevolutionProps::angle);
-  emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
+  emscripten::class_<RevolutionNode, emscripten::base<ReactCADNode>>("ReactCADRevolutionNode")
       .smart_ptr<std::shared_ptr<RevolutionNode>>("ReactCADRevolutionNode")
-      .function("setProps", &RevolutionNode::setProps);
+      .function("setProps", &RevolutionNode::setProps)
+      .function("setProfile", &RevolutionNode::setProfile)
+      .function("setProfileSVG", &RevolutionNode::setProfileSVG);
 
   emscripten::value_object<HelixProps>("HelixProps")
       .field("pitch", &HelixProps::pitch)

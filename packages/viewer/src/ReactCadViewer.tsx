@@ -49,7 +49,7 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
     const [options, setOptions] = React.useState<ViewOptions>({
       showAxes: false,
       showGrid: true,
-      showWireframe: true,
+      showWireframe: false,
       showShaded: true,
       projection: "ORTHOGRAPHIC",
       detail: "LOW",

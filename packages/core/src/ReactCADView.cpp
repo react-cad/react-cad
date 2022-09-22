@@ -37,6 +37,8 @@
 #include <OpenGl_GraphicDriver.hxx>
 #include <Prs3d_DatumAspect.hxx>
 #include <Quantity_Color.hxx>
+#include <V3d_AmbientLight.hxx>
+#include <V3d_DirectionalLight.hxx>
 
 #include <emscripten/html5.h>
 
@@ -113,15 +115,15 @@ ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdat
 
   myView->MustBeResized();
   myShapeFront = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myShapeFront, AIS_Shaded, 0, false);
+  myContext->Display(myShapeFront, AIS_Shaded, -1, false);
   myShapeBack = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myShapeBack, AIS_Shaded, 0, false);
+  myContext->Display(myShapeBack, AIS_Shaded, -1, false);
   myContext->Erase(myShapeBack, false);
 
   myWireframeFront = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myWireframeFront, AIS_WireFrame, 0, false);
+  myContext->Display(myWireframeFront, AIS_WireFrame, -1, false);
   myWireframeBack = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myWireframeBack, AIS_Shaded, 0, false);
+  myContext->Display(myWireframeBack, AIS_Shaded, -1, false);
   myContext->Erase(myWireframeBack, false);
 
   updateView();
@@ -147,7 +149,7 @@ void ReactCADView::drawShape(TopoDS_Shape shape)
   myShapeFront = temp;
   if (myShowShaded)
   {
-    myContext->Display(myShapeFront, AIS_Shaded, 0, false);
+    myContext->Display(myShapeFront, AIS_Shaded, -1, false);
   }
   myContext->Erase(myShapeBack, false);
   pthread_mutex_unlock(&shadedHandleMutex);
@@ -161,7 +163,7 @@ void ReactCADView::drawShape(TopoDS_Shape shape)
   myWireframeFront = temp;
   if (myShowWireframe)
   {
-    myContext->Display(myWireframeFront, AIS_WireFrame, 0, false);
+    myContext->Display(myWireframeFront, AIS_WireFrame, -1, false);
   }
   myContext->Erase(myWireframeBack, false);
   pthread_mutex_unlock(&wireframeHandleMutex);
@@ -319,7 +321,7 @@ void ReactCADView::showWireframe(bool show)
   myShowWireframe = show;
   if (myShowWireframe)
   {
-    myContext->Display(myWireframeFront, AIS_WireFrame, 0, false);
+    myContext->Display(myWireframeFront, AIS_WireFrame, -1, false);
   }
   else
   {
@@ -336,7 +338,7 @@ void ReactCADView::showShaded(bool show)
   myShowShaded = show;
   if (myShowShaded)
   {
-    myContext->Display(myShapeFront, AIS_Shaded, 0, false);
+    myContext->Display(myShapeFront, AIS_Shaded, -1, false);
   }
   else
   {
@@ -479,8 +481,14 @@ bool ReactCADView::initViewer()
   aViewer->SetRectangularGridGraphicValues(1000, 1000, 0);
   aViewer->Grid()->SetColors(Quantity_NOC_GRAY90, Quantity_NOC_GRAY75);
   aViewer->SetDefaultShadingModel(Graphic3d_TOSM_FRAGMENT);
-  aViewer->SetDefaultLights();
-  aViewer->SetLightOn();
+
+  Handle(V3d_DirectionalLight) aDirLight = new V3d_DirectionalLight(V3d_XposZneg, Quantity_NOC_WHITE, Standard_True);
+  Handle(V3d_AmbientLight) anAmbLight = new V3d_AmbientLight(Quantity_NOC_WHITE);
+  aViewer->AddLight(aDirLight);
+  aViewer->SetLightOn(aDirLight);
+  aViewer->AddLight(anAmbLight);
+  aViewer->SetLightOn(anAmbLight);
+
   aViewer->SetDefaultBackgroundColor(Quantity_NOC_AZURE);
 
   Handle(Aspect_NeutralWindow) aWindow = new Aspect_NeutralWindow();
@@ -532,14 +540,7 @@ void ReactCADView::initDemoScene()
     return;
   }
 
-  // myView->TriedronDisplay (Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.08,
-  // V3d_WIREFRAME);
-
-  // presentation parameters
   initPixelScaleRatio();
-
-  // Build with "--preload-file MySampleFile.brep" option to load some shapes
-  // here.
 }
 
 // ================================================================

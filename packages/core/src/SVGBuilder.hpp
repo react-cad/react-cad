@@ -13,7 +13,7 @@ typedef NCollection_List<TopoDS_Compound> SVGBuilder_ListOfShapes;
 class SVGBuilder
 {
 public:
-  SVGBuilder(const SVGImage &image);
+  SVGBuilder(const Handle(SVGImage) & image);
 
   TopoDS_Compound Shape();
 

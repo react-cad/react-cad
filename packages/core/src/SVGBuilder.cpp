@@ -17,7 +17,7 @@
 
 #include <TopoDS_Wire.hxx>
 
-SVGBuilder::SVGBuilder(const SVGImage &image) : m_compound(), m_image(&image){};
+SVGBuilder::SVGBuilder(const Handle(SVGImage) & image) : m_compound(), m_image(image){};
 
 TopoDS_Compound SVGBuilder::Shape()
 {
@@ -50,8 +50,6 @@ TopoDS_Compound SVGBuilder::Shape()
         Handle(Geom2d_Curve) c = curve;
         if (!c.IsNull())
         {
-          c->Translate(gp_Vec2d(0, m_image->Height()));
-
           BRepBuilderAPI_MakeEdge edge(c, surface);
           makeWire.Add(edge);
 
@@ -69,7 +67,7 @@ TopoDS_Compound SVGBuilder::Shape()
       TopoDS_Wire wire = fixWire.Wire();
       wire.Orientation(TopAbs_REVERSED);
 
-      BRepBuilderAPI_MakeFace face(wire);
+      BRepBuilderAPI_MakeFace face(surface, wire);
 
       SVGSubPath::Direction direction = orientation >= 0 ? SVGSubPath::Direction::CW : SVGSubPath::Direction::CCW;
       Handle(SVGSubPath) subpath = new SVGSubPath(wire, face, direction);
