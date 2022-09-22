@@ -1,4 +1,5 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
@@ -8,6 +9,7 @@
 #include <BRep_Builder.hxx>
 #include <ShapeFix_Shape.hxx>
 #include <ShapeFix_Wireframe.hxx>
+#include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -26,6 +28,7 @@
 #include "PerformanceTimer.hpp"
 #include "operations.hpp"
 
+#include "SVGBuilder.hpp"
 #include "SVGImage.hpp"
 
 EvolutionNode::EvolutionNode() : m_spine(), m_profile()
@@ -69,8 +72,17 @@ void EvolutionNode::setProfileSVG(const std::string &pathData)
         }
       }
 
-      TopoDS_Wire wire = makeWire;
-      BRepLib::BuildCurves3d(wire);
+      TopoDS_Wire suspiciousWire = makeWire;
+
+      BRepLib::BuildCurves3d(suspiciousWire);
+
+      ShapeFix_Wire fixWire;
+      fixWire.SetSurface(yzPlane);
+      fixWire.Load(suspiciousWire);
+      fixWire.Perform();
+
+      TopoDS_Wire wire = fixWire.Wire();
+      wire.Orientation(TopAbs_REVERSED);
 
       m_profile = wire;
 
@@ -88,47 +100,19 @@ void EvolutionNode::setSpine(const std::vector<Point> &points)
     polygon.Add(vertex);
   }
   polygon.Close();
-  m_spine = polygon;
+  BRepBuilderAPI_MakeFace face(polygon);
+  m_spine = face;
   propsChanged();
 }
 
-void EvolutionNode::setSpineSVG(const std::string &pathData)
+void EvolutionNode::setSpineSVG(const std::string &svg)
 {
-  SVGImage image = SVGImage::FromPathData(pathData);
-
-  Handle(Geom_Plane) xyPlane = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()));
-
-  auto shape = image.begin();
-  if (shape != image.end())
-  {
-    auto path = shape.begin();
-    if (path != shape.end())
-    {
-      BRepBuilderAPI_MakeWire makeWire;
-
-      for (auto curve = path.begin(); curve != path.end(); ++curve)
-      {
-        Handle(Geom2d_Curve) c = curve;
-        if (!c.IsNull())
-        {
-          BRepBuilderAPI_MakeEdge edge(c, xyPlane);
-          makeWire.Add(edge);
-        }
-      }
-      TopoDS_Wire wire = makeWire;
-      BRepLib::BuildCurves3d(wire);
-
-      Handle(ShapeFix_Shape) aFShape = new ShapeFix_Shape(wire);
-      aFShape->Perform();
-      Handle(ShapeFix_Wireframe) aFWire = new ShapeFix_Wireframe(aFShape->Shape());
-      aFWire->FixSmallEdges();
-      aFWire->FixWireGaps();
-
-      m_spine = TopoDS::Wire(aFWire->Shape());
-
-      propsChanged();
-    }
-  }
+  PerformanceTimer timer1("Compute profile");
+  Handle(SVGImage) image = new SVGImage(svg);
+  SVGBuilder builder(image);
+  m_spine = builder.Shape();
+  propsChanged();
+  timer1.end();
 }
 
 void EvolutionNode::computeShape()
@@ -138,19 +122,21 @@ void EvolutionNode::computeShape()
   Standard_Boolean aIsGlobalCS = Standard_True;
   Standard_Boolean aIsSolid = Standard_True;
 
-  // TODO: Parallel
-  BRepOffsetAPI_MakeEvolved anAlgo(m_spine, m_profile, aJoinType, aIsGlobalCS, aIsSolid);
+  BRep_Builder builder;
+  TopoDS_Compound compound;
+  builder.MakeCompound(compound);
 
-  anAlgo.Build();
+  TopExp_Explorer Ex;
+  for (Ex.Init(m_spine, TopAbs_FACE); Ex.More(); Ex.Next())
+  {
+    // TODO: Parallel
+    BRepOffsetAPI_MakeEvolved anAlgo(Ex.Current(), m_profile, aJoinType, aIsGlobalCS, aIsSolid);
+    anAlgo.Build();
 
-  TopoDS_Shape s = anAlgo.Shape();
+    builder.Add(compound, anAlgo.Shape());
+  }
 
-  Handle(ShapeFix_Shape) aFShape = new ShapeFix_Shape(s);
-  aFShape->Perform();
-  Handle(ShapeFix_Wireframe) aFWire = new ShapeFix_Wireframe(aFShape->Shape());
-  aFWire->FixSmallEdges();
-  aFWire->FixWireGaps();
+  shape = compound;
 
-  shape = aFWire->Shape();
   timer.end();
 }
