@@ -11,10 +11,6 @@ MirrorNode::MirrorNode()
 {
 }
 
-MirrorNode::~MirrorNode()
-{
-}
-
 void MirrorNode::setPlane(Point origin, Vector normal)
 {
   gp_Ax2 newAxis(gp_Pnt(origin.x, origin.y, origin.z), gp_Dir(normal.x, normal.y, normal.z));

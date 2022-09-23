@@ -6,10 +6,6 @@ SphereNode::SphereNode() : m_props({.radius = 1, .angle = 0, .segmentAngle1 = 0,
 {
 }
 
-SphereNode::~SphereNode()
-{
-}
-
 void SphereNode::setProps(const SphereProps &props)
 {
   if (!doubleEquals(props.radius, m_props.radius) ||

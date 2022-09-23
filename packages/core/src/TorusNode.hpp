@@ -14,7 +14,6 @@ class TorusNode : public ReactCADNode
 {
 public:
   TorusNode();
-  virtual ~TorusNode();
   void setProps(const TorusProps &props);
 
 protected:

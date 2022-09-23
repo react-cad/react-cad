@@ -8,7 +8,6 @@ class PolyhedronNode : public ReactCADNode
 {
 public:
   PolyhedronNode();
-  virtual ~PolyhedronNode();
   void setPointsAndFaces(const std::vector<Point> &points, const std::vector<std::vector<unsigned int>> &faces);
 
 protected:

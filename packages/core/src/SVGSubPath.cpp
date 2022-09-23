@@ -195,7 +195,7 @@ SVGSubPath::Inspector::Inspector(const Target &thePath) : m_subpath(thePath)
 
 NCollection_CellFilter_Action SVGSubPath::Inspector::Inspect(const Target other)
 {
-  if (!other->IsAncestorOf(m_subpath->m_parent) && m_subpath->IsInside(other))
+  if (!other->IsAncestorOf(m_subpath) && m_subpath->IsInside(other))
   {
     other->Add(m_subpath);
     return CellFilter_Keep;

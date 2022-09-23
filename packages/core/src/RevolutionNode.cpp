@@ -1,18 +1,9 @@
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
 #include <Precision.hxx>
 
 #include <StdFail_NotDone.hxx>
 
-#include <exception>
-#include <math.h>
-
-#include "PerformanceTimer.hpp"
 #include "RevolutionNode.hpp"
-#include "SVGBuilder.hpp"
-#include "SVGImage.hpp"
-#include "operations.hpp"
 
 RevolutionNode::RevolutionNode() : m_axis(0, 0, 1), m_angle(0)
 {

@@ -11,7 +11,6 @@ class MirrorNode : public ReactCADNode
 {
 public:
   MirrorNode();
-  virtual ~MirrorNode();
   void setPlane(Point origin, Vector normal);
 
 protected:

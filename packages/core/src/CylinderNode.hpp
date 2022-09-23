@@ -15,7 +15,6 @@ class CylinderNode : public ReactCADNode
 {
 public:
   CylinderNode();
-  virtual ~CylinderNode();
   void setProps(const CylinderProps &props);
 
 protected:

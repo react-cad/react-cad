@@ -9,7 +9,6 @@ class DifferenceNode : public ReactCADNode
 {
 public:
   DifferenceNode();
-  virtual ~DifferenceNode();
 
 protected:
   void computeChildren(TopTools_ListOfShape children) override;

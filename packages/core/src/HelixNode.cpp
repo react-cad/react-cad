@@ -1,6 +1,4 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepLib.hxx>
 #include <BRepOffsetAPI_MakePipeShell.hxx>
@@ -11,9 +9,8 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS_Shape.hxx>
 #include <gp_Lin2d.hxx>
-
-#include <math.h>
 
 #include "HelixNode.hpp"
 
@@ -21,10 +18,6 @@
 #include "operations.hpp"
 
 HelixNode::HelixNode() : m_pitch(10), m_height(10)
-{
-}
-
-HelixNode::~HelixNode()
 {
 }
 
@@ -81,7 +74,9 @@ TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
 
 void HelixNode::computeShape()
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
+#endif
   buildSpineAndGuide();
 
   BRep_Builder builder;
@@ -114,5 +109,7 @@ void HelixNode::computeShape()
   }
 
   shape = compound;
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }

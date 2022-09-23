@@ -27,10 +27,6 @@ PolyhedronNode::PolyhedronNode()
   });
 }
 
-PolyhedronNode::~PolyhedronNode()
-{
-}
-
 bool PolyhedronNode::checkFaces(const std::vector<std::vector<unsigned int>> &faces)
 {
   if (faces.size() < 4)

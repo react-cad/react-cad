@@ -10,7 +10,6 @@ class HelixNode : public SweepNode
 {
 public:
   HelixNode();
-  virtual ~HelixNode();
   void setPitch(Standard_Real pitch);
   void setHeight(Standard_Real height);
 

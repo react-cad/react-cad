@@ -15,7 +15,6 @@ class SweepNode : public ReactCADNode
 {
 public:
   SweepNode();
-  virtual ~SweepNode();
   void setProfile(const std::vector<Point> &points);
   void setProfileSVG(const std::string &svg);
 

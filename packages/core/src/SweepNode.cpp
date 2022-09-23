@@ -31,10 +31,6 @@ SweepNode::SweepNode() : m_points()
   setProfile(points);
 }
 
-SweepNode::~SweepNode()
-{
-}
-
 void SweepNode::setProfileSVG(const std::string &svg)
 {
   if (!m_isSVG)
@@ -48,13 +44,19 @@ void SweepNode::setProfileSVG(const std::string &svg)
   m_isSVG = Standard_True;
   m_svg = svg;
 
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer1("Compute profile");
+#endif
+
   Handle(SVGImage) image = new SVGImage(svg);
   SVGBuilder builder(image);
   m_profile = builder.Shape();
   propsChanged();
   m_profileChanged = Standard_True;
+
+#ifdef REACTCAD_DEBUG
   timer1.end();
+#endif
 }
 
 void SweepNode::setProfile(const std::vector<Point> &points)

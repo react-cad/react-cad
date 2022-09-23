@@ -7,7 +7,6 @@ class UnionNode : public ReactCADNode
 {
 public:
   UnionNode();
-  virtual ~UnionNode();
 };
 
 #endif

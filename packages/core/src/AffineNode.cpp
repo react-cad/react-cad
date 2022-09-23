@@ -9,10 +9,6 @@ AffineNode::AffineNode()
 {
 }
 
-AffineNode::~AffineNode()
-{
-}
-
 void AffineNode::setMatrix(Matrix matrix)
 {
 

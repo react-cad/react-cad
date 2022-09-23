@@ -6,10 +6,6 @@ ConeNode::ConeNode() : m_props({.center = false, .radius1 = 1, .radius2 = 1, .he
 {
 }
 
-ConeNode::~ConeNode()
-{
-}
-
 void ConeNode::setProps(const ConeProps &props)
 {
   if (!props.center == m_props.center || !doubleEquals(props.radius1, m_props.radius1) ||

@@ -7,10 +7,6 @@ BoxNode::BoxNode() : m_props({.center = false, .x = 1, .y = 1, .z = 1})
 {
 }
 
-BoxNode::~BoxNode()
-{
-}
-
 void BoxNode::setProps(const BoxProps &props)
 {
   if (props.center != m_props.center || !doubleEquals(props.x, m_props.x) || !doubleEquals(props.y, m_props.y) ||

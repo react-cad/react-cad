@@ -57,7 +57,6 @@ public:
   static std::shared_ptr<ReactCADView> getView();
   static void destroyView();
 
-  //! Destructor.
   virtual ~ReactCADView();
 
   void render(TopoDS_Shape shape, bool reset = false);

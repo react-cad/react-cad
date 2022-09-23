@@ -55,8 +55,11 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s USE_PTHREADS \
   -s EXPORT_NAME=reactCad \
   -s OFFSCREEN_FRAMEBUFFER=1 \
-  -s EXCEPTION_DEBUG=1 \
   -s EXCEPTION_CATCHING_ALLOWED=['RevolutionNode::computeShape'] \
+")
+
+set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_DEBUG "\
+  -s EXCEPTION_DEBUG=1 \
 ")
 
 add_custom_command(

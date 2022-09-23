@@ -9,10 +9,6 @@ RotationNode::RotationNode() : m_angle(0), m_axis(gp::DX()), m_quaternion(gp::DX
 {
 }
 
-RotationNode::~RotationNode()
-{
-}
-
 void RotationNode::setTransform()
 {
 }

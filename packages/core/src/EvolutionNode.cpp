@@ -5,10 +5,8 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepLib.hxx>
 #include <BRepOffsetAPI_MakeEvolved.hxx>
-#include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
-#include <ShapeFix_Shape.hxx>
-#include <ShapeFix_Wireframe.hxx>
+#include <ShapeFix_Wire.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -16,12 +14,6 @@
 
 #include <Geom2d_Curve.hxx>
 #include <Geom_Plane.hxx>
-#include <gp_Pln.hxx>
-#include <gp_Quaternion.hxx>
-
-#include <BRepTools.hxx>
-
-#include <math.h>
 
 #include "EvolutionNode.hpp"
 
@@ -107,12 +99,16 @@ void EvolutionNode::setSpine(const std::vector<Point> &points)
 
 void EvolutionNode::setSpineSVG(const std::string &svg)
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer1("Compute profile");
+#endif
   Handle(SVGImage) image = new SVGImage(svg);
   SVGBuilder builder(image);
   m_spine = builder.Shape();
   propsChanged();
+#ifdef REACTCAD_DEBUG
   timer1.end();
+#endif
 }
 
 void EvolutionNode::computeShape()

@@ -138,9 +138,15 @@ bool ReactCADNode::computeGeometry()
 
 void ReactCADNode::computeChildren(TopTools_ListOfShape children)
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate union");
+#endif
+
   m_childShape = unionOp(children);
+
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }
 
 void ReactCADNode::computeShape()

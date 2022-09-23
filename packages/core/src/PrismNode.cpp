@@ -1,17 +1,10 @@
-#include <BRepBuilderAPI_GTransform.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 
 #include <Precision.hxx>
-#include <gp_Ax2.hxx>
-#include <gp_GTrsf.hxx>
+#include <gp_Vec.hxx>
 
 #include "PerformanceTimer.hpp"
 #include "PrismNode.hpp"
-#include "SVGBuilder.hpp"
-#include "SVGImage.hpp"
-#include "operations.hpp"
 
 PrismNode::PrismNode() : m_vector(0, 0, 1)
 {
@@ -29,10 +22,15 @@ void PrismNode::setVector(Point point)
 
 void PrismNode::computeShape()
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Compute prism");
+#endif
 
   BRepPrimAPI_MakePrism prism(m_profile, m_vector);
 
   shape = prism;
+
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }

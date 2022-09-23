@@ -7,7 +7,6 @@ class STLImportNode : public ImportNode
 {
 public:
   STLImportNode();
-  ~STLImportNode();
 
 protected:
   void importFile() override;

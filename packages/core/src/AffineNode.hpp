@@ -10,7 +10,6 @@ class AffineNode : public ReactCADNode
 {
 public:
   AffineNode();
-  virtual ~AffineNode();
   void setMatrix(Matrix matrix);
 
 protected:

@@ -26,7 +26,6 @@ class WedgeNode : public ReactCADNode
 {
 public:
   WedgeNode();
-  virtual ~WedgeNode();
   void setPropsLtx(const WedgePropsLtx &props);
   void setPropsMinMax(const WedgePropsMinMax &props);
 
