@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/react-cad/react-cad/compare/v0.11.0...v0.12.0) (2022-09-23)
+
+
+### Features
+
+* use new svg renderer for revolutions ([a5f40cd](https://github.com/react-cad/react-cad/commit/a5f40cd8f62218949fba3778e0cfff522391867c))
+
+
+
+
+
 # [0.11.0](https://github.com/react-cad/react-cad/compare/v0.10.0...v0.11.0) (2022-09-20)
 
 **Note:** Version bump only for package @react-cad/viewer

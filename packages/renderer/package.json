@@ -1,7 +1,7 @@
 {
   "name": "@react-cad/renderer",
   "description": "Custom React renderer for @react-cad CAD system",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "main": "lib/index.js",
   "files": [
     "lib/**/*",
@@ -23,7 +23,7 @@
     "@react-cad/core": "^0.1.1"
   },
   "devDependencies": {
-    "@react-cad/core": "^0.11.0",
+    "@react-cad/core": "^0.12.0",
     "react": "^17.0.1",
     "react-reconciler": "^0.26.1"
   },

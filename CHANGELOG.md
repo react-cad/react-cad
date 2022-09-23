@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/react-cad/react-cad/compare/v0.11.0...v0.12.0) (2022-09-23)
+
+
+### Features
+
+* new svg algorithm for prisms ([7a9a99a](https://github.com/react-cad/react-cad/commit/7a9a99a9e464daf8e43fd5aedc5ac488d11f2828))
+* use new svg renderer for evolutions ([d0d54dc](https://github.com/react-cad/react-cad/commit/d0d54dcfb2ea7eac30db841b7906802ed4b6b16c))
+* use new svg renderer for helixes ([b7ee24f](https://github.com/react-cad/react-cad/commit/b7ee24f3274a8771961e6f53bfeed5dd254ee63e))
+* use new svg renderer for revolutions ([a5f40cd](https://github.com/react-cad/react-cad/commit/a5f40cd8f62218949fba3778e0cfff522391867c))
+
+
+
+
+
 # [0.11.0](https://github.com/react-cad/react-cad/compare/v0.10.0...v0.11.0) (2022-09-20)
 
 
