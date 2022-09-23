@@ -24,6 +24,7 @@
 
 #include "EvolutionNode.hpp"
 #include "HelixNode.hpp"
+#include "PipeNode.hpp"
 #include "PrismNode.hpp"
 #include "RevolutionNode.hpp"
 #include "SweepNode.hpp"
@@ -78,6 +79,10 @@ std::shared_ptr<ReactCADNode> createCADNode(std::string type)
   if (type == "difference")
   {
     return std::make_shared<DifferenceNode>();
+  }
+  if (type == "pipe")
+  {
+    return std::make_shared<PipeNode>();
   }
   if (type == "helix")
   {
@@ -491,6 +496,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
       .function("setPitch", &HelixNode::setPitch)
       .function("setHeight", &HelixNode::setHeight);
+
+  emscripten::class_<PipeNode, emscripten::base<SweepNode>>("ReactCADPipeNode")
+      .smart_ptr<std::shared_ptr<PipeNode>>("ReactCADPipeNode")
+      .function("setSpine", &PipeNode::setSpine)
+      .function("setSpineSVG", &PipeNode::setSpineSVG);
 
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")

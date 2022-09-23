@@ -120,6 +120,12 @@ export class ReactCADEvolutionNode extends ReactCADNode {
   public setSpineSVG(svg: string): void;
 }
 
+export class ReactCADPipeNode extends ReactCADSweepNode {
+  public setPitch(pitch: number): void;
+  public setSpine(spine: Point[]): void;
+  public setSpineSVG(pathData: string): void;
+}
+
 export class ReactCADHelixNode extends ReactCADSweepNode {
   public setPitch(pitch: number): void;
   public setHeight(height: number): void;
@@ -178,6 +184,7 @@ export interface ReactCADNodeTypes {
   intersection: ReactCADNode;
   union: ReactCADNode;
   helix: ReactCADHelixNode;
+  pipe: ReactCADPipeNode;
   prism: ReactCADPrismNode;
   evolution: ReactCADEvolutionNode;
   revolution: ReactCADRevolutionNode;
