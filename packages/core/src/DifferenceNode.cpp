@@ -8,13 +8,11 @@ DifferenceNode::DifferenceNode()
 {
 }
 
-DifferenceNode::~DifferenceNode()
-{
-}
-
 void DifferenceNode::computeChildren(TopTools_ListOfShape children)
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate difference");
+#endif
   switch (children.Size())
   {
   case 0:
@@ -30,5 +28,7 @@ void DifferenceNode::computeChildren(TopTools_ListOfShape children)
     break;
   }
   }
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }

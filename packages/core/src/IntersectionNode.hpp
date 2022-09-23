@@ -9,7 +9,6 @@ class IntersectionNode : public ReactCADNode
 {
 public:
   IntersectionNode();
-  virtual ~IntersectionNode();
 
 protected:
   void computeChildren(TopTools_ListOfShape children) override;

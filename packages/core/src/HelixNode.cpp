@@ -6,54 +6,64 @@
 #include <BRep_Builder.hxx>
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom_CylindricalSurface.hxx>
+#include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS_Shape.hxx>
 #include <gp_Lin2d.hxx>
-
-#include <math.h>
 
 #include "HelixNode.hpp"
 
 #include "PerformanceTimer.hpp"
 #include "operations.hpp"
 
-HelixNode::HelixNode() : m_props({.pitch = 1, .height = 1})
+HelixNode::HelixNode() : m_pitch(10), m_height(10)
 {
 }
 
-HelixNode::~HelixNode()
+void HelixNode::setPitch(Standard_Real pitch)
 {
-}
-
-void HelixNode::setProps(const HelixProps &props)
-{
-  if (!doubleEquals(props.pitch, m_props.pitch) || !doubleEquals(props.height, m_props.height))
+  if (!IsEqual(pitch, m_pitch))
   {
-    m_props = props;
+    m_pitch = pitch;
     propsChanged();
   }
 }
 
-TopoDS_Shape HelixNode::makeHelix(TopoDS_Wire profile)
+void HelixNode::setHeight(Standard_Real height)
 {
-  BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_props.height));
-  BRepBuilderAPI_MakeWire spine(edge);
+  if (!IsEqual(height, m_height))
+  {
+    m_height = height;
+    propsChanged();
+  }
+}
+
+void HelixNode::buildSpineAndGuide()
+{
+  BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_height));
+  BRepBuilderAPI_MakeWire makeSpine(edge);
+  m_spine = makeSpine;
 
   Standard_Real radius = 1.0;
   Standard_Real circumference = 2 * M_PI * radius;
-  Standard_Real length = m_props.height * sqrt((m_props.pitch * m_props.pitch) + (circumference * circumference));
+  Standard_Real length = m_height * sqrt((m_pitch * m_pitch) + (circumference * circumference));
 
-  gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(circumference, m_props.pitch));
+  gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(circumference, m_pitch));
   Handle_Geom2d_TrimmedCurve aSegment = GCE2d_MakeSegment(aLine2d, 0.0, length);
 
   Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(gp::XOY(), radius);
   TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length);
   BRepLib::BuildCurve3d(aHelixEdge);
 
-  BRepBuilderAPI_MakeWire guide(aHelixEdge);
+  BRepBuilderAPI_MakeWire makeGuide(aHelixEdge);
+  m_guide = makeGuide;
+}
 
-  BRepOffsetAPI_MakePipeShell pipe(spine);
-  pipe.SetMode(guide, false);
+TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
+{
+  BRepOffsetAPI_MakePipeShell pipe(m_spine);
+  pipe.SetMode(m_guide, false);
   pipe.Add(profile);
 
   pipe.Build();
@@ -64,44 +74,42 @@ TopoDS_Shape HelixNode::makeHelix(TopoDS_Wire profile)
 
 void HelixNode::computeShape()
 {
-  makeProfile();
-
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
+#endif
+  buildSpineAndGuide();
 
   BRep_Builder builder;
   TopoDS_Compound compound;
   builder.MakeCompound(compound);
 
-  std::vector<ShapeWires>::iterator it;
-  for (it = wires.begin(); it != wires.end(); ++it)
+  TopExp_Explorer Faces;
+  for (Faces.Init(m_profile, TopAbs_FACE); Faces.More(); Faces.Next())
   {
-    BRep_Builder positiveBuilder;
-    TopoDS_Compound positiveCompound;
-    positiveBuilder.MakeCompound(positiveCompound);
+    TopoDS_Face face = TopoDS::Face(Faces.Current());
+    TopoDS_Wire outerWire = BRepTools::OuterWire(face);
 
-    for (std::vector<TopoDS_Wire>::iterator pos = it->first.begin(); pos != it->first.end(); ++pos)
-    {
-      positiveBuilder.Add(positiveCompound, makeHelix(*pos));
-    }
+    TopoDS_Shape solid = makeHelix(outerWire);
 
-    if (it->second.size() == 0)
-    {
-      builder.Add(compound, positiveCompound);
-    }
-    else
-    {
-      BRep_Builder negativeBuilder;
-      TopoDS_Compound negativeCompound;
-      negativeBuilder.MakeCompound(negativeCompound);
+    TopTools_ListOfShape holes;
 
-      for (std::vector<TopoDS_Wire>::iterator neg = it->second.begin(); neg != it->second.end(); ++neg)
+    TopExp_Explorer Wires;
+    for (Wires.Init(face, TopAbs_WIRE); Wires.More(); Wires.Next())
+    {
+      TopoDS_Wire wire = TopoDS::Wire(Wires.Current());
+      if (wire.IsEqual(outerWire))
       {
-        negativeBuilder.Add(negativeCompound, makeHelix(*neg));
+        continue;
       }
-
-      builder.Add(compound, differenceOp(positiveCompound, negativeCompound));
+      holes.Append(makeHelix(wire));
     }
+
+    TopoDS_Shape helix = differenceOp(solid, holes);
+    builder.Add(compound, helix);
   }
+
   shape = compound;
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }

@@ -15,7 +15,6 @@ class BoxNode : public ReactCADNode
 {
 public:
   BoxNode();
-  virtual ~BoxNode();
   void setProps(const BoxProps &props);
 
 protected:

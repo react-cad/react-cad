@@ -1,26 +1,26 @@
 #ifndef RevolutionNode_HeaderFile
 #define RevolutionNode_HeaderFile
 
+#include "Geometry.hpp"
 #include "SweepNode.hpp"
 
-struct RevolutionProps
-{
-  std::string axis;
-  double angle;
-};
+#include <string>
+
+#include <TopoDS_Shape.hxx>
+#include <gp_Vec.hxx>
 
 class RevolutionNode : public SweepNode
 {
 public:
   RevolutionNode();
-  virtual ~RevolutionNode();
-  void setProps(const RevolutionProps &props);
+  void setAxisAngle(Vector direction, Standard_Real angle);
 
 protected:
   void computeShape() override;
 
 private:
-  RevolutionProps m_props;
+  gp_Vec m_axis;
+  Standard_Real m_angle;
 };
 
 #endif

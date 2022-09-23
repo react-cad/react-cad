@@ -15,7 +15,6 @@ class SphereNode : public ReactCADNode
 {
 public:
   SphereNode();
-  virtual ~SphereNode();
   void setProps(const SphereProps &prop);
 
 protected:

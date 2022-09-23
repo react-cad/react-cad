@@ -7,7 +7,6 @@ class ObjImportNode : public ImportNode
 {
 public:
   ObjImportNode();
-  ~ObjImportNode();
 
 protected:
   void importFile() override;

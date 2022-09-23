@@ -1,16 +1,23 @@
-import { PrismProps, Point } from "@react-cad/core";
+import { Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
+import { arrayEqual } from "./helpers";
 
 type Prism = "prism";
 
-const AXES = ["x", "y", "z"];
+function getVector(props: Props<Prism>): [number, number, number] {
+  return "vector" in props
+    ? props.vector
+    : [props.x || 0, props.y || 0, props.z || 0];
+}
 
 function validateProps(props: Props<Prism>): boolean {
-  if (!AXES.includes(props.axis)) {
-    throw new Error(`prism: unknown axis "${props.axis}"`);
+  const vector = getVector(props);
+  if (vector.length < 3) {
+    throw new Error(`prism: "vector" must be an array of 3 numbers`);
   }
-  if (props.height <= 0) {
-    throw new Error(`prism: "height" prop must be greater than 0`);
+  const total = Math.abs(vector[0]) + Math.abs(vector[1]) + Math.abs(vector[2]);
+  if (total == 0) {
+    throw new Error(`prism: "vector" must have length > 0`);
   }
 
   return true;
@@ -20,10 +27,11 @@ export function prepareUpdate(
   oldProps: Props<Prism>,
   newProps: Props<Prism>
 ): UpdatePayload<Prism> | null {
+  const oldVector = getVector(oldProps);
+  const newVector = getVector(newProps);
   if (
     oldProps.profile !== newProps.profile ||
-    oldProps.axis !== newProps.axis ||
-    oldProps.height !== newProps.height
+    !arrayEqual(oldVector, newVector)
   ) {
     validateProps(newProps);
     return newProps;
@@ -43,20 +51,14 @@ export function commitUpdate(
   instance: Instance<Prism>,
   updatePayload: UpdatePayload<Prism>
 ): void {
-  const { profile, ...prismProps } = updatePayload;
-  const props: PrismProps = Object.assign(
-    {
-      axis: "z",
-      height: 1,
-    },
-    prismProps
-  );
+  const { profile } = updatePayload;
+  const vector = getVector(updatePayload);
 
   if (typeof profile === "string") {
-    instance.node.setSVGProfile(profile);
+    instance.node.setProfileSVG(profile);
   } else {
     instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
   }
 
-  instance.node.setProps(props);
+  instance.node.setVector(vector);
 }

@@ -14,7 +14,6 @@ export type Point = [number, number, number];
 export type Quaternion = [number, number, number, number];
 export type Polygon = Point[];
 export type Profile = Polygon | string;
-export type AxisName = "x" | "y" | "z";
 export type Matrix = [
   [number, number, number, number],
   [number, number, number, number],
@@ -103,38 +102,27 @@ export class ReactCADPolyhedronNode extends ReactCADNode {
 // Sweeps
 export class ReactCADSweepNode extends ReactCADNode {
   public setProfile(path: Polygon): void;
-  public setSVGProfile(svg: string): void;
+  public setProfileSVG(svg: string): void;
 }
 
-export interface RevolutionProps {
-  axis: AxisName;
-  angle: number;
-}
 export class ReactCADRevolutionNode extends ReactCADSweepNode {
-  public setProps(props: RevolutionProps): void;
+  public setAxisAngle(axis: Vector, angle: number): void;
 }
 
-export interface PrismProps {
-  axis: AxisName;
-  height: number;
-}
 export class ReactCADPrismNode extends ReactCADSweepNode {
-  public setProps(props: PrismProps): void;
+  public setVector(vector: Vector): void;
 }
 
 export class ReactCADEvolutionNode extends ReactCADNode {
   public setProfile(profile: Point[]): void;
   public setProfileSVG(pathData: string): void;
   public setSpine(spine: Point[]): void;
-  public setSpineSVG(pathData: string): void;
+  public setSpineSVG(svg: string): void;
 }
 
-export interface HelixProps {
-  pitch: number;
-  height: number;
-}
 export class ReactCADHelixNode extends ReactCADSweepNode {
-  public setProps(props: HelixProps): void;
+  public setPitch(pitch: number): void;
+  public setHeight(height: number): void;
 }
 
 // Imports

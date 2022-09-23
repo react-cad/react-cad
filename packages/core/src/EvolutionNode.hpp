@@ -8,16 +8,16 @@ class EvolutionNode : public ReactCADNode
 public:
   EvolutionNode();
   void setSpine(const std::vector<Point> &points);
-  void setSpineSVG(const std::string &pathData);
+  void setSpineSVG(const std::string &svg);
   void setProfile(const std::vector<Point> &points);
-  void setProfileSVG(const std::string &svg);
+  void setProfileSVG(const std::string &pathData);
 
 protected:
   void computeShape() override;
 
 private:
   TopoDS_Wire m_profile;
-  TopoDS_Wire m_spine;
+  TopoDS_Shape m_spine;
 };
 
 #endif

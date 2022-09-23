@@ -6,10 +6,6 @@ TorusNode::TorusNode() : m_props({.radius1 = 1, .radius2 = 1, .angle = 0})
 {
 }
 
-TorusNode::~TorusNode()
-{
-}
-
 void TorusNode::setProps(const TorusProps &props)
 {
   if (!doubleEquals(m_props.radius1, props.radius1) || !doubleEquals(m_props.radius2, props.radius2) ||

@@ -1,6 +1,6 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { AxisName, Profile } from "@react-cad/core";
+import { Profile } from "@react-cad/core";
 
 import reactIcon from "./react-icon";
 
@@ -13,7 +13,7 @@ const profiles: Record<string, Profile> = {
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
-  SVG: reactIcon,
+  SVG: reactIcon([0, 0]),
 };
 
 export const Prism: React.FC<Props> = (props) => <prism {...props} />;
@@ -21,12 +21,11 @@ export const Prism: React.FC<Props> = (props) => <prism {...props} />;
 const range = {
   control: {
     type: "range",
-    min: 1,
-    max: 5,
+    min: 0,
+    max: 10,
     step: 1,
   },
 };
-
 export default {
   title: "Sweeps/Prism",
   component: Prism,
@@ -37,20 +36,17 @@ export default {
         type: "select",
       },
     },
-    axis: {
-      options: ["x", "y", "z"],
-      control: {
-        type: "inline-radio",
-      },
-    },
-    height: range,
+    x: range,
+    y: range,
+    z: range,
   },
 } as Meta;
 
 interface StoryProps {
   profileName: keyof typeof profiles;
-  axis: AxisName;
-  height: number;
+  x: number;
+  y: number;
+  z: number;
 }
 
 const Template: Story<StoryProps> = ({ profileName, ...args }) => (
@@ -60,6 +56,7 @@ const Template: Story<StoryProps> = ({ profileName, ...args }) => (
 export const prism = Template.bind({});
 prism.args = {
   profileName: "Square",
-  axis: "z",
-  height: 5,
+  x: 0,
+  y: 0,
+  z: 1,
 };

@@ -9,7 +9,7 @@ class ImportNode : public ReactCADNode
 {
 public:
   ImportNode();
-  virtual ~ImportNode();
+  ~ImportNode();
 
   void setFilename(const std::string &filename, bool ownFile = false);
   std::string getFilename();

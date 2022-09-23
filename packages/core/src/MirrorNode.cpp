@@ -3,16 +3,11 @@
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepLib.hxx>
 #include <BRepTools.hxx>
-#include <Message.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Solid.hxx>
 
 MirrorNode::MirrorNode()
-{
-}
-
-MirrorNode::~MirrorNode()
 {
 }
 

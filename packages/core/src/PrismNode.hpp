@@ -1,33 +1,22 @@
 #ifndef PrismNode_HeaderFile
 #define PrismNode_HeaderFile
 
+#include "Geometry.hpp"
 #include "SweepNode.hpp"
 
-struct PrismProps
-{
-  std::string axis;
-  double height;
-};
+#include <gp_Vec.hxx>
 
 class PrismNode : public SweepNode
 {
 public:
   PrismNode();
-  virtual ~PrismNode();
-  void setProps(const PrismProps &props);
+  void setVector(Point point);
 
 protected:
   void computeShape() override;
 
 private:
-  double m_sectionHeight;
-  PrismProps m_props;
-  bool m_heightChanged = false;
-  bool m_axisChanged = false;
-  TopoDS_Shape m_section;
-  bool m_sectionChanged = false;
-
-  void computeSection();
+  gp_Vec m_vector;
 };
 
 #endif

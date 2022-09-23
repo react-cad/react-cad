@@ -1,26 +1,29 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Axis } from "@react-cad/core";
+import { AxisName } from "@react-cad/core";
 
 interface Props {
   x: number;
   y: number;
   z: number;
-  axis: Axis;
+  axis: AxisName;
   angle: number;
 }
 
 export const Composed: React.FC<Props> = ({ x, y, z, axis, angle }) => (
-  <rotation axis={axis} angle={angle}>
+  <rotation
+    axis={[axis == "x" ? 1 : 0, axis == "y" ? 1 : 0, axis == "z" ? 1 : 0]}
+    angle={angle}
+  >
     <difference>
       <union>
-        <rotation axis="z" angle={(1 * 2 * Math.PI) / 3}>
+        <rotation z={(1 * 2 * Math.PI) / 3}>
           <box x={x} y={y} z={z} />
         </rotation>
-        <rotation axis="z" angle={(2 * 2 * Math.PI) / 3}>
+        <rotation z={(2 * 2 * Math.PI) / 3}>
           <box x={x} y={y} z={z} />
         </rotation>
-        <rotation axis="z" angle={(3 * 2 * Math.PI) / 3}>
+        <rotation z={(3 * 2 * Math.PI) / 3}>
           <box x={x} y={y} z={z} />
         </rotation>
       </union>

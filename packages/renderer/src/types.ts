@@ -2,11 +2,9 @@ import { Fiber } from "react-reconciler";
 import {
   ReactCADCore,
   ReactCADNode,
-  Polygon,
   Profile,
   Point,
   ReactCADNodeTypes,
-  AxisName,
   Vector,
   Quaternion,
   Matrix,
@@ -78,12 +76,19 @@ export interface ReactCADElements {
   };
   prism: {
     profile: Profile;
-    axis: AxisName;
-    height: number;
-  };
+  } & (
+    | {
+        x?: number;
+        y?: number;
+        z?: number;
+      }
+    | {
+        vector: Vector;
+      }
+  );
   revolution: {
-    profile: Polygon;
-    axis: AxisName;
+    profile: Profile;
+    axis: Vector;
     angle: number;
   };
   helix: {

@@ -7,7 +7,7 @@
 #include <BRepBuilderAPI_Sewing.hxx>
 #include <BRepLib.hxx>
 #include <BRep_Builder.hxx>
-#include <Message.hxx>
+#include <Precision.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Face.hxx>
@@ -29,7 +29,7 @@ TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh)
   TopoDS_Face aFace;
   TopoDS_Wire aWire;
   BRepBuilderAPI_Sewing aSewingTool;
-  aSewingTool.Init(1.0e-06, Standard_True);
+  aSewingTool.Init(Precision::Approximation(), Standard_True);
 
   TopoDS_Compound aComp;
   BRep_Builder BuildTool;

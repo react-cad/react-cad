@@ -3,7 +3,3 @@
 UnionNode::UnionNode()
 {
 }
-
-UnionNode::~UnionNode()
-{
-}

@@ -12,7 +12,6 @@ class ScaleNode : public ReactCADNode
 {
 public:
   ScaleNode();
-  virtual ~ScaleNode();
   void setScaleFactor(Standard_Real scaleFactor);
   void setScale(Vector scale);
   void setCenter(Point center);

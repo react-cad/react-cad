@@ -470,14 +470,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
       .smart_ptr<std::shared_ptr<SweepNode>>("ReactCADSweepNode")
       .function("setProfile", &SweepNode::setProfile)
-      .function("setSVGProfile", &SweepNode::setSVGProfile);
+      .function("setProfileSVG", &SweepNode::setProfileSVG);
 
-  emscripten::value_object<PrismProps>("PrismProps")
-      .field("axis", &PrismProps::axis)
-      .field("height", &PrismProps::height);
   emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
       .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
-      .function("setProps", &PrismNode::setProps);
+      .function("setVector", &PrismNode::setVector);
 
   emscripten::class_<EvolutionNode, emscripten::base<ReactCADNode>>("ReactCADEvolutionNode")
       .smart_ptr<std::shared_ptr<EvolutionNode>>("ReactCADEvolutionNode")
@@ -486,19 +483,14 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("setSpine", &EvolutionNode::setSpine)
       .function("setSpineSVG", &EvolutionNode::setSpineSVG);
 
-  emscripten::value_object<RevolutionProps>("RevolutionProps")
-      .field("axis", &RevolutionProps::axis)
-      .field("angle", &RevolutionProps::angle);
   emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
       .smart_ptr<std::shared_ptr<RevolutionNode>>("ReactCADRevolutionNode")
-      .function("setProps", &RevolutionNode::setProps);
+      .function("setAxisAngle", &RevolutionNode::setAxisAngle);
 
-  emscripten::value_object<HelixProps>("HelixProps")
-      .field("pitch", &HelixProps::pitch)
-      .field("height", &HelixProps::height);
   emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
       .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
-      .function("setProps", &HelixNode::setProps);
+      .function("setPitch", &HelixNode::setPitch)
+      .function("setHeight", &HelixNode::setHeight);
 
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")

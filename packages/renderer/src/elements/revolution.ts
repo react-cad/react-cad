@@ -1,13 +1,15 @@
-import { RevolutionProps, Point } from "@react-cad/core";
+import { Point } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
+import { arrayEqual } from "./helpers";
 
 type Revolution = "revolution";
 
-const AXES = ["x", "y", "z"];
-
 function validateProps(props: Props<Revolution>): boolean {
-  if (!AXES.includes(props.axis)) {
-    throw new Error(`revolution: unknown axis "${props.axis}"`);
+  if (props.axis.length !== 3) {
+    throw new Error(`revolution: axis must be a vector of 3 numbers`);
+  }
+  if (typeof props.angle !== "number") {
+    throw new Error(`revolution: "angle" must be a number`);
   }
   return true;
 }
@@ -18,7 +20,7 @@ export function prepareUpdate(
 ): UpdatePayload<Revolution> | null {
   if (
     oldProps.profile !== newProps.profile ||
-    oldProps.axis !== newProps.axis ||
+    !arrayEqual(oldProps.axis, newProps.axis) ||
     oldProps.angle !== newProps.angle
   ) {
     validateProps(newProps);
@@ -39,15 +41,13 @@ export function commitUpdate(
   instance: Instance<Revolution>,
   updatePayload: UpdatePayload<Revolution>
 ): void {
-  const { profile, ...revolutionProps } = updatePayload;
-  const props: RevolutionProps = Object.assign(
-    {
-      axis: "z",
-      angle: 0,
-    },
-    revolutionProps
-  );
+  const { profile, axis, angle } = updatePayload;
 
-  instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
-  instance.node.setProps(props);
+  if (typeof profile === "string") {
+    instance.node.setProfileSVG(profile);
+  } else {
+    instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
+  }
+
+  instance.node.setAxisAngle(axis, angle);
 }

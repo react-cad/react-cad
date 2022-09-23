@@ -16,7 +16,6 @@ class ConeNode : public ReactCADNode
 {
 public:
   ConeNode();
-  virtual ~ConeNode();
   void setProps(const ConeProps &props);
 
 protected:

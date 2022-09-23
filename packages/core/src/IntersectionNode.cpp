@@ -8,13 +8,11 @@ IntersectionNode::IntersectionNode()
 {
 }
 
-IntersectionNode::~IntersectionNode()
-{
-}
-
 void IntersectionNode::computeChildren(TopTools_ListOfShape children)
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate intersection");
+#endif
   switch (children.Size())
   {
   case 0:
@@ -28,5 +26,7 @@ void IntersectionNode::computeChildren(TopTools_ListOfShape children)
     break;
   }
   }
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }

@@ -6,10 +6,6 @@ CylinderNode::CylinderNode() : m_props({.center = false, .radius = 1, .height = 
 {
 }
 
-CylinderNode::~CylinderNode()
-{
-}
-
 void CylinderNode::setProps(const CylinderProps &props)
 {
   if (!props.center == m_props.center || !doubleEquals(props.radius, m_props.radius) ||

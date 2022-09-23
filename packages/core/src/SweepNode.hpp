@@ -15,35 +15,17 @@ class SweepNode : public ReactCADNode
 {
 public:
   SweepNode();
-  virtual ~SweepNode();
   void setProfile(const std::vector<Point> &points);
-  void setSVGProfile(const std::string &svg);
+  void setProfileSVG(const std::string &svg);
 
 protected:
-  enum Type
-  {
-    Unknown,
-    Polygon,
-    SVG,
-  };
+  TopoDS_Shape m_profile;
+  Standard_Boolean m_profileChanged = false;
 
-  Type m_type = Type::Unknown;
-
+private:
   std::vector<Point> m_points;
-  bool m_pointsChanged = false;
-
   std::string m_svg;
-  bool m_svgChanged = false;
-
-  std::vector<ShapeWires> wires;
-
-  TopoDS_Wire m_positiveProfile;
-  TopoDS_Wire m_negativeProfile;
-  bool m_profileChanged = false;
-
-  void makeProfileFromSVG();
-  void makeProfileFromPoints();
-  void makeProfile();
+  Standard_Boolean m_isSVG;
 };
 
 #endif

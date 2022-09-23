@@ -9,10 +9,6 @@ ScaleNode::ScaleNode() : m_center(0, 0, 0)
 {
 }
 
-ScaleNode::~ScaleNode()
-{
-}
-
 void ScaleNode::setCenter(Point center)
 {
   if (!IsEqual(m_center.X(), center.x) || !IsEqual(m_center.Y(), center.y) || !IsEqual(m_center.Z(), center.z))

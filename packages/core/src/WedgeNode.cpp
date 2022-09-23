@@ -9,10 +9,6 @@ WedgeNode::WedgeNode()
 {
 }
 
-WedgeNode::~WedgeNode()
-{
-}
-
 void WedgeNode::setPropsLtx(const WedgePropsLtx &props)
 {
   if (!doubleEquals(props.x, m_propsLtx.x) || !doubleEquals(props.y, m_propsLtx.y) ||

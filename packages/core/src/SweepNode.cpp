@@ -21,96 +21,48 @@
 
 #include <string.h>
 
+#include "SVGBuilder.hpp"
 #include "SVGImage.hpp"
 
-SweepNode::SweepNode()
+SweepNode::SweepNode() : m_points()
 {
-  m_points = std::vector<Point>(
+  std::vector<Point> points(
       {{.x = -1, .y = -1, .z = 0}, {.x = -1, .y = 1, .z = 0}, {.x = 1, .y = 1, .z = 0}, {.x = 1, .y = -1, .z = 0}});
-  makeProfileFromPoints();
-  m_pointsChanged = true;
-  m_type = Type::Polygon;
+  setProfile(points);
 }
 
-SweepNode::~SweepNode()
+void SweepNode::setProfileSVG(const std::string &svg)
 {
-}
-
-void SweepNode::setSVGProfile(const std::string &svg)
-{
-  if (svg != m_svg || m_type != Type::SVG)
+  if (!m_isSVG)
   {
-    m_svg = svg;
-    m_svgChanged = true;
     propsChanged();
   }
-  m_type = Type::SVG;
-}
-
-void SweepNode::makeProfileFromSVG()
-{
-  if (m_type != Type::SVG || !m_svg.length())
+  else if (svg == m_svg && m_isSVG)
   {
     return;
   }
+  m_isSVG = Standard_True;
+  m_svg = svg;
 
-  PerformanceTimer timer("Compute SVG profile");
+#ifdef REACTCAD_DEBUG
+  PerformanceTimer timer1("Compute profile");
+#endif
 
-  wires.clear();
+  Handle(SVGImage) image = new SVGImage(svg);
+  SVGBuilder builder(image);
+  m_profile = builder.Shape();
+  propsChanged();
+  m_profileChanged = Standard_True;
 
-  SVGImage image(m_svg);
-
-  Handle(Geom_Plane) surface = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()));
-
-  for (auto shape = image.begin(); shape != image.end(); ++shape)
-  {
-    std::vector<TopoDS_Wire> positivePaths;
-    std::vector<TopoDS_Wire> negativePaths;
-
-    for (auto path = shape.begin(); path != shape.end(); ++path)
-    {
-      int orientation = 0;
-      Geom2dConvert_CompCurveToBSplineCurve pathCurve;
-
-      for (auto curve = path.begin(); curve != path.end(); ++curve)
-      {
-        Handle(Geom2d_Curve) c = curve;
-        if (!c.IsNull())
-        {
-          Handle(Geom2d_BSplineCurve) bspline = Geom2dConvert::CurveToBSplineCurve(curve);
-          pathCurve.Add(bspline, 1.0e-6, Standard_True);
-
-          orientation += curve.orientation();
-        }
-      }
-
-      BRepBuilderAPI_MakeEdge edge(pathCurve.BSplineCurve(), surface);
-      BRepBuilderAPI_MakeWire wire(edge);
-      BRepLib::BuildCurves3d(wire);
-
-      if (orientation >= 0)
-      {
-        positivePaths.push_back(wire);
-      }
-      else
-      {
-        negativePaths.push_back(wire);
-      }
-    }
-
-    wires.push_back(ShapeWires(positivePaths, negativePaths));
-  }
-
-  m_svgChanged = false;
-
-  timer.end();
+#ifdef REACTCAD_DEBUG
+  timer1.end();
+#endif
 }
 
 void SweepNode::setProfile(const std::vector<Point> &points)
 {
-  m_type = Type::Polygon;
-
-  Standard_Boolean changed = false;
+  Standard_Boolean changed = m_isSVG;
+  m_isSVG = Standard_False;
 
   if (m_points.size() > points.size())
   {
@@ -127,8 +79,8 @@ void SweepNode::setProfile(const std::vector<Point> &points)
 
     for (size_t i = 0; i < points.size(); ++i)
     {
-      if (!doubleEquals(m_points[i].x, points[i].x) || !doubleEquals(m_points[i].y, points[i].y) ||
-          !doubleEquals(m_points[i].z, points[i].z))
+      if (!IsEqual(m_points[i].x, points[i].x) || !IsEqual(m_points[i].y, points[i].y) ||
+          !IsEqual(m_points[i].z, points[i].z))
       {
         m_points[i] = points[i];
         changed = true;
@@ -138,52 +90,15 @@ void SweepNode::setProfile(const std::vector<Point> &points)
 
   if (changed)
   {
+    BRepBuilderAPI_MakePolygon polygon;
+    for (auto point : points)
+    {
+      polygon.Add(gp_Pnt(point.x, point.y, point.z));
+    }
+    polygon.Close();
+    BRepBuilderAPI_MakeFace face(polygon);
+    m_profile = face;
+    m_profileChanged = Standard_True;
     propsChanged();
-    m_pointsChanged = true;
-  }
-}
-
-void SweepNode::makeProfileFromPoints()
-{
-  wires.clear();
-
-  BRepBuilderAPI_MakePolygon polygon;
-  for (auto point : m_points)
-  {
-    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z));
-    polygon.Add(vertex);
-  }
-  polygon.Close();
-
-  std::vector<TopoDS_Wire> positivePaths;
-  std::vector<TopoDS_Wire> negativePaths;
-
-  positivePaths.push_back(polygon.Wire());
-
-  wires.push_back(ShapeWires(positivePaths, negativePaths));
-
-  m_pointsChanged = false;
-}
-
-void SweepNode::makeProfile()
-{
-  switch (m_type)
-  {
-  case Type::Polygon:
-    if (m_pointsChanged)
-    {
-      makeProfileFromPoints();
-      m_profileChanged = true;
-    }
-    return;
-  case Type::SVG:
-    if (m_svgChanged)
-    {
-      makeProfileFromSVG();
-      m_profileChanged = true;
-    }
-    return;
-  case Type::Unknown:
-    return;
   }
 }

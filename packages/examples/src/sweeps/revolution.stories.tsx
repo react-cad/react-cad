@@ -1,6 +1,8 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { AxisName, Polygon, Point } from "@react-cad/core";
+import { Profile, Point, Vector } from "@react-cad/core";
+
+import reactIcon from "./react-icon";
 
 type Props = JSX.IntrinsicElements["revolution"];
 
@@ -13,11 +15,12 @@ function makePolygon(sides: number) {
   );
 }
 
-const profiles: Record<string, Polygon> = {
+const profiles: Record<string, Profile> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
+  SVG: reactIcon([24, 0]),
 };
 
 export const Revolution: React.FC<Props> = (props) => <revolution {...props} />;
@@ -32,18 +35,12 @@ export default {
         type: "select",
       },
     },
-    axis: {
-      options: ["x", "y", "z"],
-      control: {
-        type: "inline-radio",
-      },
-    },
     angle: {
       control: {
         type: "range",
-        min: 0.1,
-        max: Math.ceil(2 * Math.PI),
-        step: 0.1,
+        min: 1,
+        max: 360,
+        step: 1,
       },
     },
   },
@@ -51,17 +48,21 @@ export default {
 
 interface StoryProps {
   profileName: keyof typeof profiles;
-  axis: AxisName;
+  axis: Vector;
   angle: number;
 }
 
-const Template: Story<StoryProps> = ({ profileName, ...args }) => (
-  <Revolution profile={profiles[profileName]} {...args} />
+const Template: Story<StoryProps> = ({ profileName, angle, ...args }) => (
+  <Revolution
+    profile={profiles[profileName]}
+    angle={(angle / 180) * Math.PI}
+    {...args}
+  />
 );
 
 export const revolution = Template.bind({});
 revolution.args = {
   profileName: "Square",
-  axis: "z",
-  angle: Math.PI,
+  axis: [0, 0, 1],
+  angle: 90,
 };

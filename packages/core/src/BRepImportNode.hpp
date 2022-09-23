@@ -7,7 +7,6 @@ class BRepImportNode : public ImportNode
 {
 public:
   BRepImportNode();
-  ~BRepImportNode();
 
 protected:
   void importFile() override;

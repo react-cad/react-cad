@@ -2,7 +2,6 @@
 
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
-#include <Message.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <string>
@@ -13,13 +12,11 @@ BRepImportNode::BRepImportNode()
 {
 }
 
-BRepImportNode::~BRepImportNode()
-{
-}
-
 void BRepImportNode::importFile()
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import BRep");
+#endif
 
   TopoDS_Shape brep;
   BRep_Builder builder;
@@ -34,5 +31,7 @@ void BRepImportNode::importFile()
     shape = TopoDS_Shape();
   }
 
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }

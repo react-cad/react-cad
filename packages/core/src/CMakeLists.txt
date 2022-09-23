@@ -10,7 +10,7 @@ set(APP_TARGET_ES6 react-cad-core.esm.js)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-set(CMAKE_CXX_FLAGS "-pthread")
+set(CMAKE_CXX_FLAGS "-pthread -fexceptions")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(/usr/local/include)
@@ -42,6 +42,7 @@ target_link_libraries(
 )
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   --bind \
+  -fexceptions \
   -s EXPORTED_RUNTIME_METHODS=['FS','ccall','cwrap'] \
   -s EXPORTED_FUNCTIONS=['_main','_shutdown'] \
   -s WASM=1 \
@@ -54,7 +55,11 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s USE_PTHREADS \
   -s EXPORT_NAME=reactCad \
   -s OFFSCREEN_FRAMEBUFFER=1 \
-  -s NO_DISABLE_EXCEPTION_CATCHING \
+  -s EXCEPTION_CATCHING_ALLOWED=['RevolutionNode::computeShape'] \
+")
+
+set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_DEBUG "\
+  -s EXCEPTION_DEBUG=1 \
 ")
 
 add_custom_command(

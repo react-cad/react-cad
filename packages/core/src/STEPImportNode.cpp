@@ -11,13 +11,11 @@ STEPImportNode::STEPImportNode()
 {
 }
 
-STEPImportNode::~STEPImportNode()
-{
-}
-
 void STEPImportNode::importFile()
 {
+#ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import STEP");
+#endif
 
   STEPControl_Reader reader;
   IFSelect_ReturnStatus status = reader.ReadFile(m_filename.c_str());
@@ -48,5 +46,7 @@ void STEPImportNode::importFile()
 
   shape = reader.OneShape();
 
+#ifdef REACTCAD_DEBUG
   timer.end();
+#endif
 }
