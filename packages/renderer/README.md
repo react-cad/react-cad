@@ -1,14 +1,12 @@
-# react-cad
+# @react-cad/renderer
 
-A CAD system for producing constructive solid geometry using React.
+The custom React renderer which allows @react-cad projects to be written as React components.
 
 ## Usage
 
 ```javascript
-import React from 'react';
-import reactCadRenderer from "react-cad";
-
 import reactCadCore from "@react-cad/core";
+import reactCadRenderer from "@react-cad/renderer";
 
 const canvas = document.getElementById("my-canvas");
 
@@ -32,7 +30,7 @@ To get typechecking and code completion of @react-cad JSX elements, add `typeRoo
   "compilerOptions": {
     "typeRoots": [
       "node_modules/@types",
-      "node_modules/react-cad/types"
+      "node_modules/@react-cad/renderer/types"
     ]
   }
 }
