@@ -1,4 +1,4 @@
-import { ElementProps } from "../../lib/types";
+import { ElementProps } from "@react-cad/renderer";
 
 declare global {
   namespace JSX {

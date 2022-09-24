@@ -6,8 +6,8 @@
     "outDir": "./lib",
     "typeRoots": [
       "node_modules/@types",
-      "node_modules/@react-cad/renderer/types",
-      "../renderer/types"
+      "node_modules/react-cad/types",
+      "../react-cad/types"
     ],
     "lib": ["DOM"]
   },

@@ -4,8 +4,7 @@
   "version": "0.13.0",
   "main": "lib/index.js",
   "files": [
-    "lib/**/*",
-    "types/**/*"
+    "lib/**/*"
   ],
   "license": "MIT",
   "repository": "github:react-cad/react-cad",
