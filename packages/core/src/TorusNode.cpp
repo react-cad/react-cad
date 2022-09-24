@@ -8,8 +8,8 @@ TorusNode::TorusNode() : m_props({.radius1 = 1, .radius2 = 1, .angle = 0})
 
 void TorusNode::setProps(const TorusProps &props)
 {
-  if (!doubleEquals(m_props.radius1, props.radius1) || !doubleEquals(m_props.radius2, props.radius2) ||
-      !doubleEquals(m_props.angle, props.angle))
+  if (!IsEqual(m_props.radius1, props.radius1) || !IsEqual(m_props.radius2, props.radius2) ||
+      !IsEqual(m_props.angle, props.angle))
   {
     m_props = props;
     propsChanged();

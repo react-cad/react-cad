@@ -8,8 +8,8 @@ CylinderNode::CylinderNode() : m_props({.center = false, .radius = 1, .height = 
 
 void CylinderNode::setProps(const CylinderProps &props)
 {
-  if (!props.center == m_props.center || !doubleEquals(props.radius, m_props.radius) ||
-      !doubleEquals(props.height, m_props.height) || !doubleEquals(props.angle, m_props.angle))
+  if (!props.center == m_props.center || !IsEqual(props.radius, m_props.radius) ||
+      !IsEqual(props.height, m_props.height) || !IsEqual(props.angle, m_props.angle))
   {
     m_props = props;
     propsChanged();

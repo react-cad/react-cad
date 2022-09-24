@@ -11,8 +11,8 @@ WedgeNode::WedgeNode()
 
 void WedgeNode::setPropsLtx(const WedgePropsLtx &props)
 {
-  if (!doubleEquals(props.x, m_propsLtx.x) || !doubleEquals(props.y, m_propsLtx.y) ||
-      !doubleEquals(props.z, m_propsLtx.z) || !doubleEquals(props.ltx, m_propsLtx.ltx))
+  if (!IsEqual(props.x, m_propsLtx.x) || !IsEqual(props.y, m_propsLtx.y) || !IsEqual(props.z, m_propsLtx.z) ||
+      !IsEqual(props.ltx, m_propsLtx.ltx))
   {
     useLtx = true;
     m_propsLtx = props;
@@ -22,10 +22,9 @@ void WedgeNode::setPropsLtx(const WedgePropsLtx &props)
 
 void WedgeNode::setPropsMinMax(const WedgePropsMinMax &props)
 {
-  if (!doubleEquals(props.x, m_propsMinMax.x) || !doubleEquals(props.y, m_propsMinMax.y) ||
-      !doubleEquals(props.z, m_propsMinMax.z) || !doubleEquals(props.xmin, m_propsMinMax.xmin) ||
-      !doubleEquals(props.xmax, m_propsMinMax.xmax) || !doubleEquals(props.zmin, m_propsMinMax.zmin) ||
-      !doubleEquals(props.zmax, m_propsMinMax.zmax))
+  if (!IsEqual(props.x, m_propsMinMax.x) || !IsEqual(props.y, m_propsMinMax.y) || !IsEqual(props.z, m_propsMinMax.z) ||
+      !IsEqual(props.xmin, m_propsMinMax.xmin) || !IsEqual(props.xmax, m_propsMinMax.xmax) ||
+      !IsEqual(props.zmin, m_propsMinMax.zmin) || !IsEqual(props.zmax, m_propsMinMax.zmax))
   {
     useLtx = false;
     m_propsMinMax = props;

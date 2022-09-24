@@ -8,9 +8,8 @@ SphereNode::SphereNode() : m_props({.radius = 1, .angle = 0, .segmentAngle1 = 0,
 
 void SphereNode::setProps(const SphereProps &props)
 {
-  if (!doubleEquals(props.radius, m_props.radius) ||
-      !doubleEquals(props.angle, m_props.angle || !doubleEquals(props.segmentAngle1, m_props.segmentAngle1)) ||
-      !doubleEquals(props.segmentAngle2, m_props.segmentAngle2))
+  if (!IsEqual(props.radius, m_props.radius) || !IsEqual(props.angle, m_props.angle) ||
+      !IsEqual(props.segmentAngle1, m_props.segmentAngle1) || !IsEqual(props.segmentAngle2, m_props.segmentAngle2))
   {
     m_props = props;
     propsChanged();

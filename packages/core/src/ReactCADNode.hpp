@@ -40,8 +40,6 @@ protected:
 
   TopoDS_Shape m_childShape;
 
-  bool doubleEquals(double a, double b);
-
 private:
   Handle(ReactCADNode) m_parent;
   std::vector<Handle(ReactCADNode)> m_children;

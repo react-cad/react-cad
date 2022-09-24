@@ -9,8 +9,8 @@ BoxNode::BoxNode() : m_props({.center = false, .x = 1, .y = 1, .z = 1})
 
 void BoxNode::setProps(const BoxProps &props)
 {
-  if (props.center != m_props.center || !doubleEquals(props.x, m_props.x) || !doubleEquals(props.y, m_props.y) ||
-      !doubleEquals(props.z, m_props.z))
+  if (props.center != m_props.center || !IsEqual(props.x, m_props.x) || !IsEqual(props.y, m_props.y) ||
+      !IsEqual(props.z, m_props.z))
   {
     m_props = props;
     propsChanged();

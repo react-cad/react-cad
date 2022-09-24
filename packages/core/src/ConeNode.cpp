@@ -8,9 +8,9 @@ ConeNode::ConeNode() : m_props({.center = false, .radius1 = 1, .radius2 = 1, .he
 
 void ConeNode::setProps(const ConeProps &props)
 {
-  if (!props.center == m_props.center || !doubleEquals(props.radius1, m_props.radius1) ||
-      !doubleEquals(props.radius2, m_props.radius2) || !doubleEquals(props.height, m_props.height) ||
-      !doubleEquals(props.angle, m_props.angle))
+  if (!props.center == m_props.center || !IsEqual(props.radius1, m_props.radius1) ||
+      !IsEqual(props.radius2, m_props.radius2) || !IsEqual(props.height, m_props.height) ||
+      !IsEqual(props.angle, m_props.angle))
   {
     m_props = props;
     propsChanged();

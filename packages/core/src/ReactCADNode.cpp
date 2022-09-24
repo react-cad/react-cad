@@ -153,18 +153,3 @@ void ReactCADNode::computeShape()
 {
   shape = m_childShape;
 }
-
-bool ReactCADNode::doubleEquals(double a, double b)
-{
-  double diff = fabs(a - b);
-  a = fabs(a);
-  b = fabs(b);
-
-  double largest = (b > a) ? b : a;
-  if (diff <= largest * DBL_EPSILON)
-  {
-    return true;
-  }
-
-  return false;
-}
