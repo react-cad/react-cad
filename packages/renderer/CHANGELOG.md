@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/react-cad/react-cad/compare/v0.12.0...v0.13.0) (2022-09-24)
+
+
+### Features
+
+* add pipe component ([306c46c](https://github.com/react-cad/react-cad/commit/306c46c24ce30017d422bbfa878e312f467c55fb))
+
+
+
+
+
 # [0.12.0](https://github.com/react-cad/react-cad/compare/v0.11.0...v0.12.0) (2022-09-23)
 
 
