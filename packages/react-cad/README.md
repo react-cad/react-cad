@@ -1,6 +1,6 @@
-# react-cad
+# @react-cad/renderer
 
-A CAD system for producing constructive solid geometry using React.
+The custom React renderer which allows @react-cad projects to be written as React components.
 
 ## Usage
 
