@@ -4,13 +4,14 @@
 #include "Geometry.hpp"
 #include "SweepNode.hpp"
 
+#include <NCollection_Array1.hxx>
 #include <TopoDS_Wire.hxx>
 
 class PipeNode : public SweepNode
 {
 public:
   PipeNode();
-  void setSpine(const std::vector<Point> &points);
+  void setSpine(const NCollection_Array1<Point> &points);
   void setSpineSVG(const std::string &svg);
 
 protected:

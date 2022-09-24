@@ -46,9 +46,11 @@
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
 #include <Message_PrinterSystemLog.hxx>
+#include <NCollection_Array1.hxx>
 #include <OSD_MemInfo.hxx>
 #include <OSD_Parallel.hxx>
 #include <StlAPI.hxx>
+#include <TCollection_AsciiString.hxx>
 
 #include <Standard_ArrayStreamBuffer.hxx>
 
@@ -349,22 +351,35 @@ namespace emscripten
 namespace internal
 {
 
-template <typename T, typename Allocator> struct BindingType<std::vector<T, Allocator>>
+template <typename T, typename... Policies>
+NCollection_Array1<T> nCollectionArrayFromJSArray(const val &v, Policies... policies)
+{
+  const size_t l = v["length"].as<size_t>();
+
+  NCollection_Array1<T> rv(0, l - 1);
+  for (size_t i = 0; i < l; ++i)
+  {
+    rv[i] = (v[i].as<T>(std::forward<Policies>(policies)...));
+  }
+
+  return rv;
+}
+
+template <typename T> struct BindingType<NCollection_Array1<T>>
 {
   using ValBinding = BindingType<val>;
   using WireType = ValBinding::WireType;
 
-  static std::vector<T, Allocator> fromWireType(WireType value)
+  static NCollection_Array1<T> fromWireType(WireType value)
   {
-    return vecFromJSArray<T>(ValBinding::fromWireType(value));
+    return nCollectionArrayFromJSArray<T>(ValBinding::fromWireType(value));
   }
 };
 
 template <typename T>
 struct TypeID<
     T, typename std::enable_if_t<std::is_same<typename Canonicalized<T>::type,
-                                              std::vector<typename Canonicalized<T>::type::value_type,
-                                                          typename Canonicalized<T>::type::allocator_type>>::value>>
+                                              NCollection_Array1<typename Canonicalized<T>::type::value_type>>::value>>
 {
   static constexpr TYPEID get()
   {

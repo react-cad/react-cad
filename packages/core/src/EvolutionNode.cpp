@@ -7,6 +7,7 @@
 #include <BRepOffsetAPI_MakeEvolved.hxx>
 #include <BRep_Builder.hxx>
 #include <ShapeFix_Wire.hxx>
+#include <TCollection_AsciiString.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -27,7 +28,7 @@ EvolutionNode::EvolutionNode() : m_spine(), m_profile()
 {
 }
 
-void EvolutionNode::setProfile(const std::vector<Point> &points)
+void EvolutionNode::setProfile(const NCollection_Array1<Point> &points)
 {
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : points)
@@ -83,7 +84,7 @@ void EvolutionNode::setProfileSVG(const std::string &pathData)
   }
 }
 
-void EvolutionNode::setSpine(const std::vector<Point> &points)
+void EvolutionNode::setSpine(const NCollection_Array1<Point> &points)
 {
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : points)

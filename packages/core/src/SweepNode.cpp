@@ -24,10 +24,13 @@
 #include "SVGBuilder.hpp"
 #include "SVGImage.hpp"
 
-SweepNode::SweepNode() : m_points()
+const Point defaultPoints[4] = {
+    {.x = -1, .y = -1, .z = 0}, {.x = -1, .y = 1, .z = 0}, {.x = 1, .y = 1, .z = 0}, {.x = 1, .y = -1, .z = 0}};
+
+SweepNode::SweepNode() : m_points(), m_isSVG(Standard_False)
 {
-  std::vector<Point> points(
-      {{.x = -1, .y = -1, .z = 0}, {.x = -1, .y = 1, .z = 0}, {.x = 1, .y = 1, .z = 0}, {.x = 1, .y = -1, .z = 0}});
+
+  NCollection_Array1<Point> points(defaultPoints[0], 0, 3);
   setProfile(points);
 }
 
@@ -59,25 +62,25 @@ void SweepNode::setProfileSVG(const std::string &svg)
 #endif
 }
 
-void SweepNode::setProfile(const std::vector<Point> &points)
+void SweepNode::setProfile(const NCollection_Array1<Point> &points)
 {
   Standard_Boolean changed = m_isSVG;
   m_isSVG = Standard_False;
 
-  if (m_points.size() > points.size())
+  if (m_points.Size() > points.Size())
   {
-    m_points = std::vector<Point>(points);
+    m_points = NCollection_Array1<Point>(points);
     changed = true;
   }
   else
   {
-    if (points.size() > m_points.size())
+    if (points.Size() > m_points.Size())
     {
-      m_points.resize(points.size());
+      m_points.Resize(0, points.Size() - 1, Standard_True);
       changed = true;
     }
 
-    for (size_t i = 0; i < points.size(); ++i)
+    for (int i = 0; i < points.Size(); ++i)
     {
       if (!IsEqual(m_points[i].x, points[i].x) || !IsEqual(m_points[i].y, points[i].y) ||
           !IsEqual(m_points[i].z, points[i].z))

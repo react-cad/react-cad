@@ -23,7 +23,7 @@ PipeNode::PipeNode() : m_spine()
 {
 }
 
-void PipeNode::setSpine(const std::vector<Point> &points)
+void PipeNode::setSpine(const NCollection_Array1<Point> &points)
 {
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : points)
