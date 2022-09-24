@@ -71,6 +71,10 @@ export interface ReactCADElements {
   };
 
   evolution: {
+    profile: Point[] | string;
+    spine: Profile;
+  };
+  pipe: {
     profile: Profile;
     spine: Point[] | string;
   };
