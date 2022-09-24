@@ -10,12 +10,11 @@ PrismNode::PrismNode() : m_vector(0, 0, 1)
 {
 }
 
-void PrismNode::setVector(Point point)
+void PrismNode::setVector(gp_Vec vector)
 {
-  gp_Vec newVector(point.x, point.y, point.z);
-  if (!newVector.IsEqual(m_vector, Precision::Confusion(), Precision::Angular()))
+  if (!vector.IsEqual(m_vector, Precision::Confusion(), Precision::Angular()))
   {
-    m_vector = newVector;
+    m_vector = vector;
     propsChanged();
   }
 }

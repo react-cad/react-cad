@@ -28,12 +28,12 @@ EvolutionNode::EvolutionNode() : m_spine(), m_profile()
 {
 }
 
-void EvolutionNode::setProfile(const NCollection_Array1<Point> &points)
+void EvolutionNode::setProfile(const NCollection_Array1<gp_Pnt> &points)
 {
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : points)
   {
-    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z));
+    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(point);
     polygon.Add(vertex);
   }
   m_profile = polygon;
@@ -84,12 +84,12 @@ void EvolutionNode::setProfileSVG(const std::string &pathData)
   }
 }
 
-void EvolutionNode::setSpine(const NCollection_Array1<Point> &points)
+void EvolutionNode::setSpine(const NCollection_Array1<gp_Pnt> &points)
 {
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : points)
   {
-    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z));
+    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(point);
     polygon.Add(vertex);
   }
   polygon.Close();

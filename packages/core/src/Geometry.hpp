@@ -3,15 +3,6 @@
 
 #include <Standard_TypeDef.hxx>
 
-struct Point
-{
-  Standard_Real x;
-  Standard_Real y;
-  Standard_Real z;
-};
-
-typedef Point Vector;
-
 struct Quaternion
 {
   Standard_Real x;

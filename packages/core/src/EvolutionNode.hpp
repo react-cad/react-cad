@@ -4,14 +4,15 @@
 #include "SweepNode.hpp"
 
 #include <NCollection_Array1.hxx>
+#include <gp_Pnt.hxx>
 
 class EvolutionNode : public ReactCADNode
 {
 public:
   EvolutionNode();
-  void setSpine(const NCollection_Array1<Point> &points);
+  void setSpine(const NCollection_Array1<gp_Pnt> &points);
   void setSpineSVG(const std::string &svg);
-  void setProfile(const NCollection_Array1<Point> &points);
+  void setProfile(const NCollection_Array1<gp_Pnt> &points);
   void setProfileSVG(const std::string &pathData);
 
 protected:

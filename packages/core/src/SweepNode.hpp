@@ -7,6 +7,7 @@
 #include <NCollection_Array1.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Wire.hxx>
+#include <gp_Pnt.hxx>
 
 #include <utility>
 
@@ -14,7 +15,7 @@ class SweepNode : public ReactCADNode
 {
 public:
   SweepNode();
-  void setProfile(const NCollection_Array1<Point> &points);
+  void setProfile(const NCollection_Array1<gp_Pnt> &points);
   void setProfileSVG(const std::string &svg);
 
 protected:
@@ -22,7 +23,7 @@ protected:
   Standard_Boolean m_profileChanged = false;
 
 private:
-  NCollection_Array1<Point> m_points;
+  NCollection_Array1<gp_Pnt> m_points;
   std::string m_svg;
   Standard_Boolean m_isSVG;
 };

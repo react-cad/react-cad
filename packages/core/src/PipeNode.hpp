@@ -6,12 +6,13 @@
 
 #include <NCollection_Array1.hxx>
 #include <TopoDS_Wire.hxx>
+#include <gp_Pnt.hxx>
 
 class PipeNode : public SweepNode
 {
 public:
   PipeNode();
-  void setSpine(const NCollection_Array1<Point> &points);
+  void setSpine(const NCollection_Array1<gp_Pnt> &points);
   void setSpineSVG(const std::string &svg);
 
 protected:

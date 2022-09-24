@@ -10,31 +10,31 @@
 
 #include "PolyhedronNode.hpp"
 
-const Point defaultPoints[4] = {
-    {.x = 1, .y = 0, .z = 0},
-    {.x = 0, .y = 1, .z = 0},
-    {.x = 0, .y = 0, .z = 1},
-};
-
-const unsigned int faces[4][3] = {
-    {0, 1, 2},
-    {0, 1, 3},
-    {0, 2, 3},
-    {1, 2, 3},
-};
-
-const NCollection_Array1<int> defaultFaces[4] = {
-    NCollection_Array1<int>(faces[0][0], 0, 2),
-    NCollection_Array1<int>(faces[1][0], 0, 2),
-    NCollection_Array1<int>(faces[2][0], 0, 2),
-    NCollection_Array1<int>(faces[3][0], 0, 2),
-};
-
 PolyhedronNode::PolyhedronNode()
 {
-  m_points = NCollection_Array1<Point>(defaultPoints[0], 0, 3);
+  m_points = NCollection_Array1<gp_Pnt>(0, 3);
+  m_points[0] = gp_Pnt(0, 0, 0);
+  m_points[1] = gp_Pnt(1, 0, 0);
+  m_points[2] = gp_Pnt(0, 1, 0);
+  m_points[3] = gp_Pnt(0, 0, 1);
 
-  m_faces = NCollection_Array1<NCollection_Array1<int>>(defaultFaces[0], 0, 3);
+  m_faces = NCollection_Array1<NCollection_Array1<int>>(0, 3);
+  m_faces[0] = NCollection_Array1<int>(0, 2);
+  m_faces[0][0] = 0;
+  m_faces[0][1] = 1;
+  m_faces[0][2] = 2;
+  m_faces[1] = NCollection_Array1<int>(0, 2);
+  m_faces[1][0] = 0;
+  m_faces[1][1] = 1;
+  m_faces[1][2] = 3;
+  m_faces[2] = NCollection_Array1<int>(0, 2);
+  m_faces[2][0] = 0;
+  m_faces[2][1] = 2;
+  m_faces[2][2] = 3;
+  m_faces[3] = NCollection_Array1<int>(0, 2);
+  m_faces[3][0] = 1;
+  m_faces[3][1] = 2;
+  m_faces[3][2] = 3;
 }
 
 bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>> &faces)
@@ -63,14 +63,14 @@ bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>
   return true;
 }
 
-void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<Point> &points,
+void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
                                        const NCollection_Array1<NCollection_Array1<int>> &faces)
 {
   lock();
-  m_points = NCollection_Array1<Point>(points);
+  m_points = points;
   if (checkFaces(faces))
   {
-    m_faces = NCollection_Array1<NCollection_Array1<int>>(faces);
+    m_faces = faces;
   }
   else
   {
@@ -89,8 +89,8 @@ void PolyhedronNode::computeShape()
     BRepBuilderAPI_MakePolygon polygon;
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
-      Point point = m_points[*pointIndex];
-      polygon.Add(gp_Pnt(point.x, point.y, point.z));
+      gp_Pnt point = m_points[*pointIndex];
+      polygon.Add(point);
     }
     polygon.Close();
     BRepBuilderAPI_MakeFace f(polygon.Wire());

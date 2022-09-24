@@ -51,6 +51,8 @@
 #include <OSD_Parallel.hxx>
 #include <StlAPI.hxx>
 #include <TCollection_AsciiString.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Vec.hxx>
 
 #include <Standard_ArrayStreamBuffer.hxx>
 
@@ -60,111 +62,111 @@
 
 #include <pthread.h>
 
-std::shared_ptr<ReactCADNode> createCADNode(std::string type)
+Handle(ReactCADNode) createCADNode(std::string type)
 {
   if (type == "box")
   {
-    return std::make_shared<BoxNode>();
+    return new BoxNode();
   }
   if (type == "wedge")
   {
-    return std::make_shared<WedgeNode>();
+    return new WedgeNode();
   }
   if (type == "cone")
   {
-    return std::make_shared<ConeNode>();
+    return new ConeNode();
   }
   if (type == "cylinder")
   {
-    return std::make_shared<CylinderNode>();
+    return new CylinderNode();
   }
   if (type == "difference")
   {
-    return std::make_shared<DifferenceNode>();
+    return new DifferenceNode();
   }
   if (type == "pipe")
   {
-    return std::make_shared<PipeNode>();
+    return new PipeNode();
   }
   if (type == "helix")
   {
-    return std::make_shared<HelixNode>();
+    return new HelixNode();
   }
   if (type == "intersection")
   {
-    return std::make_shared<IntersectionNode>();
+    return new IntersectionNode();
   }
   if (type == "polyhedron")
   {
-    return std::make_shared<PolyhedronNode>();
+    return new PolyhedronNode();
   }
   if (type == "evolution")
   {
-    return std::make_shared<EvolutionNode>();
+    return new EvolutionNode();
   }
   if (type == "prism")
   {
-    return std::make_shared<PrismNode>();
+    return new PrismNode();
   }
   if (type == "revolution")
   {
-    return std::make_shared<RevolutionNode>();
+    return new RevolutionNode();
   }
   if (type == "mirror")
   {
-    return std::make_shared<MirrorNode>();
+    return new MirrorNode();
   }
   if (type == "affine")
   {
-    return std::make_shared<AffineNode>();
+    return new AffineNode();
   }
   if (type == "rotation")
   {
-    return std::make_shared<RotationNode>();
+    return new RotationNode();
   }
   if (type == "scale")
   {
-    return std::make_shared<ScaleNode>();
+    return new ScaleNode();
   }
   if (type == "sphere")
   {
-    return std::make_shared<SphereNode>();
+    return new SphereNode();
   }
   if (type == "torus")
   {
-    return std::make_shared<TorusNode>();
+    return new TorusNode();
   }
   if (type == "translation")
   {
-    return std::make_shared<TranslationNode>();
+    return new TranslationNode();
   }
   if (type == "union")
   {
-    return std::make_shared<UnionNode>();
+    return new UnionNode();
   }
   if (type == "brep")
   {
-    return std::make_shared<BRepImportNode>();
+    return new BRepImportNode();
   }
   if (type == "step")
   {
-    return std::make_shared<STEPImportNode>();
+    return new STEPImportNode();
   }
   if (type == "obj")
   {
-    return std::make_shared<ObjImportNode>();
+    return new ObjImportNode();
   }
   if (type == "stl")
   {
-    return std::make_shared<STLImportNode>();
+    return new STLImportNode();
   }
 
-  return std::make_shared<BoxNode>();
+  return new BoxNode();
 }
 
 struct RenderRequest
 {
-  std::shared_ptr<ReactCADNode> node;
+  Handle(ReactCADNode) node;
   bool reset;
 };
 
@@ -180,7 +182,7 @@ void *renderInternal(void *data)
     pthread_mutex_lock(&render_mutex);
     pthread_cond_wait(&render_cond, &render_mutex);
 
-    std::shared_ptr<ReactCADView> view = ReactCADView::getView();
+    Handle(ReactCADView) view = ReactCADView::getView();
 
     do
     {
@@ -220,7 +222,7 @@ void *renderInternal(void *data)
   return NULL;
 }
 
-void render(std::shared_ptr<ReactCADNode> node, bool reset = false)
+void render(Handle(ReactCADNode) node, bool reset = false)
 {
   pthread_mutex_lock(&render_mutex);
   renderQueue.push_back({node, reset});
@@ -230,77 +232,65 @@ void render(std::shared_ptr<ReactCADNode> node, bool reset = false)
 
 void resetView()
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->resetView();
+  ReactCADView::getView()->resetView();
 }
 
 void setQuality(double deviationCoefficent, double angle)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->setQuality(deviationCoefficent, angle);
+  ReactCADView::getView()->setQuality(deviationCoefficent, angle);
 }
 
 void setColor(std::string color)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->setColor(color);
+  ReactCADView::getView()->setColor(color);
 }
 
 void zoom(double delta)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->zoom(delta);
+  ReactCADView::getView()->zoom(delta);
 }
 
 void fit()
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->fit();
+  ReactCADView::getView()->fit();
 }
 
 void setViewpoint(ReactCADView::Viewpoint viewpoint)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->setViewpoint(viewpoint);
+  ReactCADView::getView()->setViewpoint(viewpoint);
 }
 
 void setProjection(Graphic3d_Camera::Projection projection)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->setProjection(projection);
+  ReactCADView::getView()->setProjection(projection);
 }
 
 void showAxes(bool show)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->showAxes(show);
+  ReactCADView::getView()->showAxes(show);
 }
 
 void showGrid(bool show)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->showGrid(show);
+  ReactCADView::getView()->showGrid(show);
 }
 
 void showWireframe(bool show)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->showWireframe(show);
+  ReactCADView::getView()->showWireframe(show);
 }
 
 void showShaded(bool show)
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->showShaded(show);
+  ReactCADView::getView()->showShaded(show);
 }
 
 void onResize()
 {
-  std::shared_ptr<ReactCADView> view = ReactCADView::getView();
-  view->onResize();
+  ReactCADView::getView()->onResize();
 }
 
-Standard_Boolean writeSTL(const std::shared_ptr<ReactCADNode> &node, const std::string filename,
+Standard_Boolean writeSTL(const Handle(ReactCADNode) & node, const std::string filename,
                           const Standard_Real theLinDeflection, const Standard_Boolean isRelative,
                           const Standard_Real theAngDeflection)
 {
@@ -395,18 +385,28 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   // Base node
   emscripten::class_<ReactCADNode>("ReactCADNode")
-      .smart_ptr<std::shared_ptr<ReactCADNode>>("ReactCADNode")
+      .smart_ptr<Handle(ReactCADNode)>("ReactCADNode")
       .function("appendChild", &ReactCADNode::appendChild)
       .function("insertChildBefore", &ReactCADNode::insertChildBefore)
       .function("removeChild", &ReactCADNode::removeChild)
       .function("hasParent", &ReactCADNode::hasParent);
 
-  emscripten::value_array<Point>("Point").element(&Point::x).element(&Point::y).element(&Point::z);
+  emscripten::value_array<gp_Pnt>("Point")
+      .element(&gp_Pnt::X, &gp_Pnt::SetX)
+      .element(&gp_Pnt::Y, &gp_Pnt::SetY)
+      .element(&gp_Pnt::Z, &gp_Pnt::SetZ);
+
+  emscripten::value_array<gp_Vec>("Vector")
+      .element(&gp_Vec::X, &gp_Vec::SetX)
+      .element(&gp_Vec::Y, &gp_Vec::SetY)
+      .element(&gp_Vec::Z, &gp_Vec::SetZ);
+
   emscripten::value_array<Quaternion>("Quaternion")
       .element(&Quaternion::x)
       .element(&Quaternion::y)
       .element(&Quaternion::z)
       .element(&Quaternion::w);
+
   emscripten::value_array<MatrixRow>("MatrixRow")
       .element(&MatrixRow::a1)
       .element(&MatrixRow::a2)
@@ -425,7 +425,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("y", &BoxProps::y)
       .field("z", &BoxProps::z);
   emscripten::class_<BoxNode, emscripten::base<ReactCADNode>>("ReactCADBoxNode")
-      .smart_ptr<std::shared_ptr<BoxNode>>("ReactCADBoxNode")
+      .smart_ptr<Handle(BoxNode)>("ReactCADBoxNode")
       .function("setProps", &BoxNode::setProps);
 
   emscripten::value_object<WedgePropsLtx>("WedgePropsLtx")
@@ -442,7 +442,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("zmin", &WedgePropsMinMax::zmin)
       .field("zmax", &WedgePropsMinMax::zmax);
   emscripten::class_<WedgeNode, emscripten::base<ReactCADNode>>("ReactCADWedgeNode")
-      .smart_ptr<std::shared_ptr<WedgeNode>>("ReactCADWedgeNode")
+      .smart_ptr<Handle(WedgeNode)>("ReactCADWedgeNode")
       .function("setPropsLtx", &WedgeNode::setPropsLtx)
       .function("setPropsMinMax", &WedgeNode::setPropsMinMax);
 
@@ -453,7 +453,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("height", &ConeProps::height)
       .field("angle", &ConeProps::angle);
   emscripten::class_<ConeNode, emscripten::base<ReactCADNode>>("ReactCADConeNode")
-      .smart_ptr<std::shared_ptr<ConeNode>>("ReactCADConeNode")
+      .smart_ptr<Handle(ConeNode)>("ReactCADConeNode")
       .function("setProps", &ConeNode::setProps);
 
   emscripten::value_object<CylinderProps>("CylinderProps")
@@ -462,7 +462,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("height", &CylinderProps::height)
       .field("angle", &CylinderProps::angle);
   emscripten::class_<CylinderNode, emscripten::base<ReactCADNode>>("ReactCADCylinderNode")
-      .smart_ptr<std::shared_ptr<CylinderNode>>("ReactCADCylinderNode")
+      .smart_ptr<Handle(CylinderNode)>("ReactCADCylinderNode")
       .function("setProps", &CylinderNode::setProps);
 
   emscripten::value_object<TorusProps>("TorusProps")
@@ -470,7 +470,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("radius2", &TorusProps::radius2)
       .field("angle", &TorusProps::angle);
   emscripten::class_<TorusNode, emscripten::base<ReactCADNode>>("ReactCADTorusNode")
-      .smart_ptr<std::shared_ptr<TorusNode>>("ReactCADTorusNode")
+      .smart_ptr<Handle(TorusNode)>("ReactCADTorusNode")
       .function("setProps", &TorusNode::setProps);
 
   emscripten::value_object<SphereProps>("SphereProps")
@@ -479,61 +479,61 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("segmentAngle1", &SphereProps::segmentAngle1)
       .field("segmentAngle2", &SphereProps::segmentAngle2);
   emscripten::class_<SphereNode, emscripten::base<ReactCADNode>>("ReactCADSphereNode")
-      .smart_ptr<std::shared_ptr<SphereNode>>("ReactCADSphereNode")
+      .smart_ptr<Handle(SphereNode)>("ReactCADSphereNode")
       .function("setProps", &SphereNode::setProps);
 
   emscripten::class_<PolyhedronNode, emscripten::base<ReactCADNode>>("ReactCADPolyhedronNode")
-      .smart_ptr<std::shared_ptr<PolyhedronNode>>("ReactCADPolyhedronNode")
+      .smart_ptr<Handle(PolyhedronNode)>("ReactCADPolyhedronNode")
       .function("setPointsAndFaces", &PolyhedronNode::setPointsAndFaces);
 
   // Sweeps
   emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
-      .smart_ptr<std::shared_ptr<SweepNode>>("ReactCADSweepNode")
+      .smart_ptr<Handle(SweepNode)>("ReactCADSweepNode")
       .function("setProfile", &SweepNode::setProfile)
       .function("setProfileSVG", &SweepNode::setProfileSVG);
 
   emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
-      .smart_ptr<std::shared_ptr<PrismNode>>("ReactCADPrismNode")
+      .smart_ptr<Handle(PrismNode)>("ReactCADPrismNode")
       .function("setVector", &PrismNode::setVector);
 
   emscripten::class_<EvolutionNode, emscripten::base<ReactCADNode>>("ReactCADEvolutionNode")
-      .smart_ptr<std::shared_ptr<EvolutionNode>>("ReactCADEvolutionNode")
+      .smart_ptr<Handle(EvolutionNode)>("ReactCADEvolutionNode")
       .function("setProfile", &EvolutionNode::setProfile)
       .function("setProfileSVG", &EvolutionNode::setProfileSVG)
       .function("setSpine", &EvolutionNode::setSpine)
       .function("setSpineSVG", &EvolutionNode::setSpineSVG);
 
   emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
-      .smart_ptr<std::shared_ptr<RevolutionNode>>("ReactCADRevolutionNode")
+      .smart_ptr<Handle(RevolutionNode)>("ReactCADRevolutionNode")
       .function("setAxisAngle", &RevolutionNode::setAxisAngle);
 
   emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
-      .smart_ptr<std::shared_ptr<HelixNode>>("ReactCADHelixNode")
+      .smart_ptr<Handle(HelixNode)>("ReactCADHelixNode")
       .function("setPitch", &HelixNode::setPitch)
       .function("setHeight", &HelixNode::setHeight);
 
   emscripten::class_<PipeNode, emscripten::base<SweepNode>>("ReactCADPipeNode")
-      .smart_ptr<std::shared_ptr<PipeNode>>("ReactCADPipeNode")
+      .smart_ptr<Handle(PipeNode)>("ReactCADPipeNode")
       .function("setSpine", &PipeNode::setSpine)
       .function("setSpineSVG", &PipeNode::setSpineSVG);
 
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
-      .smart_ptr<std::shared_ptr<ImportNode>>("ReactCADImportNode")
+      .smart_ptr<Handle(ImportNode)>("ReactCADImportNode")
       .function("setFilename", &ImportNode::setFilename)
       .function("getFilename", &ImportNode::getFilename);
 
   emscripten::class_<BRepImportNode, emscripten::base<ImportNode>>("ReactCADBRepImportNode")
-      .smart_ptr<std::shared_ptr<BRepImportNode>>("ReactCADBRepImportNode");
+      .smart_ptr<Handle(BRepImportNode)>("ReactCADBRepImportNode");
 
   emscripten::class_<STEPImportNode, emscripten::base<ImportNode>>("ReactCADSTEPImportNode")
-      .smart_ptr<std::shared_ptr<STEPImportNode>>("ReactCADSTEPImportNode");
+      .smart_ptr<Handle(STEPImportNode)>("ReactCADSTEPImportNode");
 
   emscripten::class_<STLImportNode, emscripten::base<ImportNode>>("ReactCADSTLImportNode")
-      .smart_ptr<std::shared_ptr<STLImportNode>>("ReactCADSTLImportNode");
+      .smart_ptr<Handle(STLImportNode)>("ReactCADSTLImportNode");
 
   emscripten::class_<ObjImportNode, emscripten::base<ImportNode>>("ReactCADObjImportNode")
-      .smart_ptr<std::shared_ptr<ObjImportNode>>("ReactCADObjImportNode");
+      .smart_ptr<Handle(ObjImportNode)>("ReactCADObjImportNode");
 
   // Transformations
   emscripten::value_object<TranslationProps>("TranslationProps")
@@ -541,25 +541,25 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .field("y", &TranslationProps::y)
       .field("z", &TranslationProps::z);
   emscripten::class_<TranslationNode, emscripten::base<ReactCADNode>>("ReactCADTranslationNode")
-      .smart_ptr<std::shared_ptr<TranslationNode>>("ReactCADTranslationNode")
+      .smart_ptr<Handle(TranslationNode)>("ReactCADTranslationNode")
       .function("setProps", &TranslationNode::setProps);
 
   emscripten::class_<MirrorNode, emscripten::base<ReactCADNode>>("ReactCADMirrorNode")
-      .smart_ptr<std::shared_ptr<MirrorNode>>("ReactCADMirrorNode")
+      .smart_ptr<Handle(MirrorNode)>("ReactCADMirrorNode")
       .function("setPlane", &MirrorNode::setPlane);
 
   emscripten::class_<AffineNode, emscripten::base<ReactCADNode>>("ReactCADAffineNode")
-      .smart_ptr<std::shared_ptr<AffineNode>>("ReactCADAffineNode")
+      .smart_ptr<Handle(AffineNode)>("ReactCADAffineNode")
       .function("setMatrix", &AffineNode::setMatrix);
 
   emscripten::class_<RotationNode, emscripten::base<ReactCADNode>>("ReactCADRotationNode")
-      .smart_ptr<std::shared_ptr<RotationNode>>("ReactCADRotationNode")
+      .smart_ptr<Handle(RotationNode)>("ReactCADRotationNode")
       .function("setAxisAngle", &RotationNode::setAxisAngle)
       .function("setEulerAngles", &RotationNode::setEulerAngles)
       .function("setRotation", &RotationNode::setRotation);
 
   emscripten::class_<ScaleNode, emscripten::base<ReactCADNode>>("ReactCADScaleNode")
-      .smart_ptr<std::shared_ptr<ScaleNode>>("ReactCADScaleNode")
+      .smart_ptr<Handle(ScaleNode)>("ReactCADScaleNode")
       .function("setCenter", &ScaleNode::setCenter)
       .function("setScaleFactor", &ScaleNode::setScaleFactor)
       .function("setScale", &ScaleNode::setScale);

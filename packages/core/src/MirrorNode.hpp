@@ -5,13 +5,15 @@
 #include "ReactCADNode.hpp"
 
 #include <gp_Ax2.hxx>
+#include <gp_Pnt.hxx>
 #include <gp_Trsf.hxx>
+#include <gp_Vec.hxx>
 
 class MirrorNode : public ReactCADNode
 {
 public:
   MirrorNode();
-  void setPlane(Point origin, Vector normal);
+  void setPlane(gp_Pnt origin, gp_Vec normal);
 
 protected:
   void computeShape() override;

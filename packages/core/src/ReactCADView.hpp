@@ -42,7 +42,7 @@
 #include <pthread.h>
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
-class ReactCADView : protected AIS_ViewController
+class ReactCADView : public Standard_Transient, protected AIS_ViewController
 {
 public:
   enum Viewpoint
@@ -54,7 +54,7 @@ public:
     Front,
     Back
   };
-  static std::shared_ptr<ReactCADView> getView();
+  static Handle(ReactCADView) getView();
   static void destroyView();
 
   virtual ~ReactCADView();
@@ -93,7 +93,7 @@ public:
   }
 
 private:
-  static std::shared_ptr<ReactCADView> singleton;
+  static Handle(ReactCADView) singleton;
   //! Default constructor.
   ReactCADView();
 

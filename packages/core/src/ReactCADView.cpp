@@ -74,7 +74,7 @@ namespace
 } // namespace
 // clang-format on
 
-std::shared_ptr<ReactCADView> ReactCADView::singleton = nullptr;
+Handle(ReactCADView) ReactCADView::singleton;
 pthread_mutex_t ReactCADView::viewMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void ReactCADView::lock()
@@ -87,11 +87,11 @@ void ReactCADView::unlock()
   pthread_mutex_unlock(&ReactCADView::viewMutex);
 }
 
-std::shared_ptr<ReactCADView> ReactCADView::getView()
+Handle(ReactCADView) ReactCADView::getView()
 {
-  if (singleton == nullptr)
+  if (singleton.IsNull())
   {
-    singleton.reset(new ReactCADView());
+    singleton = new ReactCADView();
   }
 
   return singleton;
@@ -102,7 +102,7 @@ void ReactCADView::destroyView()
   singleton = nullptr;
 }
 
-ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0)
+ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0), webglContext(-1)
 {
 
   initWindow();

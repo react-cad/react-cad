@@ -15,7 +15,7 @@ class RotationNode : public ReactCADNode
 {
 public:
   RotationNode();
-  void setAxisAngle(Vector direction, Standard_Real angle);
+  void setAxisAngle(gp_Vec axis, Standard_Real angle);
   void setEulerAngles(Standard_Real xAngle, Standard_Real yAngle, Standard_Real zAngle);
   void setRotation(Quaternion quaternion);
 

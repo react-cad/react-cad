@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include <Standard_Transient.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -13,15 +14,15 @@
 #include <pthread.h>
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
-class ReactCADNode : public std::enable_shared_from_this<ReactCADNode>
+class ReactCADNode : public Standard_Transient
 {
 public:
   ReactCADNode();
   virtual ~ReactCADNode();
 
-  void appendChild(std::shared_ptr<ReactCADNode> child);
-  void insertChildBefore(std::shared_ptr<ReactCADNode> child, const ReactCADNode &before);
-  void removeChild(ReactCADNode &child);
+  void appendChild(Handle(ReactCADNode) & child);
+  void insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before);
+  void removeChild(Handle(ReactCADNode) & child);
   bool hasParent();
 
   static void initializeMutex();
@@ -39,12 +40,11 @@ protected:
 
   TopoDS_Shape m_childShape;
 
-  bool isType(const emscripten::val &value, const std::string &type);
   bool doubleEquals(double a, double b);
 
 private:
-  std::shared_ptr<ReactCADNode> m_parent;
-  std::vector<std::shared_ptr<ReactCADNode>> m_children;
+  Handle(ReactCADNode) m_parent;
+  std::vector<Handle(ReactCADNode)> m_children;
   static pthread_mutex_t nodeMutex;
 
   bool m_propsChanged;

@@ -149,10 +149,10 @@ SVGImage::SVGBezierCurve::operator Handle(Geom2d_Curve)()
   {
     // Bezier curve
     NCollection_Array1<gp_Pnt2d> poles(0, 3);
-    poles.SetValue(0, p0());
-    poles.SetValue(1, p1());
-    poles.SetValue(2, p2());
-    poles.SetValue(3, p3());
+    poles[0] = p0();
+    poles[1] = p1();
+    poles[2] = p2();
+    poles[3] = p3();
 
     curve = new Geom2d_BezierCurve(poles);
   }

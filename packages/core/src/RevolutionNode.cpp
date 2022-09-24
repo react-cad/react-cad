@@ -1,5 +1,6 @@
 #include <BRepPrimAPI_MakeRevol.hxx>
 #include <Precision.hxx>
+#include <gp_Vec.hxx>
 
 #include <StdFail_NotDone.hxx>
 
@@ -7,17 +8,15 @@
 
 RevolutionNode::RevolutionNode() : m_axis(0, 0, 1), m_angle(0)
 {
-  setAxisAngle({.x = 0, .y = 0, .z = 1}, M_PI);
+  setAxisAngle(gp_Vec(0, 0, 1), M_PI);
 }
 
-void RevolutionNode::setAxisAngle(Vector direction, Standard_Real angle)
+void RevolutionNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 {
-  gp_Vec newAxis(direction.x, direction.y, direction.z);
-
-  if (!IsEqual(angle, m_angle) || !newAxis.IsEqual(m_axis, Precision::Confusion(), Precision::Angular()))
+  if (!IsEqual(angle, m_angle) || !axis.IsEqual(m_axis, Precision::Confusion(), Precision::Angular()))
   {
     m_angle = angle;
-    m_axis = newAxis;
+    m_axis = axis;
     propsChanged();
   }
 }
