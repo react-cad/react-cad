@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "rootDirs": ["./src", "./__tests__"],
+    "outDir": "./lib"
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["**/__tests__/**/*"]
+}

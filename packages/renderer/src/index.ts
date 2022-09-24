@@ -297,6 +297,8 @@ export function renderToSTL(
   });
 }
 
+export * from "./types";
+
 export default {
   render,
   renderToSTL,

@@ -1,12 +1,11 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { AxisName } from "@react-cad/core";
 
 interface Props {
   x: number;
   y: number;
   z: number;
-  axis: AxisName;
+  axis: "x" | "y" | "z";
   angle: number;
 }
 

@@ -1,6 +1,5 @@
 import React from "react";
-import { ReactCADCore } from "@react-cad/core";
-import ReactCadRenderer from "@react-cad/renderer";
+import ReactCADRenderer, { ReactCADCore } from "react-cad";
 import { ViewOptions } from "./types";
 
 import DetailContext from "./DetailContext";
@@ -24,7 +23,7 @@ export function useReactCadCore(
   const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
     function unload() {
       if (core.current) {
-        ReactCadRenderer.destroyContainer(core.current);
+        ReactCADRenderer.destroyContainer(core.current);
         try {
           core.current._shutdown();
         } catch (e) {
@@ -112,7 +111,7 @@ export function useReactCadRenderer(
       const quality =
         options.detail === "HIGH" ? options.highDetail : options.lowDetail;
       core.current.setQuality(...quality);
-      ReactCadRenderer.render(
+      ReactCADRenderer.render(
         <DetailContext.Provider value={options.detail}>
           {shape}
         </DetailContext.Provider>,

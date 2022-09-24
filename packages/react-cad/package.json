@@ -1,16 +1,11 @@
 {
-  "name": "@react-cad/viewer",
+  "name": "react-cad",
   "version": "0.13.0",
-  "description": "React component to view @react-cad projects in the browser",
+  "description": "A CAD system for producing constructive solid geometry in React",
   "main": "lib/index.js",
   "files": [
     "lib/**/*",
-    "README.md",
-    "*.js"
-  ],
-  "keywords": [
-    "storybook",
-    "addons"
+    "types/**/*"
   ],
   "repository": "github:react-cad/react-cad",
   "homepage": "https://github.com/react-cad/react-cad",
@@ -20,18 +15,13 @@
     "email": "react.cad.dev@gmail.com"
   },
   "license": "MIT",
-  "peerDependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "react-cad": "^0.13.0",
-    "react-icons": "^4.4.0"
-  },
   "scripts": {
     "build": "tsc",
     "start": "tsc --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@react-cad/core": "^0.13.0",
+    "@react-cad/renderer": "^0.13.0"
   },
   "publishConfig": {
     "access": "public"

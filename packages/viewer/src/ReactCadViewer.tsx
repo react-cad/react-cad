@@ -1,5 +1,5 @@
 import React from "react";
-import ReactCadRenderer from "@react-cad/renderer";
+import ReactCADRenderer from "react-cad";
 
 import { useReactCadCore, useReactCadRenderer } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
@@ -87,7 +87,7 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       async (event: React.SyntheticEvent) => {
         event.preventDefault();
         const content = await (core.current
-          ? ReactCadRenderer.renderToSTL(shape, core.current, 0.05, false, 0.5)
+          ? ReactCADRenderer.renderToSTL(shape, core.current, 0.05, false, 0.5)
           : Promise.reject("react-cad not initialised"));
 
         const a = document.createElement("a");

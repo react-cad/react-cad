@@ -1,6 +1,6 @@
 import React from "react";
+import { Point, Profile } from "react-cad";
 import { Story, Meta } from "@react-cad/storybook-framework";
-import { Point, Profile } from "@react-cad/core";
 
 import { makePolygon } from "./helpers";
 
