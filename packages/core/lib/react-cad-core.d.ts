@@ -21,7 +21,9 @@ export type Matrix = [
   [0, 0, 0, 1],
 ];
 
+declare const Projection: unique symbol;
 export type Projection = number & { _opaque: typeof Projection };
+declare const Viewpoint: unique symbol;
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
 
 // Primitives
@@ -121,7 +123,6 @@ export class ReactCADEvolutionNode extends ReactCADNode {
 }
 
 export class ReactCADPipeNode extends ReactCADSweepNode {
-  public setPitch(pitch: number): void;
   public setSpine(spine: Point[]): void;
   public setSpineSVG(pathData: string): void;
 }
