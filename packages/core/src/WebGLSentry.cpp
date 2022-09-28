@@ -45,6 +45,7 @@ WebGLSentry &WebGLSentry::operator=(const WebGLSentry &other)
   m_canvasID = other.m_canvasID;
   jsEnableCanvas(m_canvasID.c_str());
   emscripten_webgl_make_context_current(m_context);
+  return *this;
 }
 
 WebGLSentry::~WebGLSentry()
