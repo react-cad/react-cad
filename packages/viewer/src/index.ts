@@ -1,2 +1,2 @@
-export { default } from "./ReactCadViewer";
+export { default } from "./ReactCADViewer";
 export { default as DetailContext } from "./DetailContext";

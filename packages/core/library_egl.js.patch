@@ -1,0 +1,30 @@
+12,13c12,13
+<  * implementation only allows a single EGLContext to be created, that has the
+<  * magic value of 62004. (multiple creations silently return this same context)
+---
+>  * implementation has been hacked to allow multiple EGLContexts to be created
+>  * provided they are in different canvases.
+378c378
+<       return 62004; // Magic ID for Emscripten EGLContext
+---
+>       return EGL.context;
+395,398d394
+<     if (context != 62004 /* Magic ID for Emscripten EGLContext */) {
+<       EGL.setErrorCode(0x3006 /* EGL_BAD_CONTEXT */);
+<       return 0;
+<     }
+400c396
+<     GL.deleteContext(EGL.context);
+---
+>     GL.deleteContext(context);
+615,618d610
+<     if (context != 0 && context != 62004 /* Magic ID for Emscripten EGLContext */) {
+<       EGL.setErrorCode(0x3006 /* EGL_BAD_CONTEXT */);
+<       return 0;
+<     }
+624c616
+<     GL.makeContextCurrent(context ? EGL.context : null);
+---
+>     GL.makeContextCurrent(context || null);
+625a618
+>     EGL.context = context;

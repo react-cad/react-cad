@@ -7,21 +7,27 @@ import {
 } from "@storybook/preview-web";
 import { RenderContext } from "@storybook/store";
 import { ReactCadFramework } from "./types-6-0";
-import ReactCadViewer from "@react-cad/viewer";
-import reactCadCoreJs from "@react-cad/core/lib/react-cad-core";
-import reactCadCoreEsm from "@react-cad/core/lib/react-cad-core.esm";
-import reactCadCoreWasm from "@react-cad/core/lib/react-cad-core.wasm";
-import reactCadCoreWorker from "@react-cad/core/lib/react-cad-core.worker";
+import ReactCADViewer from "@react-cad/viewer";
+import { useShouldReset, useReactCADCore } from "./hooks";
 
-const RemountHandler: React.FC<{
+interface ContainerProps
+  extends Omit<React.ComponentProps<typeof ReactCADViewer>, "core"> {
   forceRemount: boolean;
   id: string;
-  children: (reset: boolean) => React.ReactElement;
-}> = ({ forceRemount, id, children }) => {
-  const [previousId, setPreviousId] = React.useState("");
-  React.useEffect(() => setPreviousId(id), [id]);
+}
+const ViewContainer: React.FC<ContainerProps> = ({
+  forceRemount,
+  id,
+  children,
+  ...props
+}) => {
+  const core = useReactCADCore();
 
-  return children(forceRemount && id !== previousId);
+  const shouldReset = useShouldReset(forceRemount, id, core);
+
+  return core ? (
+    <ReactCADViewer core={core} reset={shouldReset} {...props} />
+  ) : null;
 };
 
 export function renderToDOM(
@@ -42,25 +48,17 @@ export function renderToDOM(
 
   ReactDOM.render(
     <>
-      <style>{`html, body, #root, .full-height-preview { height: 100% }`}</style>
-      <RemountHandler forceRemount={forceRemount} id={id}>
-        {(reset) => (
-          <ReactCadViewer
-            className="full-height-preview"
-            coreUrl={reactCadCoreWasm}
-            jsUrl={reactCadCoreJs}
-            esmUrl={reactCadCoreEsm}
-            workerUrl={reactCadCoreWorker}
-            shape={storyFn()}
-            name={name}
-            reset={reset}
-            focus
-            highDetail={highDetail}
-            lowDetail={lowDetail}
-            resizable={resizable}
-          />
-        )}
-      </RemountHandler>
+      <style>{`html, body, #root { height: 100% }`}</style>
+      <ViewContainer
+        forceRemount={forceRemount}
+        id={id}
+        shape={storyFn()}
+        name={name}
+        focus
+        highDetail={highDetail}
+        lowDetail={lowDetail}
+        resizable={resizable}
+      />
     </>,
     domElement,
     () => {

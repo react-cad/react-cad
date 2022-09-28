@@ -38,6 +38,7 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #include <emscripten/html5.h>
+#include <emscripten/val.h>
 
 #include <pthread.h>
 
@@ -45,6 +46,11 @@
 class ReactCADView : public Standard_Transient, protected AIS_ViewController
 {
 public:
+  ReactCADView(emscripten::val canvas);
+  virtual ~ReactCADView();
+
+  void render(TopoDS_Shape shape, bool reset = false);
+
   enum Viewpoint
   {
     Top,
@@ -54,12 +60,6 @@ public:
     Front,
     Back
   };
-  static Handle(ReactCADView) getView();
-  static void destroyView();
-
-  virtual ~ReactCADView();
-
-  void render(TopoDS_Shape shape, bool reset = false);
 
   void setQuality(double deviationCoefficent, double angle);
 
@@ -93,18 +93,11 @@ public:
   }
 
 private:
-  static Handle(ReactCADView) singleton;
-  //! Default constructor.
-  ReactCADView();
-
   //! Create window.
   void initWindow();
 
   //! Create 3D Viewer.
   bool initViewer();
-
-  //! Fill 3D Viewer with a DEMO items.
-  void initDemoScene();
 
   //! Application event loop.
   void mainloop();
@@ -174,10 +167,8 @@ private:
   }
 
 private:
-  static void lock();
-  static void unlock();
-  static pthread_mutex_t viewMutex;
-  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE webglContext;
+  std::string myId;
+  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE myWebglContext;
   Handle(AIS_InteractiveContext) myContext; //!< interactive context
   Handle(V3d_View) myView;                  //!< 3D view
   Handle(Prs3d_TextAspect) myTextStyle;     //!< text style for OSD elements
@@ -192,6 +183,7 @@ private:
   Handle_AIS_Shape myWireframeBack;
   bool myShowShaded = true;
   bool myShowWireframe = true;
+  bool myQualityChanged = false;
   pthread_mutex_t shadedHandleMutex = PTHREAD_MUTEX_INITIALIZER;
   pthread_mutex_t wireframeHandleMutex = PTHREAD_MUTEX_INITIALIZER;
 };

@@ -60,6 +60,9 @@
 #include <emscripten/bind.h>
 #include <emscripten/html5.h>
 
+#include "Async.hpp"
+#include "UUID.hpp"
+
 #include <pthread.h>
 
 Handle(ReactCADNode) createCADNode(std::string type)
@@ -164,139 +167,44 @@ Handle(ReactCADNode) createCADNode(std::string type)
   return new BoxNode();
 }
 
-struct RenderRequest
+Handle(ReactCADView) createView(emscripten::val canvas)
 {
-  Handle(ReactCADNode) node;
-  bool reset;
-};
-
-std::list<RenderRequest> renderQueue;
-
-pthread_mutex_t render_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t render_cond = PTHREAD_COND_INITIALIZER;
-
-void *renderInternal(void *data)
-{
-  while (true)
-  {
-    pthread_mutex_lock(&render_mutex);
-    pthread_cond_wait(&render_cond, &render_mutex);
-
-    Handle(ReactCADView) view = ReactCADView::getView();
-
-    do
-    {
-      RenderRequest request = renderQueue.back();
-
-      std::list<RenderRequest>::reverse_iterator it;
-      for (it = renderQueue.rbegin(); it != renderQueue.rend(); ++it)
-      {
-        if (it->node != request.node)
-        {
-          break;
-        }
-        if (it->reset)
-        {
-          request.reset = true;
-        }
-      }
-      renderQueue.clear();
-      pthread_mutex_unlock(&render_mutex);
-
-      bool changed = request.node->computeGeometry();
-      if (changed)
-      {
-        view->render(request.node->shape, request.reset);
-      }
-      else if (request.reset)
-      {
-        view->resetView();
-      }
-
-      pthread_mutex_lock(&render_mutex);
-      // Catch requests that came in during render
-    } while (renderQueue.size());
-
-    pthread_mutex_unlock(&render_mutex);
-  }
-  return NULL;
+  return new ReactCADView(canvas);
 }
 
-void render(Handle(ReactCADNode) node, bool reset = false)
+Async async;
+
+emscripten::val computeNodeAsync(Handle(ReactCADNode) & node)
 {
-  pthread_mutex_lock(&render_mutex);
-  renderQueue.push_back({node, reset});
-  pthread_cond_signal(&render_cond);
-  pthread_mutex_unlock(&render_mutex);
+  return async.Perform([=]() { node->computeGeometry(); });
 }
 
-void resetView()
+emscripten::val renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
 {
-  ReactCADView::getView()->resetView();
+  return async.Perform([=]() { view->render(node->shape); });
 }
 
-void setQuality(double deviationCoefficent, double angle)
-{
-  ReactCADView::getView()->setQuality(deviationCoefficent, angle);
-}
+EM_JS(emscripten::EM_VAL, getFileContentsAndDelete, (const char *filenameStr), {
+  const filename = UTF8ToString(filenameStr);
+  const content = Module.FS.readFile(filename);
+  Module.FS.unlink(filename);
+  return Emval.toHandle(content);
+});
 
-void setColor(std::string color)
-{
-  ReactCADView::getView()->setColor(color);
-}
-
-void zoom(double delta)
-{
-  ReactCADView::getView()->zoom(delta);
-}
-
-void fit()
-{
-  ReactCADView::getView()->fit();
-}
-
-void setViewpoint(ReactCADView::Viewpoint viewpoint)
-{
-  ReactCADView::getView()->setViewpoint(viewpoint);
-}
-
-void setProjection(Graphic3d_Camera::Projection projection)
-{
-  ReactCADView::getView()->setProjection(projection);
-}
-
-void showAxes(bool show)
-{
-  ReactCADView::getView()->showAxes(show);
-}
-
-void showGrid(bool show)
-{
-  ReactCADView::getView()->showGrid(show);
-}
-
-void showWireframe(bool show)
-{
-  ReactCADView::getView()->showWireframe(show);
-}
-
-void showShaded(bool show)
-{
-  ReactCADView::getView()->showShaded(show);
-}
-
-void onResize()
-{
-  ReactCADView::getView()->onResize();
-}
-
-Standard_Boolean writeSTL(const Handle(ReactCADNode) & node, const std::string filename,
-                          const Standard_Real theLinDeflection, const Standard_Boolean isRelative,
-                          const Standard_Real theAngDeflection)
+emscripten::val renderSTL(const Handle(ReactCADNode) & node, const Standard_Real theLinDeflection,
+                          const Standard_Boolean isRelative, const Standard_Real theAngDeflection)
 {
   node->computeGeometry();
   BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
-  return StlAPI::Write(node->shape, filename.c_str());
+
+  std::string filename(UUID::get());
+  Standard_Boolean success = StlAPI::Write(node->shape, filename.c_str());
+  if (success)
+  {
+    emscripten::val contents = emscripten::val::take_ownership(getFileContentsAndDelete(filename.c_str()));
+    return contents;
+  }
+  return emscripten::val::undefined();
 }
 
 //! Dummy main loop callback for a single shot.
@@ -321,11 +229,6 @@ int main()
 
   ReactCADNode::initializeMutex();
 
-  pthread_t thread;
-  int data;
-  int iret1 = pthread_create(&thread, NULL, renderInternal, &data);
-  pthread_detach(thread);
-
   emscripten_set_main_loop(onMainLoop, 1, 0);
 
   return 0;
@@ -333,7 +236,6 @@ int main()
 
 extern "C" void shutdown()
 {
-  ReactCADView::destroyView();
 }
 
 namespace emscripten
@@ -390,6 +292,22 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("insertChildBefore", &ReactCADNode::insertChildBefore)
       .function("removeChild", &ReactCADNode::removeChild)
       .function("hasParent", &ReactCADNode::hasParent);
+
+  emscripten::class_<ReactCADView>("ReactCADView")
+      .smart_ptr<Handle(ReactCADView)>("ReactCADView")
+      .function("render", &ReactCADView::render)
+      // .function("setColor", &ReactCADView::setColor)
+      .function("setQuality", &ReactCADView::setQuality)
+      .function("zoom", &ReactCADView::zoom)
+      .function("resetView", &ReactCADView::resetView)
+      .function("fit", &ReactCADView::fit)
+      .function("setViewpoint", &ReactCADView::setViewpoint)
+      .function("setProjection", &ReactCADView::setProjection)
+      .function("showAxes", &ReactCADView::showAxes)
+      .function("showGrid", &ReactCADView::showGrid)
+      .function("showWireframe", &ReactCADView::showWireframe)
+      .function("showShaded", &ReactCADView::showShaded)
+      .function("onResize", &ReactCADView::onResize);
 
   emscripten::value_array<gp_Pnt>("Point")
       .element(&gp_Pnt::X, &gp_Pnt::SetX)
@@ -520,8 +438,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
       .smart_ptr<Handle(ImportNode)>("ReactCADImportNode")
-      .function("setFilename", &ImportNode::setFilename)
-      .function("getFilename", &ImportNode::getFilename);
+      .function("setFileContents", &ImportNode::setFileContents);
 
   emscripten::class_<BRepImportNode, emscripten::base<ImportNode>>("ReactCADBRepImportNode")
       .smart_ptr<Handle(BRepImportNode)>("ReactCADBRepImportNode");
@@ -577,18 +494,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .value("BACK", ReactCADView::Viewpoint::Back);
 
   emscripten::function("createCADNode", &createCADNode);
-  emscripten::function("render", &render);
-  // emscripten::function("setColor", &setColor);
-  emscripten::function("setQuality", &setQuality);
-  emscripten::function("zoom", &zoom);
-  emscripten::function("resetView", &resetView);
-  emscripten::function("fit", &fit);
-  emscripten::function("setViewpoint", &setViewpoint);
-  emscripten::function("setProjection", &setProjection);
-  emscripten::function("showAxes", &showAxes);
-  emscripten::function("showGrid", &showGrid);
-  emscripten::function("showWireframe", &showWireframe);
-  emscripten::function("showShaded", &showShaded);
-  emscripten::function("onResize", &onResize);
-  emscripten::function("writeSTL", &writeSTL);
+  emscripten::function("createView", &createView);
+  emscripten::function("renderSTL", &renderSTL);
+  emscripten::function("computeNodeAsync", &computeNodeAsync);
+  emscripten::function("renderNodeAsync", &renderNodeAsync);
 }

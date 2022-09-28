@@ -1,7 +1,20 @@
 #include "ImportNode.hpp"
 
+#include "UUID.hpp"
+
 #include <OSD_File.hxx>
 #include <OSD_Path.hxx>
+
+#include <emscripten.h>
+
+namespace
+{
+EM_JS(void, writeFile, (const char *filenameStr, emscripten::EM_VAL contents_handle), {
+  const filename = UTF8ToString(filenameStr);
+  const contents = Emval.toValue(contents_handle);
+  Module.FS.writeFile(filename, typeof contents == "string" ? contents : new Uint8Array(contents));
+})
+}
 
 ImportNode::ImportNode()
 {
@@ -22,6 +35,13 @@ void ImportNode::removeFile()
   file.Remove();
 }
 
+void ImportNode::setFileContents(emscripten::val contents)
+{
+  std::string filename = UUID::get();
+  writeFile(filename.c_str(), contents.as_handle());
+  setFilename(filename, true);
+}
+
 void ImportNode::setFilename(const std::string &filename, bool ownFile)
 {
   if (m_ownFile && filename != m_filename)
@@ -31,11 +51,6 @@ void ImportNode::setFilename(const std::string &filename, bool ownFile)
   m_ownFile = ownFile;
   m_filename = filename;
   propsChanged();
-}
-
-std::string ImportNode::getFilename()
-{
-  return m_filename;
 }
 
 void ImportNode::computeShape()
