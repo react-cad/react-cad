@@ -1,4 +1,3 @@
-import { BoxProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Box = "box";
@@ -38,14 +37,7 @@ export function commitUpdate(
   instance: Instance<Box>,
   updatePayload: UpdatePayload<Box>
 ): void {
-  const props: BoxProps = Object.assign(
-    {
-      center: false,
-      x: 1,
-      y: 1,
-      z: 1,
-    },
-    updatePayload
-  );
-  instance.node.setProps(props);
+  const { x, y, z, center } = updatePayload;
+  instance.node.setSize([x, y, z]);
+  instance.node.setCentered(Boolean(center));
 }

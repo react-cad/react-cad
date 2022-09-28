@@ -3,39 +3,29 @@
 
 #include "ReactCADNode.hpp"
 
-struct WedgePropsLtx
-{
-  double x;
-  double y;
-  double z;
-  double ltx;
-};
-
-struct WedgePropsMinMax
-{
-  double x;
-  double y;
-  double z;
-  double xmin;
-  double xmax;
-  double zmin;
-  double zmax;
-};
+#include <gp_Pnt.hxx>
 
 class WedgeNode : public ReactCADNode
 {
 public:
   WedgeNode();
-  void setPropsLtx(const WedgePropsLtx &props);
-  void setPropsMinMax(const WedgePropsMinMax &props);
+  void setSize(gp_Pnt size);
+  void setLtx(Standard_Real ltx);
+  void setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real zmin, Standard_Real zmax);
 
 protected:
   void computeShape() override;
 
 private:
-  bool useLtx = true;
-  WedgePropsLtx m_propsLtx;
-  WedgePropsMinMax m_propsMinMax;
+  Standard_Boolean m_useLtx = true;
+
+  gp_Pnt m_size;
+  Standard_Real m_ltx;
+
+  Standard_Real m_xmin;
+  Standard_Real m_xmax;
+  Standard_Real m_zmin;
+  Standard_Real m_zmax;
 };
 
 #endif

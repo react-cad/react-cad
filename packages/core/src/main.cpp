@@ -337,68 +337,39 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .element(&Matrix::a4);
 
   // Primitives
-  emscripten::value_object<BoxProps>("BoxProps")
-      .field("center", &BoxProps::center)
-      .field("x", &BoxProps::x)
-      .field("y", &BoxProps::y)
-      .field("z", &BoxProps::z);
   emscripten::class_<BoxNode, emscripten::base<ReactCADNode>>("ReactCADBoxNode")
       .smart_ptr<Handle(BoxNode)>("ReactCADBoxNode")
-      .function("setProps", &BoxNode::setProps);
+      .function("setSize", &BoxNode::setSize)
+      .function("setCentered", &BoxNode::setCentered);
 
-  emscripten::value_object<WedgePropsLtx>("WedgePropsLtx")
-      .field("x", &WedgePropsLtx::x)
-      .field("y", &WedgePropsLtx::y)
-      .field("z", &WedgePropsLtx::z)
-      .field("ltx", &WedgePropsLtx::ltx);
-  emscripten::value_object<WedgePropsMinMax>("WedgePropsMinMax")
-      .field("x", &WedgePropsMinMax::x)
-      .field("y", &WedgePropsMinMax::y)
-      .field("z", &WedgePropsMinMax::z)
-      .field("xmin", &WedgePropsMinMax::xmin)
-      .field("xmax", &WedgePropsMinMax::xmax)
-      .field("zmin", &WedgePropsMinMax::zmin)
-      .field("zmax", &WedgePropsMinMax::zmax);
   emscripten::class_<WedgeNode, emscripten::base<ReactCADNode>>("ReactCADWedgeNode")
       .smart_ptr<Handle(WedgeNode)>("ReactCADWedgeNode")
-      .function("setPropsLtx", &WedgeNode::setPropsLtx)
-      .function("setPropsMinMax", &WedgeNode::setPropsMinMax);
+      .function("setSize", &WedgeNode::setSize)
+      .function("setLtx", &WedgeNode::setLtx)
+      .function("setMinMax", &WedgeNode::setMinMax);
 
-  emscripten::value_object<ConeProps>("ConeProps")
-      .field("center", &ConeProps::center)
-      .field("radius1", &ConeProps::radius1)
-      .field("radius2", &ConeProps::radius2)
-      .field("height", &ConeProps::height)
-      .field("angle", &ConeProps::angle);
   emscripten::class_<ConeNode, emscripten::base<ReactCADNode>>("ReactCADConeNode")
       .smart_ptr<Handle(ConeNode)>("ReactCADConeNode")
-      .function("setProps", &ConeNode::setProps);
+      .function("setSize", &ConeNode::setSize)
+      .function("setAngle", &ConeNode::setAngle)
+      .function("setCentered", &ConeNode::setCentered);
 
-  emscripten::value_object<CylinderProps>("CylinderProps")
-      .field("center", &CylinderProps::center)
-      .field("radius", &CylinderProps::radius)
-      .field("height", &CylinderProps::height)
-      .field("angle", &CylinderProps::angle);
   emscripten::class_<CylinderNode, emscripten::base<ReactCADNode>>("ReactCADCylinderNode")
       .smart_ptr<Handle(CylinderNode)>("ReactCADCylinderNode")
-      .function("setProps", &CylinderNode::setProps);
+      .function("setSize", &CylinderNode::setSize)
+      .function("setAngle", &CylinderNode::setAngle)
+      .function("setCentered", &CylinderNode::setCentered);
 
-  emscripten::value_object<TorusProps>("TorusProps")
-      .field("radius1", &TorusProps::radius1)
-      .field("radius2", &TorusProps::radius2)
-      .field("angle", &TorusProps::angle);
   emscripten::class_<TorusNode, emscripten::base<ReactCADNode>>("ReactCADTorusNode")
       .smart_ptr<Handle(TorusNode)>("ReactCADTorusNode")
-      .function("setProps", &TorusNode::setProps);
+      .function("setSize", &TorusNode::setSize)
+      .function("setAngle", &TorusNode::setAngle);
 
-  emscripten::value_object<SphereProps>("SphereProps")
-      .field("radius", &SphereProps::radius)
-      .field("angle", &SphereProps::angle)
-      .field("segmentAngle1", &SphereProps::segmentAngle1)
-      .field("segmentAngle2", &SphereProps::segmentAngle2);
   emscripten::class_<SphereNode, emscripten::base<ReactCADNode>>("ReactCADSphereNode")
       .smart_ptr<Handle(SphereNode)>("ReactCADSphereNode")
-      .function("setProps", &SphereNode::setProps);
+      .function("setRadius", &SphereNode::setRadius)
+      .function("setAngle", &SphereNode::setAngle)
+      .function("setSegment", &SphereNode::setSegment);
 
   emscripten::class_<PolyhedronNode, emscripten::base<ReactCADNode>>("ReactCADPolyhedronNode")
       .smart_ptr<Handle(PolyhedronNode)>("ReactCADPolyhedronNode")
@@ -453,13 +424,9 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<Handle(ObjImportNode)>("ReactCADObjImportNode");
 
   // Transformations
-  emscripten::value_object<TranslationProps>("TranslationProps")
-      .field("x", &TranslationProps::x)
-      .field("y", &TranslationProps::y)
-      .field("z", &TranslationProps::z);
   emscripten::class_<TranslationNode, emscripten::base<ReactCADNode>>("ReactCADTranslationNode")
       .smart_ptr<Handle(TranslationNode)>("ReactCADTranslationNode")
-      .function("setProps", &TranslationNode::setProps);
+      .function("setVector", &TranslationNode::setVector);
 
   emscripten::class_<MirrorNode, emscripten::base<ReactCADNode>>("ReactCADMirrorNode")
       .smart_ptr<Handle(MirrorNode)>("ReactCADMirrorNode")

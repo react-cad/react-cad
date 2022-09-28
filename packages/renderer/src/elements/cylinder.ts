@@ -1,4 +1,3 @@
-import { CylinderProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Cylinder = "cylinder";
@@ -40,14 +39,8 @@ export function commitUpdate(
   instance: Instance<Cylinder>,
   updatePayload: UpdatePayload<Cylinder>
 ): void {
-  const props: CylinderProps = Object.assign(
-    {
-      center: false,
-      radius: 1,
-      height: 1,
-      angle: 0,
-    },
-    updatePayload
-  );
-  instance.node.setProps(props);
+  const { center = false, radius = 1, height = 1, angle = 0 } = updatePayload;
+  instance.node.setSize(radius, height);
+  instance.node.setAngle(angle);
+  instance.node.setCentered(center);
 }

@@ -1,4 +1,3 @@
-import { TorusProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Torus = "torus";
@@ -39,14 +38,7 @@ export function commitUpdate(
   instance: Instance<Torus>,
   updatePayload: UpdatePayload<Torus>
 ): void {
-  const props: TorusProps = Object.assign(
-    {
-      radius1: 1,
-      radius2: 2,
-      angle: 0,
-    },
-    updatePayload
-  );
-
-  instance.node.setProps(props);
+  const { radius1 = 1, radius2 = 2, angle = 0 } = updatePayload;
+  instance.node.setSize(radius1, radius2);
+  instance.node.setAngle(angle);
 }

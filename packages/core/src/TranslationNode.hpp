@@ -3,24 +3,19 @@
 
 #include "ReactCADNode.hpp"
 
-struct TranslationProps
-{
-  double x;
-  double y;
-  double z;
-};
+#include <gp_Vec.hxx>
 
 class TranslationNode : public ReactCADNode
 {
 public:
   TranslationNode();
-  void setProps(const TranslationProps &props);
+  void setVector(gp_Vec vector);
 
 protected:
   void computeShape() override;
 
 private:
-  TranslationProps m_props;
+  gp_Vec m_vector;
 };
 
 #endif

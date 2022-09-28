@@ -1,4 +1,3 @@
-import { WedgePropsLtx, WedgePropsMinMax } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Wedge = "wedge";
@@ -63,32 +62,12 @@ export function commitUpdate(
   instance: Instance<Wedge>,
   updatePayload: UpdatePayload<Wedge>
 ): void {
+  const { x = 1, y = 1, z = 1 } = updatePayload;
+  instance.node.setSize([x, y, z]);
   if ("ltx" in updatePayload) {
-    const props: WedgePropsLtx = Object.assign(
-      {
-        x: 1,
-        y: 1,
-        z: 1,
-        ltx: 1,
-      },
-      updatePayload
-    );
-
-    instance.node.setPropsLtx(props);
+    instance.node.setLtx(updatePayload.ltx);
   } else {
-    const props: WedgePropsMinMax = Object.assign(
-      {
-        x: 1,
-        y: 1,
-        z: 1,
-        xmin: 0,
-        xmax: 1,
-        zmin: 0,
-        zmax: 0,
-      },
-      updatePayload
-    );
-
-    instance.node.setPropsMinMax(props);
+    const { xmin = 0, xmax = 1, zmin = 0, zmax = 0 } = updatePayload;
+    instance.node.setMinMax(xmin, xmax, zmin, zmax);
   }
 }

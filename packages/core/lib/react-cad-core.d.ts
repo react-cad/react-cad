@@ -43,74 +43,38 @@ declare const Viewpoint: unique symbol;
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
 
 // Primitives
-export interface BoxProps {
-  center: boolean;
-  x: number;
-  y: number;
-  z: number;
-}
 export class ReactCADBoxNode extends ReactCADNode {
-  public setProps(props: BoxProps): void;
+  public setSize(size: Vector): void;
+  public setCentered(centered: boolean): void;
 }
 
-export interface WedgePropsLtx {
-  x: number;
-  y: number;
-  z: number;
-  ltx: number;
-}
-export interface WedgePropsMinMax {
-  x: number;
-  y: number;
-  z: number;
-  xmin: number;
-  xmax: number;
-  zmin: number;
-  zmax: number;
-}
 export class ReactCADWedgeNode extends ReactCADNode {
-  public setPropsLtx(props: WedgePropsLtx): void;
-  public setPropsMinMax(props: WedgePropsMinMax): void;
+  public setSize(size: Vector): void;
+  public setLtx(ltx: number): void;
+  public setMinMax(xmin: number, xmax: number, zmin: number, zmax: number): void;
 }
 
-export interface ConeProps {
-  center: boolean;
-  radius1: number;
-  radius2: number;
-  height: number;
-  angle: number;
-}
 export class ReactCADConeNode extends ReactCADNode {
-  public setProps(props: ConeProps): void;
+  public setSize(radius1: number, radius2: number, height: number): void;
+  public setAngle(angle: number): void;
+  public setCentered(centered: boolean);
 }
 
-export interface CylinderProps {
-  center: boolean;
-  radius: number;
-  height: number;
-  angle: number;
-}
 export class ReactCADCylinderNode extends ReactCADNode {
-  public setProps(props: CylinderProps): void;
+  public setSize(radius: number, height: number): void;
+  public setAngle(angle: number): void;
+  public setCentered(centered: boolean);
 }
 
-export interface SphereProps {
-  radius: number;
-  angle: number;
-  segmentAngle1: number;
-  segmentAngle2: number;
-}
 export class ReactCADSphereNode extends ReactCADNode {
-  public setProps(props: SphereProps): void;
+  public setRadius(radius: number): void;
+  public setAngle(angle: number): void;
+  public setSegment(angle1: number, angle2: number): void;
 }
 
-export interface TorusProps {
-  radius1: number;
-  radius2: number;
-  angle: number;
-}
 export class ReactCADTorusNode extends ReactCADNode {
-  public setProps(props: TorusProps): void;
+  public setSize(radius1: number, radius2: number): void;
+  public setAngle(angle: number): void;
 }
 
 export class ReactCADPolyhedronNode extends ReactCADNode {
@@ -162,13 +126,8 @@ export class ReactCADSTLImportNode extends ReactCADImportNode {}
 export class ReactCADObjImportNode extends ReactCADImportNode {}
 
 // Transformations
-export interface TranslationProps {
-  x: number;
-  y: number;
-  z: number;
-}
 export class ReactCADTranslationNode extends ReactCADNode {
-  public setProps(props: TranslationProps): void;
+  public setVector(vector: Vector): void;
 }
 
 export class ReactCADMirrorNode extends ReactCADNode {

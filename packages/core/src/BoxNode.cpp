@@ -1,32 +1,38 @@
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <Precision.hxx>
 #include <gp_Pnt.hxx>
 
 #include "BoxNode.hpp"
 
-BoxNode::BoxNode() : m_props({.center = false, .x = 1, .y = 1, .z = 1})
+BoxNode::BoxNode() : m_size(gp_Pnt(1, 1, 1)), m_centered(Standard_False)
 {
 }
 
-void BoxNode::setProps(const BoxProps &props)
+void BoxNode::setSize(gp_Pnt size)
 {
-  if (props.center != m_props.center || !IsEqual(props.x, m_props.x) || !IsEqual(props.y, m_props.y) ||
-      !IsEqual(props.z, m_props.z))
+  if (!size.IsEqual(m_size, Precision::Confusion()))
   {
-    m_props = props;
+    m_size = size;
+    propsChanged();
+  }
+}
+
+void BoxNode::setCentered(Standard_Boolean centered)
+{
+  if (centered != m_centered)
+  {
+    m_centered = centered;
     propsChanged();
   }
 }
 
 void BoxNode::computeShape()
 {
-  TopoDS_Solid box;
-  if (m_props.center)
+  gp_Pnt origin = gp::Origin();
+  if (m_centered)
   {
-    box = BRepPrimAPI_MakeBox(gp_Pnt(-m_props.x / 2, -m_props.y / 2, -m_props.z / 2), m_props.x, m_props.y, m_props.z);
+    origin.Translate(gp_Vec(-m_size.X() / 2.0, -m_size.Y() / 2.0, -m_size.Z() / 2.0));
   }
-  else
-  {
-    box = BRepPrimAPI_MakeBox(m_props.x, m_props.y, m_props.z);
-  }
+  BRepPrimAPI_MakeBox box(origin, m_size);
   shape = box;
 }

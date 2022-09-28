@@ -2,50 +2,68 @@
 
 #include "SphereNode.hpp"
 
-SphereNode::SphereNode() : m_props({.radius = 1, .angle = 0, .segmentAngle1 = 0, .segmentAngle2 = 0})
+SphereNode::SphereNode() : m_radius(1), m_angle(0), m_segmentAngle1(0), m_segmentAngle2(0)
 {
 }
 
-void SphereNode::setProps(const SphereProps &props)
+void SphereNode::setRadius(Standard_Real radius)
 {
-  if (!IsEqual(props.radius, m_props.radius) || !IsEqual(props.angle, m_props.angle) ||
-      !IsEqual(props.segmentAngle1, m_props.segmentAngle1) || !IsEqual(props.segmentAngle2, m_props.segmentAngle2))
+  if (!IsEqual(radius, m_radius))
   {
-    m_props = props;
+    m_radius = radius;
+    propsChanged();
+  }
+}
+
+void SphereNode::setAngle(Standard_Real angle)
+{
+  if (!IsEqual(angle, m_angle))
+  {
+    m_angle = angle;
+    propsChanged();
+  }
+}
+
+void SphereNode::setSegment(Standard_Real angle1, Standard_Real angle2)
+{
+  if (!IsEqual(angle1, m_segmentAngle1) || !IsEqual(angle2, m_segmentAngle2))
+  {
+    m_segmentAngle1 = angle1;
+    m_segmentAngle2 = angle2;
     propsChanged();
   }
 }
 
 void SphereNode::computeShape()
 {
-  double angle = fmin(fmax(m_props.angle, 0), 2 * M_PI);
+  double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
   TopoDS_Solid sphere;
 
-  if (m_props.segmentAngle1 == 0 && m_props.segmentAngle2 == 0)
+  if (m_segmentAngle1 == 0 && m_segmentAngle2 == 0)
   {
-    if (m_props.angle == 0)
+    if (m_angle == 0)
     {
-      sphere = BRepPrimAPI_MakeSphere(m_props.radius);
+      sphere = BRepPrimAPI_MakeSphere(m_radius);
     }
     else
     {
-      sphere = BRepPrimAPI_MakeSphere(m_props.radius, angle);
+      sphere = BRepPrimAPI_MakeSphere(m_radius, angle);
     }
   }
   else
   {
-    double segmentAngle1 = fmin(fmax(m_props.segmentAngle1, -M_PI_2), M_PI_2);
-    double segmentAngle2 = fmin(fmax(m_props.segmentAngle2, -M_PI_2), segmentAngle1);
+    double segmentAngle1 = fmin(fmax(m_segmentAngle1, -M_PI_2), M_PI_2);
+    double segmentAngle2 = fmin(fmax(m_segmentAngle2, -M_PI_2), segmentAngle1);
 
-    if (m_props.angle == 0)
+    if (m_angle == 0)
     {
-      sphere = BRepPrimAPI_MakeSphere(m_props.radius, segmentAngle2, segmentAngle1);
+      sphere = BRepPrimAPI_MakeSphere(m_radius, segmentAngle2, segmentAngle1);
     }
     else
     {
 
-      sphere = BRepPrimAPI_MakeSphere(m_props.radius, segmentAngle2, segmentAngle1, angle);
+      sphere = BRepPrimAPI_MakeSphere(m_radius, segmentAngle2, segmentAngle1, angle);
     }
   }
 

@@ -3,25 +3,21 @@
 
 #include "ReactCADNode.hpp"
 
-struct BoxProps
-{
-  bool center;
-  double x;
-  double y;
-  double z;
-};
+#include <gp_Pnt.hxx>
 
 class BoxNode : public ReactCADNode
 {
 public:
   BoxNode();
-  void setProps(const BoxProps &props);
+  void setSize(gp_Pnt size);
+  void setCentered(Standard_Boolean centered);
 
 protected:
   void computeShape() override;
 
 private:
-  BoxProps m_props;
+  gp_Pnt m_size;
+  Standard_Boolean m_centered;
 };
 
 #endif

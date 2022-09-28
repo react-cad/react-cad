@@ -3,24 +3,20 @@
 
 #include "ReactCADNode.hpp"
 
-struct TorusProps
-{
-  double radius1;
-  double radius2;
-  double angle;
-};
-
 class TorusNode : public ReactCADNode
 {
 public:
   TorusNode();
-  void setProps(const TorusProps &props);
+  void setSize(Standard_Real radius1, Standard_Real radius2);
+  void setAngle(Standard_Real angle);
 
 protected:
   void computeShape() override;
 
 private:
-  TorusProps m_props;
+  Standard_Real m_radius1;
+  Standard_Real m_radius2;
+  Standard_Real m_angle;
 };
 
 #endif
