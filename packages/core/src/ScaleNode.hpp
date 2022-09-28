@@ -7,14 +7,16 @@
 
 #include <Standard_Boolean.hxx>
 #include <Standard_Real.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Vec.hxx>
 
 class ScaleNode : public ReactCADNode
 {
 public:
   ScaleNode();
   void setScaleFactor(Standard_Real scaleFactor);
-  void setScale(Vector scale);
-  void setCenter(Point center);
+  void setScale(gp_Vec scale);
+  void setCenter(gp_Pnt center);
 
 protected:
   void computeShape() override;

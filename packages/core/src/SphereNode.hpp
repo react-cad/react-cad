@@ -3,25 +3,22 @@
 
 #include "ReactCADNode.hpp"
 
-struct SphereProps
-{
-  double radius;
-  double angle;
-  double segmentAngle1;
-  double segmentAngle2;
-};
-
 class SphereNode : public ReactCADNode
 {
 public:
   SphereNode();
-  void setProps(const SphereProps &prop);
+  void setRadius(Standard_Real radius);
+  void setAngle(Standard_Real angle);
+  void setSegment(Standard_Real angle1, Standard_Real angle2);
 
 protected:
   void computeShape() override;
 
 private:
-  SphereProps m_props;
+  Standard_Real m_radius;
+  Standard_Real m_angle;
+  Standard_Real m_segmentAngle1;
+  Standard_Real m_segmentAngle2;
 };
 
 #endif

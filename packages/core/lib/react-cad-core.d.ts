@@ -9,6 +9,22 @@ export class ReactCADNode extends EmClass {
   public hasParent(): boolean;
 }
 
+export class ReactCADView extends EmClass {
+  public render(node: ReactCADNode, reset: boolean): void;
+  // public setColor(color: string): void;
+  public zoom(delta: number): void;
+  public setViewpoint(viewpoint: Viewpoint): void;
+  public resetView(): void;
+  public fit(): void;
+  public setQuality(deviationCoefficent: number, angle: number): void;
+  public setProjection(projection: Projection): void;
+  public showAxes(show: boolean): void;
+  public showGrid(show: boolean): void;
+  public showWireframe(show: boolean): void;
+  public showShaded(show: boolean): void;
+  public onResize(): void;
+}
+
 export type Vector = [number, number, number];
 export type Point = [number, number, number];
 export type Quaternion = [number, number, number, number];
@@ -27,74 +43,38 @@ declare const Viewpoint: unique symbol;
 export type Viewpoint = number & { _opaque: typeof Viewpoint };
 
 // Primitives
-export interface BoxProps {
-  center: boolean;
-  x: number;
-  y: number;
-  z: number;
-}
 export class ReactCADBoxNode extends ReactCADNode {
-  public setProps(props: BoxProps): void;
+  public setSize(size: Vector): void;
+  public setCentered(centered: boolean): void;
 }
 
-export interface WedgePropsLtx {
-  x: number;
-  y: number;
-  z: number;
-  ltx: number;
-}
-export interface WedgePropsMinMax {
-  x: number;
-  y: number;
-  z: number;
-  xmin: number;
-  xmax: number;
-  zmin: number;
-  zmax: number;
-}
 export class ReactCADWedgeNode extends ReactCADNode {
-  public setPropsLtx(props: WedgePropsLtx): void;
-  public setPropsMinMax(props: WedgePropsMinMax): void;
+  public setSize(size: Vector): void;
+  public setLtx(ltx: number): void;
+  public setMinMax(xmin: number, xmax: number, zmin: number, zmax: number): void;
 }
 
-export interface ConeProps {
-  center: boolean;
-  radius1: number;
-  radius2: number;
-  height: number;
-  angle: number;
-}
 export class ReactCADConeNode extends ReactCADNode {
-  public setProps(props: ConeProps): void;
+  public setSize(radius1: number, radius2: number, height: number): void;
+  public setAngle(angle: number): void;
+  public setCentered(centered: boolean);
 }
 
-export interface CylinderProps {
-  center: boolean;
-  radius: number;
-  height: number;
-  angle: number;
-}
 export class ReactCADCylinderNode extends ReactCADNode {
-  public setProps(props: CylinderProps): void;
+  public setSize(radius: number, height: number): void;
+  public setAngle(angle: number): void;
+  public setCentered(centered: boolean);
 }
 
-export interface SphereProps {
-  radius: number;
-  angle: number;
-  segmentAngle1: number;
-  segmentAngle2: number;
-}
 export class ReactCADSphereNode extends ReactCADNode {
-  public setProps(props: SphereProps): void;
+  public setRadius(radius: number): void;
+  public setAngle(angle: number): void;
+  public setSegment(angle1: number, angle2: number): void;
 }
 
-export interface TorusProps {
-  radius1: number;
-  radius2: number;
-  angle: number;
-}
 export class ReactCADTorusNode extends ReactCADNode {
-  public setProps(props: TorusProps): void;
+  public setSize(radius1: number, radius2: number): void;
+  public setAngle(angle: number): void;
 }
 
 export class ReactCADPolyhedronNode extends ReactCADNode {
@@ -134,8 +114,7 @@ export class ReactCADHelixNode extends ReactCADSweepNode {
 
 // Imports
 export class ReactCADImportNode extends ReactCADNode {
-  public setFilename(src: string, ownFile: boolean): void;
-  public getFilename(): string;
+  public setFileContents(contents: string | ArrayBuffer): void;
 }
 
 export class ReactCADBRepImportNode extends ReactCADImportNode {}
@@ -147,13 +126,8 @@ export class ReactCADSTLImportNode extends ReactCADImportNode {}
 export class ReactCADObjImportNode extends ReactCADImportNode {}
 
 // Transformations
-export interface TranslationProps {
-  x: number;
-  y: number;
-  z: number;
-}
 export class ReactCADTranslationNode extends ReactCADNode {
-  public setProps(props: TranslationProps): void;
+  public setVector(vector: Vector): void;
 }
 
 export class ReactCADMirrorNode extends ReactCADNode {
@@ -218,44 +192,20 @@ export interface ReactCADCore extends EmscriptenModule {
   createCADNode<T extends keyof ReactCADNodeTypes = "union">(
     type: T
   ): ReactCADNodeTypes[T];
-  render(node: ReactCADNode, reset = false): void;
-  // setColor(color: string): void;
-  zoom(delta: number): void;
-  setViewpoint(viewpoint: Viewpoint): void;
-  resetView(): void;
-  fit(): void;
-  setQuality(deviationCoefficent: number, angle: number): void;
-  setProjection(projection: Projection): void;
-  showAxes(show: boolean): void;
-  showGrid(show: boolean): void;
-  showWireframe(show: boolean): void;
-  showShaded(show: boolean): void;
-  onResize(): void;
-  writeSTL(
+  createView(canvas: HTMLCanvasElement): ReactCADView;
+  computeNodeAsync(node: ReactCADNode): Promise<void>;
+  renderNodeAsync(node: ReactCADNode, view: ReactCADView): Promise<void>;
+  renderSTL(
     node: ReactCADNode,
-    filename: string,
     linearDeflection: number,
     isRelative: boolean,
     angularDeflection: number
-  ): boolean;
+  ): string | ArrayBuffer | undefined;
   cwrap: typeof cwrap;
   ccall: typeof ccall;
   canvas: HTMLCanvasElement;
+  canvases: Record<string, HTMLCanvasElement>;
   mainScriptUrlOrBlob?: string;
-  FS: {
-    readFile(
-      path: string,
-      opts: { encoding: "binary"; flags?: string }
-    ): Uint8Array;
-    readFile(path: string, opts: { encoding: "utf8"; flags?: string }): string;
-    readFile(path: string, opts?: { flags?: string }): Uint8Array;
-    writeFile(
-      path: string,
-      data: string | ArrayBufferView,
-      opts?: { flags?: string }
-    ): void;
-    unlink(path: string): void;
-  };
   _shutdown(): void;
 }
 

@@ -1,41 +1,39 @@
 import React from "react";
-import ReactCADRenderer from "react-cad";
+import { ReactCADCore, ReactCADNode } from "react-cad";
 
-import { useReactCadCore, useReactCadRenderer } from "./hooks";
+import { useExport, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
 import Toolbar from "./Toolbar";
 
 interface Props {
   className?: string;
-  coreUrl: string;
-  jsUrl: string;
-  esmUrl: string;
-  workerUrl: string;
-  shape: React.ReactElement<unknown>;
+  core: ReactCADCore;
+  node: ReactCADNode;
   name?: string;
   reset?: boolean;
   focus?: boolean;
   resizable?: boolean;
   highDetail?: [number, number];
   lowDetail?: [number, number];
+  setDetail?: (detail: ViewOptions["detail"]) => void;
+  rerender?: any;
 }
 
-const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
+const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
   (
     {
       className,
-      coreUrl,
-      jsUrl,
-      esmUrl,
-      workerUrl,
-      shape,
+      core,
+      node,
       name,
       reset,
       focus,
       resizable,
       highDetail = [0.001, 0.5],
       lowDetail = [0.002, 1],
+      setDetail,
+      rerender,
     },
     forwardedRef
   ) => {
@@ -57,55 +55,49 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       lowDetail,
     });
 
-    const [core, loaded, canvasRef, onResize] = useReactCadCore(
-      coreUrl,
-      jsUrl,
-      esmUrl,
-      workerUrl
-    );
-    useReactCadRenderer(core, loaded, shape, options, reset);
+    const [view, canvasRef, onResize] = useReactCADView(core, options);
+
+    React.useEffect(() => {
+      if (view.current) {
+        core.renderNodeAsync(node, view.current).then(() => {
+          if (reset) {
+            view.current?.resetView();
+          }
+        });
+      }
+    }, [node, rerender]);
 
     React.useEffect(
       () => setOptions((options) => ({ ...options, highDetail, lowDetail })),
       [...highDetail, ...lowDetail]
     );
 
+    React.useEffect(() => {
+      setDetail?.(options.detail);
+    }, [options.detail]);
+
     const handleSetViewpoint = React.useCallback((viewpoint: Viewpoint) => {
-      core.current?.setViewpoint(core.current.Viewpoint[viewpoint]);
+      view.current?.setViewpoint(core.Viewpoint[viewpoint]);
     }, []);
 
     const handleZoom = React.useCallback((amount: number) => {
-      core.current?.zoom(amount);
+      view.current?.zoom(amount);
     }, []);
 
     const handleResetView = React.useCallback(() => {
-      core.current?.resetView();
+      view.current?.resetView();
     }, []);
-    const handleFit = React.useCallback(() => core.current?.fit(), []);
 
-    const handleDownload = React.useCallback(
-      async (event: React.SyntheticEvent) => {
-        event.preventDefault();
-        const content = await (core.current
-          ? ReactCADRenderer.renderToSTL(shape, core.current, 0.05, false, 0.5)
-          : Promise.reject("react-cad not initialised"));
+    const handleFit = React.useCallback(() => view.current?.fit(), []);
 
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(
-          new Blob([content], { type: "model/stl" })
-        );
-        a.download = `${name || "react-cad"}.stl`;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(a.href);
-        document.body.removeChild(a);
-      },
-      [shape, name]
-    );
+    const handleDownload = useExport(node, core, name);
 
     return (
-      <div className={className} ref={wrapperRef}>
+      <div
+        className={className}
+        ref={wrapperRef}
+        style={{ height: "100%", width: "100%" }}
+      >
         <Toolbar
           options={options}
           setOptions={setOptions}
@@ -124,4 +116,4 @@ const ReactCadViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
   }
 );
 
-export default ReactCadViewer;
+export default ReactCADViewer;

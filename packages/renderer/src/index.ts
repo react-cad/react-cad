@@ -1,6 +1,6 @@
 import React from "react";
 import ReactReconciler from "react-reconciler";
-import { ReactCADCore } from "@react-cad/core";
+import { ReactCADCore, ReactCADNode } from "@react-cad/core";
 
 import {
   Type,
@@ -103,10 +103,7 @@ export const HostConfig: ReactReconciler.HostConfig<
     return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { root, rootNodes, nodes, core, reset } = rootContainerInstance;
-
-    core.render(root, reset);
-    rootContainerInstance.reset = false;
+    const { rootNodes, nodes, callback } = rootContainerInstance;
 
     // Free memory of removed nodes
     const removedNodes = nodes.filter((node) => !node.hasParent());
@@ -119,6 +116,8 @@ export const HostConfig: ReactReconciler.HostConfig<
     rootContainerInstance.rootNodes = rootNodes.filter(
       (node) => !removedNodes.includes(node)
     );
+
+    callback?.();
   },
   shouldSetTextContent(_type: Type, _props: Props) {
     return false;
@@ -170,137 +169,50 @@ export const HostConfig: ReactReconciler.HostConfig<
 
 const reconcilerInstance = ReactReconciler(HostConfig);
 
-interface RendererConfig {
-  context: Container;
-  container: ReactReconciler.FiberRoot;
-}
+class ReactCADRoot {
+  private context: Container;
+  private container: ReactReconciler.FiberRoot;
+  private isDeleted: boolean;
 
-const rendererConfigs: Map<ReactCADCore, RendererConfig> = new Map();
+  public constructor(rootNode: ReactCADNode, core: ReactCADCore) {
+    const isAsync = false;
+    const hydrate = false;
 
-function createConfig(core: ReactCADCore): RendererConfig {
-  const root = core.createCADNode("union");
+    this.context = {
+      core,
+      nodes: [],
+      rootNodes: [],
+      root: rootNode,
+    };
 
-  const isAsync = false;
-  const hydrate = false;
-
-  const context: Container = {
-    core,
-    nodes: [],
-    rootNodes: [],
-    root,
-    reset: true,
-  };
-
-  const container = reconcilerInstance.createContainer(
-    context,
-    isAsync,
-    hydrate
-  );
-
-  return { context, container };
-}
-
-export function render(
-  element: React.ReactElement,
-  core: ReactCADCore,
-  reset = false
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const existingContainer = rendererConfigs.get(core);
-    const { container } =
-      existingContainer ??
-      rendererConfigs.set(core, createConfig(core)).get(core) ??
-      {};
-
-    if (container) {
-      if (reset) {
-        container.containerInfo.reset = true;
-      }
-      reconcilerInstance.updateContainer(element, container, null, () => {
-        if (!existingContainer) {
-          core.resetView();
-        }
-        resolve();
-      });
-      return;
-    }
-
-    reject("React container could not be created");
-  });
-}
-
-export function destroyContainer(core: ReactCADCore): void {
-  const config = rendererConfigs.get(core);
-  if (!config) {
-    return;
-  }
-  rendererConfigs.delete(core);
-  config.context.nodes.forEach((node) => node.delete());
-  config.context.root.delete();
-}
-
-export function renderToSTL(
-  element: React.ReactElement,
-  core: ReactCADCore,
-  linearDeflection = 0.05,
-  isRelative = false,
-  angularDeflection = 0.5
-): Promise<string> {
-  const isAsync = false;
-  const hydrate = false;
-
-  const context: Container = {
-    core,
-    nodes: [],
-    rootNodes: [],
-    root: core.createCADNode("union"),
-    reset: true,
-  };
-
-  const container = reconcilerInstance.createContainer(
-    context,
-    isAsync,
-    hydrate
-  ); // Creates root fiber node.
-
-  const parentComponent = null;
-
-  return new Promise((resolve, reject) => {
-    reconcilerInstance.updateContainer(
-      element,
-      container,
-      parentComponent,
-      () => {
-        try {
-          const filename = "/tmp/shape.stl";
-          const success = core.writeSTL(
-            context.root,
-            filename,
-            linearDeflection,
-            isRelative,
-            angularDeflection
-          );
-          context.nodes.forEach((node) => node.delete());
-          context.root.delete();
-          if (success) {
-            const content = core.FS.readFile(filename, { encoding: "utf8" });
-            core.FS.unlink(filename);
-            resolve(content);
-          }
-          core.FS.unlink(filename);
-          reject("Could not create stl");
-        } catch (e) {
-          reject(e);
-        }
-      }
+    this.container = reconcilerInstance.createContainer(
+      this.context,
+      isAsync,
+      hydrate
     );
-  });
+
+    this.isDeleted = false;
+  }
+
+  public render(element: React.ReactElement, callback = () => {}) {
+    if (this.isDeleted) {
+      throw Error("Cannot render a deleted root");
+    }
+    this.context.callback = callback;
+    reconcilerInstance.updateContainer(element, this.container, null, () => {});
+  }
+
+  public delete() {
+    this.context.nodes.forEach((node) => node.delete());
+    this.isDeleted = true;
+  }
+}
+
+export function createRoot(
+  root: ReactCADNode,
+  core: ReactCADCore
+): ReactCADRoot {
+  return new ReactCADRoot(root, core);
 }
 
 export * from "./types";
-
-export default {
-  render,
-  renderToSTL,
-  destroyContainer,
-};

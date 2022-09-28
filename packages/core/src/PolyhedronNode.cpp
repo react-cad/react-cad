@@ -12,38 +12,48 @@
 
 PolyhedronNode::PolyhedronNode()
 {
-  m_points = std::vector<Point>({
-      {.x = 0, .y = 0, .z = 0},
-      {.x = 1, .y = 0, .z = 0},
-      {.x = 0, .y = 1, .z = 0},
-      {.x = 0, .y = 0, .z = 1},
-  });
+  m_points = NCollection_Array1<gp_Pnt>(0, 3);
+  m_points[0] = gp_Pnt(0, 0, 0);
+  m_points[1] = gp_Pnt(1, 0, 0);
+  m_points[2] = gp_Pnt(0, 1, 0);
+  m_points[3] = gp_Pnt(0, 0, 1);
 
-  m_faces = std::vector<std::vector<unsigned int>>({
-      {0, 1, 2},
-      {0, 1, 3},
-      {0, 2, 3},
-      {1, 2, 3},
-  });
+  m_faces = NCollection_Array1<NCollection_Array1<int>>(0, 3);
+  m_faces[0] = NCollection_Array1<int>(0, 2);
+  m_faces[0][0] = 0;
+  m_faces[0][1] = 1;
+  m_faces[0][2] = 2;
+  m_faces[1] = NCollection_Array1<int>(0, 2);
+  m_faces[1][0] = 0;
+  m_faces[1][1] = 1;
+  m_faces[1][2] = 3;
+  m_faces[2] = NCollection_Array1<int>(0, 2);
+  m_faces[2][0] = 0;
+  m_faces[2][1] = 2;
+  m_faces[2][2] = 3;
+  m_faces[3] = NCollection_Array1<int>(0, 2);
+  m_faces[3][0] = 1;
+  m_faces[3][1] = 2;
+  m_faces[3][2] = 3;
 }
 
-bool PolyhedronNode::checkFaces(const std::vector<std::vector<unsigned int>> &faces)
+bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>> &faces)
 {
-  if (faces.size() < 4)
+  if (faces.Size() < 4)
   {
     return false;
   }
 
   for (auto face = m_faces.begin(); face != m_faces.end(); ++face)
   {
-    if (face->size() < 3)
+    if (face->Size() < 3)
     {
       return false;
     }
 
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
-      if (*pointIndex < 0 || *pointIndex >= m_points.size())
+      if (*pointIndex < 0 || *pointIndex >= m_points.Size())
       {
         return false;
       }
@@ -53,18 +63,18 @@ bool PolyhedronNode::checkFaces(const std::vector<std::vector<unsigned int>> &fa
   return true;
 }
 
-void PolyhedronNode::setPointsAndFaces(const std::vector<Point> &points,
-                                       const std::vector<std::vector<unsigned int>> &faces)
+void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
+                                       const NCollection_Array1<NCollection_Array1<int>> &faces)
 {
   lock();
-  m_points = std::vector<Point>(points);
+  m_points = points;
   if (checkFaces(faces))
   {
-    m_faces = std::vector<std::vector<unsigned int>>(faces);
+    m_faces = faces;
   }
   else
   {
-    m_faces = std::vector<std::vector<unsigned int>>();
+    m_faces = NCollection_Array1<NCollection_Array1<int>>();
   }
   propsChanged();
   unlock();
@@ -79,8 +89,8 @@ void PolyhedronNode::computeShape()
     BRepBuilderAPI_MakePolygon polygon;
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
-      Point point = m_points.at(*pointIndex);
-      polygon.Add(gp_Pnt(point.x, point.y, point.z));
+      gp_Pnt point = m_points[*pointIndex];
+      polygon.Add(point);
     }
     polygon.Close();
     BRepBuilderAPI_MakeFace f(polygon.Wire());

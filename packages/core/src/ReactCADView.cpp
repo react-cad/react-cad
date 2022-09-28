@@ -44,21 +44,29 @@
 
 #include <iostream>
 
+#include <pthread.h>
+
 #include "PerformanceTimer.hpp"
+#include "UUID.hpp"
+#include "WebGLSentry.hpp"
 
 // clang-format off
 namespace
 {
-  EM_JS(void, jsInitCanvas, (), {
-    specialHTMLTargets["!canvas"] = Module.canvas;
+  EM_JS(void, jsInitCanvas, (emscripten::EM_VAL canvas_handle, const char* idStr), {
+    const canvas = Emval.toValue(canvas_handle);
+    const id = UTF8ToString(idStr);
+    specialHTMLTargets[id] = canvas;
+  });
+  
+  EM_JS(int, jsCanvasGetWidth, (const char* idStr), {
+    const id = UTF8ToString(idStr);
+    return specialHTMLTargets[id].width;
   });
 
-  EM_JS(int, jsCanvasGetWidth, (), {
-    return Module.canvas.width;
-  });
-
-  EM_JS(int, jsCanvasGetHeight, (), {
-    return Module.canvas.height;
+  EM_JS(int, jsCanvasGetHeight, (const char* idStr), {
+    const id = UTF8ToString(idStr);
+    return specialHTMLTargets[id].height;
   });
 
   EM_JS(float, jsDevicePixelRatio, (), {
@@ -67,51 +75,27 @@ namespace
   });
 
   //! Return cavas size in pixels.
-  static Graphic3d_Vec2i jsCanvasSize()
+  static Graphic3d_Vec2i jsCanvasSize(const char* idStr)
   {
-    return Graphic3d_Vec2i (jsCanvasGetWidth(), jsCanvasGetHeight());
+    return Graphic3d_Vec2i (jsCanvasGetWidth(idStr), jsCanvasGetHeight(idStr));
   }
 } // namespace
 // clang-format on
 
-std::shared_ptr<ReactCADView> ReactCADView::singleton = nullptr;
-pthread_mutex_t ReactCADView::viewMutex = PTHREAD_MUTEX_INITIALIZER;
-
-void ReactCADView::lock()
+ReactCADView::ReactCADView(emscripten::val canvas)
+    : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get())
 {
-  pthread_mutex_lock(&ReactCADView::viewMutex);
-}
-
-void ReactCADView::unlock()
-{
-  pthread_mutex_unlock(&ReactCADView::viewMutex);
-}
-
-std::shared_ptr<ReactCADView> ReactCADView::getView()
-{
-  if (singleton == nullptr)
-  {
-    singleton.reset(new ReactCADView());
-  }
-
-  return singleton;
-}
-
-void ReactCADView::destroyView()
-{
-  singleton = nullptr;
-}
-
-ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0)
-{
+  const char *aTargetId = myId.c_str();
+  jsInitCanvas(canvas.as_handle(), aTargetId);
 
   initWindow();
   initViewer();
-  initDemoScene();
   if (myView.IsNull())
   {
     return;
   }
+
+  WebGLSentry sentry(myWebglContext, myId);
 
   myView->MustBeResized();
   myShapeFront = new AIS_Shape(TopoDS_Shape());
@@ -135,11 +119,13 @@ ReactCADView::ReactCADView() : myDevicePixelRatio(jsDevicePixelRatio()), myUpdat
 // ================================================================
 ReactCADView::~ReactCADView()
 {
+  WebGLSentry sentry(myWebglContext, myId);
+  emscripten_webgl_destroy_context(myWebglContext);
 }
 
 void ReactCADView::drawShape(TopoDS_Shape shape)
 {
-
+  WebGLSentry sentry(myWebglContext, myId);
   myShapeBack->SetShape(shape);
   myContext->Redisplay(myShapeBack, false);
 
@@ -171,9 +157,10 @@ void ReactCADView::drawShape(TopoDS_Shape shape)
 
 void ReactCADView::render(TopoDS_Shape shape, bool reset)
 {
-  if (shape.IsNotEqual(myShape))
+  if (shape.IsNotEqual(myShape) || myQualityChanged)
   {
     myShape = shape;
+    myQualityChanged = false;
 
 #ifdef REACTCAD_DEBUG
     PerformanceTimer timer("Compute mesh");
@@ -198,14 +185,22 @@ void ReactCADView::render(TopoDS_Shape shape, bool reset)
 
 void ReactCADView::setQuality(double deviationCoefficent, double angle)
 {
-  myShapeFront->SetOwnDeviationCoefficient(deviationCoefficent);
-  myShapeFront->SetOwnDeviationAngle(angle);
-  myShapeBack->SetOwnDeviationCoefficient(deviationCoefficent);
-  myShapeBack->SetOwnDeviationAngle(angle);
-  myWireframeFront->SetOwnDeviationCoefficient(deviationCoefficent);
-  myWireframeFront->SetOwnDeviationAngle(angle);
-  myWireframeBack->SetOwnDeviationCoefficient(deviationCoefficent);
-  myWireframeBack->SetOwnDeviationAngle(angle);
+  Standard_Real oldCoefficient, previousCoeffient, oldAngle, previousAngle;
+  myShapeFront->OwnDeviationCoefficient(previousCoeffient, oldCoefficient);
+  myShapeFront->OwnDeviationAngle(previousAngle, oldAngle);
+
+  if (!IsEqual(deviationCoefficent, previousCoeffient) || !IsEqual(angle, previousAngle))
+  {
+    myQualityChanged = true;
+    myShapeFront->SetOwnDeviationCoefficient(deviationCoefficent);
+    myShapeFront->SetOwnDeviationAngle(angle);
+    myShapeBack->SetOwnDeviationCoefficient(deviationCoefficent);
+    myShapeBack->SetOwnDeviationAngle(angle);
+    myWireframeFront->SetOwnDeviationCoefficient(deviationCoefficent);
+    myWireframeFront->SetOwnDeviationAngle(angle);
+    myWireframeBack->SetOwnDeviationCoefficient(deviationCoefficent);
+    myWireframeBack->SetOwnDeviationAngle(angle);
+  }
 }
 
 void ReactCADView::setColor(std::string colorString)
@@ -290,17 +285,9 @@ void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 
 void ReactCADView::showAxes(bool show)
 {
+  WebGLSentry sentr(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
-
-  if (show)
-  {
-    myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.1, V3d_WIREFRAME);
-  }
-  else
-  {
-    myView->TriedronErase();
-  }
 
   myView->Invalidate();
   updateView();
@@ -308,6 +295,7 @@ void ReactCADView::showAxes(bool show)
 
 void ReactCADView::showGrid(bool show)
 {
+  WebGLSentry sentr(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   if (show)
   {
@@ -323,6 +311,7 @@ void ReactCADView::showGrid(bool show)
 
 void ReactCADView::showWireframe(bool show)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   pthread_mutex_lock(&wireframeHandleMutex);
   myShowWireframe = show;
   if (myShowWireframe)
@@ -340,6 +329,7 @@ void ReactCADView::showWireframe(bool show)
 
 void ReactCADView::showShaded(bool show)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   pthread_mutex_lock(&shadedHandleMutex);
   myShowShaded = show;
   if (myShowShaded)
@@ -361,8 +351,7 @@ void ReactCADView::showShaded(bool show)
 // ================================================================
 void ReactCADView::initWindow()
 {
-  jsInitCanvas();
-  const char *aTargetId = "!canvas";
+  const char *aTargetId = myId.c_str();
   const EM_BOOL toUseCapture(EM_TRUE);
 
   emscripten_set_mousedown_callback(aTargetId, this, toUseCapture, onMouseCallback);
@@ -386,6 +375,7 @@ void ReactCADView::initWindow()
 // ================================================================
 void ReactCADView::dumpGlInfo(bool theIsBasic)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   TColStd_IndexedDataMapOfStringString aGlCapsDict;
   myView->DiagnosticInformation(aGlCapsDict,
                                 theIsBasic ? Graphic3d_DiagnosticInfo_Basic : Graphic3d_DiagnosticInfo_Complete);
@@ -448,32 +438,21 @@ void ReactCADView::initPixelScaleRatio()
 // ================================================================
 bool ReactCADView::initViewer()
 {
-  // Build with "--preload-file MyFontFile.ttf" option
-  // and register font in Font Manager to use custom font(s).
-  /*const char* aFontPath = "MyFontFile.ttf";
-  if (Handle(Font_SystemFont) aFont = Font_FontMgr::GetInstance()->CheckFont
-  (aFontPath))
-  {
-    Font_FontMgr::GetInstance()->RegisterFont (aFont, true);
-  }
-  else
-  {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: font '")
-  + aFontPath + "' is not found", Message_Fail);
-  }*/
+  const char *aTargetId = myId.c_str();
   EmscriptenWebGLContextAttributes attributes;
   emscripten_webgl_init_context_attributes(&attributes);
   attributes.alpha = false;
   attributes.powerPreference = EM_WEBGL_POWER_PREFERENCE_HIGH_PERFORMANCE;
   attributes.renderViaOffscreenBackBuffer = true;
   attributes.proxyContextToMainThread = EMSCRIPTEN_WEBGL_CONTEXT_PROXY_ALWAYS;
-  webglContext = emscripten_webgl_create_context("!canvas", &attributes);
-  EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(webglContext);
+  myWebglContext = emscripten_webgl_create_context(aTargetId, &attributes);
+
+  WebGLSentry sentry(myWebglContext, myId);
 
   Handle(Aspect_DisplayConnection) aDisp;
 
   Handle(OpenGl_GraphicDriver) aDriver = new OpenGl_GraphicDriver(aDisp, false);
-  // aDriver->ChangeOptions().buffersNoSwap = true; // swap has no effect in WebGL
+  aDriver->ChangeOptions().buffersNoSwap = true; // swap has no effect in WebGL
   if (!aDriver->InitContext())
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Error: EGL initialization failed"), Message_Fail);
@@ -498,7 +477,7 @@ bool ReactCADView::initViewer()
   aViewer->SetDefaultBackgroundColor(Quantity_NOC_AZURE);
 
   Handle(Aspect_NeutralWindow) aWindow = new Aspect_NeutralWindow();
-  Graphic3d_Vec2i aWinSize = jsCanvasSize();
+  Graphic3d_Vec2i aWinSize = jsCanvasSize(aTargetId);
   if (aWinSize.x() < 10 || aWinSize.y() < 10)
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Warning: invalid canvas size"), Message_Warning);
@@ -525,6 +504,7 @@ bool ReactCADView::initViewer()
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);
+  myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.1, V3d_WIREFRAME);
 
 #ifdef REACTCAD_DEBUG
   // dumpGlInfo(false);
@@ -533,20 +513,6 @@ bool ReactCADView::initViewer()
   myContext = new AIS_InteractiveContext(aViewer);
   initPixelScaleRatio();
   return true;
-}
-
-// ================================================================
-// Function : initDemoScene
-// Purpose  :
-// ================================================================
-void ReactCADView::initDemoScene()
-{
-  if (myContext.IsNull())
-  {
-    return;
-  }
-
-  initPixelScaleRatio();
 }
 
 // ================================================================
@@ -572,10 +538,8 @@ void ReactCADView::redrawView()
 {
   if (!myView.IsNull())
   {
-    lock();
-    EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(webglContext);
+    WebGLSentry sentry(myWebglContext, myId);
     FlushViewEvents(myContext, myView, true);
-    unlock();
   }
 }
 
@@ -585,6 +549,7 @@ void ReactCADView::redrawView()
 // ================================================================
 void ReactCADView::handleViewRedraw(const Handle(AIS_InteractiveContext) & theCtx, const Handle(V3d_View) & theView)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   myUpdateRequests = 0;
   AIS_ViewController::handleViewRedraw(theCtx, theView);
   if (myToAskNextFrame)
@@ -602,8 +567,11 @@ void ReactCADView::onResize()
     return;
   }
 
+  WebGLSentry sentry(myWebglContext, myId);
+  const char *aTargetId = myId.c_str();
+
   Handle(Aspect_NeutralWindow) aWindow = Handle(Aspect_NeutralWindow)::DownCast(myView->Window());
-  Graphic3d_Vec2i aWinSizeOld, aWinSizeNew(jsCanvasSize());
+  Graphic3d_Vec2i aWinSizeOld, aWinSizeNew(jsCanvasSize(aTargetId));
   if (aWinSizeNew.x() < 10 || aWinSizeNew.y() < 10)
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Warning: invalid canvas size"), Message_Warning);
@@ -617,7 +585,7 @@ void ReactCADView::onResize()
       myDevicePixelRatio = aPixelRatio;
       initPixelScaleRatio();
     }
-    aWindow->SetSize(aWinSizeNew.x(), aWinSizeNew.y());
+    bool ret = aWindow->SetSize(aWinSizeNew.x(), aWinSizeNew.y());
     myView->MustBeResized();
     myView->Invalidate();
     redrawView();
@@ -635,6 +603,7 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
   {
     return EM_FALSE;
   }
+  WebGLSentry sentr(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -720,6 +689,7 @@ EM_BOOL ReactCADView::onWheelEvent(int theEventType, const EmscriptenWheelEvent 
   {
     return EM_FALSE;
   }
+  WebGLSentry sentr(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -765,6 +735,7 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
   {
     return EM_FALSE;
   }
+  WebGLSentry sentr(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());

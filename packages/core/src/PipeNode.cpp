@@ -23,12 +23,12 @@ PipeNode::PipeNode() : m_spine()
 {
 }
 
-void PipeNode::setSpine(const std::vector<Point> &points)
+void PipeNode::setSpine(const NCollection_Array1<gp_Pnt> &points)
 {
   BRepBuilderAPI_MakePolygon polygon;
   for (auto point : points)
   {
-    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(gp_Pnt(point.x, point.y, point.z));
+    TopoDS_Vertex vertex = BRepBuilderAPI_MakeVertex(point);
     polygon.Add(vertex);
   }
   m_spine = polygon;

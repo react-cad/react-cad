@@ -1,123 +1,161 @@
 import React from "react";
-import ReactCADRenderer, { ReactCADCore } from "react-cad";
+import {
+  createRoot,
+  ReactCADCore,
+  ReactCADView,
+  ReactCADNode,
+} from "react-cad";
 import { ViewOptions } from "./types";
 
 import DetailContext from "./DetailContext";
 
-export function useReactCadCore(
-  coreUrl: string,
-  jsUrl: string,
-  esmUrl: string,
-  workerUrl: string
+export function useReactCADRenderer(
+  core: ReactCADCore,
+  shape: React.ReactElement,
+  detail: ViewOptions["detail"],
+  reset?: boolean
+): [ReactCADNode, number, boolean] {
+  const rootNode = React.useMemo(() => core.createCADNode("union"), [core]);
+  const root = React.useMemo(() => createRoot(rootNode, core), [core]);
+
+  const [renderFrameId, setRenderFrameId] = React.useState(0);
+  const [renderReset, setRenderReset] = React.useState(false);
+
+  const renderCallback = React.useMemo(() => {
+    let shouldReset = Boolean(reset);
+
+    return async () => {
+      await core.computeNodeAsync(rootNode);
+
+      setRenderReset(shouldReset);
+      setRenderFrameId((n) => n + 1);
+
+      shouldReset = false;
+    };
+  }, [core, rootNode, reset]);
+
+  React.useEffect(() => {
+    root.render(
+      <DetailContext.Provider value={detail}>{shape}</DetailContext.Provider>,
+      renderCallback
+    );
+  }, [shape, detail, root, rootNode]);
+
+  React.useEffect(
+    () => () => {
+      root.delete();
+      rootNode.delete();
+    },
+    []
+  );
+
+  return [rootNode, renderFrameId, renderReset];
+}
+
+export function useReactCADView(
+  core: ReactCADCore,
+  options: ViewOptions
 ): [
-  React.MutableRefObject<ReactCADCore | undefined>,
-  boolean,
+  React.MutableRefObject<ReactCADView | undefined>,
   (canvas: HTMLCanvasElement | null) => void,
   () => void
 ] {
-  const core = React.useRef<ReactCADCore>();
-  const [loaded, setLoaded] = React.useState(false);
-  const cancelled = React.useRef<boolean>(false);
+  const view = React.useRef<ReactCADView & { deleted?: boolean }>();
   const [onResize, setOnResize] = React.useState(() => () => {});
 
   const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
-    function unload() {
-      if (core.current) {
-        ReactCADRenderer.destroyContainer(core.current);
-        try {
-          core.current._shutdown();
-        } catch (e) {
-          // Ignore emscripten exit message
-        }
-      }
-
-      core.current = undefined;
-
-      setLoaded(false);
-    }
-
     if (canvas) {
-      cancelled.current = false;
-
-      import(/* webpackIgnore: true */ `./${esmUrl}`).then(
-        ({
-          default: reactCadCore,
-        }: {
-          default: EmscriptenModuleFactory<ReactCADCore>;
-        }) =>
-          reactCadCore({
-            canvas: canvas,
-            mainScriptUrlOrBlob: jsUrl,
-            locateFile: (path) => (path.includes("wasm") ? coreUrl : workerUrl),
-          }).then((c) => {
-            core.current = c;
-
-            if (cancelled.current) {
-              unload();
-            } else {
-              canvas.width = canvas.clientWidth * window.devicePixelRatio;
-              canvas.height = canvas.clientHeight * window.devicePixelRatio;
-
-              setOnResize(() => () => {
-                canvas.width = canvas.clientWidth * window.devicePixelRatio;
-                canvas.height = canvas.clientHeight * window.devicePixelRatio;
-                core.current?.onResize();
-              });
-
-              setLoaded(true);
-            }
-          })
-      );
-    } else {
-      cancelled.current = true;
-      unload();
+      if (view.current) {
+        view.current.delete();
+        view.current.deleted = true;
+      }
+      view.current = core.createView(canvas);
+      view.current.deleted = false;
+      setOnResize(() => () => {
+        if (!view.current?.deleted) {
+          canvas.width = canvas.clientWidth * window.devicePixelRatio;
+          canvas.height = canvas.clientHeight * window.devicePixelRatio;
+          view.current?.onResize();
+        }
+      });
     }
   }, []);
 
+  React.useEffect(
+    () => () => {
+      if (view.current && !view.current.deleted) {
+        view.current.delete();
+      }
+    },
+    []
+  );
+
   React.useEffect(() => {
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    if (onResize) {
+      onResize();
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
+    }
   }, [onResize]);
 
-  return [core, loaded, canvasRef, onResize];
-}
-
-export function useReactCadRenderer(
-  core: React.MutableRefObject<ReactCADCore | undefined>,
-  loaded: boolean,
-  shape: React.ReactElement,
-  options: ViewOptions,
-  reset?: boolean
-): void {
   React.useEffect(() => {
-    if (loaded && core.current) {
-      core.current.showAxes(options.showAxes);
-      core.current.showGrid(options.showGrid);
-      core.current.showWireframe(options.showWireframe);
-      core.current.showShaded(options.showShaded);
-      core.current.setProjection(core.current.Projection[options.projection]);
+    if (view.current) {
+      view.current.showAxes(options.showAxes);
+      view.current.showGrid(options.showGrid);
+      view.current.showWireframe(options.showWireframe);
+      view.current.showShaded(options.showShaded);
+      view.current.setProjection(core.Projection[options.projection]);
+      const quality =
+        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
+      view.current.setQuality(...quality);
     }
   }, [
-    loaded,
+    onResize,
     options.showAxes,
     options.showGrid,
     options.showShaded,
     options.showWireframe,
     options.projection,
+    options.detail,
+    ...options.highDetail,
+    ...options.lowDetail,
   ]);
 
-  React.useEffect(() => {
-    if (loaded && core.current) {
-      const quality =
-        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
-      core.current.setQuality(...quality);
-      ReactCADRenderer.render(
-        <DetailContext.Provider value={options.detail}>
-          {shape}
-        </DetailContext.Provider>,
-        core.current,
-        !!reset
+  return [view, canvasRef, onResize];
+}
+
+export function useExport(
+  node: ReactCADNode,
+  core: ReactCADCore,
+  name: string | undefined
+): (event: React.SyntheticEvent) => void {
+  const linearDeflection = 0.05;
+  const isRelative = false;
+  const angularDeflection = 0.5;
+  return React.useCallback(
+    async (event: React.SyntheticEvent) => {
+      event.preventDefault();
+
+      const content = core.renderSTL(
+        node,
+        linearDeflection,
+        isRelative,
+        angularDeflection
       );
-    }
-  }, [loaded, shape, options.detail, options.highDetail, options.lowDetail]);
+
+      if (content) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([content], { type: "model/stl" })
+        );
+        a.download = `${name || "react-cad"}.stl`;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(a.href);
+        document.body.removeChild(a);
+      }
+    },
+    [node, core, name]
+  );
 }

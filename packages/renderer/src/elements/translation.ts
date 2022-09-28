@@ -1,4 +1,3 @@
-import { TranslationProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Translation = "translation";
@@ -21,14 +20,6 @@ export function commitUpdate(
   instance: Instance<Translation>,
   updatePayload: UpdatePayload<Translation>
 ): void {
-  const props: TranslationProps = Object.assign(
-    {
-      x: 0,
-      y: 0,
-      z: 0,
-    },
-    updatePayload
-  );
-
-  instance.node.setProps(props);
+  const { x = 0, y = 0, z = 0 } = updatePayload;
+  instance.node.setVector([x, y, z]);
 }

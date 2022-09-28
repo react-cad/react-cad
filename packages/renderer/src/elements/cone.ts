@@ -1,4 +1,3 @@
-import { ConeProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Cone = "cone";
@@ -46,15 +45,14 @@ export function commitUpdate(
   instance: Instance<Cone>,
   updatePayload: UpdatePayload<Cone>
 ): void {
-  const props: ConeProps = Object.assign(
-    {
-      center: false,
-      radius1: 1,
-      radius2: 1,
-      height: 1,
-      angle: 0,
-    },
-    updatePayload
-  );
-  instance.node.setProps(props);
+  const {
+    center = false,
+    radius1 = 1,
+    radius2 = 1,
+    height = 1,
+    angle = 0,
+  } = updatePayload;
+  instance.node.setSize(radius1, radius2, height);
+  instance.node.setAngle(angle);
+  instance.node.setCentered(center);
 }

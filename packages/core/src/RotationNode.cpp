@@ -17,14 +17,12 @@ void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
 {
 }
 
-void RotationNode::setAxisAngle(Vector direction, Standard_Real angle)
+void RotationNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 {
-  gp_Dir newDirection(direction.x, direction.y, direction.z);
-
-  if (!IsEqual(angle, m_angle) || !newDirection.IsParallel(m_axis, RealEpsilon()))
+  if (!IsEqual(angle, m_angle) || !axis.IsParallel(m_axis, RealEpsilon()))
   {
     m_angle = angle;
-    m_axis = newDirection;
+    m_axis = axis;
     m_quaternion = gp_Quaternion(m_axis, m_angle);
     m_transform.SetRotation(m_quaternion);
     propsChanged();

@@ -2,33 +2,41 @@
 
 #include "TorusNode.hpp"
 
-TorusNode::TorusNode() : m_props({.radius1 = 1, .radius2 = 1, .angle = 0})
+TorusNode::TorusNode() : m_radius1(1), m_radius2(1), m_angle(0)
 {
 }
 
-void TorusNode::setProps(const TorusProps &props)
+void TorusNode::setSize(Standard_Real radius1, Standard_Real radius2)
 {
-  if (!doubleEquals(m_props.radius1, props.radius1) || !doubleEquals(m_props.radius2, props.radius2) ||
-      !doubleEquals(m_props.angle, props.angle))
+  if (!IsEqual(m_radius1, radius1) || !IsEqual(m_radius2, radius2))
   {
-    m_props = props;
+    m_radius1 = radius1;
+    m_radius2 = radius2;
+    propsChanged();
+  }
+}
+void TorusNode::setAngle(Standard_Real angle)
+{
+  if (!IsEqual(m_angle, angle))
+  {
+    m_angle = angle;
     propsChanged();
   }
 }
 
 void TorusNode::computeShape()
 {
-  double angle = fmin(fmax(m_props.angle, 0), 2 * M_PI);
+  double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
   TopoDS_Shell torus;
 
-  if (m_props.angle == 0)
+  if (m_angle == 0)
   {
-    torus = BRepPrimAPI_MakeTorus(m_props.radius1, m_props.radius2);
+    torus = BRepPrimAPI_MakeTorus(m_radius1, m_radius2);
   }
   else
   {
-    torus = BRepPrimAPI_MakeTorus(m_props.radius1, m_props.radius2, angle);
+    torus = BRepPrimAPI_MakeTorus(m_radius1, m_radius2, angle);
   }
 
   shape = torus;

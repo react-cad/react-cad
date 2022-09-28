@@ -1,9 +1,18 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
+import Documentation from "./box.docs.mdx";
+
 type Props = JSX.IntrinsicElements["box"];
 
-export const Box: React.FC<Props> = (props) => <box {...props} />;
+export const Box: Story<Props> = (props) => <box {...props} />;
+Box.storyName = "default box";
+Box.args = {
+  center: false,
+  x: 5,
+  y: 5,
+  z: 5,
+};
 
 const range = {
   control: {
@@ -25,13 +34,17 @@ export default {
     y: range,
     z: range,
   },
+  parameters: {
+    docs: {
+      page: Documentation,
+    },
+  },
 } as Meta;
 
-const Template: Story<Props> = (args) => <Box {...args} />;
-
-export const box = Template.bind({});
-box.args = {
-  center: false,
+export const Centered = Box.bind({});
+Centered.storyName = "centered box";
+Centered.args = {
+  center: true,
   x: 5,
   y: 5,
   z: 5,

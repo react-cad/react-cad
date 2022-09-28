@@ -13,7 +13,7 @@ class RevolutionNode : public SweepNode
 {
 public:
   RevolutionNode();
-  void setAxisAngle(Vector direction, Standard_Real angle);
+  void setAxisAngle(gp_Vec direction, Standard_Real angle);
 
 protected:
   void computeShape() override;

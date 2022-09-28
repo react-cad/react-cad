@@ -11,9 +11,9 @@ MirrorNode::MirrorNode()
 {
 }
 
-void MirrorNode::setPlane(Point origin, Vector normal)
+void MirrorNode::setPlane(gp_Pnt origin, gp_Vec normal)
 {
-  gp_Ax2 newAxis(gp_Pnt(origin.x, origin.y, origin.z), gp_Dir(normal.x, normal.y, normal.z));
+  gp_Ax2 newAxis(origin, gp_Dir(normal));
 
   if (!newAxis.IsCoplanar(m_axis, 0.000001, 0.2))
   {

@@ -1,34 +1,42 @@
 #include <BRepPrimAPI_MakeWedge.hxx>
+#include <Precision.hxx>
 #include <gp_Pnt.hxx>
 
 #include "WedgeNode.hpp"
 
 WedgeNode::WedgeNode()
-    : m_propsLtx({.x = 1, .y = 1, .z = 1, .ltx = 1}),
-      m_propsMinMax({.x = 1, .y = 1, .z = 1, .xmin = 1, .xmax = 1, .zmin = 1, .zmax = 1})
+    : m_useLtx(Standard_True), m_size(1, 1, 1), m_ltx(0.5), m_xmin(0.5), m_xmax(0.5), m_zmin(0.5), m_zmax(0.5)
 {
 }
 
-void WedgeNode::setPropsLtx(const WedgePropsLtx &props)
+void WedgeNode::setSize(gp_Pnt size)
 {
-  if (!doubleEquals(props.x, m_propsLtx.x) || !doubleEquals(props.y, m_propsLtx.y) ||
-      !doubleEquals(props.z, m_propsLtx.z) || !doubleEquals(props.ltx, m_propsLtx.ltx))
+  if (!size.IsEqual(m_size, Precision::Confusion()))
   {
-    useLtx = true;
-    m_propsLtx = props;
+    m_size = size;
     propsChanged();
   }
 }
 
-void WedgeNode::setPropsMinMax(const WedgePropsMinMax &props)
+void WedgeNode::setLtx(Standard_Real ltx)
 {
-  if (!doubleEquals(props.x, m_propsMinMax.x) || !doubleEquals(props.y, m_propsMinMax.y) ||
-      !doubleEquals(props.z, m_propsMinMax.z) || !doubleEquals(props.xmin, m_propsMinMax.xmin) ||
-      !doubleEquals(props.xmax, m_propsMinMax.xmax) || !doubleEquals(props.zmin, m_propsMinMax.zmin) ||
-      !doubleEquals(props.zmax, m_propsMinMax.zmax))
+  if (!m_useLtx || !IsEqual(ltx, m_ltx))
   {
-    useLtx = false;
-    m_propsMinMax = props;
+    m_useLtx = Standard_True;
+    m_ltx = ltx;
+    propsChanged();
+  }
+}
+
+void WedgeNode::setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real zmin, Standard_Real zmax)
+{
+  if (!IsEqual(xmin, m_xmin) || !IsEqual(xmax, m_xmax) || !IsEqual(zmin, m_zmin) || !IsEqual(zmax, m_zmax))
+  {
+    m_useLtx = Standard_False;
+    m_xmin = xmin;
+    m_xmax = xmax;
+    m_zmin = zmin;
+    m_zmax = zmax;
     propsChanged();
   }
 }
@@ -37,14 +45,13 @@ void WedgeNode::computeShape()
 {
   TopoDS_Solid wedge;
 
-  if (useLtx)
+  if (m_useLtx)
   {
-    wedge = BRepPrimAPI_MakeWedge(m_propsLtx.x, m_propsLtx.y, m_propsLtx.z, m_propsLtx.ltx);
+    wedge = BRepPrimAPI_MakeWedge(m_size.X(), m_size.Y(), m_size.Z(), m_ltx);
   }
   else
   {
-    wedge = BRepPrimAPI_MakeWedge(m_propsMinMax.x, m_propsMinMax.y, m_propsMinMax.z, m_propsMinMax.xmin,
-                                  m_propsMinMax.zmin, m_propsMinMax.xmax, m_propsMinMax.zmax);
+    wedge = BRepPrimAPI_MakeWedge(m_size.X(), m_size.Y(), m_size.Z(), m_xmin, m_zmin, m_xmax, m_zmax);
   }
 
   shape = wedge;

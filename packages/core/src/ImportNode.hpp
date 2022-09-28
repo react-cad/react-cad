@@ -1,6 +1,7 @@
 #ifndef ImportNode_HeaderFile
 #define ImportNode_HeaderFile
 
+#include <emscripten/val.h>
 #include <string>
 
 #include "ReactCADNode.hpp"
@@ -9,18 +10,19 @@ class ImportNode : public ReactCADNode
 {
 public:
   ImportNode();
-  ~ImportNode();
+  ImportNode(const ImportNode &other);
+  ImportNode &operator=(const ImportNode &other);
+  ~ImportNode() override;
 
-  void setFilename(const std::string &filename, bool ownFile = false);
-  std::string getFilename();
+  void setFileContents(emscripten::val contents);
 
 protected:
-  std::string m_filename;
   void computeShape() override;
+
+  std::string m_filename;
   virtual void importFile() = 0;
 
 private:
-  bool m_ownFile = false;
   void removeFile();
 };
 

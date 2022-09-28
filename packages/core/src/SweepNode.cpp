@@ -14,9 +14,11 @@
 #include <Geom_BSplineCurve.hxx>
 #include <Geom_BezierCurve.hxx>
 #include <Geom_Plane.hxx>
+#include <Precision.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Compound.hxx>
 #include <gp_Ax2.hxx>
+#include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
 
 #include <string.h>
@@ -24,10 +26,13 @@
 #include "SVGBuilder.hpp"
 #include "SVGImage.hpp"
 
-SweepNode::SweepNode() : m_points()
+SweepNode::SweepNode() : m_points(), m_isSVG(Standard_False)
 {
-  std::vector<Point> points(
-      {{.x = -1, .y = -1, .z = 0}, {.x = -1, .y = 1, .z = 0}, {.x = 1, .y = 1, .z = 0}, {.x = 1, .y = -1, .z = 0}});
+  NCollection_Array1<gp_Pnt> points(0, 3);
+  points[0] = gp_Pnt(-1, -1, 0);
+  points[1] = gp_Pnt(-1, 1, 0);
+  points[2] = gp_Pnt(1, 1, 0);
+  points[3] = gp_Pnt(1, -1, 0);
   setProfile(points);
 }
 
@@ -59,28 +64,27 @@ void SweepNode::setProfileSVG(const std::string &svg)
 #endif
 }
 
-void SweepNode::setProfile(const std::vector<Point> &points)
+void SweepNode::setProfile(const NCollection_Array1<gp_Pnt> &points)
 {
   Standard_Boolean changed = m_isSVG;
   m_isSVG = Standard_False;
 
-  if (m_points.size() > points.size())
+  if (m_points.Size() > points.Size())
   {
-    m_points = std::vector<Point>(points);
+    m_points = NCollection_Array1<gp_Pnt>(points);
     changed = true;
   }
   else
   {
-    if (points.size() > m_points.size())
+    if (points.Size() > m_points.Size())
     {
-      m_points.resize(points.size());
+      m_points.Resize(0, points.Size() - 1, Standard_True);
       changed = true;
     }
 
-    for (size_t i = 0; i < points.size(); ++i)
+    for (int i = 0; i < points.Size(); ++i)
     {
-      if (!IsEqual(m_points[i].x, points[i].x) || !IsEqual(m_points[i].y, points[i].y) ||
-          !IsEqual(m_points[i].z, points[i].z))
+      if (!m_points[i].IsEqual(points[i], Precision::Confusion()))
       {
         m_points[i] = points[i];
         changed = true;
@@ -93,7 +97,7 @@ void SweepNode::setProfile(const std::vector<Point> &points)
     BRepBuilderAPI_MakePolygon polygon;
     for (auto point : points)
     {
-      polygon.Add(gp_Pnt(point.x, point.y, point.z));
+      polygon.Add(point);
     }
     polygon.Close();
     BRepBuilderAPI_MakeFace face(polygon);

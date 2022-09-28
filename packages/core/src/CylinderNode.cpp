@@ -2,16 +2,34 @@
 
 #include "CylinderNode.hpp"
 
-CylinderNode::CylinderNode() : m_props({.center = false, .radius = 1, .height = 1, .angle = 0})
+CylinderNode::CylinderNode() : m_centered(Standard_False), m_radius(1), m_height(1), m_angle(0)
 {
 }
 
-void CylinderNode::setProps(const CylinderProps &props)
+void CylinderNode::setSize(Standard_Real radius, Standard_Real height)
 {
-  if (!props.center == m_props.center || !doubleEquals(props.radius, m_props.radius) ||
-      !doubleEquals(props.height, m_props.height) || !doubleEquals(props.angle, m_props.angle))
+  if (!IsEqual(radius, m_radius) || !IsEqual(height, m_height))
   {
-    m_props = props;
+    m_radius = radius;
+    m_height = height;
+    propsChanged();
+  }
+}
+
+void CylinderNode::setAngle(Standard_Real angle)
+{
+  if (!IsEqual(angle, m_angle))
+  {
+    m_angle = angle;
+    propsChanged();
+  }
+}
+
+void CylinderNode::setCentered(Standard_Boolean centered)
+{
+  if (centered != m_centered)
+  {
+    m_centered = centered;
     propsChanged();
   }
 }
@@ -20,20 +38,20 @@ void CylinderNode::computeShape()
 {
   TopoDS_Solid cylinder;
 
-  if (m_props.angle == 0)
+  if (m_angle == 0)
   {
-    cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height);
+    cylinder = BRepPrimAPI_MakeCylinder(m_radius, m_height);
   }
   else
   {
-    Standard_Real a = fmin(fmax(m_props.angle, 0), 2 * M_PI);
-    cylinder = BRepPrimAPI_MakeCylinder(m_props.radius, m_props.height, a);
+    Standard_Real a = fmin(fmax(m_angle, 0), 2 * M_PI);
+    cylinder = BRepPrimAPI_MakeCylinder(m_radius, m_height, a);
   }
 
-  if (m_props.center)
+  if (m_centered)
   {
     gp_Trsf translation;
-    translation.SetTranslation(gp_Vec(0, 0, -m_props.height / 2));
+    translation.SetTranslation(gp_Vec(0, 0, -m_height / 2));
     cylinder.Move(translation);
   }
   shape = cylinder;

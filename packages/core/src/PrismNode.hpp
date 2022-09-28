@@ -10,7 +10,7 @@ class PrismNode : public SweepNode
 {
 public:
   PrismNode();
-  void setVector(Point point);
+  void setVector(gp_Vec vector);
 
 protected:
   void computeShape() override;

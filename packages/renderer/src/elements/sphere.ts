@@ -1,4 +1,3 @@
-import { SphereProps } from "@react-cad/core";
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Sphere = "sphere";
@@ -56,15 +55,13 @@ export function commitUpdate(
   instance: Instance<Sphere>,
   updatePayload: UpdatePayload<Sphere>
 ): void {
-  const props: SphereProps = Object.assign(
-    {
-      radius: 1,
-      angle: 0,
-      segmentAngle1: 0,
-      segmentAngle2: 0,
-    },
-    updatePayload
-  );
-
-  instance.node.setProps(props);
+  const {
+    radius = 1,
+    angle = 0,
+    segmentAngle1 = 0,
+    segmentAngle2 = 0,
+  } = updatePayload;
+  instance.node.setRadius(radius);
+  instance.node.setAngle(angle);
+  instance.node.setSegment(segmentAngle1, segmentAngle2);
 }

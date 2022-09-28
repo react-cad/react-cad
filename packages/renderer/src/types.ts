@@ -159,7 +159,7 @@ export type Container = {
   root: ReactCADNode;
   nodes: ReactCADNode[];
   rootNodes: ReactCADNode[];
-  reset: boolean;
+  callback?: () => void;
 };
 
 export type HostContext = unknown;

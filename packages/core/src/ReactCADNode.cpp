@@ -31,7 +31,7 @@ void ReactCADNode::unlock()
 }
 
 ReactCADNode::ReactCADNode()
-    : m_parent(nullptr), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
+    : m_parent(), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
       m_childShape(TopoDS_Shape())
 {
 }
@@ -40,25 +40,25 @@ ReactCADNode::~ReactCADNode()
 {
 }
 
-void ReactCADNode::appendChild(std::shared_ptr<ReactCADNode> child)
+void ReactCADNode::appendChild(Handle(ReactCADNode) & child)
 {
   lock();
   m_children.push_back(child);
-  child->m_parent = shared_from_this();
+  child->m_parent = this;
   m_childrenChanged = true;
   notifyAncestors();
   unlock();
 }
 
-void ReactCADNode::insertChildBefore(std::shared_ptr<ReactCADNode> child, const ReactCADNode &before)
+void ReactCADNode::insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before)
 {
   lock();
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
-    if (it->get() == &before)
+    if (*it == before)
     {
       m_children.insert(it, child);
-      child->m_parent = shared_from_this();
+      child->m_parent = this;
       m_childrenChanged = true;
       notifyAncestors();
       break;
@@ -67,14 +67,14 @@ void ReactCADNode::insertChildBefore(std::shared_ptr<ReactCADNode> child, const 
   unlock();
 }
 
-void ReactCADNode::removeChild(ReactCADNode &child)
+void ReactCADNode::removeChild(Handle(ReactCADNode) & child)
 {
   lock();
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
-    if (it->get() == &child)
+    if (*it == child)
     {
-      child.m_parent = nullptr;
+      child->m_parent = nullptr;
       m_children.erase(it);
       m_childrenChanged = true;
       notifyAncestors();
@@ -99,8 +99,8 @@ void ReactCADNode::propsChanged()
 
 void ReactCADNode::notifyAncestors()
 {
-  std::shared_ptr<ReactCADNode> ancestor = m_parent;
-  while (ancestor && !ancestor->m_childrenChanged)
+  Handle(ReactCADNode) ancestor = m_parent;
+  while (!ancestor.IsNull() && !ancestor->m_childrenChanged)
   {
     ancestor->m_childrenChanged = true;
     ancestor = ancestor->m_parent;
@@ -152,25 +152,4 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children)
 void ReactCADNode::computeShape()
 {
   shape = m_childShape;
-}
-
-bool ReactCADNode::isType(const emscripten::val &value, const std::string &type)
-{
-  std::string valType = value.typeOf().as<std::string>();
-  return valType == type;
-}
-
-bool ReactCADNode::doubleEquals(double a, double b)
-{
-  double diff = fabs(a - b);
-  a = fabs(a);
-  b = fabs(b);
-
-  double largest = (b > a) ? b : a;
-  if (diff <= largest * DBL_EPSILON)
-  {
-    return true;
-  }
-
-  return false;
 }

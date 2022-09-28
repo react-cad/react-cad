@@ -28,6 +28,8 @@ RUN apt-get update && apt-get -y install tk-dev tcl-dev fswatch
 COPY --from=0 /opt/occt /opt/occt
 COPY --from=0 /emsdk/upstream/emscripten/cache /emsdk/upstream/emscripten/cache
 COPY --from=0 /tmp/nanosvg/src /usr/local/include
+COPY library_egl.js.patch .
+RUN patch /emsdk/upstream/emscripten/src/library_egl.js library_egl.js.patch
 
 RUN mkdir /react-cad
 WORKDIR /react-cad

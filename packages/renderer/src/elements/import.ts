@@ -1,5 +1,3 @@
-import { nanoid } from "nanoid";
-
 import { Props, Instance, UpdatePayload } from "../types";
 
 type Import = "stl" | "step" | "obj";
@@ -34,14 +32,6 @@ export function commitUpdate(
   instance: Instance<Import>,
   updatePayload: UpdatePayload<Import>
 ): void {
-  let filename = instance.node.getFilename();
-  if (filename.length === 0) {
-    filename = `${nanoid()}.step`;
-  }
   const { data } = updatePayload;
-  instance.core.FS.writeFile(
-    filename,
-    typeof data === "string" ? data : new Uint8Array(data)
-  );
-  instance.node.setFilename(filename, true);
+  instance.node.setFileContents(data);
 }

@@ -4,20 +4,24 @@
 #include "Geometry.hpp"
 #include "ReactCADNode.hpp"
 
+#include <NCollection_Array1.hxx>
+#include <gp_Pnt.hxx>
+
 class PolyhedronNode : public ReactCADNode
 {
 public:
   PolyhedronNode();
-  void setPointsAndFaces(const std::vector<Point> &points, const std::vector<std::vector<unsigned int>> &faces);
+  void setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
+                         const NCollection_Array1<NCollection_Array1<int>> &faces);
 
 protected:
   void computeShape() override;
 
 private:
-  std::vector<Point> m_points;
-  std::vector<std::vector<unsigned int>> m_faces;
+  NCollection_Array1<gp_Pnt> m_points;
+  NCollection_Array1<NCollection_Array1<int>> m_faces;
 
-  bool checkFaces(const std::vector<std::vector<unsigned int>> &faces);
+  bool checkFaces(const NCollection_Array1<NCollection_Array1<int>> &faces);
 };
 
 #endif

@@ -3,25 +3,22 @@
 
 #include "ReactCADNode.hpp"
 
-struct CylinderProps
-{
-  bool center;
-  double radius;
-  double height;
-  double angle;
-};
-
 class CylinderNode : public ReactCADNode
 {
 public:
   CylinderNode();
-  void setProps(const CylinderProps &props);
+  void setSize(Standard_Real radius, Standard_Real height);
+  void setAngle(Standard_Real angle);
+  void setCentered(Standard_Boolean centered);
 
 protected:
   void computeShape() override;
 
 private:
-  CylinderProps m_props;
+  Standard_Real m_radius;
+  Standard_Real m_height;
+  Standard_Real m_angle;
+  Standard_Boolean m_centered;
 };
 
 #endif
