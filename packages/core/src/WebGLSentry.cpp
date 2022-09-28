@@ -24,11 +24,27 @@ namespace
 // clang-format on
 
 WebGLSentry::WebGLSentry(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context, std::string canvasID)
+    : m_context(context), m_canvasID(canvasID)
 {
   pthread_once(&webgl_init_once, webgl_mutex_init);
   pthread_mutex_lock(&webgl_mutex);
-  jsEnableCanvas(canvasID.c_str());
-  emscripten_webgl_make_context_current(context);
+  jsEnableCanvas(m_canvasID.c_str());
+  emscripten_webgl_make_context_current(m_context);
+}
+
+WebGLSentry::WebGLSentry(const WebGLSentry &other) : m_context(other.m_context), m_canvasID(other.m_canvasID)
+{
+  pthread_mutex_lock(&webgl_mutex);
+  jsEnableCanvas(m_canvasID.c_str());
+  emscripten_webgl_make_context_current(m_context);
+}
+
+WebGLSentry &WebGLSentry::operator=(const WebGLSentry &other)
+{
+  m_context = other.m_context;
+  m_canvasID = other.m_canvasID;
+  jsEnableCanvas(m_canvasID.c_str());
+  emscripten_webgl_make_context_current(m_context);
 }
 
 WebGLSentry::~WebGLSentry()

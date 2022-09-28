@@ -6,23 +6,23 @@
 
 #include "ReactCADNode.hpp"
 
-// TODO: copy assignment, copy constructor
 class ImportNode : public ReactCADNode
 {
 public:
   ImportNode();
-  ~ImportNode();
+  ImportNode(const ImportNode &other);
+  ImportNode &operator=(const ImportNode &other);
+  ~ImportNode() override;
 
   void setFileContents(emscripten::val contents);
 
 protected:
-  void setFilename(const std::string &filename, bool ownFile = false);
-  std::string m_filename;
   void computeShape() override;
+
+  std::string m_filename;
   virtual void importFile() = 0;
 
 private:
-  bool m_ownFile = false;
   void removeFile();
 };
 

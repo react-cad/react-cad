@@ -17,7 +17,7 @@ protected:
   void computeShape() override;
 
 private:
-  Standard_Boolean m_useLtx = true;
+  Standard_Boolean m_useLtx;
 
   gp_Pnt m_size;
   Standard_Real m_ltx;
