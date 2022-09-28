@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/react-cad/react-cad/compare/v0.14.0...v0.15.0) (2022-09-28)
+
+
+### Features
+
+* allow multiple viewers on page ([8b08a04](https://github.com/react-cad/react-cad/commit/8b08a04e7d29a17ab06cb70bb89a70f1847c079f))
+* always show triedron ([f7963da](https://github.com/react-cad/react-cad/commit/f7963da456237ab70de30b8aaf6eb296f7309a84))
+* finalise primitives api ([085ff4d](https://github.com/react-cad/react-cad/commit/085ff4dfaa0090340102ca449614e491cf91edd0))
+
+
+
+
+
 # [0.14.0](https://github.com/react-cad/react-cad/compare/v0.13.0...v0.14.0) (2022-09-24)
 
 

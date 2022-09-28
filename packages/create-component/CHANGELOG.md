@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/react-cad/react-cad/compare/v0.14.0...v0.15.0) (2022-09-28)
+
+
+### Features
+
+* allow multiple viewers on page ([8b08a04](https://github.com/react-cad/react-cad/commit/8b08a04e7d29a17ab06cb70bb89a70f1847c079f))
+
+
+
+
+
 # [0.14.0](https://github.com/react-cad/react-cad/compare/v0.13.0...v0.14.0) (2022-09-24)
 
 
