@@ -184,27 +184,16 @@ emscripten::val renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView
   return async.Perform([=]() { view->render(node->shape); });
 }
 
-EM_JS(emscripten::EM_VAL, getFileContentsAndDelete, (const char *filenameStr), {
-  const filename = UTF8ToString(filenameStr);
-  const content = Module.FS.readFile(filename);
-  Module.FS.unlink(filename);
-  return Emval.toHandle(content);
-});
-
 emscripten::val renderSTL(const Handle(ReactCADNode) & node, const Standard_Real theLinDeflection,
                           const Standard_Boolean isRelative, const Standard_Real theAngDeflection)
 {
-  node->computeGeometry();
-  BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
-
   std::string filename(UUID::get());
-  Standard_Boolean success = StlAPI::Write(node->shape, filename.c_str());
-  if (success)
-  {
-    emscripten::val contents = emscripten::val::take_ownership(getFileContentsAndDelete(filename.c_str()));
-    return contents;
-  }
-  return emscripten::val::undefined();
+  return async.GenerateFile(filename, [=]() {
+    node->computeGeometry();
+    BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
+
+    StlAPI::Write(node->shape, filename.c_str());
+  });
 }
 
 //! Dummy main loop callback for a single shot.

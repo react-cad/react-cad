@@ -136,7 +136,7 @@ export function useExport(
     async (event: React.SyntheticEvent) => {
       event.preventDefault();
 
-      const content = core.renderSTL(
+      const content = await core.renderSTL(
         node,
         linearDeflection,
         isRelative,
