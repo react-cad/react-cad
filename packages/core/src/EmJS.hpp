@@ -17,10 +17,10 @@ public:
   static int canvasGetWidth(const std::string &id);
   static int canvasGetHeight(const std::string &id);
   static Graphic3d_Vec2i canvasGetSize(const std::string &id);
-  static emscripten::val getPromise(int queueID, int promiseID);
-  static void resolvePromise(int queueID, int promiseID);
-  static void rejectPromise(int queueID, int promiseID);
-  static void resolvePromiseWithFileContents(int queueID, int promiseID, const std::string &filename);
+  static emscripten::val getPromise(int promiseID);
+  static void resolvePromise(int promiseID);
+  static void rejectPromise(int promiseID);
+  static void resolvePromiseWithFileContents(int promiseID, const std::string &filename);
   static void writeFile(const std::string &filename, emscripten::val contents);
   static void copyFile(const std::string &src, const std::string &dest);
   static void deleteFile(const std::string &filename);

@@ -124,38 +124,73 @@ export function useReactCADView(
   return [view, canvasRef, onResize];
 }
 
+function download(
+  content: string | ArrayBuffer,
+  name: string,
+  mimetype: string
+) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content], { type: mimetype }));
+  a.download = name;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  document.body.removeChild(a);
+}
+
 export function useExport(
   node: ReactCADNode,
   core: ReactCADCore,
   name: string | undefined
-): (event: React.SyntheticEvent) => void {
+): { exportSTL: () => void; exportBREP: () => void } {
   const linearDeflection = 0.05;
   const isRelative = false;
   const angularDeflection = 0.5;
-  return React.useCallback(
-    async (event: React.SyntheticEvent) => {
-      event.preventDefault();
 
-      const content = await core.renderSTL(
-        node,
-        linearDeflection,
-        isRelative,
-        angularDeflection
-      );
+  const exportBREP = React.useCallback(async () => {
+    const content = await core.renderBREP(node);
 
-      if (content) {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(
-          new Blob([content], { type: "model/stl" })
-        );
-        a.download = `${name || "react-cad"}.stl`;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(a.href);
-        document.body.removeChild(a);
+    if (content) {
+      download(content, `${name || "react-cad"}.brep`, "model/brep");
+    }
+  }, [node, core, name]);
+
+  const exportSTL = React.useCallback(async () => {
+    const content = await core.renderSTL(
+      node,
+      linearDeflection,
+      isRelative,
+      angularDeflection
+    );
+
+    if (content) {
+      download(content, `${name || "react-cad"}.stl`, "model/stl");
+    }
+  }, [node, core, name]);
+
+  return { exportSTL, exportBREP };
+}
+
+export function useClickOutside(
+  callback: () => void
+): React.RefObject<HTMLDivElement> {
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        callback();
       }
-    },
-    [node, core, name]
-  );
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
+
+  return wrapperRef;
 }

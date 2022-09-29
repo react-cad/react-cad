@@ -72,3 +72,76 @@ export const Separator: React.FC = () => (
 export const Section: React.FC = ({ children }) => (
   <div style={{ display: "flex", padding: "0 1px" }}>{children}</div>
 );
+
+export const Dropdown: React.FC<{ open: boolean }> = ({ open, children }) => (
+  <div
+    style={{
+      position: "absolute",
+      top: "-12px",
+      left: "110%",
+      display: open ? "inline-block" : "none",
+      background: "rgba(255, 255, 255, 0.95)",
+      filter:
+        "drop-shadow(rgba(0, 0, 0, 0.05) 0px 5px 5px) drop-shadow(rgba(0, 0, 0, 0.1) 0px 1px 3px)",
+      borderRadius: 8,
+      fontSize: 12,
+      writingMode: "horizontal-tb",
+    }}
+  >
+    <div
+      style={{
+        position: "absolute",
+        top: "calc(50% - 8px)",
+        borderStyle: "solid",
+        left: -16,
+        borderWidth: "8px",
+        borderColor:
+          "transparent rgba(255, 255, 255, 0.95) transparent transparent",
+      }}
+    />
+    <div
+      style={{
+        minWidth: 180,
+        overflow: "hidden auto",
+        maxHeight: 432,
+        borderRadius: 8,
+      }}
+    >
+      {children}
+    </div>
+  </div>
+);
+
+export const DropdownLink: React.FC<JSX.IntrinsicElements["a"]> = ({
+  onClick,
+  children,
+}) => (
+  <a
+    style={{
+      fontSize: 12,
+      transition: "all 150ms ease-out 0s",
+      color: "rgba(51, 51, 51, 0.5)",
+      textDecoration: "none",
+      cursor: "pointer",
+      justifyContent: "space-between",
+      lineHeight: "18px",
+      padding: "7px 15px",
+      display: "flex",
+      alignItems: "center",
+      fontFamily:
+        '"Nunito Sans", -apple-system, ".SFNSText-Regular", "San Francisco", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    }}
+    onClick={onClick}
+  >
+    <span
+      style={{
+        flex: "1 1 0%",
+        textAlign: "left",
+        color: "rgb(51, 51, 51)",
+        fontWeight: 400,
+      }}
+    >
+      {children}
+    </span>
+  </a>
+);

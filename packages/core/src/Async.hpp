@@ -11,16 +11,12 @@
 class Async
 {
 public:
-  Async();
-  emscripten::val Perform(std::function<void()> &&func);
-  emscripten::val GenerateFile(const std::string &filename, std::function<void()> &&func);
+  static emscripten::val Perform(std::function<void()> &&func);
+  static emscripten::val GenerateFile(const std::string &filename, std::function<void()> &&func);
 
 private:
-  static int NextID();
-
   std::thread m_thread;
   emscripten::ProxyingQueue m_queue;
-  int m_queue_id;
   int m_promise_id;
 };
 

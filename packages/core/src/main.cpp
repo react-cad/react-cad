@@ -41,7 +41,6 @@
 #include "ScaleNode.hpp"
 #include "TranslationNode.hpp"
 
-#include <BRepMesh_IncrementalMesh.hxx>
 #include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
@@ -49,7 +48,6 @@
 #include <NCollection_Array1.hxx>
 #include <OSD_MemInfo.hxx>
 #include <OSD_Parallel.hxx>
-#include <StlAPI.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
@@ -62,6 +60,7 @@
 
 #include "Async.hpp"
 #include "UUID.hpp"
+#include "export.hpp"
 
 #include <pthread.h>
 
@@ -172,28 +171,14 @@ Handle(ReactCADView) createView(emscripten::val canvas)
   return new ReactCADView(canvas);
 }
 
-Async async;
-
 emscripten::val computeNodeAsync(Handle(ReactCADNode) & node)
 {
-  return async.Perform([=]() { node->computeGeometry(); });
+  return Async::Perform([=]() { node->computeGeometry(); });
 }
 
 emscripten::val renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
 {
-  return async.Perform([=]() { view->render(node->shape); });
-}
-
-emscripten::val renderSTL(const Handle(ReactCADNode) & node, const Standard_Real theLinDeflection,
-                          const Standard_Boolean isRelative, const Standard_Real theAngDeflection)
-{
-  std::string filename(UUID::get());
-  return async.GenerateFile(filename, [=]() {
-    node->computeGeometry();
-    BRepMesh_IncrementalMesh mesh(node->shape, theLinDeflection, isRelative, theAngDeflection);
-
-    StlAPI::Write(node->shape, filename.c_str());
-  });
+  return Async::Perform([=]() { view->render(node->shape); });
 }
 
 //! Dummy main loop callback for a single shot.
@@ -206,11 +191,6 @@ int main()
 {
 #ifdef REACTCAD_DEBUG
   Message::DefaultMessenger()->Printers().First()->SetTraceLevel(Message_Trace);
-  Handle(Message_PrinterSystemLog) aJSConsolePrinter = new Message_PrinterSystemLog("webgl-sample", Message_Trace);
-  /*
-  Message::DefaultMessenger()->AddPrinter(
-      aJSConsolePrinter); // open JavaScript console within the Browser to see this output
-      */
   Message::DefaultMessenger()->Send(
       TCollection_AsciiString("NbLogicalProcessors: ") + OSD_Parallel::NbLogicalProcessors(), Message_Trace);
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
@@ -221,10 +201,6 @@ int main()
   emscripten_set_main_loop(onMainLoop, 1, 0);
 
   return 0;
-}
-
-extern "C" void shutdown()
-{
 }
 
 namespace emscripten
@@ -452,6 +428,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("createCADNode", &createCADNode);
   emscripten::function("createView", &createView);
   emscripten::function("renderSTL", &renderSTL);
+  emscripten::function("renderBREP", &renderBREP);
   emscripten::function("computeNodeAsync", &computeNodeAsync);
   emscripten::function("renderNodeAsync", &renderNodeAsync);
 }
