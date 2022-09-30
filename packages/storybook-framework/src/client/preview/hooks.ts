@@ -3,8 +3,8 @@ import type { ReactCADCore } from "@react-cad/core";
 
 import jsUrl from "@react-cad/core/lib/react-cad-core";
 import esmUrl from "@react-cad/core/lib/react-cad-core.esm";
-import wasmUrl from "@react-cad/core/lib/react-cad-core.wasm";
 import workerUrl from "@react-cad/core/lib/react-cad-core.worker";
+import localWasmUrl from "@react-cad/core/lib/react-cad-core.wasm";
 
 // Stop typescript and webpack messing with dynamic import
 const importCore = Function(`return import("./${esmUrl}")`) as () => Promise<
@@ -18,7 +18,9 @@ const corePromise = importCore()
     return reactCadCore({
       mainScriptUrlOrBlob: jsUrl,
       locateFile: (path: string) =>
-        path.includes("wasm") ? wasmUrl : workerUrl,
+        path.includes("wasm")
+          ? process.env.REACTCAD_WASM || localWasmUrl
+          : workerUrl,
     });
   })
   .then((c) => {
