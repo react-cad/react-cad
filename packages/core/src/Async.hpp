@@ -6,21 +6,18 @@
 #include <emscripten/proxying.h>
 #include <emscripten/val.h>
 #include <iostream>
-#include <sched.h>
+#include <string>
 
 class Async
 {
 public:
-  Async();
-  emscripten::val Perform(std::function<void()> &&func);
+  static emscripten::val Perform(std::function<void()> &&func);
+  static emscripten::val GenerateFile(const std::string &filename, std::function<void()> &&func);
 
 private:
-  static uint32_t NextID();
-
   std::thread m_thread;
   emscripten::ProxyingQueue m_queue;
-  uint32_t m_queue_id;
-  uint32_t m_promise_id;
+  int m_promise_id;
 };
 
 #endif

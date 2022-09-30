@@ -90,7 +90,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const handleFit = React.useCallback(() => view.current?.fit(), []);
 
-    const handleDownload = useExport(node, core, name);
+    const exportFns = useExport(node, core, name);
 
     return (
       <div
@@ -101,7 +101,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
         <Toolbar
           options={options}
           setOptions={setOptions}
-          onDownload={handleDownload}
+          exportFns={exportFns}
           onSetViewpoint={handleSetViewpoint}
           onZoom={handleZoom}
           onFit={handleFit}

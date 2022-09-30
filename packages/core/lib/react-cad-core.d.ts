@@ -200,13 +200,16 @@ export interface ReactCADCore extends EmscriptenModule {
     linearDeflection: number,
     isRelative: boolean,
     angularDeflection: number
-  ): string | ArrayBuffer | undefined;
-  cwrap: typeof cwrap;
-  ccall: typeof ccall;
+  ): Promise<string | ArrayBuffer | undefined>;
+  renderBREP(
+    node: ReactCADNode,
+  ): Promise<string | ArrayBuffer | undefined>;
+  renderSTEP(
+    node: ReactCADNode,
+  ): Promise<string | ArrayBuffer | undefined>;
   canvas: HTMLCanvasElement;
   canvases: Record<string, HTMLCanvasElement>;
   mainScriptUrlOrBlob?: string;
-  _shutdown(): void;
 }
 
 declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;

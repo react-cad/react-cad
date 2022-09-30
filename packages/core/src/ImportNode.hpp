@@ -21,9 +21,6 @@ protected:
 
   std::string m_filename;
   virtual void importFile() = 0;
-
-private:
-  void removeFile();
 };
 
 #endif

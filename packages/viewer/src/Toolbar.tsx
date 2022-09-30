@@ -14,21 +14,21 @@ import {
   TbFrame,
   TbBox,
   Tb3DCubeSphere,
-  TbFileDownload,
   TbPentagon,
   TbCircle,
 } from "react-icons/tb";
 
 import { Section, Button, Separator } from "./ui";
 
-import { ViewOptions, Viewpoint } from "./types";
+import { ExportFns, ViewOptions, Viewpoint } from "./types";
+import ExportButton from "./ExportButton";
 
 const ZOOM_AMOUNT = 50;
 
 interface Props {
   options: ViewOptions;
   setOptions: (updater: (options: ViewOptions) => ViewOptions) => void;
-  onDownload: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  exportFns: ExportFns;
   onSetViewpoint: (viewpoint: Viewpoint) => void;
   onZoom: (amount: number) => void;
   onResetView: () => void;
@@ -40,7 +40,7 @@ interface Props {
 const Toolbar: React.FC<Props> = ({
   options,
   setOptions,
-  onDownload,
+  exportFns,
   onSetViewpoint,
   onZoom,
   onResetView,
@@ -203,6 +203,9 @@ const Toolbar: React.FC<Props> = ({
         "&:focus": {
           outline: "rgba(30,167,253,0.5) solid 1px",
         },
+        " *": {
+          boxSizing: "border-box",
+        },
         ...(onResize
           ? {
               resize: "both",
@@ -332,9 +335,7 @@ const Toolbar: React.FC<Props> = ({
           <Separator />
         </Section>
         <Section>
-          <Button title="Download as STL" onClick={onDownload}>
-            <TbFileDownload />
-          </Button>
+          <ExportButton {...exportFns} />
         </Section>
       </div>
       <div style={{ flexGrow: 1 }}>{children}</div>

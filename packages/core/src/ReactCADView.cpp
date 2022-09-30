@@ -46,47 +46,15 @@
 
 #include <pthread.h>
 
+#include "EmJS.hpp"
 #include "PerformanceTimer.hpp"
 #include "UUID.hpp"
 #include "WebGLSentry.hpp"
 
-// clang-format off
-namespace
-{
-  EM_JS(void, jsInitCanvas, (emscripten::EM_VAL canvas_handle, const char* idStr), {
-    const canvas = Emval.toValue(canvas_handle);
-    const id = UTF8ToString(idStr);
-    specialHTMLTargets[id] = canvas;
-  });
-  
-  EM_JS(int, jsCanvasGetWidth, (const char* idStr), {
-    const id = UTF8ToString(idStr);
-    return specialHTMLTargets[id].width;
-  });
-
-  EM_JS(int, jsCanvasGetHeight, (const char* idStr), {
-    const id = UTF8ToString(idStr);
-    return specialHTMLTargets[id].height;
-  });
-
-  EM_JS(float, jsDevicePixelRatio, (), {
-    var aDevicePixelRatio = window.devicePixelRatio || 1;
-    return aDevicePixelRatio;
-  });
-
-  //! Return cavas size in pixels.
-  static Graphic3d_Vec2i jsCanvasSize(const char* idStr)
-  {
-    return Graphic3d_Vec2i (jsCanvasGetWidth(idStr), jsCanvasGetHeight(idStr));
-  }
-} // namespace
-// clang-format on
-
 ReactCADView::ReactCADView(emscripten::val canvas)
-    : myDevicePixelRatio(jsDevicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get())
+    : myDevicePixelRatio(EmJS::devicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get())
 {
-  const char *aTargetId = myId.c_str();
-  jsInitCanvas(canvas.as_handle(), aTargetId);
+  EmJS::initCanvas(canvas, myId);
 
   initWindow();
   initViewer();
@@ -477,7 +445,7 @@ bool ReactCADView::initViewer()
   aViewer->SetDefaultBackgroundColor(Quantity_NOC_AZURE);
 
   Handle(Aspect_NeutralWindow) aWindow = new Aspect_NeutralWindow();
-  Graphic3d_Vec2i aWinSize = jsCanvasSize(aTargetId);
+  Graphic3d_Vec2i aWinSize = EmJS::canvasGetSize(myId);
   if (aWinSize.x() < 10 || aWinSize.y() < 10)
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Warning: invalid canvas size"), Message_Warning);
@@ -571,13 +539,13 @@ void ReactCADView::onResize()
   const char *aTargetId = myId.c_str();
 
   Handle(Aspect_NeutralWindow) aWindow = Handle(Aspect_NeutralWindow)::DownCast(myView->Window());
-  Graphic3d_Vec2i aWinSizeOld, aWinSizeNew(jsCanvasSize(aTargetId));
+  Graphic3d_Vec2i aWinSizeOld, aWinSizeNew(EmJS::canvasGetSize(myId));
   if (aWinSizeNew.x() < 10 || aWinSizeNew.y() < 10)
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Warning: invalid canvas size"), Message_Warning);
   }
   aWindow->Size(aWinSizeOld.x(), aWinSizeOld.y());
-  const float aPixelRatio = jsDevicePixelRatio();
+  const float aPixelRatio = EmJS::devicePixelRatio();
   if (aWinSizeNew != aWinSizeOld || aPixelRatio != myDevicePixelRatio)
   {
     if (myDevicePixelRatio != aPixelRatio)
