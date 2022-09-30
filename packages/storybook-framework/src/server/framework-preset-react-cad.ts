@@ -1,7 +1,8 @@
 import path from "path";
 import { findEsm } from "./findEsm";
 import { TransformOptions } from "@babel/core";
-import type { Configuration } from "webpack";
+import { DefinePlugin, Configuration } from "webpack";
+import CopyPlugin from "copy-webpack-plugin";
 import type { StorybookConfig } from "@storybook/core-common";
 
 export {
@@ -45,6 +46,18 @@ export async function babelDefault(
 }
 
 export function webpack(config: Configuration): Configuration {
+  // Service worker to add COOP/COEP headers
+  config.plugins?.push(
+    new CopyPlugin({
+      patterns: [
+        {
+          from: require.resolve("coi-serviceworker"),
+          to: "coi-serviceworker.js",
+        },
+      ],
+    })
+  );
+
   config.module?.rules?.push({
     test: /react-cad-core\.wasm$/,
     use: "file-loader",
@@ -61,6 +74,20 @@ export function webpack(config: Configuration): Configuration {
     test: /react-cad-core\.worker\.js$/,
     use: "file-loader",
   });
+
+  // Serve WASM from CDN in production
+  if (config.mode === "production") {
+    // eslint-disable-next-line
+    const { version } = require("../../package.json");
+
+    config.plugins?.push(
+      new DefinePlugin({
+        "process.env.REACTCAD_WASM": JSON.stringify(
+          `https://unpkg.com/@react-cad/core@${version}/lib/react-cad-core.wasm`
+        ),
+      })
+    );
+  }
 
   config.resolve = {
     ...config.resolve,

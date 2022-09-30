@@ -35,6 +35,8 @@
     "@storybook/core": "^6.5.12",
     "@storybook/react": "^6.5.12",
     "babel-plugin-add-react-displayname": "^0.0.5",
+    "coi-serviceworker": "^0.1.6",
+    "copy-webpack-plugin": "^11.0.0",
     "file-loader": "^6.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

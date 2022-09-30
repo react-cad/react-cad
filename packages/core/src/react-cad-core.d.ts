@@ -34,7 +34,7 @@ export type Matrix = [
   [number, number, number, number],
   [number, number, number, number],
   [number, number, number, number],
-  [0, 0, 0, 1],
+  [0, 0, 0, 1]
 ];
 
 declare const Projection: unique symbol;
@@ -51,19 +51,24 @@ export class ReactCADBoxNode extends ReactCADNode {
 export class ReactCADWedgeNode extends ReactCADNode {
   public setSize(size: Vector): void;
   public setLtx(ltx: number): void;
-  public setMinMax(xmin: number, xmax: number, zmin: number, zmax: number): void;
+  public setMinMax(
+    xmin: number,
+    xmax: number,
+    zmin: number,
+    zmax: number
+  ): void;
 }
 
 export class ReactCADConeNode extends ReactCADNode {
   public setSize(radius1: number, radius2: number, height: number): void;
   public setAngle(angle: number): void;
-  public setCentered(centered: boolean);
+  public setCentered(centered: boolean): void;
 }
 
 export class ReactCADCylinderNode extends ReactCADNode {
   public setSize(radius: number, height: number): void;
   public setAngle(angle: number): void;
-  public setCentered(centered: boolean);
+  public setCentered(centered: boolean): void;
 }
 
 export class ReactCADSphereNode extends ReactCADNode {
@@ -201,12 +206,8 @@ export interface ReactCADCore extends EmscriptenModule {
     isRelative: boolean,
     angularDeflection: number
   ): Promise<string | ArrayBuffer | undefined>;
-  renderBREP(
-    node: ReactCADNode,
-  ): Promise<string | ArrayBuffer | undefined>;
-  renderSTEP(
-    node: ReactCADNode,
-  ): Promise<string | ArrayBuffer | undefined>;
+  renderBREP(node: ReactCADNode): Promise<string | ArrayBuffer | undefined>;
+  renderSTEP(node: ReactCADNode): Promise<string | ArrayBuffer | undefined>;
   canvas: HTMLCanvasElement;
   canvases: Record<string, HTMLCanvasElement>;
   mainScriptUrlOrBlob?: string;
