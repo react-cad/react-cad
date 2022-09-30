@@ -204,6 +204,9 @@ export interface ReactCADCore extends EmscriptenModule {
   renderBREP(
     node: ReactCADNode,
   ): Promise<string | ArrayBuffer | undefined>;
+  renderSTEP(
+    node: ReactCADNode,
+  ): Promise<string | ArrayBuffer | undefined>;
   canvas: HTMLCanvasElement;
   canvases: Record<string, HTMLCanvasElement>;
   mainScriptUrlOrBlob?: string;

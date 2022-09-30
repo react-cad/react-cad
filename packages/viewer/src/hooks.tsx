@@ -5,7 +5,7 @@ import {
   ReactCADView,
   ReactCADNode,
 } from "react-cad";
-import { ViewOptions } from "./types";
+import { ExportFns, ViewOptions } from "./types";
 
 import DetailContext from "./DetailContext";
 
@@ -143,7 +143,7 @@ export function useExport(
   node: ReactCADNode,
   core: ReactCADCore,
   name: string | undefined
-): { exportSTL: () => void; exportBREP: () => void } {
+): ExportFns {
   const linearDeflection = 0.05;
   const isRelative = false;
   const angularDeflection = 0.5;
@@ -153,6 +153,14 @@ export function useExport(
 
     if (content) {
       download(content, `${name || "react-cad"}.brep`, "model/brep");
+    }
+  }, [node, core, name]);
+
+  const exportSTEP = React.useCallback(async () => {
+    const content = await core.renderSTEP(node);
+
+    if (content) {
+      download(content, `${name || "react-cad"}.step`, "model/step");
     }
   }, [node, core, name]);
 
@@ -169,7 +177,7 @@ export function useExport(
     }
   }, [node, core, name]);
 
-  return { exportSTL, exportBREP };
+  return { exportSTL, exportBREP, exportSTEP };
 }
 
 export function useClickOutside(

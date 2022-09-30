@@ -7,28 +7,21 @@ import { Button, Dropdown, DropdownLink } from "./ui";
 
 type Props = ExportFns;
 
-const ExportButton: React.FC<Props> = ({ exportSTL, exportBREP }) => {
+const ExportButton: React.FC<Props> = ({
+  exportSTL,
+  exportBREP,
+  exportSTEP,
+}) => {
   const [open, setOpen] = React.useState(false);
   const toggleOpen = React.useCallback(() => setOpen((o) => !o), []);
   const close = React.useCallback(() => setOpen(false), []);
 
-  const handleSTL = React.useCallback(
-    (event: React.SyntheticEvent) => {
+  const handler = (exportFn: () => void) =>
+    React.useCallback((event: React.SyntheticEvent) => {
       event.preventDefault();
-      exportSTL();
+      exportFn();
       close();
-    },
-    [exportSTL]
-  );
-
-  const handleBREP = React.useCallback(
-    (event: React.SyntheticEvent) => {
-      event?.preventDefault();
-      exportBREP();
-      close();
-    },
-    [exportBREP]
-  );
+    }, []);
 
   const ref = useClickOutside(close);
 
@@ -38,8 +31,15 @@ const ExportButton: React.FC<Props> = ({ exportSTL, exportBREP }) => {
         <TbFileDownload />
       </Button>
       <Dropdown open={open}>
-        <DropdownLink onClick={handleBREP}>Download as BREP</DropdownLink>
-        <DropdownLink onClick={handleSTL}>Download as STL</DropdownLink>
+        <DropdownLink onClick={handler(exportBREP)}>
+          Download as BREP
+        </DropdownLink>
+        <DropdownLink onClick={handler(exportSTEP)}>
+          Download as STEP
+        </DropdownLink>
+        <DropdownLink onClick={handler(exportSTL)}>
+          Download as STL
+        </DropdownLink>
       </Dropdown>
     </div>
   );

@@ -429,6 +429,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("createView", &createView);
   emscripten::function("renderSTL", &renderSTL);
   emscripten::function("renderBREP", &renderBREP);
+  emscripten::function("renderSTEP", &renderSTEP);
   emscripten::function("computeNodeAsync", &computeNodeAsync);
   emscripten::function("renderNodeAsync", &renderNodeAsync);
 }
