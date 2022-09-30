@@ -1,6 +1,6 @@
 {
   "name": "react-cad",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "A CAD system for producing constructive solid geometry in React",
   "main": "lib/index.js",
   "files": [
@@ -20,8 +20,8 @@
     "start": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@react-cad/core": "^0.16.0",
-    "@react-cad/renderer": "^0.16.0"
+    "@react-cad/core": "^0.17.0",
+    "@react-cad/renderer": "^0.17.0"
   },
   "publishConfig": {
     "access": "public"
