@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0](https://github.com/react-cad/react-cad/compare/v0.15.0...v0.16.0) (2022-09-30)
+
+
+### Features
+
+* add brep export ([b556992](https://github.com/react-cad/react-cad/commit/b5569926e1cdc99077c1cbbfe7b512944e56a433))
+* add step export ([3d72c7f](https://github.com/react-cad/react-cad/commit/3d72c7f0cc2db4b563a7aef24712ced6e19b1801))
+
+
+
+
+
 # [0.15.0](https://github.com/react-cad/react-cad/compare/v0.14.0...v0.15.0) (2022-09-28)
 
 
