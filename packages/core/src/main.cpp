@@ -177,9 +177,10 @@ emscripten::val computeNodeAsync(Handle(ReactCADNode) & node)
   return Async::Perform([=]() { node->computeGeometry(); });
 }
 
-emscripten::val renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
+Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
 {
-  return Async::Perform([=]() { view->render(node->shape); });
+  return Async::PerformWithProgress(
+      [=](const Message_ProgressRange &progressRange) { view->render(node->shape, progressRange); });
 }
 
 #ifdef REACTCAD_DEBUG

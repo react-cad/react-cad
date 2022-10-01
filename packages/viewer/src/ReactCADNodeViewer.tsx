@@ -59,10 +59,13 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     React.useEffect(() => {
       if (view.current) {
-        core.renderNodeAsync(node, view.current).then(() => {
+        const progress = core.renderNodeAsync(node, view.current);
+        progress.subscribe(console.log);
+        progress.then(() => {
           if (reset) {
             view.current?.resetView();
           }
+          progress.delete();
         });
       }
     }, [node, rerender]);

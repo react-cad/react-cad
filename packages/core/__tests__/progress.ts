@@ -9,8 +9,8 @@ describe("progress", () => {
       progress.subscribe(progressWatcher);
       await progress;
       expect(progressWatcher).toHaveBeenCalledTimes(11);
-      expect(progressWatcher).toHaveBeenNthCalledWith(6, 0.5);
-      expect(progressWatcher).toHaveBeenLastCalledWith(1);
+      expect(progressWatcher).toHaveBeenNthCalledWith(6, 0.5, "Task");
+      expect(progressWatcher).toHaveBeenLastCalledWith(1, "Task");
       progress.delete();
     }
   });

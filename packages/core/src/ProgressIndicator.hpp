@@ -10,9 +10,9 @@ class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
   ProgressIndicator();
-  ~ProgressIndicator();
   Standard_Boolean UserBreak() override;
   void Show(const Message_ProgressScope &theScope, const Standard_Boolean isForce) override;
+  void Reset() override;
 
   void subscribe(emscripten::val fn);
   void unsubscribe(emscripten::val fn);
@@ -24,6 +24,7 @@ public:
 private:
   static int NextID();
   int m_progress_id;
+  Standard_Real m_last_progress;
   Standard_Boolean m_cancelled;
   emscripten::val m_js_progress;
 };

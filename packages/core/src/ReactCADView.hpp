@@ -32,6 +32,7 @@
 #include <AIS_Shape.hxx>
 #include <AIS_ViewController.hxx>
 #include <Graphic3d_Camera.hxx>
+#include <Message_ProgressRange.hxx>
 #include <TopoDS_Shape.hxx>
 #include <V3d_View.hxx>
 
@@ -49,7 +50,7 @@ public:
   ReactCADView(emscripten::val canvas);
   virtual ~ReactCADView();
 
-  void render(TopoDS_Shape shape, bool reset = false);
+  void render(TopoDS_Shape &shape, const Message_ProgressRange &theRange = Message_ProgressRange());
 
   enum Viewpoint
   {
@@ -105,7 +106,7 @@ private:
   //! Flush events and redraw view.
   void redrawView();
 
-  void drawShape(TopoDS_Shape shape);
+  void drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange);
 
   //! Request view redrawing.
   void updateView();
@@ -177,15 +178,11 @@ private:
   float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
   unsigned int myUpdateRequests;            //!< counter for unhandled update requests
   TopoDS_Shape myShape;
-  Handle_AIS_Shape myShapeFront;
-  Handle_AIS_Shape myShapeBack;
-  Handle_AIS_Shape myWireframeFront;
-  Handle_AIS_Shape myWireframeBack;
+  Handle_AIS_Shape myShaded;
+  Handle_AIS_Shape myWireframe;
   bool myShowShaded = true;
   bool myShowWireframe = true;
   bool myQualityChanged = false;
-  pthread_mutex_t shadedHandleMutex = PTHREAD_MUTEX_INITIALIZER;
-  pthread_mutex_t wireframeHandleMutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 #endif // _ReactCADView_HeaderFile

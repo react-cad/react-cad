@@ -10,7 +10,7 @@ set(APP_TARGET_ES6 react-cad-core.esm.js)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "-pthread -fexceptions")
-set(CMAKE_CXX_FLAGS_RELEASE "-Oz")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
@@ -61,7 +61,7 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
 ")
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_RELEASE "\
-  -Oz \
+  -O2 \
 ")
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_DEBUG "\
   -s EXCEPTION_DEBUG=1 \

@@ -31,7 +31,8 @@ emscripten::val Async::Perform(std::function<void()> &&func)
 Handle(ProgressIndicator) Async::PerformWithProgress(std::function<void(const Message_ProgressRange &)> &&func)
 {
   Handle(ProgressIndicator) progress = new ProgressIndicator();
-  queue.proxyAsync(thread.native_handle(), [=]() { func(ProgressIndicator::Start(progress)); });
+  Message_ProgressRange progressRange = ProgressIndicator::Start(progress);
+  queue.proxyAsync(thread.native_handle(), [=]() { func(progressRange); });
   return progress;
 }
 

@@ -22,8 +22,8 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
       progressObject.subscribers.splice(index, 1);
     }
   };
-  progressObject.notify = (progress) => {
-    progressObject.subscribers.forEach(fn => fn(progress));
+  progressObject.notify = (...args) => {
+    progressObject.subscribers.forEach(fn => fn(...args));
   };
   progressObject.cancel = () => {
     progressObject.subscribers.length = 0;
@@ -39,31 +39,14 @@ int ProgressIndicator::NextID()
   return ++id;
 }
 
-ProgressIndicator::ProgressIndicator() : m_progress_id(NextID()), m_cancelled(Standard_False)
+ProgressIndicator::ProgressIndicator() : m_progress_id(NextID()), m_last_progress(0), m_cancelled(Standard_False)
 {
   m_js_progress = emscripten::val::take_ownership(jsGetProgress());
 }
 
-ProgressIndicator::~ProgressIndicator()
+void ProgressIndicator::Reset()
 {
-  // emscripten::val destructor crashes if called off the main thread since it isn't defined there
-
-  // Do the real destruction on the main thread
-  // clang-format off
-  MAIN_THREAD_EM_ASM({
-    __emval_decref($0);
-  }, m_js_progress.as_handle());
-  // clang-format on
-
-  // Create a dummy reference on this thread so the destructor thinks it worked
-  // This will corrupt emscripten::vals on the calling thread, but we don't have any
-  // clang-format off
-  EM_ASM({
-    emval_handle_array[$0] = {
-      refcount: 1
-    };
-  }, m_js_progress.as_handle());
-  // clang-format on
+  m_last_progress = 0;
 }
 
 Standard_Boolean ProgressIndicator::UserBreak()
@@ -74,18 +57,30 @@ Standard_Boolean ProgressIndicator::UserBreak()
 void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standard_Boolean isForce)
 {
   Standard_Real progress = GetPosition();
-  // clang-format off
-  MAIN_THREAD_ASYNC_EM_ASM(
-      {
-        const progressObject = Emval.toValue($0);
-        progressObject.notify($1);
-        if ($1 == 1)
+
+  if (progress - m_last_progress > 0.01)
+  {
+    Standard_CString name = theScope.Name();
+
+    // clang-format off
+    MAIN_THREAD_ASYNC_EM_ASM(
         {
-          progressObject.resolve()
-        }
-      },
-      m_js_progress.as_handle(), progress);
-  // clang-format on
+          const progressObject = Emval.toValue($0);
+          const name = $1 == 0 ? undefined : UTF8ToString($1);
+          const progress = $2;
+
+          progressObject.notify(progress, name);
+
+          if (progress == 1)
+          {
+            progressObject.resolve()
+          }
+        },
+        m_js_progress.as_handle(), name, progress);
+    // clang-format on
+  }
+
+  m_last_progress = progress;
 }
 
 void ProgressIndicator::subscribe(emscripten::val fn)
