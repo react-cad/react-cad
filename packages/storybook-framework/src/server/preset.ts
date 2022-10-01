@@ -5,7 +5,12 @@ export const addons: StorybookConfig["addons"] = [
   require.resolve("./framework-preset-react-cad-docs"),
 ];
 
-export const previewHead = (head: string): string => `
+export const previewHead = (
+  head: string,
+  config: { configType: string }
+): string =>
+  config.configType === "PRODUCTION"
+    ? `
   <script>
     window.coi = {
       doReload: () => window.parent.location.reload(),
@@ -13,4 +18,5 @@ export const previewHead = (head: string): string => `
   </script>
   <script src="coi-serviceworker.js"></script>
   ${head}
-`;
+`
+    : head;

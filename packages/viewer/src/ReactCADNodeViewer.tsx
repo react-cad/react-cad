@@ -58,7 +58,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
     const [view, canvasRef, onResize] = useReactCADView(core, options);
 
     React.useEffect(() => {
-      if (view.current) {
+      if (rerender && view.current) {
         const progress = core.renderNodeAsync(node, view.current);
         progress.subscribe(console.log);
         progress.then(() => {
