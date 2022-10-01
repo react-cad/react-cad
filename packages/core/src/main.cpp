@@ -59,6 +59,7 @@
 #include <emscripten/html5.h>
 
 #include "Async.hpp"
+#include "ProgressIndicator.hpp"
 #include "UUID.hpp"
 #include "export.hpp"
 
@@ -181,6 +182,20 @@ emscripten::val renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView
   return Async::Perform([=]() { view->render(node->shape); });
 }
 
+#ifdef REACTCAD_DEBUG
+Handle(ProgressIndicator) testProgress()
+{
+  return Async::PerformWithProgress([](const Message_ProgressRange &progressRange) {
+    Message_ProgressScope scope(progressRange, "Task", 10);
+    for (int i = 0; i < 10 && scope.More(); ++i)
+    {
+      scope.Next();
+      usleep(10000);
+    }
+  });
+}
+#endif
+
 //! Dummy main loop callback for a single shot.
 extern "C" void onMainLoop()
 {
@@ -273,6 +288,15 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("showWireframe", &ReactCADView::showWireframe)
       .function("showShaded", &ReactCADView::showShaded)
       .function("onResize", &ReactCADView::onResize);
+
+  emscripten::class_<ProgressIndicator>("ProgressIndicator")
+      .smart_ptr<Handle(ProgressIndicator)>("ProgressIndicator")
+      .function("subscribe", &ProgressIndicator::subscribe)
+      .function("unsubscribe", &ProgressIndicator::unsubscribe)
+      .function("then", &ProgressIndicator::then)
+      .function("then", &ProgressIndicator::thenCatch)
+      .function("catch", &ProgressIndicator::catchError)
+      .function("cancel", &ProgressIndicator::cancel);
 
   emscripten::value_array<gp_Pnt>("Point")
       .element(&gp_Pnt::X, &gp_Pnt::SetX)
@@ -432,4 +456,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("renderSTEP", &renderSTEP);
   emscripten::function("computeNodeAsync", &computeNodeAsync);
   emscripten::function("renderNodeAsync", &renderNodeAsync);
+#ifdef REACTCAD_DEBUG
+  emscripten::function("testProgress", &testProgress);
+#endif
 }

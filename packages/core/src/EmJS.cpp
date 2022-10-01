@@ -129,7 +129,6 @@ void EmJS::resolvePromise(int promiseID)
       {
         const g = typeof global == "undefined" ? window : global;
         const promise = g["ReactCADAsync"][$0];
-        console.log(g["ReactCADAsync"], $0);
         delete g["ReactCADAsync"][$0];
         promise.resolve();
       },

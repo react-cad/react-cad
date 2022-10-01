@@ -25,6 +25,13 @@ export class ReactCADView extends EmClass {
   public onResize(): void;
 }
 
+export class ProgressIndicator extends Promise<void> {
+  subscribe(fn: (progress: number) => void): void;
+  unsubscribe(fn: (progress: number) => void): void;
+  cancel(): void;
+  delete(): void;
+}
+
 export type Vector = [number, number, number];
 export type Point = [number, number, number];
 export type Quaternion = [number, number, number, number];
@@ -211,6 +218,7 @@ export interface ReactCADCore extends EmscriptenModule {
   canvas: HTMLCanvasElement;
   canvases: Record<string, HTMLCanvasElement>;
   mainScriptUrlOrBlob?: string;
+  testProgress?: () => ProgressIndicator;
 }
 
 declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;
