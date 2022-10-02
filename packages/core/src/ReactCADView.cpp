@@ -91,7 +91,9 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
 {
   WebGLSentry sentry(myWebglContext, myId);
 
-  Message_ProgressScope progressScope(theRange, "Triangulating mesh", 100);
+  Message_ProgressScope progressScope(theRange, "Rendering", 100);
+
+  progressScope.Next(5);
 
   PerformanceTimer meshTimer("Mesh timer");
 
@@ -103,7 +105,7 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
       BRepMesh_DiscretFactory::Get().Discret(shape, deviationCoefficent, deviationAngle);
   if (!aMeshAlgo.IsNull())
   {
-    aMeshAlgo->Perform(progressScope.Next(95));
+    aMeshAlgo->Perform(progressScope.Next(90));
   }
 
   meshTimer.end();
@@ -458,9 +460,6 @@ bool ReactCADView::initViewer()
   myView = new V3d_View(aViewer);
   myView->SetImmediateUpdate(false);
   myView->ChangeRenderingParams().Resolution = (unsigned int)(96.0 * myDevicePixelRatio + 0.5);
-#ifdef REACTCAD_DEBUG
-  myView->ChangeRenderingParams().ToShowStats = true;
-#endif
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);

@@ -128,8 +128,6 @@ export const DropdownLink: React.FC<JSX.IntrinsicElements["a"]> = ({
       padding: "7px 15px",
       display: "flex",
       alignItems: "center",
-      fontFamily:
-        '"Nunito Sans", -apple-system, ".SFNSText-Regular", "San Francisco", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
     }}
     onClick={onClick}
   >

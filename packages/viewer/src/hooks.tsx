@@ -85,6 +85,7 @@ export function useReactCADView(
     () => () => {
       if (view.current && !view.current.deleted) {
         view.current.delete();
+        view.current.deleted = true;
       }
     },
     []

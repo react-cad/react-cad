@@ -1,10 +1,11 @@
 import React from "react";
-import { ReactCADCore, ReactCADNode } from "react-cad";
+import { ProgressIndicator, ReactCADCore, ReactCADNode } from "react-cad";
 
 import { useExport, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
 import Toolbar from "./Toolbar";
+import ProgressBar from "./ProgressBar";
 
 interface Props {
   className?: string;
@@ -57,16 +58,29 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const [view, canvasRef, onResize] = useReactCADView(core, options);
 
+    const [
+      progressIndicator,
+      setProgressIndicator,
+    ] = React.useState<ProgressIndicator>();
+
     React.useEffect(() => {
       if (rerender && view.current) {
         const progress = core.renderNodeAsync(node, view.current);
-        progress.subscribe(console.log);
-        progress.then(() => {
-          if (reset) {
-            view.current?.resetView();
-          }
+        setProgressIndicator(progress);
+        progress.then(
+          () => {
+            if (reset) {
+              view.current?.resetView();
+            }
+            setProgressIndicator(undefined);
+          },
+          () => {}
+        );
+
+        return () => {
+          progress.cancel();
           progress.delete();
-        });
+        };
       }
     }, [node, rerender]);
 
@@ -99,7 +113,12 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       <div
         className={className}
         ref={wrapperRef}
-        style={{ height: "100%", width: "100%" }}
+        style={{
+          height: "100%",
+          width: "100%",
+          fontFamily:
+            '"Nunito Sans", -apple-system, ".SFNSText-Regular", "San Francisco", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+        }}
       >
         <Toolbar
           options={options}
@@ -112,7 +131,9 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           focus={focus}
           onResize={resizable ? onResize : undefined}
         >
-          <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
+          <ProgressBar progressIndicator={progressIndicator}>
+            <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
+          </ProgressBar>
         </Toolbar>
       </div>
     );

@@ -4,11 +4,12 @@
 
 // clang-format off
 EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
+  let fulfilled = false;
   let promiseResolve;
   let promiseReject;
   const progressObject = new Promise(function(resolve, reject) {
-    promiseResolve = resolve;
-    promiseReject = reject;
+    promiseResolve = function() { fulfilled = true; resolve() };
+    promiseReject = function() { fulfilled = true; reject(); };
   });
   progressObject.resolve = promiseResolve;
   progressObject.reject = promiseReject;
@@ -27,6 +28,9 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
   };
   progressObject.cancel = () => {
     progressObject.subscribers.length = 0;
+    if (!fulfilled) {
+      progressObject.reject("Cancelled");
+    }
   };
 
   return Emval.toHandle(progressObject);
@@ -71,7 +75,7 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
 
           progressObject.notify(progress, name);
 
-          if (progress == 1)
+          if (progress > 0.9999999999)
           {
             progressObject.resolve()
           }
