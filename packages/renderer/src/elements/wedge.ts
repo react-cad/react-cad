@@ -17,7 +17,8 @@ export function validateProps(props: Props<Wedge>): boolean {
     if (props.ltx < 0) {
       throw new Error(`wedge: "ltx" prop must be greater than or equal to 0`);
     }
-  } else {
+  }
+  if ("xmin" in props) {
     if (props.xmax < props.xmin) {
       throw new Error(
         `wedge: "xmax" prop must be greater than or equal to "xmin"`

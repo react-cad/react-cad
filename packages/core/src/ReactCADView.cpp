@@ -46,8 +46,6 @@
 
 #include <iostream>
 
-#include <pthread.h>
-
 #include "EmJS.hpp"
 #include "PerformanceTimer.hpp"
 #include "UUID.hpp"
@@ -91,9 +89,7 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
 {
   WebGLSentry sentry(myWebglContext, myId);
 
-  Message_ProgressScope progressScope(theRange, "Rendering", 100);
-
-  progressScope.Next(5);
+  Message_ProgressScope scope(theRange, "Rendering", 100);
 
   PerformanceTimer meshTimer("Mesh timer");
 
@@ -105,35 +101,41 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
       BRepMesh_DiscretFactory::Get().Discret(shape, deviationCoefficent, deviationAngle);
   if (!aMeshAlgo.IsNull())
   {
-    aMeshAlgo->Perform(progressScope.Next(90));
+    Message_ProgressScope meshScope(scope.Next(99), "Generating mesh", 1);
+    aMeshAlgo->Perform(meshScope.Next());
   }
 
   meshTimer.end();
 
-  PerformanceTimer displayTimer("Display timer");
-
-  myShaded->SetShape(shape);
-  myContext->Redisplay(myShaded, false);
-  myWireframe->SetShape(shape);
-  myContext->Redisplay(myWireframe, false);
-
-  if (myShowShaded)
+  if (scope.More())
   {
-    myContext->Display(myShaded, AIS_Shaded, -1, false);
+    PerformanceTimer displayTimer("Display timer");
+
+    myShaded->SetShape(shape);
+    myContext->Redisplay(myShaded, false);
+    myWireframe->SetShape(shape);
+    myContext->Redisplay(myWireframe, false);
+
+    if (myShowShaded)
+    {
+      myContext->Display(myShaded, AIS_Shaded, -1, false);
+    }
+
+    if (myShowWireframe)
+    {
+      myContext->Display(myWireframe, AIS_WireFrame, -1, false);
+    }
+
+    scope.Next();
+
+    displayTimer.end();
   }
-
-  if (myShowWireframe)
-  {
-    myContext->Display(myWireframe, AIS_WireFrame, -1, false);
-  }
-
-  progressScope.Next(5);
-
-  displayTimer.end();
 }
 
 void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
+  WebGLSentry sentry(myWebglContext, myId);
+  Message_ProgressScope scope(theRange, "Rendering", 100);
   if (shape.IsNotEqual(myShape) || myQualityChanged)
   {
     myShape = shape;
@@ -143,7 +145,7 @@ void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theR
     PerformanceTimer timer("Compute mesh");
 #endif
 
-    drawShape(shape, theRange);
+    drawShape(shape, scope.Next(99));
 
 #ifdef REACTCAD_DEBUG
     timer.end();
@@ -151,7 +153,10 @@ void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theR
   }
 
   myView->Invalidate();
-  redrawView();
+  if (scope.More())
+  {
+    redrawView();
+  }
 }
 
 void ReactCADView::setQuality(double deviationCoefficent, double angle)
@@ -251,7 +256,7 @@ void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 
 void ReactCADView::showAxes(bool show)
 {
-  WebGLSentry sentr(myWebglContext, myId);
+  WebGLSentry sentry(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
 
@@ -261,7 +266,7 @@ void ReactCADView::showAxes(bool show)
 
 void ReactCADView::showGrid(bool show)
 {
-  WebGLSentry sentr(myWebglContext, myId);
+  WebGLSentry sentry(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   if (show)
   {
@@ -562,7 +567,7 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentr(myWebglContext, myId);
+  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -648,7 +653,7 @@ EM_BOOL ReactCADView::onWheelEvent(int theEventType, const EmscriptenWheelEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentr(myWebglContext, myId);
+  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -694,7 +699,7 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentr(myWebglContext, myId);
+  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());

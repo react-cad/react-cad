@@ -4,29 +4,36 @@
 #include <Message_ProgressIndicator.hxx>
 #include <Message_ProgressScope.hxx>
 
+#include <emscripten/proxying.h>
 #include <emscripten/val.h>
+
+#include <pthread.h>
 
 class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
   ProgressIndicator();
+  Standard_EXPORT void Delete() const override;
   Standard_Boolean UserBreak() override;
   void Show(const Message_ProgressScope &theScope, const Standard_Boolean isForce) override;
   void Reset() override;
 
   void subscribe(emscripten::val fn);
   void unsubscribe(emscripten::val fn);
-  void then(emscripten::val thenFn);
-  void thenCatch(emscripten::val thenFn, emscripten::val catchFn);
-  void catchError(emscripten::val catchFn);
+  emscripten::val then(emscripten::val thenFn);
+  emscripten::val thenCatch(emscripten::val thenFn, emscripten::val catchFn);
+  emscripten::val catchError(emscripten::val catchFn);
   void cancel();
 
 private:
-  static int NextID();
-  int m_progress_id;
-  Standard_Real m_last_progress;
-  Standard_Boolean m_cancelled;
+  static const pthread_t main_thread;
+  static emscripten::ProxyingQueue deletion_queue;
+
   emscripten::val m_js_progress;
+
+  Standard_Real m_last_progress;
+  const char *m_last_name;
+  Standard_Boolean m_cancelled;
 };
 
 #endif

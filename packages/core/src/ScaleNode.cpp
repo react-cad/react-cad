@@ -50,7 +50,7 @@ TopoDS_Shape scaleAxis(TopoDS_Shape shape, gp_Pnt center, gp_Dir direction, Stan
   return aBRepGTrsf.Shape();
 }
 
-void ScaleNode::computeShape()
+void ScaleNode::computeShape(const Message_ProgressRange &theRange)
 {
   TopoDS_Shape tmp = m_childShape;
   if (IsEqual(m_scaleX, m_scaleY) && IsEqual(m_scaleY, m_scaleZ))

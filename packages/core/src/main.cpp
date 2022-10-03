@@ -63,8 +63,6 @@
 #include "UUID.hpp"
 #include "export.hpp"
 
-#include <pthread.h>
-
 Handle(ReactCADNode) createCADNode(std::string type)
 {
   if (type == "box")
@@ -172,21 +170,28 @@ Handle(ReactCADView) createView(emscripten::val canvas)
   return new ReactCADView(canvas);
 }
 
-emscripten::val computeNodeAsync(Handle(ReactCADNode) & node)
+Handle(ProgressIndicator) computeNodeAsync(Handle(ReactCADNode) & node)
 {
-  return Async::Perform([=]() { node->computeGeometry(); });
+  return Async::Perform([=](const Message_ProgressRange &progressRange) { node->computeGeometry(progressRange); });
 }
 
 Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
 {
-  return Async::PerformWithProgress(
-      [=](const Message_ProgressRange &progressRange) { view->render(node->shape, progressRange); });
+  return Async::Perform([=](const Message_ProgressRange &progressRange) {
+    Message_ProgressScope scope(progressRange, "Computing shape", 101);
+    scope.Next();
+    node->computeGeometry(scope.Next(50));
+    if (scope.More())
+    {
+      view->render(node->shape, scope.Next(50));
+    }
+  });
 }
 
 #ifdef REACTCAD_DEBUG
 Handle(ProgressIndicator) testProgress()
 {
-  return Async::PerformWithProgress([](const Message_ProgressRange &progressRange) {
+  return Async::Perform([](const Message_ProgressRange &progressRange) {
     Message_ProgressScope scope(progressRange, "Task", 10);
     for (int i = 0; i < 10 && scope.More(); ++i)
     {
@@ -211,8 +216,6 @@ int main()
       TCollection_AsciiString("NbLogicalProcessors: ") + OSD_Parallel::NbLogicalProcessors(), Message_Trace);
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
 #endif
-
-  ReactCADNode::initializeMutex();
 
   emscripten_set_main_loop(onMainLoop, 1, 0);
 

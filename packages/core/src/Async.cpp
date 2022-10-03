@@ -12,27 +12,10 @@ std::thread thread(thread_func);
 emscripten::ProxyingQueue queue;
 int promise_id = 0;
 
-emscripten::val Async::Perform(std::function<void()> &&func)
-{
-  ++promise_id;
-
-  int id = promise_id;
-
-  emscripten::val promise = EmJS::getPromise(id);
-
-  int result = queue.proxyAsync(thread.native_handle(), [=]() {
-    func();
-    EmJS::resolvePromise(id);
-  });
-
-  return promise;
-}
-
-Handle(ProgressIndicator) Async::PerformWithProgress(std::function<void(const Message_ProgressRange &)> &&func)
+Handle(ProgressIndicator) Async::Perform(std::function<void(const Message_ProgressRange &)> &&func)
 {
   Handle(ProgressIndicator) progress = new ProgressIndicator();
-  Message_ProgressRange progressRange = ProgressIndicator::Start(progress);
-  queue.proxyAsync(thread.native_handle(), [=]() { func(progressRange); });
+  queue.proxyAsync(thread.native_handle(), [=]() { func(ProgressIndicator::Start(progress)); });
   return progress;
 }
 

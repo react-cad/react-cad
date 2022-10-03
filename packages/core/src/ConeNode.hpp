@@ -12,7 +12,7 @@ public:
   void setAngle(Standard_Real angle);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   Standard_Boolean m_centered;

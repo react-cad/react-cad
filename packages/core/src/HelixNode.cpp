@@ -72,7 +72,7 @@ TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
   return pipe;
 }
 
-void HelixNode::computeShape()
+void HelixNode::computeShape(const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
@@ -84,17 +84,35 @@ void HelixNode::computeShape()
   builder.MakeCompound(compound);
 
   TopExp_Explorer Faces;
+  int nbFaces = 0;
   for (Faces.Init(m_profile, TopAbs_FACE); Faces.More(); Faces.Next())
   {
-    TopoDS_Face face = TopoDS::Face(Faces.Current());
-    TopoDS_Wire outerWire = BRepTools::OuterWire(face);
+    ++nbFaces;
+  }
 
+  Message_ProgressScope scope(theRange, "Computing helix", nbFaces);
+
+  for (Faces.ReInit(); Faces.More() && scope.More(); Faces.Next())
+  {
+    TopoDS_Face face = TopoDS::Face(Faces.Current());
+
+    TopExp_Explorer Wires;
+    int nbWires = 0;
+    for (Wires.Init(face, TopAbs_WIRE); Wires.More(); Wires.Next())
+    {
+      ++nbWires;
+    }
+
+    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires);
+
+    TopoDS_Wire outerWire = BRepTools::OuterWire(face);
     TopoDS_Shape solid = makeHelix(outerWire);
+
+    faceScope.Next();
 
     TopTools_ListOfShape holes;
 
-    TopExp_Explorer Wires;
-    for (Wires.Init(face, TopAbs_WIRE); Wires.More(); Wires.Next())
+    for (Wires.ReInit(); Wires.More() && faceScope.More(); Wires.Next())
     {
       TopoDS_Wire wire = TopoDS::Wire(Wires.Current());
       if (wire.IsEqual(outerWire))
@@ -102,6 +120,7 @@ void HelixNode::computeShape()
         continue;
       }
       holes.Append(makeHelix(wire));
+      faceScope.Next();
     }
 
     TopoDS_Shape helix = differenceOp(solid, holes);

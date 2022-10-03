@@ -8,25 +8,25 @@ import {
 import { ExportFns, ViewOptions } from "./types";
 
 import DetailContext from "./DetailContext";
+import CADErrorBoundary from "./CADErrorBoundary";
 
 export function useReactCADRenderer(
   core: ReactCADCore,
   shape: React.ReactElement,
   detail: ViewOptions["detail"],
   reset?: boolean
-): [ReactCADNode, number, boolean] {
+): [ReactCADNode, number, boolean, unknown | undefined] {
   const rootNode = React.useMemo(() => core.createCADNode("union"), [core]);
   const root = React.useMemo(() => createRoot(rootNode, core), [core]);
 
   const [renderFrameId, setRenderFrameId] = React.useState(0);
   const [renderReset, setRenderReset] = React.useState(false);
+  const [renderError, setRenderError] = React.useState<unknown>();
 
   const renderCallback = React.useMemo(() => {
     let shouldReset = Boolean(reset);
 
     return async () => {
-      await core.computeNodeAsync(rootNode);
-
       setRenderReset(shouldReset);
       setRenderFrameId((n) => n + 1);
 
@@ -36,10 +36,20 @@ export function useReactCADRenderer(
 
   React.useEffect(() => {
     root.render(
-      <DetailContext.Provider value={detail}>{shape}</DetailContext.Provider>,
+      <CADErrorBoundary shape={shape} log={setRenderError}>
+        <DetailContext.Provider value={detail}>{shape}</DetailContext.Provider>
+      </CADErrorBoundary>,
       renderCallback
     );
+
+    return () => setRenderError(undefined);
   }, [shape, detail, root, rootNode]);
+
+  React.useEffect(() => {
+    if (renderError) {
+      console.error(renderError);
+    }
+  }, [renderError]);
 
   React.useEffect(
     () => () => {
@@ -49,7 +59,7 @@ export function useReactCADRenderer(
     []
   );
 
-  return [rootNode, renderFrameId, renderReset];
+  return [rootNode, renderFrameId, renderReset, renderError];
 }
 
 export function useReactCADView(
@@ -60,22 +70,21 @@ export function useReactCADView(
   (canvas: HTMLCanvasElement | null) => void,
   () => void
 ] {
-  const view = React.useRef<ReactCADView & { deleted?: boolean }>();
+  const view = React.useRef<ReactCADView>();
   const [onResize, setOnResize] = React.useState(() => () => {});
 
   const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
     if (canvas) {
       if (view.current) {
         view.current.delete();
-        view.current.deleted = true;
+        view.current = undefined;
       }
       view.current = core.createView(canvas);
-      view.current.deleted = false;
       setOnResize(() => () => {
-        if (!view.current?.deleted) {
+        if (view.current) {
           canvas.width = canvas.clientWidth * window.devicePixelRatio;
           canvas.height = canvas.clientHeight * window.devicePixelRatio;
-          view.current?.onResize();
+          view.current.onResize();
         }
       });
     }
@@ -83,9 +92,9 @@ export function useReactCADView(
 
   React.useEffect(
     () => () => {
-      if (view.current && !view.current.deleted) {
+      if (view.current) {
         view.current.delete();
-        view.current.deleted = true;
+        view.current = undefined;
       }
     },
     []

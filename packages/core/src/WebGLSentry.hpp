@@ -2,19 +2,18 @@
 #define WebGLSentry_HeaderFile
 
 #include <emscripten/html5.h>
+#include <mutex>
 #include <string>
 
 class WebGLSentry
 {
 public:
-  WebGLSentry(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context, std::string canvasID);
-  WebGLSentry(const WebGLSentry &other);
-  WebGLSentry &operator=(const WebGLSentry &other);
-  ~WebGLSentry();
+  WebGLSentry(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context, const std::string &canvasID);
+  WebGLSentry(const WebGLSentry &other) = delete;
+  WebGLSentry &operator=(const WebGLSentry &other) = delete;
 
 private:
-  EMSCRIPTEN_WEBGL_CONTEXT_HANDLE m_context;
-  std::string m_canvasID;
+  std::lock_guard<std::recursive_mutex> m_lock;
 };
 
 #endif

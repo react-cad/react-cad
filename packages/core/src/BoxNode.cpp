@@ -1,4 +1,5 @@
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <Message_ProgressScope.hxx>
 #include <Precision.hxx>
 #include <gp_Pnt.hxx>
 
@@ -26,7 +27,7 @@ void BoxNode::setCentered(Standard_Boolean centered)
   }
 }
 
-void BoxNode::computeShape()
+void BoxNode::computeShape(const Message_ProgressRange &theRange)
 {
   gp_Pnt origin = gp::Origin();
   if (m_centered)

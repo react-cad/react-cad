@@ -16,7 +16,7 @@ void TranslationNode::setVector(gp_Vec vector)
   }
 }
 
-void TranslationNode::computeShape()
+void TranslationNode::computeShape(const Message_ProgressRange &theRange)
 {
   gp_Trsf transform;
   transform.SetTranslation(m_vector);

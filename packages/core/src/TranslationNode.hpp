@@ -12,7 +12,7 @@ public:
   void setVector(gp_Vec vector);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   gp_Vec m_vector;

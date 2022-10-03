@@ -24,7 +24,7 @@ void TorusNode::setAngle(Standard_Real angle)
   }
 }
 
-void TorusNode::computeShape()
+void TorusNode::computeShape(const Message_ProgressRange &theRange)
 {
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 

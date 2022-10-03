@@ -11,7 +11,8 @@ public:
   IntersectionNode();
 
 protected:
-  void computeChildren(TopTools_ListOfShape children) override;
+  void computeChildren(TopTools_ListOfShape children,
+                       const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 };
 
 #endif

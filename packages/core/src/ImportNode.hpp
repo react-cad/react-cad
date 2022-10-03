@@ -17,10 +17,10 @@ public:
   void setFileContents(emscripten::val contents);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
   std::string m_filename;
-  virtual void importFile() = 0;
+  virtual void importFile(const Message_ProgressRange &theRange) = 0;
 };
 
 #endif

@@ -35,7 +35,7 @@ void ConeNode::setAngle(Standard_Real angle)
   }
 }
 
-void ConeNode::computeShape()
+void ConeNode::computeShape(const Message_ProgressRange &theRange)
 {
   TopoDS_Solid cone;
 

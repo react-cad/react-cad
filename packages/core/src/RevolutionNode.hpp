@@ -16,7 +16,7 @@ public:
   void setAxisAngle(gp_Vec direction, Standard_Real angle);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   gp_Vec m_axis;

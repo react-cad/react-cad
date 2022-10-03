@@ -63,26 +63,36 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       setProgressIndicator,
     ] = React.useState<ProgressIndicator>();
 
+    const shouldReset = React.useRef(false);
+
     React.useEffect(() => {
       if (rerender && view.current) {
         const progress = core.renderNodeAsync(node, view.current);
+
         setProgressIndicator(progress);
+
         progress.then(
           () => {
-            if (reset) {
+            if (reset || shouldReset.current) {
               view.current?.resetView();
+              shouldReset.current = false;
             }
-            setProgressIndicator(undefined);
           },
-          () => {}
+          () => {
+            shouldReset.current = Boolean(reset || shouldReset.current);
+          }
         );
-
-        return () => {
-          progress.cancel();
-          progress.delete();
-        };
       }
     }, [node, rerender]);
+
+    React.useEffect(() => {
+      if (progressIndicator) {
+        return () => {
+          progressIndicator.cancel();
+          progressIndicator.delete();
+        };
+      }
+    }, [progressIndicator]);
 
     React.useEffect(
       () => setOptions((options) => ({ ...options, highDetail, lowDetail })),

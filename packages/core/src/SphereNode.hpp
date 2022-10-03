@@ -12,7 +12,7 @@ public:
   void setSegment(Standard_Real angle1, Standard_Real angle2);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   Standard_Real m_radius;

@@ -41,7 +41,7 @@ void WedgeNode::setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real 
   }
 }
 
-void WedgeNode::computeShape()
+void WedgeNode::computeShape(const Message_ProgressRange &theRange)
 {
   TopoDS_Solid wedge;
 

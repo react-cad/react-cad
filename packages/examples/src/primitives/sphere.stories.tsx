@@ -9,7 +9,7 @@ const positiveIntegerControl = {
   control: {
     type: "range",
     min: 1,
-    max: 10,
+    max: 5,
     step: 0.1,
   },
 };
@@ -37,7 +37,7 @@ const Template: Story<Props> = (args) => <sphere {...args} />;
 
 export const sphere = Template.bind({});
 sphere.args = {
-  radius: 5,
+  radius: 1,
   angle: 0,
   segmentAngle1: 0,
   segmentAngle2: 0,

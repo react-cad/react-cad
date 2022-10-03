@@ -8,11 +8,17 @@ IntersectionNode::IntersectionNode()
 {
 }
 
-void IntersectionNode::computeChildren(TopTools_ListOfShape children)
+void IntersectionNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate intersection");
 #endif
+  Message_ProgressScope scope(theRange, "Computing intersection", 1);
+  if (!scope.More())
+  {
+    return;
+  }
+
   switch (children.Size())
   {
   case 0:

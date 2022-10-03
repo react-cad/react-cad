@@ -22,11 +22,6 @@ EM_JS(float, jsDevicePixelRatio, (), {
   return aDevicePixelRatio;
 });
 
-EM_JS(void, jsEnableCanvas, (const char *idStr), {
-  const id = UTF8ToString(idStr);
-  Module.canvas = specialHTMLTargets[id];
-});
-
 EM_JS(int, jsCanvasGetWidth, (const char* idStr), {
   const id = UTF8ToString(idStr);
   return specialHTMLTargets[id].width;
@@ -100,7 +95,12 @@ float EmJS::devicePixelRatio()
 
 void EmJS::enableCanvas(const std::string &id)
 {
-  jsEnableCanvas(id.c_str());
+  // clang-format off
+  MAIN_THREAD_EM_ASM({
+    const id = UTF8ToString($0);
+    Module.canvas = specialHTMLTargets[id];
+  }, id.c_str());
+  // clang-format on
 }
 
 int EmJS::canvasGetWidth(const std::string &id)

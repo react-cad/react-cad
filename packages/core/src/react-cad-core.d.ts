@@ -30,6 +30,7 @@ export class ProgressIndicator extends Promise<void> {
   unsubscribe(fn: (progress: number, name?: string) => void): void;
   cancel(): void;
   delete(): void;
+  isDeleted(): boolean;
 }
 
 export type Vector = [number, number, number];
@@ -205,7 +206,7 @@ export interface ReactCADCore extends EmscriptenModule {
     type: T
   ): ReactCADNodeTypes[T];
   createView(canvas: HTMLCanvasElement): ReactCADView;
-  computeNodeAsync(node: ReactCADNode): Promise<void>;
+  computeNodeAsync(node: ReactCADNode): ProgressIndicator;
   renderNodeAsync(node: ReactCADNode, view: ReactCADView): ProgressIndicator;
   renderSTL(
     node: ReactCADNode,

@@ -18,12 +18,19 @@
 
 #include <string>
 
-TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh)
+TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh, const Message_ProgressRange &theRange)
 {
   if (aMesh.IsNull())
   {
     return TopoDS_Shape();
   }
+
+  Message_ProgressScope scope(theRange, "Building shape from mesh", 9);
+
+  const TColgp_Array1OfPnt &aNodes = aMesh->Nodes();
+  const Poly_Array1OfTriangle &aTriangles = aMesh->Triangles();
+
+  Message_ProgressScope meshScope(scope.Next(4), "Making faces from triangles ", aTriangles.Size());
 
   TopoDS_Vertex aTriVertexes[3];
   TopoDS_Face aFace;
@@ -35,9 +42,7 @@ TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh)
   BRep_Builder BuildTool;
   BuildTool.MakeCompound(aComp);
 
-  const TColgp_Array1OfPnt &aNodes = aMesh->Nodes();
-  const Poly_Array1OfTriangle &aTriangles = aMesh->Triangles();
-  for (Standard_Integer aTriIdx = aTriangles.Lower(); aTriIdx <= aTriangles.Upper(); ++aTriIdx)
+  for (Standard_Integer aTriIdx = aTriangles.Lower(); aTriIdx <= aTriangles.Upper() && meshScope.More(); ++aTriIdx)
   {
     const Poly_Triangle &aTriangle = aTriangles(aTriIdx);
 
@@ -63,23 +68,28 @@ TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh)
         }
       }
     }
+
+    meshScope.Next();
   }
 
-  aSewingTool.Load(aComp);
-  aSewingTool.Perform();
-
-  TopoDS_Shape theShape = aSewingTool.SewedShape();
-
-  if (theShape.ShapeType() == TopAbs_SHELL)
+  if (scope.More())
   {
-    TopoDS_Shell shell = TopoDS::Shell(theShape);
-    BRepBuilderAPI_MakeSolid makeSolid;
-    makeSolid.Add(shell);
-    makeSolid.Build();
-    TopoDS_Solid solid = makeSolid.Solid();
-    BRepLib::OrientClosedSolid(solid);
+    aSewingTool.Load(aComp);
+    aSewingTool.Perform(scope.Next(4));
 
-    return solid;
+    TopoDS_Shape theShape = aSewingTool.SewedShape();
+
+    if (theShape.ShapeType() == TopAbs_SHELL)
+    {
+      TopoDS_Shell shell = TopoDS::Shell(theShape);
+      BRepBuilderAPI_MakeSolid makeSolid;
+      makeSolid.Add(shell);
+      makeSolid.Build();
+      TopoDS_Solid solid = makeSolid.Solid();
+      BRepLib::OrientClosedSolid(solid);
+
+      return solid;
+    }
   }
 
   return TopoDS_Shape();

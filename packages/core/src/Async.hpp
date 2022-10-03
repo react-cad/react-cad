@@ -11,9 +11,7 @@
 class Async
 {
 public:
-  static emscripten::val Perform(std::function<void()> &&func);
-  static Handle(ProgressIndicator)
-      PerformWithProgress(std::function<void(const Message_ProgressRange &progressRange)> &&func);
+  static Handle(ProgressIndicator) Perform(std::function<void(const Message_ProgressRange &progressRange)> &&func);
   static emscripten::val GenerateFile(const std::string &filename, std::function<void()> &&func);
 
 private:

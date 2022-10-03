@@ -7,31 +7,33 @@ interface Props {
 }
 
 const ProgressBar: React.FC<Props> = ({ progressIndicator, children }) => {
-  const [progress, setProgress] = React.useState(0);
+  const [progress, setProgress] = React.useState<number>(0);
   const [message, setMessage] = React.useState<string>();
+  const [show, setShow] = React.useState(false);
 
   React.useEffect(() => {
     if (progressIndicator) {
       const observer = (p: number, m?: string) => {
         setProgress(p);
         if (m) {
-          setMessage(m);
+          if (m === "Cancelling") {
+            setMessage("Shape changed, cancelling render");
+          } else {
+            setMessage(m);
+          }
+        }
+        if (p > 0.9999999999) {
+          setShow(false);
         }
       };
 
-      progressIndicator.subscribe(observer);
-    } else {
-      const clearProgress = () => {
-        setProgress(0);
-        setMessage(undefined);
-      };
+      try {
+        progressIndicator.subscribe(observer);
+      } catch (e) {
+        // In some cases parent useEffect cleanup occurs first, and the indicator is already deleted
+      }
 
-      const timeout = setTimeout(clearProgress, 1000);
-
-      return () => {
-        clearTimeout(timeout);
-        clearProgress();
-      };
+      setShow(true);
     }
   }, [progressIndicator]);
 
@@ -45,8 +47,8 @@ const ProgressBar: React.FC<Props> = ({ progressIndicator, children }) => {
           bottom: 0,
           left: 0,
           width: "100%",
-          opacity: progressIndicator ? 1 : 0,
-          transition: progressIndicator ? "" : "opacity 0.5s 0.5s",
+          opacity: show ? 1 : 0,
+          transition: show ? "" : "opacity 0.5s 0.5s",
         }}
       >
         <label style={{ display: "block" }}>
@@ -58,7 +60,7 @@ const ProgressBar: React.FC<Props> = ({ progressIndicator, children }) => {
               display: "block",
               backgroundColor: "rgb(255,255,255,0.75)",
               width: "max-content",
-              borderTopRightRadius: "1rem",
+              borderTopRightRadius: "4px",
             }}
           >
             {message}
@@ -77,11 +79,9 @@ const ProgressBar: React.FC<Props> = ({ progressIndicator, children }) => {
                 backgroundColor: "transparent",
               },
               "&::-webkit-progress-value": {
-                transition: "width 0.4s",
                 backgroundColor: "rgb(30, 167, 253)",
               },
               "&::-moz-progress-bar": {
-                transition: "width 0.4s",
                 backgroundColor: "rgb(30, 167, 253)",
               },
             }}

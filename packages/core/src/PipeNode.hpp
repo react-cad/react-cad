@@ -16,7 +16,7 @@ public:
   void setSpineSVG(const std::string &svg);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   TopoDS_Wire m_spine;

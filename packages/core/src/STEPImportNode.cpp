@@ -11,11 +11,13 @@ STEPImportNode::STEPImportNode()
 {
 }
 
-void STEPImportNode::importFile()
+void STEPImportNode::importFile(const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import STEP");
 #endif
+
+  Message_ProgressScope scope(theRange, "Importing STEP file", 1);
 
   STEPControl_Reader reader;
   IFSelect_ReturnStatus status = reader.ReadFile(m_filename.c_str());
@@ -31,7 +33,7 @@ void STEPImportNode::importFile()
     return;
   }
 
-  Standard_Integer num = reader.TransferRoots();
+  Standard_Integer num = reader.TransferRoots(scope.Next());
 
   if (num == 0)
   {

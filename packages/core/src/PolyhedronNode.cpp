@@ -66,7 +66,6 @@ bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>
 void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
                                        const NCollection_Array1<NCollection_Array1<int>> &faces)
 {
-  lock();
   m_points = points;
   if (checkFaces(faces))
   {
@@ -77,14 +76,17 @@ void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
     m_faces = NCollection_Array1<NCollection_Array1<int>>();
   }
   propsChanged();
-  unlock();
 }
 
-void PolyhedronNode::computeShape()
+void PolyhedronNode::computeShape(const Message_ProgressRange &theRange)
 {
   BRepBuilderAPI_Sewing polyhedron;
 
-  for (auto face = m_faces.begin(); face != m_faces.end(); ++face)
+  Message_ProgressScope scope(theRange, "Computing polyhedron", 9);
+
+  Message_ProgressScope meshScope(scope.Next(4), "Building faces", m_faces.Size());
+
+  for (auto face = m_faces.begin(); face != m_faces.end() && meshScope.More(); ++face)
   {
     BRepBuilderAPI_MakePolygon polygon;
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
@@ -100,23 +102,28 @@ void PolyhedronNode::computeShape()
       return;
     }
     polyhedron.Add(f);
+
+    meshScope.Next();
   }
 
-  polyhedron.Perform();
-  TopoDS_Shape sewedShape = polyhedron.SewedShape();
+  if (scope.More())
+  {
+    polyhedron.Perform(scope.Next(4));
+    TopoDS_Shape sewedShape = polyhedron.SewedShape();
 
-  if (sewedShape.ShapeType() == TopAbs_SHELL)
-  {
-    TopoDS_Shell shell = TopoDS::Shell(sewedShape);
-    BRepBuilderAPI_MakeSolid makeSolid;
-    makeSolid.Add(shell);
-    makeSolid.Build();
-    TopoDS_Solid solid = makeSolid.Solid();
-    BRepLib::OrientClosedSolid(solid);
-    shape = solid;
+    if (sewedShape.ShapeType() == TopAbs_SHELL && scope.More())
+    {
+      TopoDS_Shell shell = TopoDS::Shell(sewedShape);
+      BRepBuilderAPI_MakeSolid makeSolid;
+      makeSolid.Add(shell);
+      makeSolid.Build();
+      TopoDS_Solid solid = makeSolid.Solid();
+      BRepLib::OrientClosedSolid(solid);
+      shape = solid;
+      scope.Next(1);
+      return;
+    }
   }
-  else
-  {
-    shape = TopoDS_Shape();
-  }
+
+  shape = TopoDS_Shape();
 }

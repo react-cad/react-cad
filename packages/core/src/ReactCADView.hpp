@@ -33,6 +33,7 @@
 #include <AIS_ViewController.hxx>
 #include <Graphic3d_Camera.hxx>
 #include <Message_ProgressRange.hxx>
+#include <Message_ProgressScope.hxx>
 #include <TopoDS_Shape.hxx>
 #include <V3d_View.hxx>
 
@@ -40,8 +41,6 @@
 #include <emscripten/bind.h>
 #include <emscripten/html5.h>
 #include <emscripten/val.h>
-
-#include <pthread.h>
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADView : public Standard_Transient, protected AIS_ViewController

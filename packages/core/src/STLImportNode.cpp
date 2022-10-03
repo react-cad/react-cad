@@ -12,23 +12,30 @@ STLImportNode::STLImportNode()
 {
 }
 
-void STLImportNode::importFile()
+void STLImportNode::importFile(const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Triangulating STL");
 #endif
 
-  Handle(Poly_Triangulation) mesh = RWStl::ReadFile(m_filename.c_str());
+  Message_ProgressScope scope(theRange, "Importing STL file", 3);
+
+  Handle(Poly_Triangulation) mesh = RWStl::ReadFile(m_filename.c_str(), scope.Next());
 
 #ifdef REACTCAD_DEBUG
   timer.end();
-
-  PerformanceTimer timer2("Sewing STL mesh");
 #endif
 
-  shape = shapeFromMesh(mesh);
+  if (scope.More())
+  {
+#ifdef REACTCAD_DEBUG
+    PerformanceTimer timer2("Sewing STL mesh");
+#endif
+
+    shape = shapeFromMesh(mesh, scope.Next(2));
 
 #ifdef REACTCAD_DEBUG
-  timer2.end();
+    timer2.end();
 #endif
+  }
 }
