@@ -42,6 +42,8 @@
 #include <emscripten/html5.h>
 #include <emscripten/val.h>
 
+#include "Trihedron.hpp"
+
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADView : public Standard_Transient, protected AIS_ViewController
 {
@@ -172,10 +174,11 @@ private:
   Handle(AIS_InteractiveContext) myContext; //!< interactive context
   Handle(V3d_View) myView;                  //!< 3D view
   Handle(Prs3d_TextAspect) myTextStyle;     //!< text style for OSD elements
-  Aspect_Touch myClickTouch;                //!< single touch position for handling clicks
-  OSD_Timer myDoubleTapTimer;               //!< timer for handling double tap
-  float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
-  unsigned int myUpdateRequests;            //!< counter for unhandled update requests
+  Handle(Trihedron) myTrihedron;
+  Aspect_Touch myClickTouch;     //!< single touch position for handling clicks
+  OSD_Timer myDoubleTapTimer;    //!< timer for handling double tap
+  float myDevicePixelRatio;      //!< device pixel ratio for handling high DPI displays
+  unsigned int myUpdateRequests; //!< counter for unhandled update requests
   TopoDS_Shape myShape;
   Handle_AIS_Shape myShaded;
   Handle_AIS_Shape myWireframe;

@@ -26,6 +26,7 @@
 #include "WasmVKeys.hpp"
 
 #include <AIS_Shape.hxx>
+#include <AIS_Trihedron.hxx>
 #include <Aspect_DisplayConnection.hxx>
 #include <Aspect_Grid.hxx>
 #include <Aspect_Handle.hxx>
@@ -468,13 +469,20 @@ bool ReactCADView::initViewer()
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);
-  myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.1, V3d_WIREFRAME);
+
+  myTrihedron = new Trihedron();
+  myTrihedron->SetLabelsColor(Quantity_NOC_GOLD);
+  myTrihedron->SetScale(0.1);
+  myTrihedron->SetPosition(Aspect_TOTP_RIGHT_UPPER);
+  myTrihedron->SetWireframe(Standard_True);
+  myTrihedron->Display(*myView);
 
 #ifdef REACTCAD_DEBUG
   // dumpGlInfo(false);
 #endif
 
   myContext = new AIS_InteractiveContext(aViewer);
+
   initPixelScaleRatio();
   return true;
 }
