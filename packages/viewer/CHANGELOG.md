@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/react-cad/react-cad/compare/v0.17.0...v0.18.0) (2022-10-04)
+
+
+### Bug Fixes
+
+* remove coi-serviceworker from dev build ([67df3d9](https://github.com/react-cad/react-cad/commit/67df3d9b334adefaf1dc56742d69c25854cbf006))
+
+
+### Features
+
+* **core:** report meshing progress ([bf5aa52](https://github.com/react-cad/react-cad/commit/bf5aa52c2b4b986cf39bc54589d08a35b3185644))
+* report file export progress ([80984f3](https://github.com/react-cad/react-cad/commit/80984f317236e44e097800e6bcbc6038b33a0814))
+* report geometry progress ([91c2b37](https://github.com/react-cad/react-cad/commit/91c2b374aea5e01c0a761fa554f9e436be5de26d))
+* **viewer:** display render progress bar ([af36a7e](https://github.com/react-cad/react-cad/commit/af36a7e3149045eea3808da5335ebac50e4f57a4))
+
+
+
+
+
 # [0.17.0](https://github.com/react-cad/react-cad/compare/v0.16.0...v0.17.0) (2022-09-30)
 
 **Note:** Version bump only for package @react-cad/viewer

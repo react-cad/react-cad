@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/react-cad/react-cad/compare/v0.17.0...v0.18.0) (2022-10-04)
+
+
+### Features
+
+* report file export progress ([80984f3](https://github.com/react-cad/react-cad/commit/80984f317236e44e097800e6bcbc6038b33a0814))
+* report geometry progress ([91c2b37](https://github.com/react-cad/react-cad/commit/91c2b374aea5e01c0a761fa554f9e436be5de26d))
+
+
+
+
+
 # [0.17.0](https://github.com/react-cad/react-cad/compare/v0.16.0...v0.17.0) (2022-09-30)
 
 **Note:** Version bump only for package @react-cad/renderer
