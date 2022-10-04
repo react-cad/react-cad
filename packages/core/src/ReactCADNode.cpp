@@ -2,33 +2,15 @@
 #include <math.h>
 
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
+#include <Message.hxx>
+#include <Message_ProgressScope.hxx>
+
+#include <mutex>
 
 #include "ReactCADNode.hpp"
 #include "operations.hpp"
 
 #include "PerformanceTimer.hpp"
-
-#include <pthread.h>
-
-pthread_mutex_t ReactCADNode::nodeMutex;
-
-void ReactCADNode::initializeMutex()
-{
-  pthread_mutexattr_t Attr;
-  pthread_mutexattr_init(&Attr);
-  pthread_mutexattr_settype(&Attr, PTHREAD_MUTEX_RECURSIVE);
-  pthread_mutex_init(&ReactCADNode::nodeMutex, &Attr);
-}
-
-void ReactCADNode::lock()
-{
-  pthread_mutex_lock(&ReactCADNode::nodeMutex);
-}
-
-void ReactCADNode::unlock()
-{
-  pthread_mutex_unlock(&ReactCADNode::nodeMutex);
-}
 
 ReactCADNode::ReactCADNode()
     : m_parent(), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
@@ -42,17 +24,14 @@ ReactCADNode::~ReactCADNode()
 
 void ReactCADNode::appendChild(Handle(ReactCADNode) & child)
 {
-  lock();
   m_children.push_back(child);
   child->m_parent = this;
   m_childrenChanged = true;
   notifyAncestors();
-  unlock();
 }
 
 void ReactCADNode::insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before)
 {
-  lock();
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
     if (*it == before)
@@ -64,12 +43,10 @@ void ReactCADNode::insertChildBefore(Handle(ReactCADNode) & child, const Handle(
       break;
     }
   }
-  unlock();
 }
 
 void ReactCADNode::removeChild(Handle(ReactCADNode) & child)
 {
-  lock();
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
     if (*it == child)
@@ -81,7 +58,6 @@ void ReactCADNode::removeChild(Handle(ReactCADNode) & child)
       break;
     }
   }
-  unlock();
 }
 
 bool ReactCADNode::hasParent()
@@ -91,10 +67,8 @@ bool ReactCADNode::hasParent()
 
 void ReactCADNode::propsChanged()
 {
-  lock();
   m_propsChanged = true;
   notifyAncestors();
-  unlock();
 }
 
 void ReactCADNode::notifyAncestors()
@@ -107,49 +81,69 @@ void ReactCADNode::notifyAncestors()
   }
 }
 
-bool ReactCADNode::computeGeometry()
+bool ReactCADNode::computeGeometry(const Message_ProgressRange &theRange)
 {
-  bool changed = false;
-
-  lock();
+  Message_ProgressScope scope(theRange, "Computing geometry", 1);
   if (m_propsChanged || m_childrenChanged)
   {
     if (m_childrenChanged)
     {
+      Message_ProgressScope childScope(scope.Next(), "Computing child geometry", m_children.size() + 2);
       TopTools_ListOfShape shapes;
-      for (auto child : m_children)
+      for (auto child = m_children.begin(); child != m_children.end() && childScope.More(); ++child)
       {
-        child->computeGeometry();
-        shapes.Append(child->shape);
+        (*child)->computeGeometry(childScope.Next());
+        shapes.Append((*child)->shape);
       }
-      computeChildren(shapes);
-      m_childrenChanged = false;
+
+      computeChildren(shapes, childScope.Next());
+
+      if (!childScope.More())
+      {
+        return false;
+      }
+
+      computeShape(childScope.Next());
+
+      if (childScope.More())
+      {
+        m_childrenChanged = false;
+        m_propsChanged = false;
+        return true;
+      }
     }
-
-    computeShape();
-    m_propsChanged = false;
-
-    changed = true;
+    else
+    {
+      computeShape(scope.Next());
+      if (scope.More())
+      {
+        m_propsChanged = false;
+        return true;
+      }
+    }
   }
-  unlock();
 
-  return changed;
+  return false;
 }
 
-void ReactCADNode::computeChildren(TopTools_ListOfShape children)
+void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate union");
 #endif
 
-  m_childShape = unionOp(children);
+  Message_ProgressScope scope(theRange, "Computing union", 1);
+  if (scope.More())
+  {
+    m_childShape = unionOp(children);
+  }
 
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
 }
 
-void ReactCADNode::computeShape()
+void ReactCADNode::computeShape(const Message_ProgressRange &theRange)
 {
   shape = m_childShape;
 }

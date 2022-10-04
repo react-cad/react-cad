@@ -34,7 +34,7 @@ void CylinderNode::setCentered(Standard_Boolean centered)
   }
 }
 
-void CylinderNode::computeShape()
+void CylinderNode::computeShape(const Message_ProgressRange &theRange)
 {
   TopoDS_Solid cylinder;
 
@@ -54,5 +54,6 @@ void CylinderNode::computeShape()
     translation.SetTranslation(gp_Vec(0, 0, -m_height / 2));
     cylinder.Move(translation);
   }
+
   shape = cylinder;
 }

@@ -22,11 +22,6 @@ EM_JS(float, jsDevicePixelRatio, (), {
   return aDevicePixelRatio;
 });
 
-EM_JS(void, jsEnableCanvas, (const char *idStr), {
-  const id = UTF8ToString(idStr);
-  Module.canvas = specialHTMLTargets[id];
-});
-
 EM_JS(int, jsCanvasGetWidth, (const char* idStr), {
   const id = UTF8ToString(idStr);
   return specialHTMLTargets[id].width;
@@ -35,21 +30,6 @@ EM_JS(int, jsCanvasGetWidth, (const char* idStr), {
 EM_JS(int, jsCanvasGetHeight, (const char* idStr), {
   const id = UTF8ToString(idStr);
   return specialHTMLTargets[id].height;
-});
-
-EM_JS(emscripten::EM_VAL, jsGetPromise, (int promiseID), {
-  const promiseObject = {};
-  promiseObject.promise = new Promise(function(resolve, reject) {
-    promiseObject.resolve = resolve;
-    promiseObject.reject = reject;
-  });
-
-  const g = typeof global == "undefined" ? window : global;
-
-  g["ReactCADAsync"] = g["ReactCADAsync"] || {};
-  g["ReactCADAsync"][promiseID] = promiseObject;
-
-  return Emval.toHandle(promiseObject.promise);
 });
 
 EM_JS(void, jsWriteFile, (const char *filenameStr, emscripten::EM_VAL contents_handle), {
@@ -70,17 +50,6 @@ EM_JS(void, jsDeleteFile, (const char *filenameStr), {
     Module.FS.unlink(filename);
   } catch(e) {}
 });
-
-EM_JS(void, jsDownloadSync, (const char *urlStr, const char *filenameStr), {
-  const url = UTF8ToString(urlStr);
-  const filename = UTF8ToString(filenameStr);
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", url, false);  // synchronous request
-  xhr.responseType = "arraybuffer";
-  xhr.send(null);
-  Module.FS.writeFile(filename, new Uint8Array(xhr.response));
-});
-
 // clang-format on
 
 emscripten::val EmJS::getFileContentsAndDelete(const std::string &filename)
@@ -100,7 +69,12 @@ float EmJS::devicePixelRatio()
 
 void EmJS::enableCanvas(const std::string &id)
 {
-  jsEnableCanvas(id.c_str());
+  // clang-format off
+  MAIN_THREAD_EM_ASM({
+    const id = UTF8ToString($0);
+    Module.canvas = specialHTMLTargets[id];
+  }, id.c_str());
+  // clang-format on
 }
 
 int EmJS::canvasGetWidth(const std::string &id)
@@ -116,52 +90,6 @@ int EmJS::canvasGetHeight(const std::string &id)
 Graphic3d_Vec2i EmJS::canvasGetSize(const std::string &id)
 {
   return Graphic3d_Vec2i(jsCanvasGetWidth(id.c_str()), jsCanvasGetHeight(id.c_str()));
-}
-
-emscripten::val EmJS::getPromise(int promiseID)
-{
-  return emscripten::val::take_ownership(jsGetPromise(promiseID));
-}
-
-void EmJS::resolvePromise(int promiseID)
-{
-  MAIN_THREAD_EM_ASM(
-      {
-        const g = typeof global == "undefined" ? window : global;
-        const promise = g["ReactCADAsync"][$0];
-        console.log(g["ReactCADAsync"], $0);
-        delete g["ReactCADAsync"][$0];
-        promise.resolve();
-      },
-      promiseID);
-}
-
-void EmJS::resolvePromiseWithFileContents(int promiseID, const std::string &filename)
-{
-  MAIN_THREAD_EM_ASM(
-      {
-        const g = typeof global == "undefined" ? window : global;
-        const promise = g["ReactCADAsync"][$0];
-        delete g["ReactCADAsync"][$0];
-
-        const filename = UTF8ToString($1);
-        const content = Module.FS.readFile(filename);
-        Module.FS.unlink(filename);
-        promise.resolve(content);
-      },
-      promiseID, filename.c_str());
-}
-
-void EmJS::rejectPromise(int promiseID)
-{
-  MAIN_THREAD_EM_ASM(
-      {
-        const g = typeof global == "undefined" ? window : global;
-        const promise = g["ReactCADAsync"][$0];
-        delete g["ReactCADAsync"][$0];
-        promise.reject();
-      },
-      promiseID);
 }
 
 void EmJS::writeFile(const std::string &filename, emscripten::val contents)

@@ -32,6 +32,8 @@
 #include <AIS_Shape.hxx>
 #include <AIS_ViewController.hxx>
 #include <Graphic3d_Camera.hxx>
+#include <Message_ProgressRange.hxx>
+#include <Message_ProgressScope.hxx>
 #include <TopoDS_Shape.hxx>
 #include <V3d_View.hxx>
 
@@ -40,7 +42,7 @@
 #include <emscripten/html5.h>
 #include <emscripten/val.h>
 
-#include <pthread.h>
+#include "Trihedron.hpp"
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADView : public Standard_Transient, protected AIS_ViewController
@@ -49,7 +51,7 @@ public:
   ReactCADView(emscripten::val canvas);
   virtual ~ReactCADView();
 
-  void render(TopoDS_Shape shape, bool reset = false);
+  void render(TopoDS_Shape &shape, const Message_ProgressRange &theRange = Message_ProgressRange());
 
   enum Viewpoint
   {
@@ -61,7 +63,9 @@ public:
     Back
   };
 
-  void setQuality(double deviationCoefficent, double angle);
+  void setQuality(double deviationCoefficent, double angle,
+                  const Message_ProgressRange &theRange = Message_ProgressRange());
+  void setQualitySync(double deviationCoefficent, double angle);
 
   void setColor(std::string color);
 
@@ -105,7 +109,7 @@ private:
   //! Flush events and redraw view.
   void redrawView();
 
-  void drawShape(TopoDS_Shape shape);
+  void drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange);
 
   //! Request view redrawing.
   void updateView();
@@ -172,20 +176,17 @@ private:
   Handle(AIS_InteractiveContext) myContext; //!< interactive context
   Handle(V3d_View) myView;                  //!< 3D view
   Handle(Prs3d_TextAspect) myTextStyle;     //!< text style for OSD elements
-  Aspect_Touch myClickTouch;                //!< single touch position for handling clicks
-  OSD_Timer myDoubleTapTimer;               //!< timer for handling double tap
-  float myDevicePixelRatio;                 //!< device pixel ratio for handling high DPI displays
-  unsigned int myUpdateRequests;            //!< counter for unhandled update requests
+  Handle(Trihedron) myTrihedron;
+  Aspect_Touch myClickTouch;     //!< single touch position for handling clicks
+  OSD_Timer myDoubleTapTimer;    //!< timer for handling double tap
+  float myDevicePixelRatio;      //!< device pixel ratio for handling high DPI displays
+  unsigned int myUpdateRequests; //!< counter for unhandled update requests
   TopoDS_Shape myShape;
-  Handle_AIS_Shape myShapeFront;
-  Handle_AIS_Shape myShapeBack;
-  Handle_AIS_Shape myWireframeFront;
-  Handle_AIS_Shape myWireframeBack;
+  Handle_AIS_Shape myShaded;
+  Handle_AIS_Shape myWireframe;
   bool myShowShaded = true;
   bool myShowWireframe = true;
   bool myQualityChanged = false;
-  pthread_mutex_t shadedHandleMutex = PTHREAD_MUTEX_INITIALIZER;
-  pthread_mutex_t wireframeHandleMutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 #endif // _ReactCADView_HeaderFile

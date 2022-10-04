@@ -1,10 +1,11 @@
 import React from "react";
 import { ReactCADCore, ReactCADNode } from "react-cad";
 
-import { useExport, useReactCADView } from "./hooks";
+import { useExport, useProgressQueue, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
 import Toolbar from "./Toolbar";
+import ProgressBar from "./ProgressBar";
 
 interface Props {
   className?: string;
@@ -55,13 +56,31 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       lowDetail,
     });
 
-    const [view, canvasRef, onResize] = useReactCADView(core, options);
+    const [progressIndicator, addTask, queuedTasks] = useProgressQueue();
+
+    const [view, canvasRef, onResize] = useReactCADView(core, options, addTask);
+
+    const shouldReset = React.useRef(false);
 
     React.useEffect(() => {
-      if (view.current) {
-        core.renderNodeAsync(node, view.current).then(() => {
-          if (reset) {
-            view.current?.resetView();
+      if (rerender) {
+        addTask(() => {
+          if (view.current) {
+            const progress = core.renderNodeAsync(node, view.current);
+
+            progress.then(
+              () => {
+                if (reset || shouldReset.current) {
+                  view.current?.resetView();
+                  shouldReset.current = false;
+                }
+              },
+              () => {
+                shouldReset.current = Boolean(reset || shouldReset.current);
+              }
+            );
+
+            return progress;
           }
         });
       }
@@ -90,13 +109,18 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const handleFit = React.useCallback(() => view.current?.fit(), []);
 
-    const exportFns = useExport(node, core, name);
+    const exportFns = useExport(core, addTask, node, name);
 
     return (
       <div
         className={className}
         ref={wrapperRef}
-        style={{ height: "100%", width: "100%" }}
+        style={{
+          height: "100%",
+          width: "100%",
+          fontFamily:
+            '"Nunito Sans", -apple-system, ".SFNSText-Regular", "San Francisco", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+        }}
       >
         <Toolbar
           options={options}
@@ -109,7 +133,12 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           focus={focus}
           onResize={resizable ? onResize : undefined}
         >
-          <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
+          <ProgressBar
+            progressIndicator={progressIndicator}
+            queuedTasks={queuedTasks}
+          >
+            <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
+          </ProgressBar>
         </Toolbar>
       </div>
     );

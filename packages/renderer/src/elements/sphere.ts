@@ -55,6 +55,7 @@ export function commitUpdate(
   instance: Instance<Sphere>,
   updatePayload: UpdatePayload<Sphere>
 ): void {
+  validateProps(updatePayload);
   const {
     radius = 1,
     angle = 0,

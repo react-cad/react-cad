@@ -23,7 +23,7 @@ void MirrorNode::setPlane(gp_Pnt origin, gp_Vec normal)
   }
 }
 
-void MirrorNode::computeShape()
+void MirrorNode::computeShape(const Message_ProgressRange &theRange)
 {
   BRepBuilderAPI_Transform theTransform(m_trsf);
   theTransform.Perform(m_childShape, true);

@@ -32,5 +32,6 @@ export function commitUpdate(
   instance: Instance<Mirror>,
   updatePayload: UpdatePayload<Mirror>
 ): void {
+  validateProps(updatePayload);
   instance.node.setPlane(updatePayload.origin, updatePayload.normal);
 }

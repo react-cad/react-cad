@@ -71,6 +71,7 @@ export function commitUpdate(
   instance: Instance<Rotation>,
   updatePayload: UpdatePayload<Rotation>
 ): void {
+  validateProps(updatePayload);
   if ("quaternion" in updatePayload) {
     instance.node.setRotation(updatePayload.quaternion);
   } else if ("axis" in updatePayload) {

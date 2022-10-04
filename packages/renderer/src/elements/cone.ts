@@ -6,10 +6,8 @@ function validateProps(props: Props<Cone>): boolean {
   if (props.radius1 <= 0) {
     throw new Error(`cylinder: "radius1" prop must be greater than 0`);
   }
-  if (props.radius2 <= 0 || props.radius2 >= props.radius1) {
-    throw new Error(
-      `cylinder: "radius2" prop must be greater than 0 and less than "radius1"`
-    );
+  if (props.radius2 <= 0) {
+    throw new Error(`cylinder: "radius2" prop must be greater than 0"`);
   }
   if (props.height <= 0) {
     throw new Error(`cylinder: "height" prop must be greater than 0`);
@@ -45,6 +43,7 @@ export function commitUpdate(
   instance: Instance<Cone>,
   updatePayload: UpdatePayload<Cone>
 ): void {
+  validateProps(updatePayload);
   const {
     center = false,
     radius1 = 1,

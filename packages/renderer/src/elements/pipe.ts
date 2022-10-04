@@ -25,6 +25,7 @@ export function commitUpdate(
   instance: Instance<Pipe>,
   updatePayload: UpdatePayload<Pipe>
 ): void {
+  validateProps(updatePayload);
   const { spine, profile } = updatePayload;
 
   if (typeof profile === "string") {

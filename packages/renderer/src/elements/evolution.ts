@@ -25,6 +25,7 @@ export function commitUpdate(
   instance: Instance<Evolution>,
   updatePayload: UpdatePayload<Evolution>
 ): void {
+  validateProps(updatePayload);
   const { spine, profile } = updatePayload;
 
   if (typeof profile === "string") {

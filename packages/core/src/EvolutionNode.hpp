@@ -16,7 +16,7 @@ public:
   void setProfileSVG(const std::string &pathData);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   TopoDS_Wire m_profile;

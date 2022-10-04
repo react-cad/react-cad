@@ -59,10 +59,9 @@
 #include <emscripten/html5.h>
 
 #include "Async.hpp"
+#include "ProgressIndicator.hpp"
 #include "UUID.hpp"
 #include "export.hpp"
-
-#include <pthread.h>
 
 Handle(ReactCADNode) createCADNode(std::string type)
 {
@@ -171,15 +170,45 @@ Handle(ReactCADView) createView(emscripten::val canvas)
   return new ReactCADView(canvas);
 }
 
-emscripten::val computeNodeAsync(Handle(ReactCADNode) & node)
+Handle(ProgressIndicator) computeNodeAsync(Handle(ReactCADNode) & node)
 {
-  return Async::Perform([=]() { node->computeGeometry(); });
+  return Async::Perform([=](const Message_ProgressRange &progressRange) { node->computeGeometry(progressRange); });
 }
 
-emscripten::val renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
+Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
 {
-  return Async::Perform([=]() { view->render(node->shape); });
+  return Async::Perform([=](const Message_ProgressRange &progressRange) {
+    Message_ProgressScope scope(progressRange, "Computing shape", 101);
+    scope.Next();
+    node->computeGeometry(scope.Next(50));
+    if (scope.More())
+    {
+      view->render(node->shape, scope.Next(50));
+    }
+  });
 }
+
+Handle(ProgressIndicator)
+    setRenderQuality(Handle(ReactCADView) & view, double linearDeflection, double angularDeflection)
+{
+  return Async::Perform([=](const Message_ProgressRange &progressRange) {
+    view->setQuality(linearDeflection, angularDeflection, progressRange);
+  });
+}
+
+#ifdef REACTCAD_DEBUG
+Handle(ProgressIndicator) testProgress()
+{
+  return Async::Perform([](const Message_ProgressRange &progressRange) {
+    Message_ProgressScope scope(progressRange, "Task", 10);
+    for (int i = 0; i < 10 && scope.More(); ++i)
+    {
+      scope.Next();
+      usleep(10000);
+    }
+  });
+}
+#endif
 
 //! Dummy main loop callback for a single shot.
 extern "C" void onMainLoop()
@@ -195,8 +224,6 @@ int main()
       TCollection_AsciiString("NbLogicalProcessors: ") + OSD_Parallel::NbLogicalProcessors(), Message_Trace);
   Message::DefaultMessenger()->Send(OSD_MemInfo::PrintInfo(), Message_Trace);
 #endif
-
-  ReactCADNode::initializeMutex();
 
   emscripten_set_main_loop(onMainLoop, 1, 0);
 
@@ -262,8 +289,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<Handle(ReactCADView)>("ReactCADView")
       .function("render", &ReactCADView::render)
       // .function("setColor", &ReactCADView::setColor)
-      .function("setQuality", &ReactCADView::setQuality)
       .function("zoom", &ReactCADView::zoom)
+      .function("setQuality", &ReactCADView::setQualitySync)
       .function("resetView", &ReactCADView::resetView)
       .function("fit", &ReactCADView::fit)
       .function("setViewpoint", &ReactCADView::setViewpoint)
@@ -273,6 +300,16 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("showWireframe", &ReactCADView::showWireframe)
       .function("showShaded", &ReactCADView::showShaded)
       .function("onResize", &ReactCADView::onResize);
+
+  emscripten::class_<ProgressIndicator>("ProgressIndicator")
+      .smart_ptr<Handle(ProgressIndicator)>("ProgressIndicator")
+      .function("subscribe", &ProgressIndicator::subscribe)
+      .function("unsubscribe", &ProgressIndicator::unsubscribe)
+      .function("then", &ProgressIndicator::then)
+      .function("then", &ProgressIndicator::thenCatch)
+      .function("catch", &ProgressIndicator::catchError)
+      .function("isFulfilled", &ProgressIndicator::isFulfilled)
+      .function("cancel", &ProgressIndicator::cancel);
 
   emscripten::value_array<gp_Pnt>("Point")
       .element(&gp_Pnt::X, &gp_Pnt::SetX)
@@ -432,4 +469,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("renderSTEP", &renderSTEP);
   emscripten::function("computeNodeAsync", &computeNodeAsync);
   emscripten::function("renderNodeAsync", &renderNodeAsync);
+  emscripten::function("setRenderQuality", &setRenderQuality);
+#ifdef REACTCAD_DEBUG
+  emscripten::function("testProgress", &testProgress);
+#endif
 }

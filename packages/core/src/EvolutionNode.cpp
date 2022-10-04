@@ -112,7 +112,7 @@ void EvolutionNode::setSpineSVG(const std::string &svg)
 #endif
 }
 
-void EvolutionNode::computeShape()
+void EvolutionNode::computeShape(const Message_ProgressRange &theRange)
 {
   PerformanceTimer timer("Build evolution");
   GeomAbs_JoinType aJoinType = GeomAbs_Arc;
@@ -124,13 +124,22 @@ void EvolutionNode::computeShape()
   builder.MakeCompound(compound);
 
   TopExp_Explorer Ex;
+  int nbFaces = 0;
   for (Ex.Init(m_spine, TopAbs_FACE); Ex.More(); Ex.Next())
+  {
+    ++nbFaces;
+  }
+
+  Message_ProgressScope scope(theRange, "Computing evolution", nbFaces);
+
+  for (Ex.ReInit(); Ex.More() && scope.More(); Ex.Next())
   {
     // TODO: Parallel
     BRepOffsetAPI_MakeEvolved anAlgo(Ex.Current(), m_profile, aJoinType, aIsGlobalCS, aIsSolid);
     anAlgo.Build();
 
     builder.Add(compound, anAlgo.Shape());
+    scope.Next();
   }
 
   shape = compound;

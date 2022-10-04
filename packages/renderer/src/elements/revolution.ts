@@ -41,6 +41,7 @@ export function commitUpdate(
   instance: Instance<Revolution>,
   updatePayload: UpdatePayload<Revolution>
 ): void {
+  validateProps(updatePayload);
   const { profile, axis, angle } = updatePayload;
 
   if (typeof profile === "string") {

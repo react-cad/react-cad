@@ -14,15 +14,15 @@ const importCore = Function(`return import("./${esmUrl}")`) as () => Promise<
 let core: ReactCADCore | undefined;
 
 const corePromise = importCore()
-  .then(({ default: reactCadCore }) => {
-    return reactCadCore({
+  .then(({ default: reactCadCore }) =>
+    reactCadCore({
       mainScriptUrlOrBlob: jsUrl,
       locateFile: (path: string) =>
         path.includes("wasm")
           ? process.env.REACTCAD_WASM || localWasmUrl
           : workerUrl,
-    });
-  })
+    })
+  )
   .then((c) => {
     core = c;
     return c;

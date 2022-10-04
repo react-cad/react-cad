@@ -38,6 +38,7 @@ export function commitUpdate(
   instance: Instance<Torus>,
   updatePayload: UpdatePayload<Torus>
 ): void {
+  validateProps(updatePayload);
   const { radius1 = 1, radius2 = 2, angle = 0 } = updatePayload;
   instance.node.setSize(radius1, radius2);
   instance.node.setAngle(angle);

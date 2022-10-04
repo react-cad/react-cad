@@ -34,7 +34,7 @@ void SphereNode::setSegment(Standard_Real angle1, Standard_Real angle2)
   }
 }
 
-void SphereNode::computeShape()
+void SphereNode::computeShape(const Message_ProgressRange &theRange)
 {
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 

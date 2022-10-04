@@ -26,13 +26,16 @@
 #include "WasmVKeys.hpp"
 
 #include <AIS_Shape.hxx>
+#include <AIS_Trihedron.hxx>
 #include <Aspect_DisplayConnection.hxx>
 #include <Aspect_Grid.hxx>
 #include <Aspect_Handle.hxx>
 #include <Aspect_NeutralWindow.hxx>
+#include <BRepMesh_DiscretFactory.hxx>
 #include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_ProgressScope.hxx>
 #include <OpenGl_Context.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <Prs3d_DatumAspect.hxx>
@@ -44,15 +47,14 @@
 
 #include <iostream>
 
-#include <pthread.h>
-
 #include "EmJS.hpp"
 #include "PerformanceTimer.hpp"
 #include "UUID.hpp"
 #include "WebGLSentry.hpp"
 
 ReactCADView::ReactCADView(emscripten::val canvas)
-    : myDevicePixelRatio(EmJS::devicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get())
+    : myDevicePixelRatio(EmJS::devicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get()),
+      myShape()
 {
   EmJS::initCanvas(canvas, myId);
 
@@ -63,20 +65,12 @@ ReactCADView::ReactCADView(emscripten::val canvas)
     return;
   }
 
-  WebGLSentry sentry(myWebglContext, myId);
-
   myView->MustBeResized();
-  myShapeFront = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myShapeFront, AIS_Shaded, -1, false);
-  myShapeBack = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myShapeBack, AIS_Shaded, -1, false);
-  myContext->Erase(myShapeBack, false);
+  myShaded = new AIS_Shape(myShape);
+  myContext->Display(myShaded, AIS_Shaded, -1, false);
 
-  myWireframeFront = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myWireframeFront, AIS_WireFrame, -1, false);
-  myWireframeBack = new AIS_Shape(TopoDS_Shape());
-  myContext->Display(myWireframeBack, AIS_Shaded, -1, false);
-  myContext->Erase(myWireframeBack, false);
+  myWireframe = new AIS_Shape(myShape);
+  myContext->Display(myWireframe, AIS_WireFrame, -1, false);
 
   updateView();
 }
@@ -91,40 +85,54 @@ ReactCADView::~ReactCADView()
   emscripten_webgl_destroy_context(myWebglContext);
 }
 
-void ReactCADView::drawShape(TopoDS_Shape shape)
+void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
-  WebGLSentry sentry(myWebglContext, myId);
-  myShapeBack->SetShape(shape);
-  myContext->Redisplay(myShapeBack, false);
+  Message_ProgressScope scope(theRange, "Rendering", 100);
 
-  pthread_mutex_lock(&shadedHandleMutex);
-  Handle_AIS_Shape temp = myShapeBack;
-  myShapeBack = myShapeFront;
-  myShapeFront = temp;
-  if (myShowShaded)
+  PerformanceTimer meshTimer("Mesh timer");
+
+  Standard_Real deviationCoefficent = 0, previousCoeffient = 0, deviationAngle = 0, previousAngle = 0;
+  myShaded->OwnDeviationCoefficient(deviationCoefficent, previousCoeffient);
+  myShaded->OwnDeviationAngle(deviationAngle, previousAngle);
+
+  Handle(BRepMesh_DiscretRoot) aMeshAlgo =
+      BRepMesh_DiscretFactory::Get().Discret(shape, deviationCoefficent, deviationAngle);
+  if (!aMeshAlgo.IsNull())
   {
-    myContext->Display(myShapeFront, AIS_Shaded, -1, false);
+    Message_ProgressScope meshScope(scope.Next(99), "Generating mesh", 1);
+    aMeshAlgo->Perform(meshScope.Next());
   }
-  myContext->Erase(myShapeBack, false);
-  pthread_mutex_unlock(&shadedHandleMutex);
 
-  myWireframeBack->SetShape(shape);
-  myContext->Redisplay(myWireframeBack, false);
+  meshTimer.end();
 
-  pthread_mutex_lock(&wireframeHandleMutex);
-  temp = myWireframeBack;
-  myWireframeBack = myWireframeFront;
-  myWireframeFront = temp;
-  if (myShowWireframe)
+  if (scope.More())
   {
-    myContext->Display(myWireframeFront, AIS_WireFrame, -1, false);
+    PerformanceTimer displayTimer("Display timer");
+
+    myShaded->SetShape(shape);
+    myContext->Redisplay(myShaded, false);
+    myWireframe->SetShape(shape);
+    myContext->Redisplay(myWireframe, false);
+
+    if (myShowShaded)
+    {
+      myContext->Display(myShaded, AIS_Shaded, -1, false);
+    }
+
+    if (myShowWireframe)
+    {
+      myContext->Display(myWireframe, AIS_WireFrame, -1, false);
+    }
+
+    scope.Next();
+
+    displayTimer.end();
   }
-  myContext->Erase(myWireframeBack, false);
-  pthread_mutex_unlock(&wireframeHandleMutex);
 }
 
-void ReactCADView::render(TopoDS_Shape shape, bool reset)
+void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
+  Message_ProgressScope scope(theRange, "Rendering", 100);
   if (shape.IsNotEqual(myShape) || myQualityChanged)
   {
     myShape = shape;
@@ -134,40 +142,47 @@ void ReactCADView::render(TopoDS_Shape shape, bool reset)
     PerformanceTimer timer("Compute mesh");
 #endif
 
-    drawShape(shape);
+    drawShape(shape, scope.Next(99));
 
 #ifdef REACTCAD_DEBUG
     timer.end();
 #endif
   }
 
-  if (reset)
-  {
-    myView->ResetViewOrientation();
-    myView->FitAll(0.5, false);
-  }
-
   myView->Invalidate();
-  redrawView();
+  if (scope.More())
+  {
+    redrawView();
+  }
 }
 
-void ReactCADView::setQuality(double deviationCoefficent, double angle)
+void ReactCADView::setQualitySync(double deviationCoefficent, double angle)
+{
+  setQuality(deviationCoefficent, angle);
+}
+
+void ReactCADView::setQuality(double deviationCoefficent, double angle, const Message_ProgressRange &theRange)
 {
   Standard_Real oldCoefficient, previousCoeffient, oldAngle, previousAngle;
-  myShapeFront->OwnDeviationCoefficient(previousCoeffient, oldCoefficient);
-  myShapeFront->OwnDeviationAngle(previousAngle, oldAngle);
+  Standard_Boolean initialized = myShaded->OwnDeviationCoefficient(previousCoeffient, oldCoefficient);
+  myShaded->OwnDeviationAngle(previousAngle, oldAngle);
 
-  if (!IsEqual(deviationCoefficent, previousCoeffient) || !IsEqual(angle, previousAngle))
+  if (!initialized || !IsEqual(deviationCoefficent, previousCoeffient) || !IsEqual(angle, previousAngle))
   {
     myQualityChanged = true;
-    myShapeFront->SetOwnDeviationCoefficient(deviationCoefficent);
-    myShapeFront->SetOwnDeviationAngle(angle);
-    myShapeBack->SetOwnDeviationCoefficient(deviationCoefficent);
-    myShapeBack->SetOwnDeviationAngle(angle);
-    myWireframeFront->SetOwnDeviationCoefficient(deviationCoefficent);
-    myWireframeFront->SetOwnDeviationAngle(angle);
-    myWireframeBack->SetOwnDeviationCoefficient(deviationCoefficent);
-    myWireframeBack->SetOwnDeviationAngle(angle);
+
+    Handle(BRepMesh_DiscretRoot) aMeshAlgo =
+        BRepMesh_DiscretFactory::Get().Discret(myShape, deviationCoefficent, angle);
+    if (!aMeshAlgo.IsNull())
+    {
+      Message_ProgressScope meshScope(theRange, "Generating mesh", 1);
+      aMeshAlgo->Perform(meshScope.Next());
+    }
+
+    myShaded->SetOwnDeviationCoefficient(deviationCoefficent);
+    myShaded->SetOwnDeviationAngle(angle);
+    myWireframe->SetOwnDeviationCoefficient(deviationCoefficent);
+    myWireframe->SetOwnDeviationAngle(angle);
   }
 }
 
@@ -175,8 +190,7 @@ void ReactCADView::setColor(std::string colorString)
 {
   Quantity_Color color;
   Quantity_Color::ColorFromHex(colorString.c_str(), color);
-  myShapeFront->SetColor(color);
-  myShapeBack->SetColor(color);
+  myShaded->SetColor(color);
   myView->Invalidate();
   updateView();
 }
@@ -253,7 +267,6 @@ void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 
 void ReactCADView::showAxes(bool show)
 {
-  WebGLSentry sentr(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
 
@@ -263,7 +276,6 @@ void ReactCADView::showAxes(bool show)
 
 void ReactCADView::showGrid(bool show)
 {
-  WebGLSentry sentr(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   if (show)
   {
@@ -279,36 +291,30 @@ void ReactCADView::showGrid(bool show)
 
 void ReactCADView::showWireframe(bool show)
 {
-  WebGLSentry sentry(myWebglContext, myId);
-  pthread_mutex_lock(&wireframeHandleMutex);
   myShowWireframe = show;
   if (myShowWireframe)
   {
-    myContext->Display(myWireframeFront, AIS_WireFrame, -1, false);
+    myContext->Display(myWireframe, AIS_WireFrame, -1, false);
   }
   else
   {
-    myContext->Erase(myWireframeFront, false);
+    myContext->Erase(myWireframe, false);
   }
-  pthread_mutex_unlock(&wireframeHandleMutex);
   myView->Invalidate();
   updateView();
 }
 
 void ReactCADView::showShaded(bool show)
 {
-  WebGLSentry sentry(myWebglContext, myId);
-  pthread_mutex_lock(&shadedHandleMutex);
   myShowShaded = show;
   if (myShowShaded)
   {
-    myContext->Display(myShapeFront, AIS_Shaded, -1, false);
+    myContext->Display(myShaded, AIS_Shaded, -1, false);
   }
   else
   {
-    myContext->Erase(myShapeFront, false);
+    myContext->Erase(myShaded, false);
   }
-  pthread_mutex_unlock(&shadedHandleMutex);
   myView->Invalidate();
   updateView();
 }
@@ -466,19 +472,23 @@ bool ReactCADView::initViewer()
   myView = new V3d_View(aViewer);
   myView->SetImmediateUpdate(false);
   myView->ChangeRenderingParams().Resolution = (unsigned int)(96.0 * myDevicePixelRatio + 0.5);
-#ifdef REACTCAD_DEBUG
-  myView->ChangeRenderingParams().ToShowStats = true;
-#endif
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);
-  myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.1, V3d_WIREFRAME);
+
+  myTrihedron = new Trihedron();
+  myTrihedron->SetLabelsColor(Quantity_NOC_GOLD);
+  myTrihedron->SetScale(0.1);
+  myTrihedron->SetPosition(Aspect_TOTP_RIGHT_UPPER);
+  myTrihedron->SetWireframe(Standard_True);
+  myTrihedron->Display(*myView);
 
 #ifdef REACTCAD_DEBUG
   // dumpGlInfo(false);
 #endif
 
   myContext = new AIS_InteractiveContext(aViewer);
+
   initPixelScaleRatio();
   return true;
 }
@@ -536,7 +546,6 @@ void ReactCADView::onResize()
   }
 
   WebGLSentry sentry(myWebglContext, myId);
-  const char *aTargetId = myId.c_str();
 
   Handle(Aspect_NeutralWindow) aWindow = Handle(Aspect_NeutralWindow)::DownCast(myView->Window());
   Graphic3d_Vec2i aWinSizeOld, aWinSizeNew(EmJS::canvasGetSize(myId));
@@ -571,7 +580,6 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentr(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -657,7 +665,6 @@ EM_BOOL ReactCADView::onWheelEvent(int theEventType, const EmscriptenWheelEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentr(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -703,7 +710,6 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentr(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());

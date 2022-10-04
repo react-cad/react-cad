@@ -16,7 +16,7 @@ public:
   void setPlane(gp_Pnt origin, gp_Vec normal);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   gp_Trsf m_trsf;

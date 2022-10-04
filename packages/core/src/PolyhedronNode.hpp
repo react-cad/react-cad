@@ -15,7 +15,7 @@ public:
                          const NCollection_Array1<NCollection_Array1<int>> &faces);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   NCollection_Array1<gp_Pnt> m_points;

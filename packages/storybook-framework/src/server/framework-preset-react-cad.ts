@@ -46,18 +46,6 @@ export async function babelDefault(
 }
 
 export function webpack(config: Configuration): Configuration {
-  // Service worker to add COOP/COEP headers
-  config.plugins?.push(
-    new CopyPlugin({
-      patterns: [
-        {
-          from: require.resolve("coi-serviceworker"),
-          to: "coi-serviceworker.js",
-        },
-      ],
-    })
-  );
-
   config.module?.rules?.push({
     test: /react-cad-core\.wasm$/,
     use: "file-loader",
@@ -75,16 +63,30 @@ export function webpack(config: Configuration): Configuration {
     use: "file-loader",
   });
 
-  // Serve WASM from CDN in production
   if (config.mode === "production") {
     // eslint-disable-next-line
     const { version } = require("../../package.json");
 
+    if (!process.env.REACTCAD_LOCAL_WASM) {
+      // Serve WASM from CDN in production
+      config.plugins?.push(
+        new DefinePlugin({
+          "process.env.REACTCAD_WASM": JSON.stringify(
+            `https://unpkg.com/@react-cad/core@${version}/lib/react-cad-core.wasm`
+          ),
+        })
+      );
+    }
+
+    // Service worker to add COOP/COEP headers
     config.plugins?.push(
-      new DefinePlugin({
-        "process.env.REACTCAD_WASM": JSON.stringify(
-          `https://unpkg.com/@react-cad/core@${version}/lib/react-cad-core.wasm`
-        ),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: require.resolve("coi-serviceworker"),
+            to: "coi-serviceworker.js",
+          },
+        ],
       })
     );
   }

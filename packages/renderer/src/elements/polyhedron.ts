@@ -78,6 +78,7 @@ export function commitUpdate(
   instance: Instance<Polyhedron>,
   updatePayload: UpdatePayload<Polyhedron>
 ): void {
+  validateProps(updatePayload);
   const { points = defaultPoints, faces = defaultFaces } = updatePayload;
   instance.node.setPointsAndFaces(points, faces);
 }

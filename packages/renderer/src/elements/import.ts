@@ -32,6 +32,7 @@ export function commitUpdate(
   instance: Instance<Import>,
   updatePayload: UpdatePayload<Import>
 ): void {
+  validateProps(updatePayload);
   const { data } = updatePayload;
   instance.node.setFileContents(data);
 }

@@ -1,23 +1,26 @@
 #ifndef Async_HeaderFile
 #define Async_HeaderFile
 
-#include <condition_variable>
 #include <emscripten/eventloop.h>
 #include <emscripten/proxying.h>
 #include <emscripten/val.h>
-#include <iostream>
+#include <pthread.h>
 #include <string>
+
+#include "ProgressIndicator.hpp"
 
 class Async
 {
 public:
-  static emscripten::val Perform(std::function<void()> &&func);
-  static emscripten::val GenerateFile(const std::string &filename, std::function<void()> &&func);
+  static Handle(ProgressIndicator) Perform(std::function<void(const Message_ProgressRange &progressRange)> &&func);
+  static Handle(ProgressIndicator)
+      GenerateFile(const std::string &filename, std::function<void(const Message_ProgressRange &progressRange)> &&func);
 
 private:
-  std::thread m_thread;
-  emscripten::ProxyingQueue m_queue;
-  int m_promise_id;
+  static void thread_function();
+  static pthread_t main_thread;
+  static std::thread worker_thread;
+  static emscripten::ProxyingQueue worker_queue;
 };
 
 #endif

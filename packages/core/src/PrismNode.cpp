@@ -19,11 +19,13 @@ void PrismNode::setVector(gp_Vec vector)
   }
 }
 
-void PrismNode::computeShape()
+void PrismNode::computeShape(const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Compute prism");
 #endif
+
+  Message_ProgressScope scope(theRange, "Computing prism", 1);
 
   BRepPrimAPI_MakePrism prism(m_profile, m_vector);
 

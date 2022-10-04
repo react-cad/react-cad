@@ -37,6 +37,7 @@ export function commitUpdate(
   instance: Instance<Box>,
   updatePayload: UpdatePayload<Box>
 ): void {
+  validateProps(updatePayload);
   const { x, y, z, center } = updatePayload;
   instance.node.setSize([x, y, z]);
   instance.node.setCentered(Boolean(center));

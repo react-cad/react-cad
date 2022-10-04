@@ -1,5 +1,6 @@
 export class EmClass {
   delete(): void;
+  isDeleted(): boolean;
 }
 
 export class ReactCADNode extends EmClass {
@@ -13,16 +14,25 @@ export class ReactCADView extends EmClass {
   public render(node: ReactCADNode, reset: boolean): void;
   // public setColor(color: string): void;
   public zoom(delta: number): void;
+  public setQuality(deviationCoefficent: number, angle: number): void;
   public setViewpoint(viewpoint: Viewpoint): void;
   public resetView(): void;
   public fit(): void;
-  public setQuality(deviationCoefficent: number, angle: number): void;
   public setProjection(projection: Projection): void;
   public showAxes(show: boolean): void;
   public showGrid(show: boolean): void;
   public showWireframe(show: boolean): void;
   public showShaded(show: boolean): void;
   public onResize(): void;
+}
+
+export class ProgressIndicator<T = void> extends Promise<T> {
+  subscribe(fn: (progress: number, name?: string) => void): void;
+  unsubscribe(fn: (progress: number, name?: string) => void): void;
+  isFulfilled(): boolean;
+  cancel(): void;
+  delete(): void;
+  isDeleted(): boolean;
 }
 
 export type Vector = [number, number, number];
@@ -198,19 +208,28 @@ export interface ReactCADCore extends EmscriptenModule {
     type: T
   ): ReactCADNodeTypes[T];
   createView(canvas: HTMLCanvasElement): ReactCADView;
-  computeNodeAsync(node: ReactCADNode): Promise<void>;
-  renderNodeAsync(node: ReactCADNode, view: ReactCADView): Promise<void>;
+  computeNodeAsync(node: ReactCADNode): ProgressIndicator;
+  renderNodeAsync(node: ReactCADNode, view: ReactCADView): ProgressIndicator;
+  setRenderQuality(
+    view: ReactCADView,
+    deviationCoefficent: number,
+    angle: number
+  ): ProgressIndicator;
   renderSTL(
     node: ReactCADNode,
     linearDeflection: number,
-    isRelative: boolean,
     angularDeflection: number
-  ): Promise<string | ArrayBuffer | undefined>;
-  renderBREP(node: ReactCADNode): Promise<string | ArrayBuffer | undefined>;
-  renderSTEP(node: ReactCADNode): Promise<string | ArrayBuffer | undefined>;
+  ): ProgressIndicator<string | ArrayBuffer | undefined>;
+  renderBREP(
+    node: ReactCADNode
+  ): ProgressIndicator<string | ArrayBuffer | undefined>;
+  renderSTEP(
+    node: ReactCADNode
+  ): ProgressIndicator<string | ArrayBuffer | undefined>;
   canvas: HTMLCanvasElement;
   canvases: Record<string, HTMLCanvasElement>;
   mainScriptUrlOrBlob?: string;
+  testProgress?: () => ProgressIndicator;
 }
 
 declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;

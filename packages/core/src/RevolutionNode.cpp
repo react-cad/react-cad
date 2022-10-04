@@ -21,7 +21,7 @@ void RevolutionNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
   }
 }
 
-void RevolutionNode::computeShape()
+void RevolutionNode::computeShape(const Message_ProgressRange &theRange)
 {
   gp_Ax1 axis(gp::Origin(), m_axis);
 

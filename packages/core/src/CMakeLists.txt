@@ -10,7 +10,7 @@ set(APP_TARGET_ES6 react-cad-core.esm.js)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "-pthread -fexceptions")
-set(CMAKE_CXX_FLAGS_RELEASE "-Oz")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
@@ -57,11 +57,12 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s USE_PTHREADS=1 \
   -s EXPORT_NAME=reactCad \
   -s OFFSCREEN_FRAMEBUFFER=1 \
+  -s TEXTDECODER=0 \
   -s EXCEPTION_CATCHING_ALLOWED=['RevolutionNode::computeShape'] \
 ")
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_RELEASE "\
-  -Oz \
+  -O2 \
 ")
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_DEBUG "\
   -s EXCEPTION_DEBUG=1 \

@@ -14,7 +14,7 @@ public:
   void setHeight(Standard_Real height);
 
 protected:
-  void computeShape() override;
+  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   void buildSpineAndGuide();
