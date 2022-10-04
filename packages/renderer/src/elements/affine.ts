@@ -31,5 +31,6 @@ export function commitUpdate(
   instance: Instance<Affine>,
   updatePayload: UpdatePayload<Affine>
 ): void {
+  validateProps(updatePayload);
   instance.node.setMatrix(updatePayload.matrix);
 }

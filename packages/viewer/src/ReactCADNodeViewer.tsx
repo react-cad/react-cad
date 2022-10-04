@@ -1,7 +1,7 @@
 import React from "react";
-import { ProgressIndicator, ReactCADCore, ReactCADNode } from "react-cad";
+import { ReactCADCore, ReactCADNode } from "react-cad";
 
-import { useExport, useReactCADView } from "./hooks";
+import { useExport, useProgressQueue, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
 import Toolbar from "./Toolbar";
@@ -56,43 +56,35 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       lowDetail,
     });
 
-    const [view, canvasRef, onResize] = useReactCADView(core, options);
+    const [progressIndicator, addTask, queuedTasks] = useProgressQueue();
 
-    const [
-      progressIndicator,
-      setProgressIndicator,
-    ] = React.useState<ProgressIndicator>();
+    const [view, canvasRef, onResize] = useReactCADView(core, options, addTask);
 
     const shouldReset = React.useRef(false);
 
     React.useEffect(() => {
-      if (rerender && view.current) {
-        const progress = core.renderNodeAsync(node, view.current);
+      if (rerender) {
+        addTask(() => {
+          if (view.current) {
+            const progress = core.renderNodeAsync(node, view.current);
 
-        setProgressIndicator(progress);
+            progress.then(
+              () => {
+                if (reset || shouldReset.current) {
+                  view.current?.resetView();
+                  shouldReset.current = false;
+                }
+              },
+              () => {
+                shouldReset.current = Boolean(reset || shouldReset.current);
+              }
+            );
 
-        progress.then(
-          () => {
-            if (reset || shouldReset.current) {
-              view.current?.resetView();
-              shouldReset.current = false;
-            }
-          },
-          () => {
-            shouldReset.current = Boolean(reset || shouldReset.current);
+            return progress;
           }
-        );
+        });
       }
     }, [node, rerender]);
-
-    React.useEffect(() => {
-      if (progressIndicator) {
-        return () => {
-          progressIndicator.cancel();
-          progressIndicator.delete();
-        };
-      }
-    }, [progressIndicator]);
 
     React.useEffect(
       () => setOptions((options) => ({ ...options, highDetail, lowDetail })),
@@ -117,7 +109,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const handleFit = React.useCallback(() => view.current?.fit(), []);
 
-    const exportFns = useExport(node, core, name);
+    const exportFns = useExport(core, addTask, node, name);
 
     return (
       <div
@@ -141,7 +133,10 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           focus={focus}
           onResize={resizable ? onResize : undefined}
         >
-          <ProgressBar progressIndicator={progressIndicator}>
+          <ProgressBar
+            progressIndicator={progressIndicator}
+            queuedTasks={queuedTasks}
+          >
             <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
           </ProgressBar>
         </Toolbar>

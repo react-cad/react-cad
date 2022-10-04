@@ -76,8 +76,9 @@ export const Section: React.FC = ({ children }) => (
 export const Dropdown: React.FC<{ open: boolean }> = ({ open, children }) => (
   <div
     style={{
+      zIndex: Number.MAX_SAFE_INTEGER,
       position: "absolute",
-      top: "-12px",
+      top: "-28px",
       left: "110%",
       display: open ? "inline-block" : "none",
       background: "rgba(255, 255, 255, 0.95)",

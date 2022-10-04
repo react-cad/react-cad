@@ -51,6 +51,7 @@ export function commitUpdate(
   instance: Instance<Prism>,
   updatePayload: UpdatePayload<Prism>
 ): void {
+  validateProps(updatePayload);
   const { profile } = updatePayload;
   const vector = getVector(updatePayload);
 

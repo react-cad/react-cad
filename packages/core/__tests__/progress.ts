@@ -1,6 +1,16 @@
 import reactCadCore from "..";
 
 describe("progress", () => {
+  it("should return a promise", async () => {
+    const core = await reactCadCore();
+    const node = core.createCADNode("cylinder");
+    const promise = core.computeNodeAsync(node);
+    return promise.then(() => {
+      node.delete();
+      promise.delete();
+    });
+  });
+
   it("should indicate progress", async () => {
     const progressWatcher = jest.fn();
     const core = await reactCadCore();

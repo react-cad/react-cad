@@ -54,6 +54,7 @@ export function commitUpdate(
   instance: Instance<Scale>,
   updatePayload: UpdatePayload<Scale>
 ): void {
+  validateProps(updatePayload);
   instance.node.setCenter(updatePayload.center || [0, 0, 0]);
   if ("factor" in updatePayload) {
     instance.node.setScaleFactor(updatePayload.factor || 1);

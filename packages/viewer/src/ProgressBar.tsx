@@ -4,36 +4,40 @@ import { ProgressIndicator } from "react-cad";
 
 interface Props {
   progressIndicator?: ProgressIndicator;
+  queuedTasks: number;
 }
 
-const ProgressBar: React.FC<Props> = ({ progressIndicator, children }) => {
+const ProgressBar: React.FC<Props> = ({
+  progressIndicator,
+  queuedTasks,
+  children,
+}) => {
   const [progress, setProgress] = React.useState<number>(0);
   const [message, setMessage] = React.useState<string>();
   const [show, setShow] = React.useState(false);
 
   React.useEffect(() => {
-    if (progressIndicator) {
+    if (progressIndicator && !progressIndicator.isDeleted()) {
       const observer = (p: number, m?: string) => {
         setProgress(p);
         if (m) {
-          if (m === "Cancelling") {
-            setMessage("Shape changed, cancelling render");
-          } else {
-            setMessage(m);
-          }
-        }
-        if (p > 0.9999999999) {
-          setShow(false);
+          setMessage(m);
         }
       };
 
-      try {
-        progressIndicator.subscribe(observer);
-      } catch (e) {
-        // In some cases parent useEffect cleanup occurs first, and the indicator is already deleted
-      }
-
       setShow(true);
+      setProgress(0);
+      progressIndicator.subscribe(observer);
+      progressIndicator.then(
+        () => setShow(false),
+        () => setMessage("Options changed, waiting for renderer...")
+      );
+
+      return () => {
+        if (!progressIndicator.isDeleted()) {
+          progressIndicator.unsubscribe(observer);
+        }
+      };
     }
   }, [progressIndicator]);
 
@@ -64,6 +68,11 @@ const ProgressBar: React.FC<Props> = ({ progressIndicator, children }) => {
             }}
           >
             {message}
+            {queuedTasks
+              ? ` (+ ${queuedTasks} task${
+                  queuedTasks === 1 ? "" : "s"
+                } in queue)`
+              : null}
           </div>
           <progress
             css={{

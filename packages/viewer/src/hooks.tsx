@@ -4,6 +4,7 @@ import {
   ReactCADCore,
   ReactCADView,
   ReactCADNode,
+  ProgressIndicator,
 } from "react-cad";
 import { ExportFns, ViewOptions } from "./types";
 
@@ -64,7 +65,8 @@ export function useReactCADRenderer(
 
 export function useReactCADView(
   core: ReactCADCore,
-  options: ViewOptions
+  options: ViewOptions,
+  addTask: AddTask
 ): [
   React.MutableRefObject<ReactCADView | undefined>,
   (canvas: HTMLCanvasElement | null) => void,
@@ -115,9 +117,6 @@ export function useReactCADView(
       view.current.showWireframe(options.showWireframe);
       view.current.showShaded(options.showShaded);
       view.current.setProjection(core.Projection[options.projection]);
-      const quality =
-        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
-      view.current.setQuality(...quality);
     }
   }, [
     onResize,
@@ -126,10 +125,22 @@ export function useReactCADView(
     options.showShaded,
     options.showWireframe,
     options.projection,
-    options.detail,
-    ...options.highDetail,
-    ...options.lowDetail,
   ]);
+
+  const [loaded, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    const quality =
+      options.detail === "HIGH" ? options.highDetail : options.lowDetail;
+    if (loaded) {
+      addTask(
+        () => view.current && core.setRenderQuality(view.current, ...quality)
+      );
+    } else {
+      view.current?.setQuality(...quality);
+    }
+    setLoaded(true);
+  }, [options.detail, ...options.highDetail, ...options.lowDetail]);
 
   return [view, canvasRef, onResize];
 }
@@ -150,42 +161,65 @@ function download(
 }
 
 export function useExport(
-  node: ReactCADNode,
   core: ReactCADCore,
+  addTask: AddTask,
+  node: ReactCADNode,
   name: string | undefined
 ): ExportFns {
   const linearDeflection = 0.05;
-  const isRelative = false;
   const angularDeflection = 0.5;
 
-  const exportBREP = React.useCallback(async () => {
-    const content = await core.renderBREP(node);
+  const exportBREP = React.useCallback(
+    () =>
+      addTask(() => {
+        const progress = core.renderBREP(node);
 
-    if (content) {
-      download(content, `${name || "react-cad"}.brep`, "model/brep");
-    }
-  }, [node, core, name]);
+        progress.then(
+          (content) =>
+            content &&
+            download(content, `${name || "react-cad"}.brep`, "model/brep")
+        );
 
-  const exportSTEP = React.useCallback(async () => {
-    const content = await core.renderSTEP(node);
+        return progress;
+      }, false),
+    [core, addTask, node, name]
+  );
 
-    if (content) {
-      download(content, `${name || "react-cad"}.step`, "model/step");
-    }
-  }, [node, core, name]);
+  const exportSTEP = React.useCallback(
+    () =>
+      addTask(() => {
+        const progress = core.renderSTEP(node);
 
-  const exportSTL = React.useCallback(async () => {
-    const content = await core.renderSTL(
-      node,
-      linearDeflection,
-      isRelative,
-      angularDeflection
-    );
+        progress.then(
+          (content) =>
+            content &&
+            download(content, `${name || "react-cad"}.step`, "model/step")
+        );
 
-    if (content) {
-      download(content, `${name || "react-cad"}.stl`, "model/stl");
-    }
-  }, [node, core, name]);
+        return progress;
+      }, false),
+    [core, addTask, node, name]
+  );
+
+  const exportSTL = React.useCallback(
+    () =>
+      addTask(() => {
+        const progress = core.renderSTL(
+          node,
+          linearDeflection,
+          angularDeflection
+        );
+
+        progress.then(
+          (content) =>
+            content &&
+            download(content, `${name || "react-cad"}.stl`, "model/stl")
+        );
+
+        return progress;
+      }, false),
+    [core, node, addTask, name]
+  );
 
   return { exportSTL, exportBREP, exportSTEP };
 }
@@ -211,4 +245,81 @@ export function useClickOutside(
   }, [wrapperRef]);
 
   return wrapperRef;
+}
+
+type Task = () => ProgressIndicator<any> | undefined;
+
+type AddTask = (task: Task, cancelPrevious?: boolean) => Promise<void>;
+
+type QueueItem = [Task, () => void];
+
+export function useProgressQueue(): [
+  ProgressIndicator<any> | undefined,
+  AddTask,
+  number
+] {
+  const [progressIndicator, setProgressIndicator] = React.useState<
+    ProgressIndicator<any>
+  >();
+
+  const queue = React.useRef<QueueItem[]>([]);
+
+  const [queueLength, setQueueLength] = React.useState(0);
+
+  const then = React.useCallback(() => {
+    let progress: ProgressIndicator | undefined;
+    let resolve: undefined | (() => void);
+
+    do {
+      const [task, r] = queue.current.shift() ?? [];
+      progress = task?.();
+      if (!progress) {
+        r?.();
+      } else {
+        resolve = r;
+      }
+    } while (queue.current.length && !progress);
+
+    setQueueLength(queue.current.length);
+
+    progress?.then(then, () => {}).then(resolve);
+
+    if (progress) {
+      setProgressIndicator((p) => {
+        p?.delete();
+        return progress;
+      });
+    }
+
+    return progress;
+  }, [queue]);
+
+  const addTask = React.useCallback<AddTask>(
+    (task, cancelPrevious = true) => {
+      const queueItem: QueueItem = [task, () => {}];
+      const promise = new Promise<void>((resolve) => (queueItem[1] = resolve));
+      if (
+        !progressIndicator ||
+        progressIndicator.isDeleted() ||
+        progressIndicator.isFulfilled()
+      ) {
+        queue.current.push(queueItem);
+        then();
+      } else {
+        if (cancelPrevious) {
+          queue.current.forEach(([, resolve]) => resolve());
+          queue.current = [queueItem];
+          progressIndicator.catch(then).catch(() => {});
+          progressIndicator.cancel();
+        } else {
+          queue.current.push(queueItem);
+          setQueueLength(queue.current.length);
+        }
+      }
+      return promise;
+    },
+    [progressIndicator, then]
+  );
+
+  return [progressIndicator, addTask, queueLength];
 }

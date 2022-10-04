@@ -63,6 +63,7 @@ export function commitUpdate(
   instance: Instance<Wedge>,
   updatePayload: UpdatePayload<Wedge>
 ): void {
+  validateProps(updatePayload);
   const { x = 1, y = 1, z = 1 } = updatePayload;
   instance.node.setSize([x, y, z]);
   if ("ltx" in updatePayload) {

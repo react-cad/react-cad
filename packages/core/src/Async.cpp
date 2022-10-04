@@ -3,34 +3,30 @@
 
 #include <Message.hxx>
 
-void thread_func()
+void Async::thread_function()
 {
   emscripten_exit_with_live_runtime();
 }
 
-std::thread thread(thread_func);
-emscripten::ProxyingQueue queue;
-int promise_id = 0;
+pthread_t Async::main_thread(pthread_self());
+std::thread Async::worker_thread(thread_function);
+emscripten::ProxyingQueue Async::worker_queue;
 
 Handle(ProgressIndicator) Async::Perform(std::function<void(const Message_ProgressRange &)> &&func)
 {
   Handle(ProgressIndicator) progress = new ProgressIndicator();
-  queue.proxyAsync(thread.native_handle(), [=]() { func(ProgressIndicator::Start(progress)); });
+  worker_queue.proxyAsync(worker_thread.native_handle(), [=]() { func(ProgressIndicator::Start(progress)); });
   return progress;
 }
 
-emscripten::val Async::GenerateFile(const std::string &filename, std::function<void()> &&func)
+Handle(ProgressIndicator) Async::GenerateFile(const std::string &filename,
+                                              std::function<void(const Message_ProgressRange &progressRange)> &&func)
 {
-  ++promise_id;
-
-  int id = promise_id;
-
-  emscripten::val promise = EmJS::getPromise(id);
-
-  int result = queue.proxyAsync(thread.native_handle(), [=]() {
-    func();
-    EmJS::resolvePromiseWithFileContents(id, filename);
+  std::string myFilename(filename);
+  Handle(ProgressIndicator) progress = new ProgressIndicator(Standard_False);
+  int result = worker_queue.proxyAsync(worker_thread.native_handle(), [=]() {
+    func(ProgressIndicator::Start(progress));
+    worker_queue.proxyAsync(main_thread, [=]() { progress->resolve(EmJS::getFileContentsAndDelete(myFilename)); });
   });
-
-  return promise;
+  return progress;
 }

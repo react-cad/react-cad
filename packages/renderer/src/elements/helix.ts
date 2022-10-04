@@ -44,6 +44,7 @@ export function commitUpdate(
   instance: Instance<Helix>,
   updatePayload: UpdatePayload<Helix>
 ): void {
+  validateProps(updatePayload);
   const { profile = defaultProfile, height = 10, pitch = 10 } = updatePayload;
 
   if (typeof profile === "string") {

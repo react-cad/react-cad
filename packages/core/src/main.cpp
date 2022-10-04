@@ -188,6 +188,14 @@ Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(Re
   });
 }
 
+Handle(ProgressIndicator)
+    setRenderQuality(Handle(ReactCADView) & view, double linearDeflection, double angularDeflection)
+{
+  return Async::Perform([=](const Message_ProgressRange &progressRange) {
+    view->setQuality(linearDeflection, angularDeflection, progressRange);
+  });
+}
+
 #ifdef REACTCAD_DEBUG
 Handle(ProgressIndicator) testProgress()
 {
@@ -281,8 +289,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<Handle(ReactCADView)>("ReactCADView")
       .function("render", &ReactCADView::render)
       // .function("setColor", &ReactCADView::setColor)
-      .function("setQuality", &ReactCADView::setQuality)
       .function("zoom", &ReactCADView::zoom)
+      .function("setQuality", &ReactCADView::setQualitySync)
       .function("resetView", &ReactCADView::resetView)
       .function("fit", &ReactCADView::fit)
       .function("setViewpoint", &ReactCADView::setViewpoint)
@@ -300,6 +308,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("then", &ProgressIndicator::then)
       .function("then", &ProgressIndicator::thenCatch)
       .function("catch", &ProgressIndicator::catchError)
+      .function("isFulfilled", &ProgressIndicator::isFulfilled)
       .function("cancel", &ProgressIndicator::cancel);
 
   emscripten::value_array<gp_Pnt>("Point")
@@ -460,6 +469,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("renderSTEP", &renderSTEP);
   emscripten::function("computeNodeAsync", &computeNodeAsync);
   emscripten::function("renderNodeAsync", &renderNodeAsync);
+  emscripten::function("setRenderQuality", &setRenderQuality);
 #ifdef REACTCAD_DEBUG
   emscripten::function("testProgress", &testProgress);
 #endif

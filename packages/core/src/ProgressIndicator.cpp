@@ -1,24 +1,34 @@
 #include "ProgressIndicator.hpp"
 
+#include <Message.hxx>
 #include <emscripten.h>
+
+#define IsComplete(x) ((x) > 0.9999999999)
+#define ONE_PERCENT 0.01
 
 // clang-format off
 EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
-  let fulfilled = false;
-  let cancelled = false;
   let promiseResolve;
   let promiseReject;
   const progressObject = new Promise(function(resolve, reject) {
     promiseResolve = resolve;
     promiseReject = reject;
   });
-  progressObject.resolve = promiseResolve;
-  progressObject.reject = promiseReject;
+
+  progressObject.fulfilled = false;
   progressObject.subscribers = [];
+  const fulfill = (fn) => (...args) => {
+    progressObject.fulfilled = true;
+    progressObject.subscribers.length = 0;
+    fn(...args);
+  };
+  progressObject.resolve = fulfill(promiseResolve);
+  progressObject.reject = fulfill(promiseReject);
+
   let lastProgress;
   let lastMessage;
   progressObject.subscribe = (fn) => {
-    if (fulfilled || cancelled) {
+    if (progressObject.fulfilled) {
       return;
     }
     if (lastProgress !== undefined) {
@@ -33,7 +43,7 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
     }
   };
   progressObject.notify = (progress, message) => {
-    if (fulfilled || cancelled) {
+    if (progressObject.fulfilled) {
       return;
     }
 
@@ -41,20 +51,11 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
     lastMessage = message;
 
     progressObject.subscribers.forEach(fn => fn(progress, message));
-
-    if (progress > 0.9999999999) {
-      progressObject.resolve();
-      progressObject.subscribers.length = 0;
-      fulfilled = true;
-    }
   };
-  progressObject.cancel = () => {
-    if (!fulfilled && !cancelled) {
+  progressObject.cancel = (...args) => {
+    if (!progressObject.fulfilled) {
       progressObject.notify(lastProgress, "Cancelling");
-      progressObject.reject();
-      progressObject.subscribers.length = 0;
-      cancelled = true;
-      fulfilled = true;
+      progressObject.reject(...args);
     }
   };
 
@@ -62,7 +63,9 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
 });
 // clang-format on
 
-ProgressIndicator::ProgressIndicator() : m_last_progress(0), m_cancelled(Standard_False), m_last_name(nullptr)
+ProgressIndicator::ProgressIndicator(Standard_Boolean resolveWhenComplete)
+    : m_last_progress(0), m_cancelled(Standard_False), m_last_name(nullptr),
+      m_resolve_when_complete(resolveWhenComplete)
 {
   m_js_progress = emscripten::val::take_ownership(jsGetProgress());
 }
@@ -102,8 +105,8 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
   Standard_CString name = theScope.Name();
 
   if (/* forced */ isForce || /* first update */ IsEqual(m_last_progress, (Standard_Real)0) ||
-      /* last update */ progress > 0.9999999999 ||
-      /* progressed 1% */ progress - m_last_progress > 0.01 || /* message changed */ name != m_last_name)
+      /* last update */ IsComplete(progress) ||
+      /* progressed 1% */ progress - m_last_progress > ONE_PERCENT || /* message changed */ name != m_last_name)
   {
     // clang-format off
     MAIN_THREAD_ASYNC_EM_ASM(
@@ -115,10 +118,15 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
           } catch (e) {
           }
           const progress = $2;
+          const resolveWhenComplete = $3;
 
           progressObject.notify(progress, name);
+
+          if (resolveWhenComplete && progress > 0.9999999999) {
+            progressObject.resolve();
+          }
         },
-        m_js_progress.as_handle(), name, progress);
+        m_js_progress.as_handle(), name, progress, m_resolve_when_complete);
     // clang-format on
   }
 
@@ -151,8 +159,18 @@ emscripten::val ProgressIndicator::catchError(emscripten::val catchFn)
   return m_js_progress.call<emscripten::val>("catch", catchFn);
 }
 
+emscripten::val ProgressIndicator::isFulfilled()
+{
+  return m_js_progress["fulfilled"];
+}
+
 void ProgressIndicator::cancel()
 {
   m_cancelled = true;
-  m_js_progress.call<void>("cancel");
+  m_js_progress.call<void>("cancel", 99);
+}
+
+void ProgressIndicator::resolve(emscripten::val result)
+{
+  m_js_progress.call<void>("resolve", result);
 }

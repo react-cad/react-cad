@@ -12,7 +12,7 @@
 class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
-  ProgressIndicator();
+  ProgressIndicator(Standard_Boolean resolveWhenComplete = Standard_True);
   Standard_EXPORT void Delete() const override;
   Standard_Boolean UserBreak() override;
   void Show(const Message_ProgressScope &theScope, const Standard_Boolean isForce) override;
@@ -23,14 +23,17 @@ public:
   emscripten::val then(emscripten::val thenFn);
   emscripten::val thenCatch(emscripten::val thenFn, emscripten::val catchFn);
   emscripten::val catchError(emscripten::val catchFn);
+  emscripten::val isFulfilled();
   void cancel();
+  void resolve(emscripten::val result);
 
 private:
   static const pthread_t main_thread;
   static emscripten::ProxyingQueue deletion_queue;
 
-  emscripten::val m_js_progress;
+  Standard_Boolean m_resolve_when_complete;
 
+  emscripten::val m_js_progress;
   Standard_Real m_last_progress;
   const char *m_last_name;
   Standard_Boolean m_cancelled;

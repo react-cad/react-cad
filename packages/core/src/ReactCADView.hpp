@@ -63,7 +63,9 @@ public:
     Back
   };
 
-  void setQuality(double deviationCoefficent, double angle);
+  void setQuality(double deviationCoefficent, double angle,
+                  const Message_ProgressRange &theRange = Message_ProgressRange());
+  void setQualitySync(double deviationCoefficent, double angle);
 
   void setColor(std::string color);
 
