@@ -21,7 +21,7 @@
     "webpack-dev-server": "^3.11.1"
   },
   "scripts": {
-    "start": "start-storybook -p 6006",
-    "build": "build-storybook"
+    "start": "start-storybook -p 6006 --docs --no-manager-cache",
+    "build": "build-storybook --docs --no-manager-cache"
   }
 }

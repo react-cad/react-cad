@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
+    "@storybook/theming": "^6.5.12",
     "react-cad": "^0.18.0",
     "react-icons": "^4.4.0"
   },

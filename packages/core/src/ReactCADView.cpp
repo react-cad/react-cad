@@ -56,20 +56,28 @@ ReactCADView::ReactCADView(emscripten::val canvas)
     : myDevicePixelRatio(EmJS::devicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get()),
       myShape()
 {
+  SetLockOrbitZUp(true);
+  SetShowRotateCenter(false);
+
   EmJS::initCanvas(canvas, myId);
 
   initWindow();
   initViewer();
+
   if (myView.IsNull())
   {
     return;
   }
+
+  WebGLSentry sentry(myWebglContext, myId);
 
   myView->MustBeResized();
   myShaded = new AIS_Shape(myShape);
   myContext->Display(myShaded, AIS_Shaded, -1, false);
 
   myWireframe = new AIS_Shape(myShape);
+  myWireframe->SetColor(Quantity_NOC_WHITE);
+  myWireframe->SetWidth(2);
   myContext->Display(myWireframe, AIS_WireFrame, -1, false);
 
   updateView();
@@ -87,6 +95,7 @@ ReactCADView::~ReactCADView()
 
 void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   Message_ProgressScope scope(theRange, "Rendering", 100);
 
   PerformanceTimer meshTimer("Mesh timer");
@@ -163,6 +172,8 @@ void ReactCADView::setQualitySync(double deviationCoefficent, double angle)
 
 void ReactCADView::setQuality(double deviationCoefficent, double angle, const Message_ProgressRange &theRange)
 {
+  WebGLSentry sentry(myWebglContext, myId);
+
   Standard_Real oldCoefficient, previousCoeffient, oldAngle, previousAngle;
   Standard_Boolean initialized = myShaded->OwnDeviationCoefficient(previousCoeffient, oldCoefficient);
   myShaded->OwnDeviationAngle(previousAngle, oldAngle);
@@ -309,10 +320,12 @@ void ReactCADView::showShaded(bool show)
   myShowShaded = show;
   if (myShowShaded)
   {
+    myWireframe->SetColor(Quantity_NOC_WHITE);
     myContext->Display(myShaded, AIS_Shaded, -1, false);
   }
   else
   {
+    myWireframe->SetColor(Quantity_NOC_HOTPINK);
     myContext->Erase(myShaded, false);
   }
   myView->Invalidate();
@@ -472,6 +485,7 @@ bool ReactCADView::initViewer()
   myView = new V3d_View(aViewer);
   myView->SetImmediateUpdate(false);
   myView->ChangeRenderingParams().Resolution = (unsigned int)(96.0 * myDevicePixelRatio + 0.5);
+  myView->ChangeRenderingParams().IsAntialiasingEnabled = Standard_True;
   myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
   myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);
