@@ -6,6 +6,7 @@
 #include <BRep_Builder.hxx>
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom_CylindricalSurface.hxx>
+#include <Message.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -103,7 +104,7 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
       ++nbWires;
     }
 
-    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires);
+    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires * 2);
 
     TopoDS_Wire outerWire = BRepTools::OuterWire(face);
     TopoDS_Shape solid = makeHelix(outerWire);
@@ -123,7 +124,7 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
       faceScope.Next();
     }
 
-    TopoDS_Shape helix = differenceOp(solid, holes);
+    TopoDS_Shape helix = differenceOp(solid, holes, faceScope.Next(nbWires));
     builder.Add(compound, helix);
   }
 

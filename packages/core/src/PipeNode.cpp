@@ -120,7 +120,7 @@ void PipeNode::computeShape(const Message_ProgressRange &theRange)
       ++nbWires;
     }
 
-    Message_ProgressScope faceScope(scope.Next(), "Computing pipe component", nbWires + 2);
+    Message_ProgressScope faceScope(scope.Next(), "Computing pipe component", nbWires * 2);
 
     TopoDS_Wire outerWire = BRepTools::OuterWire(face);
     TopoDS_Shape solid = makePipe(outerWire);
@@ -140,9 +140,8 @@ void PipeNode::computeShape(const Message_ProgressRange &theRange)
       faceScope.Next();
     }
 
-    TopoDS_Shape pipe = differenceOp(solid, holes);
+    TopoDS_Shape pipe = differenceOp(solid, holes, faceScope.Next(nbWires));
     builder.Add(compound, pipe);
-    faceScope.Next(2);
   }
 
   shape = compound;

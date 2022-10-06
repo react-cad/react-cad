@@ -111,19 +111,23 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
     // clang-format off
     MAIN_THREAD_ASYNC_EM_ASM(
         {
-          const progressObject = Emval.toValue($0);
-          let name = "";
           try {
-            name = $1 == 0 ? "" : UTF8ToString($1);
+            const progressObject = Emval.toValue($0);
+            let name = "";
+            try {
+              name = $1 == 0 ? "" : UTF8ToString($1);
+            } catch (e) {
+            }
+            const progress = $2;
+            const resolveWhenComplete = $3;
+
+            progressObject.notify(progress, name);
+
+            if (resolveWhenComplete && progress > 0.9999999999) {
+              progressObject.resolve();
+            }
           } catch (e) {
-          }
-          const progress = $2;
-          const resolveWhenComplete = $3;
-
-          progressObject.notify(progress, name);
-
-          if (resolveWhenComplete && progress > 0.9999999999) {
-            progressObject.resolve();
+            // progressObject probably deleted before the async function ran
           }
         },
         m_js_progress.as_handle(), name, progress, m_resolve_when_complete);

@@ -28,7 +28,7 @@ void IntersectionNode::computeChildren(TopTools_ListOfShape children, const Mess
     m_childShape = children.First();
     break;
   default: {
-    m_childShape = intersectionOp(children);
+    m_childShape = intersectionOp(children, scope.Next());
     break;
   }
   }

@@ -53,8 +53,8 @@
 #include "WebGLSentry.hpp"
 
 ReactCADView::ReactCADView(emscripten::val canvas)
-    : myDevicePixelRatio(EmJS::devicePixelRatio()), myUpdateRequests(0), myWebglContext(-1), myId(UUID::get()),
-      myShape()
+    : myDevicePixelRatio(emscripten_get_device_pixel_ratio()), myUpdateRequests(0), myWebglContext(-1),
+      myId(UUID::get()), myShape()
 {
   SetLockOrbitZUp(true);
   SetShowRotateCenter(false);
@@ -141,27 +141,30 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
 
 void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
-  Message_ProgressScope scope(theRange, "Rendering", 100);
-  if (shape.IsNotEqual(myShape) || myQualityChanged)
   {
-    myShape = shape;
-    myQualityChanged = false;
+    WebGLSentry sentry(myWebglContext, myId);
+    Message_ProgressScope scope(theRange, "Rendering", 100);
+    if (shape.IsNotEqual(myShape) || myQualityChanged)
+    {
+      myShape = shape;
+      myQualityChanged = false;
 
 #ifdef REACTCAD_DEBUG
-    PerformanceTimer timer("Compute mesh");
+      PerformanceTimer timer("Compute mesh");
 #endif
 
-    drawShape(shape, scope.Next(99));
+      drawShape(shape, scope.Next(99));
 
 #ifdef REACTCAD_DEBUG
-    timer.end();
+      timer.end();
 #endif
-  }
+    }
 
-  myView->Invalidate();
-  if (scope.More())
-  {
-    redrawView();
+    myView->Invalidate();
+    if (scope.More())
+    {
+      redrawView();
+    }
   }
 }
 
@@ -199,6 +202,7 @@ void ReactCADView::setQuality(double deviationCoefficent, double angle, const Me
 
 void ReactCADView::setColor(std::string colorString)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   Quantity_Color color;
   Quantity_Color::ColorFromHex(colorString.c_str(), color);
   myShaded->SetColor(color);
@@ -208,6 +212,7 @@ void ReactCADView::setColor(std::string colorString)
 
 void ReactCADView::zoom(double delta)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
 
@@ -222,6 +227,7 @@ void ReactCADView::zoom(double delta)
 
 void ReactCADView::resetView()
 {
+  WebGLSentry sentry(myWebglContext, myId);
   myView->ResetViewOrientation();
   myView->Invalidate();
   fit();
@@ -230,6 +236,7 @@ void ReactCADView::resetView()
 
 void ReactCADView::fit()
 {
+  WebGLSentry sentry(myWebglContext, myId);
   myView->FitAll(0.5, false);
   myView->Invalidate();
   updateView();
@@ -237,6 +244,7 @@ void ReactCADView::fit()
 
 void ReactCADView::setViewpoint(Viewpoint viewpoint)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   switch (viewpoint)
   {
   case Viewpoint::Top:
@@ -271,6 +279,7 @@ void ReactCADView::setViewpoint(Viewpoint viewpoint)
 
 void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   myView->Camera()->SetProjectionType(projection);
   myView->Invalidate();
   updateView();
@@ -278,6 +287,7 @@ void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 
 void ReactCADView::showAxes(bool show)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
 
@@ -287,6 +297,7 @@ void ReactCADView::showAxes(bool show)
 
 void ReactCADView::showGrid(bool show)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   if (show)
   {
@@ -302,6 +313,7 @@ void ReactCADView::showGrid(bool show)
 
 void ReactCADView::showWireframe(bool show)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   myShowWireframe = show;
   if (myShowWireframe)
   {
@@ -317,6 +329,7 @@ void ReactCADView::showWireframe(bool show)
 
 void ReactCADView::showShaded(bool show)
 {
+  WebGLSentry sentry(myWebglContext, myId);
   myShowShaded = show;
   if (myShowShaded)
   {
@@ -439,7 +452,8 @@ bool ReactCADView::initViewer()
   Handle(Aspect_DisplayConnection) aDisp;
 
   Handle(OpenGl_GraphicDriver) aDriver = new OpenGl_GraphicDriver(aDisp, false);
-  aDriver->ChangeOptions().buffersNoSwap = true; // swap has no effect in WebGL
+  aDriver->ChangeOptions().buffersNoSwap = true;
+  aDriver->ChangeOptions().buffersOpaqueAlpha = true;
   if (!aDriver->InitContext())
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Error: EGL initialization failed"), Message_Fail);
@@ -471,23 +485,10 @@ bool ReactCADView::initViewer()
   }
   aWindow->SetSize(aWinSize.x(), aWinSize.y());
 
-  myTextStyle = new Prs3d_TextAspect();
-  myTextStyle->SetFont(Font_NOF_ASCII_MONO);
-  myTextStyle->SetHeight(12);
-  myTextStyle->Aspect()->SetColor(Quantity_NOC_GRAY95);
-  myTextStyle->Aspect()->SetColorSubTitle(Quantity_NOC_BLACK);
-  myTextStyle->Aspect()->SetDisplayType(Aspect_TODT_SHADOW);
-  myTextStyle->Aspect()->SetTextFontAspect(Font_FA_Bold);
-  myTextStyle->Aspect()->SetTextZoomable(false);
-  myTextStyle->SetHorizontalJustification(Graphic3d_HTA_LEFT);
-  myTextStyle->SetVerticalJustification(Graphic3d_VTA_BOTTOM);
-
   myView = new V3d_View(aViewer);
   myView->SetImmediateUpdate(false);
   myView->ChangeRenderingParams().Resolution = (unsigned int)(96.0 * myDevicePixelRatio + 0.5);
   myView->ChangeRenderingParams().IsAntialiasingEnabled = Standard_True;
-  myView->ChangeRenderingParams().StatsTextAspect = myTextStyle->Aspect();
-  myView->ChangeRenderingParams().StatsTextHeight = (int)myTextStyle->Height();
   myView->SetWindow(aWindow);
 
   myTrihedron = new Trihedron();
@@ -496,6 +497,7 @@ bool ReactCADView::initViewer()
   myTrihedron->SetPosition(Aspect_TOTP_RIGHT_UPPER);
   myTrihedron->SetWireframe(Standard_True);
   myTrihedron->Display(*myView);
+  myTrihedron->SetArrowDiameter(2);
 
 #ifdef REACTCAD_DEBUG
   // dumpGlInfo(false);
@@ -568,7 +570,7 @@ void ReactCADView::onResize()
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Warning: invalid canvas size"), Message_Warning);
   }
   aWindow->Size(aWinSizeOld.x(), aWinSizeOld.y());
-  const float aPixelRatio = EmJS::devicePixelRatio();
+  const float aPixelRatio = emscripten_get_device_pixel_ratio();
   if (aWinSizeNew != aWinSizeOld || aPixelRatio != myDevicePixelRatio)
   {
     if (myDevicePixelRatio != aPixelRatio)
@@ -594,6 +596,7 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
   {
     return EM_FALSE;
   }
+  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -680,6 +683,8 @@ EM_BOOL ReactCADView::onWheelEvent(int theEventType, const EmscriptenWheelEvent 
     return EM_FALSE;
   }
 
+  WebGLSentry sentry(myWebglContext, myId);
+
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
   const Graphic3d_Vec2i aNewPos =
@@ -724,6 +729,8 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
   {
     return EM_FALSE;
   }
+
+  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -782,7 +789,7 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
             myDoubleTapTimer.Stop();
             myDoubleTapTimer.Reset();
             myDoubleTapTimer.Start();
-            SelectInViewer(Graphic3d_Vec2i(myClickTouch.From), false);
+            SelectInViewer(Graphic3d_Vec2i(myClickTouch.From));
           }
         }
         hasUpdates = true;

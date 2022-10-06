@@ -58,7 +58,9 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const [progressIndicator, addTask, queuedTasks] = useProgressQueue();
 
-    const [view, canvasRef, onResize] = useReactCADView(core, options, addTask);
+    const canvasRef = React.useRef<HTMLCanvasElement>(null);
+
+    const [view, onResize] = useReactCADView(canvasRef, core, options, addTask);
 
     const shouldReset = React.useRef(false);
 

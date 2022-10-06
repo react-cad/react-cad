@@ -11,7 +11,6 @@ class EmJS
 {
 public:
   static emscripten::val getFileContentsAndDelete(const std::string &filename);
-  static float devicePixelRatio();
   static void initCanvas(emscripten::val canvas, const std::string &id);
   static void enableCanvas(const std::string &id);
   static int canvasGetWidth(const std::string &id);

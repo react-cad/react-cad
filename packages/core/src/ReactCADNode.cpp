@@ -135,7 +135,7 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_
   Message_ProgressScope scope(theRange, "Computing union", 1);
   if (scope.More())
   {
-    m_childShape = unionOp(children);
+    m_childShape = unionOp(children, scope.Next());
   }
 
 #ifdef REACTCAD_DEBUG

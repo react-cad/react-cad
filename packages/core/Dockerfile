@@ -7,12 +7,12 @@ RUN mkdir freetype/build
 RUN cd freetype/build && emcmake cmake ..
 RUN cd freetype/build && emmake make install
 
-RUN git clone --branch V7_5_0 --depth 1 https://git.dev.opencascade.org/repos/occt.git occt
+RUN git clone --branch V7_6_3 --depth 1 https://git.dev.opencascade.org/repos/occt.git occt
 RUN mkdir occt/build
 RUN cd occt/build && emcmake cmake .. \
   -DBUILD_LIBRARY_TYPE=Static \
   -DBUILD_MODULE_Draw=0 \
-  -DCMAKE_CXX_FLAGS="-s USE_FREETYPE=1 -pthread -fexceptions" \
+  -DCMAKE_CXX_FLAGS="-pthread -fexceptions" \
   -D3RDPARTY_TK_INCLUDE_DIR=/usr/include/tk \
   -D3RDPARTY_FREETYPE_INCLUDE_DIR_ft2build=/usr/local/include/freetype2 \
   -D3RDPARTY_FREETYPE_INCLUDE_DIR_freetype2=/usr/local/include \

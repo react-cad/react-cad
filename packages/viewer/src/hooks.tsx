@@ -64,43 +64,34 @@ export function useReactCADRenderer(
 }
 
 export function useReactCADView(
+  canvasRef: React.RefObject<HTMLCanvasElement>,
   core: ReactCADCore,
   options: ViewOptions,
   addTask: AddTask
-): [
-  React.MutableRefObject<ReactCADView | undefined>,
-  (canvas: HTMLCanvasElement | null) => void,
-  () => void
-] {
+): [React.MutableRefObject<ReactCADView | undefined>, () => void] {
   const view = React.useRef<ReactCADView>();
   const [onResize, setOnResize] = React.useState(() => () => {});
 
-  const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
-    if (canvas) {
-      if (view.current) {
-        view.current.delete();
-        view.current = undefined;
-      }
-      view.current = core.createView(canvas);
+  React.useEffect(() => {
+    if (canvasRef.current) {
+      view.current = core.createView(canvasRef.current);
       setOnResize(() => () => {
-        if (view.current) {
-          canvas.width = canvas.clientWidth * window.devicePixelRatio;
-          canvas.height = canvas.clientHeight * window.devicePixelRatio;
+        if (view.current && canvasRef.current) {
+          canvasRef.current.width =
+            canvasRef.current.clientWidth * window.devicePixelRatio;
+          canvasRef.current.height =
+            canvasRef.current.clientHeight * window.devicePixelRatio;
           view.current.onResize();
         }
       });
+      return () => {
+        if (view.current) {
+          view.current.delete();
+          view.current = undefined;
+        }
+      };
     }
   }, []);
-
-  React.useEffect(
-    () => () => {
-      if (view.current) {
-        view.current.delete();
-        view.current = undefined;
-      }
-    },
-    []
-  );
 
   React.useEffect(() => {
     if (onResize) {
@@ -142,7 +133,7 @@ export function useReactCADView(
     setLoaded(true);
   }, [options.detail, ...options.highDetail, ...options.lowDetail]);
 
-  return [view, canvasRef, onResize];
+  return [view, onResize];
 }
 
 function download(
