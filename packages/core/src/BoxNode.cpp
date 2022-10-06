@@ -1,4 +1,5 @@
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <Message.hxx>
 #include <Message_ProgressScope.hxx>
 #include <Precision.hxx>
 #include <gp_Pnt.hxx>
@@ -29,11 +30,12 @@ void BoxNode::setCentered(Standard_Boolean centered)
 
 void BoxNode::computeShape(const Message_ProgressRange &theRange)
 {
-  gp_Pnt origin = gp::Origin();
+  TopoDS_Solid box = BRepPrimAPI_MakeBox(gp::Origin(), m_size);
   if (m_centered)
   {
-    origin.Translate(gp_Vec(-m_size.X() / 2.0, -m_size.Y() / 2.0, -m_size.Z() / 2.0));
+    gp_Trsf translation;
+    translation.SetTranslation(gp_Vec(-m_size.X() / 2.0, -m_size.Y() / 2.0, -m_size.Z() / 2.0));
+    box.Move(translation);
   }
-  BRepPrimAPI_MakeBox box(origin, m_size);
   shape = box;
 }

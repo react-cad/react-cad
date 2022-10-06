@@ -1,0 +1,81 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Primitives/<polyhedron>" />
+
+# polyhedron
+
+The `polyhedron` element creates an arbitrary polyhedron. It takes an array of `points` and an array of `faces`. Each point is a 3 element array of x-, y- and z-coordinates. Each face is an array of indices into the `points` array, describing a polygon with vertices at those points. The faces must be planar and combine to fully enclose a part of 3d space.
+
+<ArgsTable
+  rows={{
+    points: {
+      name: "points",
+      type: {
+        required: true,
+      },
+      description: "An array of points in 3d space",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a tuple of x-, y- and z-coordinates",
+        },
+      },
+    },
+    faces: {
+      name: "faces",
+      type: {
+        required: true,
+      },
+      description: "An array of faces, each of which is an array of indices into the `points` array, so as to describe a polygon with vertices at those points. Faces must be planar and fully enclose a part of 3d space.",
+      table: {
+        type: {
+          summary: "number[][]",
+          detail: "an array of arrays of numbers",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Polyhedron = (props) => <polyhedron {...props} />;
+
+### Polyhedron
+
+A simple irregular tetrahedron.
+
+<Source language="jsx" code={`
+  <polyhedron
+    points={[
+      [1, 0, 0],
+      [0, 1, 0],
+      [1, 1, 0],
+      [1, 1, 1],
+    ]}
+    faces={[
+      [0, 1, 2],
+      [0, 1, 3],
+      [0, 2, 3],
+      [1, 2, 3],
+    ]}
+  />
+`} />
+
+<Story name="polyhedron" args={{
+  points: [
+    [1, 0, 0],
+    [0, 1, 0],
+    [1, 1, 0],
+    [1, 1, 1],
+  ],
+  faces: [
+    [0, 1, 2],
+    [0, 1, 3],
+    [0, 2, 3],
+    [1, 2, 3],
+  ]
+}}>
+  {Polyhedron.bind({})}
+</Story>

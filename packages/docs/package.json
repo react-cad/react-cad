@@ -1,5 +1,5 @@
 {
-  "name": "@react-cad/examples",
+  "name": "@react-cad/docs",
   "version": "0.18.0",
   "main": "lib/index.js",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "webpack-dev-server": "^3.11.1"
   },
   "scripts": {
-    "start": "start-storybook -p 6006"
+    "start": "start-storybook -p 6007 --docs --no-manager-cache",
+    "build": "build-storybook --docs --no-manager-cache"
   }
 }

@@ -20,3 +20,5 @@ export const previewHead = (
   ${head}
 `
     : head;
+
+export const managerEntries = [require.resolve("./theme")];

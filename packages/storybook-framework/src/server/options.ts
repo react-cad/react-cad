@@ -1,6 +1,5 @@
 import { sync } from "read-pkg-up";
 import type { LoadOptions } from "@storybook/core-common";
-3;
 
 export default {
   packageJson: sync({ cwd: __dirname })?.packageJson,

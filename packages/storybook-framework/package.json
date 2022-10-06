@@ -40,6 +40,7 @@
     "file-loader": "^6.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-lazyload": "^3.2.0",
     "react-refresh": "^0.11.0"
   },
   "scripts": {
@@ -50,6 +51,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@types/react-lazyload": "^3.2.0",
     "webpack": "^5.74.0"
   }
 }

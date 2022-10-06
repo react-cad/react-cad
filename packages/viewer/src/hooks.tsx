@@ -64,18 +64,23 @@ export function useReactCADRenderer(
 }
 
 export function useReactCADView(
-  canvasRef: React.RefObject<HTMLCanvasElement>,
+  canvasContainerRef: React.RefObject<HTMLDivElement>,
   core: ReactCADCore,
   options: ViewOptions,
   addTask: AddTask
-): [React.MutableRefObject<ReactCADView | undefined>, () => void] {
+): React.MutableRefObject<ReactCADView | undefined> {
+  const canvasRef = React.useRef<HTMLCanvasElement>();
   const view = React.useRef<ReactCADView>();
-  const [onResize, setOnResize] = React.useState(() => () => {});
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
+    canvasRef.current = canvasContainerRef.current?.getElementsByTagName(
+      "canvas"
+    )[0];
     if (canvasRef.current) {
       view.current = core.createView(canvasRef.current);
-      setOnResize(() => () => {
+
+      const onResize = () => {
         if (view.current && canvasRef.current) {
           canvasRef.current.width =
             canvasRef.current.clientWidth * window.devicePixelRatio;
@@ -83,8 +88,23 @@ export function useReactCADView(
             canvasRef.current.clientHeight * window.devicePixelRatio;
           view.current.onResize();
         }
-      });
+      };
+
+      const observer = new ResizeObserver(onResize);
+      observer.observe(canvasRef.current, {});
+
+      const quality =
+        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
+      view.current?.setQuality(...quality);
+
+      setLoaded(true);
+
       return () => {
+        observer.disconnect();
+        if (canvasContainerRef.current) {
+          canvasContainerRef.current.innerHTML = "";
+          canvasRef.current = undefined;
+        }
         if (view.current) {
           view.current.delete();
           view.current = undefined;
@@ -92,14 +112,6 @@ export function useReactCADView(
       };
     }
   }, []);
-
-  React.useEffect(() => {
-    if (onResize) {
-      onResize();
-      window.addEventListener("resize", onResize);
-      return () => window.removeEventListener("resize", onResize);
-    }
-  }, [onResize]);
 
   React.useEffect(() => {
     if (view.current) {
@@ -110,7 +122,7 @@ export function useReactCADView(
       view.current.setProjection(core.Projection[options.projection]);
     }
   }, [
-    onResize,
+    loaded,
     options.showAxes,
     options.showGrid,
     options.showShaded,
@@ -118,22 +130,17 @@ export function useReactCADView(
     options.projection,
   ]);
 
-  const [loaded, setLoaded] = React.useState(false);
-
   React.useEffect(() => {
-    const quality =
-      options.detail === "HIGH" ? options.highDetail : options.lowDetail;
     if (loaded) {
+      const quality =
+        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
       addTask(
         () => view.current && core.setRenderQuality(view.current, ...quality)
       );
-    } else {
-      view.current?.setQuality(...quality);
     }
-    setLoaded(true);
   }, [options.detail, ...options.highDetail, ...options.lowDetail]);
 
-  return [view, onResize];
+  return view;
 }
 
 function download(

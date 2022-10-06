@@ -69,8 +69,6 @@ ReactCADView::ReactCADView(emscripten::val canvas)
     return;
   }
 
-  WebGLSentry sentry(myWebglContext, myId);
-
   myView->MustBeResized();
   myShaded = new AIS_Shape(myShape);
   myContext->Display(myShaded, AIS_Shaded, -1, false);
@@ -89,13 +87,11 @@ ReactCADView::ReactCADView(emscripten::val canvas)
 // ================================================================
 ReactCADView::~ReactCADView()
 {
-  WebGLSentry sentry(myWebglContext, myId);
   emscripten_webgl_destroy_context(myWebglContext);
 }
 
 void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   Message_ProgressScope scope(theRange, "Rendering", 100);
 
   PerformanceTimer meshTimer("Mesh timer");
@@ -142,7 +138,6 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
 void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
   {
-    WebGLSentry sentry(myWebglContext, myId);
     Message_ProgressScope scope(theRange, "Rendering", 100);
     if (shape.IsNotEqual(myShape) || myQualityChanged)
     {
@@ -175,7 +170,6 @@ void ReactCADView::setQualitySync(double deviationCoefficent, double angle)
 
 void ReactCADView::setQuality(double deviationCoefficent, double angle, const Message_ProgressRange &theRange)
 {
-  WebGLSentry sentry(myWebglContext, myId);
 
   Standard_Real oldCoefficient, previousCoeffient, oldAngle, previousAngle;
   Standard_Boolean initialized = myShaded->OwnDeviationCoefficient(previousCoeffient, oldCoefficient);
@@ -202,7 +196,6 @@ void ReactCADView::setQuality(double deviationCoefficent, double angle, const Me
 
 void ReactCADView::setColor(std::string colorString)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   Quantity_Color color;
   Quantity_Color::ColorFromHex(colorString.c_str(), color);
   myShaded->SetColor(color);
@@ -212,7 +205,6 @@ void ReactCADView::setColor(std::string colorString)
 
 void ReactCADView::zoom(double delta)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
 
@@ -227,7 +219,6 @@ void ReactCADView::zoom(double delta)
 
 void ReactCADView::resetView()
 {
-  WebGLSentry sentry(myWebglContext, myId);
   myView->ResetViewOrientation();
   myView->Invalidate();
   fit();
@@ -236,7 +227,6 @@ void ReactCADView::resetView()
 
 void ReactCADView::fit()
 {
-  WebGLSentry sentry(myWebglContext, myId);
   myView->FitAll(0.5, false);
   myView->Invalidate();
   updateView();
@@ -244,7 +234,6 @@ void ReactCADView::fit()
 
 void ReactCADView::setViewpoint(Viewpoint viewpoint)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   switch (viewpoint)
   {
   case Viewpoint::Top:
@@ -279,7 +268,6 @@ void ReactCADView::setViewpoint(Viewpoint viewpoint)
 
 void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   myView->Camera()->SetProjectionType(projection);
   myView->Invalidate();
   updateView();
@@ -287,7 +275,6 @@ void ReactCADView::setProjection(Graphic3d_Camera::Projection projection)
 
 void ReactCADView::showAxes(bool show)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   aViewer->DisplayPrivilegedPlane(show, 5);
 
@@ -297,7 +284,6 @@ void ReactCADView::showAxes(bool show)
 
 void ReactCADView::showGrid(bool show)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   Handle(V3d_Viewer) aViewer = myView->Viewer();
   if (show)
   {
@@ -313,7 +299,6 @@ void ReactCADView::showGrid(bool show)
 
 void ReactCADView::showWireframe(bool show)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   myShowWireframe = show;
   if (myShowWireframe)
   {
@@ -329,7 +314,6 @@ void ReactCADView::showWireframe(bool show)
 
 void ReactCADView::showShaded(bool show)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   myShowShaded = show;
   if (myShowShaded)
   {
@@ -375,7 +359,6 @@ void ReactCADView::initWindow()
 // ================================================================
 void ReactCADView::dumpGlInfo(bool theIsBasic)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   TColStd_IndexedDataMapOfStringString aGlCapsDict;
   myView->DiagnosticInformation(aGlCapsDict,
                                 theIsBasic ? Graphic3d_DiagnosticInfo_Basic : Graphic3d_DiagnosticInfo_Complete);
@@ -543,7 +526,6 @@ void ReactCADView::redrawView()
 // ================================================================
 void ReactCADView::handleViewRedraw(const Handle(AIS_InteractiveContext) & theCtx, const Handle(V3d_View) & theView)
 {
-  WebGLSentry sentry(myWebglContext, myId);
   myUpdateRequests = 0;
   AIS_ViewController::handleViewRedraw(theCtx, theView);
   if (myToAskNextFrame)
@@ -596,7 +578,6 @@ EM_BOOL ReactCADView::onMouseEvent(int theEventType, const EmscriptenMouseEvent 
   {
     return EM_FALSE;
   }
-  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
@@ -683,8 +664,6 @@ EM_BOOL ReactCADView::onWheelEvent(int theEventType, const EmscriptenWheelEvent 
     return EM_FALSE;
   }
 
-  WebGLSentry sentry(myWebglContext, myId);
-
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
   const Graphic3d_Vec2i aNewPos =
@@ -729,8 +708,6 @@ EM_BOOL ReactCADView::onTouchEvent(int theEventType, const EmscriptenTouchEvent 
   {
     return EM_FALSE;
   }
-
-  WebGLSentry sentry(myWebglContext, myId);
 
   Graphic3d_Vec2i aWinSize;
   myView->Window()->Size(aWinSize.x(), aWinSize.y());
