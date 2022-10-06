@@ -32,7 +32,7 @@ else()
   set(OCCT_BIN_DIR)
 endif()
 
-set(OpenCASCADE_LIBS TKSTL TKRWMesh TKOpenGles TKV3d TKHLR TKMesh TKService TKShHealing TKOffset TKBool TKBO TKPrim TKTopAlgo TKGeomAlgo TKBRep TKGeomBase TKG3d TKG2d TKMath TKernel TKXSBase TKSTEPBase TKSTEP TKSTEPAttr TKSTEP209)
+set(OpenCASCADE_LIBS TKSTL TKRWMesh TKOpenGl TKV3d TKHLR TKMesh TKService TKShHealing TKOffset TKBool TKBO TKPrim TKTopAlgo TKGeomAlgo TKBRep TKGeomBase TKG3d TKG2d TKMath TKernel TKXSBase TKSTEPBase TKSTEP TKSTEPAttr TKSTEP209)
 
 add_executable(${APP_TARGET} ${SOURCES})
 target_compile_definitions(${APP_TARGET} PRIVATE $<$<CONFIG:Debug>:REACTCAD_DEBUG>)

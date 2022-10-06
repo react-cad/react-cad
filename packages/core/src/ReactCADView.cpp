@@ -436,7 +436,7 @@ bool ReactCADView::initViewer()
 
   Handle(OpenGl_GraphicDriver) aDriver = new OpenGl_GraphicDriver(aDisp, false);
   aDriver->ChangeOptions().buffersNoSwap = true;
-  aDriver->ChangeOptions().buffersOpaqueAlpha = true;
+  // aDriver->ChangeOptions().buffersOpaqueAlpha = true;
   if (!aDriver->InitContext())
   {
     Message::DefaultMessenger()->Send(TCollection_AsciiString("Error: EGL initialization failed"), Message_Fail);

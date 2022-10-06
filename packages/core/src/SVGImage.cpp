@@ -148,7 +148,7 @@ SVGImage::SVGBezierCurve::operator Handle(Geom2d_Curve)()
   else
   {
     // Bezier curve
-    NCollection_Array1<gp_Pnt2d> poles(0, 3);
+    TColgp_Array1OfPnt2d poles(0, 3);
     poles[0] = p0();
     poles[1] = p1();
     poles[2] = p2();

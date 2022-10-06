@@ -7,7 +7,7 @@ RUN mkdir freetype/build
 RUN cd freetype/build && emcmake cmake ..
 RUN cd freetype/build && emmake make install
 
-RUN git clone --branch V7_6_3 --depth 1 https://git.dev.opencascade.org/repos/occt.git occt
+RUN git clone --branch V7_5_0 --depth 1 https://git.dev.opencascade.org/repos/occt.git occt
 RUN mkdir occt/build
 RUN cd occt/build && emcmake cmake .. \
   -DBUILD_LIBRARY_TYPE=Static \

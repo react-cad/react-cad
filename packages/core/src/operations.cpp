@@ -17,7 +17,7 @@ TopoDS_Shape unionOp(TopTools_ListOfShape shapes, const Message_ProgressRange &t
 
     aBuilder.SetArguments(shapes);
 
-    aBuilder.Build(theRange);
+    aBuilder.Build(/*theRange*/);
     if (aBuilder.HasErrors())
     {
       TopoDS_Shape nullShape;
@@ -43,7 +43,7 @@ TopoDS_Shape differenceOp(TopoDS_Shape positive, TopTools_ListOfShape negative, 
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(negative);
 
-  aBuilder.Build(theRange);
+  aBuilder.Build(/*theRange*/);
   if (aBuilder.HasErrors())
   {
     TopoDS_Shape nullShape;
@@ -70,7 +70,7 @@ TopoDS_Shape intersectionOp(TopoDS_Shape positive, TopoDS_Shape negative, const 
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(aLT);
 
-  aBuilder.Build(theRange);
+  aBuilder.Build(/*theRange*/);
 
   if (aBuilder.HasErrors())
   {

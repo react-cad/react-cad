@@ -72,10 +72,10 @@ void EvolutionNode::setProfileSVG(const std::string &pathData)
       ShapeFix_Wire fixWire;
       fixWire.SetSurface(yzPlane);
       fixWire.Load(suspiciousWire);
+      fixWire.ClosedWireMode() = Standard_False;
       fixWire.Perform();
 
       TopoDS_Wire wire = fixWire.Wire();
-      wire.Orientation(TopAbs_REVERSED);
 
       m_profile = wire;
 
