@@ -1,11 +1,11 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
 
-<Meta title="Primitives/<cylinder>" />
+<Meta title="Reference/Primitives/Cylinder" />
 
 # cylinder
 
-The `cylinder` element creates a cylinder. It has a `height` in the z-axis and a `radius`. An optional `angle` prop limits the shape to the portion of the cylinder within that angle around the z-axis. The cylinder can optionally be centered on the origin. 
+The `cylinder` element creates a cylinder centered on the z-axis. It has a `height` and a `radius`. An optional `angle` prop limits the shape to the portion of the cylinder within that angle around the z-axis. The cylinder can optionally be centered on the origin. 
 
 <ArgsTable
   rows={{
@@ -69,6 +69,8 @@ export const Cylinder = (props) => <cylinder {...props} />;
 
 ### Cylinder
 
+A cylinder of height 5 and radius 2.
+
 <Source language="jsx" code={`
   <cylinder height={5} radius={2} />
 `} />
@@ -79,6 +81,8 @@ export const Cylinder = (props) => <cylinder {...props} />;
 
 ### Cylinder limited by an angle
 
+A cylinder of height 5 and radius 2, limited to 3 quarters of a turn.
+
 <Source language="jsx" code={`
   <cylinder height={5} radius={2} angle={3 * Math.PI / 2} />
 `} />
@@ -88,6 +92,8 @@ export const Cylinder = (props) => <cylinder {...props} />;
 </Story>
 
 ### Centered cylinder
+
+A cylinder centered at the origin.
 
 <Source language="jsx" code={`
   <cylinder height={5} radius={2} center />

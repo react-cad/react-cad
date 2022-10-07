@@ -1,7 +1,7 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
 
-<Meta title="Primitives/<torus>" />
+<Meta title="Reference/Primitives/Torus" />
 
 # torus
 
@@ -57,6 +57,8 @@ export const Torus = (props) => <torus {...props} />;
 
 ### Torus
 
+A torus with a radius of 3 and a tube radius of 1.
+
 <Source language="jsx" code={`
   <torus radius1={3} radius2={1} />
 `} />
@@ -66,6 +68,8 @@ export const Torus = (props) => <torus {...props} />;
 </Story>
 
 ### Torus limited by an angle
+
+A torus with a radius of 3 and a tube radius of 1, limited to 3 quarters of a turn.
 
 <Source language="jsx" code={`
   <torus radius1={3} radius2={1} angle={3 * Math.PI / 2} />

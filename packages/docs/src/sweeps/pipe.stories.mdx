@@ -1,0 +1,97 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import reactIcon from './react-icon';
+
+<Meta title="Reference/Sweeps/Pipe" />
+
+# pipe
+
+The `pipe` element extrudes a 2-dimensional shape along an arbitrary 2-dimensional path. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planar polygon, or a string containing an SVG image. The path is passed to `spine` as a string of SVG path commands (the same format used for the `d` attribute of an SVG `path` element).
+
+The path will be traced in the xz plane, with x-values mapped to the x-axis, and positive y-values mapped to negative z-values (due to the nature of the SVG coordinate system).
+
+<ArgsTable
+  rows={{
+    profile: {
+      name: "profile",
+      description: "The shape to be extruded.",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: 'string | [number, number, number][]',
+          detail: "an SVG image, or a list of [x, y, z] points describing a planar polygon",
+        },
+      },
+    },
+    path: {
+      name: "path",
+      description: "The path along which to extruded the profile.",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: 'string',
+          detail: "a series of SVG path commands",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Pipe = (props) => <pipe {...props} />;
+
+### Triangular pipe
+
+A triangular profile extruded along a series of straight lines. We extend the path in the negative y-direction, as this will equate to the positive z-direction, ie upwards.
+
+Extruding a pipe along straight line doesn't affect the normal of the shape - it remains flat whichever direction the line goes.
+
+<Source language="jsx" code={`
+  <pipe profile={[[0,2,0], [3,2,0], [1.5,0,0]]} spine="M 0 0 L 0 -5 L 5 -10" />
+`} />
+
+<Story name="pipe" args={{ profile: [[0,2,0], [3,2,0], [1.5,0,0]], spine: "M 0 0 L 0 -5 L 5 -10" }}>
+  {Pipe.bind({})}
+</Story>
+
+### Smooth pipe
+
+To make a smooth pipe use curve path commands to round out corners, and the profile will follow the curve.
+
+<Source language="jsx" code={`
+  <pipe profile={[[0,2,0], [3,2,0], [1.5,0,0]]} spine="M 0 0 L 0 -3 C 0 -5 1 -6 2 -7 L 5 -10"  />
+`} />
+
+<Story name="smooth pipe" args={{ profile: [[0,2,0], [3,2,0], [1.5,0,0]], spine: "M 0 0 L 0 -3 C 0 -5 1 -6 2 -7 L 5 -10" }}>
+  {Pipe.bind({})}
+</Story>
+
+### SVG pipe
+
+An ellipse extruded along a path including a straight section and two quadratic bezier curves.
+
+<Source language="jsx" code={`
+  <pipe profile={[[0,2,0], [3,2,0], [1.5,0,0]]} spine="M0 0 Q -5 -10 5 -10 T 10 -20" />
+`} />
+
+<Story name="ellipse" args={{ profile: `<svg><ellipse rx="0.3" ry="0.2" /></svg>`, spine: "M 0 0 L 0 -3 A 1 1 0 0 1 2 -3 C 2 -1 5 0 4 -2" }}>
+  {Pipe.bind({})}
+</Story>
+
+### React icon pipe
+
+A complex SVG pipe. 
+
+<Source language="jsx" code={`
+  import reactIcon from './react-icon.svg';
+<pipe profile={reactIcon} spine="M 0 0 C 0 -10 10 -10 10 -20" />
+`} />
+
+<Story name="react icon pipe" args={{ profile: reactIcon([0,0]), spine: "M 0 0 C 0 -10 10 -10 10 -20" }}>
+  {Pipe.bind({})}
+</Story>

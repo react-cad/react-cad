@@ -1,7 +1,7 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
 
-<Meta title="Primitives/<wedge>" />
+<Meta title="Reference/Primitives/Wedge" />
 
 # wedge
 
@@ -110,15 +110,19 @@ export const Wedge = (props) => <wedge {...props} />;
 
 ### Wedge defined using ltx
 
+A 5x5x3 wedge tapering to 1 unit wide at `y = 5`.
+
 <Source language="jsx" code={`
-  <wedge x={5} y={5} z={5} ltx={1} />
+  <wedge x={5} y={5} z={3} ltx={1} />
 `} />
 
-  <Story name="wedge" args={{ x: 5, y: 5, z: 5, ltx: 1 }}>
+  <Story name="wedge" args={{ x: 5, y: 5, z: 3, ltx: 1 }}>
     {Wedge.bind({})}
   </Story>
 
 ### Wedge defined using xmin, zmin, xmax and zmax
+
+A 5x5x3 wedge tapering to a square with corners at `(1,5,2)` and `(3,5,4)`.
 
 <Source language="jsx" code={`
   <wedge x={5} y={5} z={5} xmin={1} zmin={2} xmax={3} zmax={4} />

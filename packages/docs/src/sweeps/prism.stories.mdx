@@ -1,0 +1,105 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import reactIcon from './react-icon';
+
+<Meta title="Reference/Sweeps/Prism" />
+
+# prism
+
+The `prism` element extrudes a 2-dimensional shape along a vector. The vector is defined by the `x`, `y` and `z` props. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planar polygon, or a string containing an SVG image.
+
+<ArgsTable
+  rows={{
+    x: {
+      name: "x",
+      description: "The distance along the x-axis to extrude the profile",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    y: {
+      name: "y",
+      description: "The distance along the y-axis to extrude the profile",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    z: {
+      name: "z",
+      description: "The distance along the z-axis to extrude the profile",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    profile: {
+      name: "profile",
+      description: "The shape to be extruded.",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: 'string | [number, number, number][]',
+          detail: "an SVG image, or a list of [x, y, z] points describing a planar polygon",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Prism = (props) => <prism {...props} />;
+
+### Triangular prism
+
+A prism of height 5 with a triangular profile. Since it's defined using a list of points, the profile does not have to be defined in the xy plane, although it still must be planar.
+
+<Source language="jsx" code={`
+  <prism z={5} profile={[[0,0,1], [3,0,0], [1.5,2,0]]} />
+`} />
+
+<Story name="prism" args={{ z: 5, profile: [[0,0,1], [3,0,0], [1.5,2,0]] }}>
+  {Prism.bind({})}
+</Story>
+
+### Vector prism
+
+A prism extending along the vector `[1,2,3]` with an SVG `circle` profile. Since it's defined using an SVG it begins in the xy plane.
+
+<Source language="jsx" code={`
+  <prism x={1} y={2} z={3} profile={\`<svg><circle r="3" /></svg>\`} />
+`} />
+
+<Story name="ellipse-prism" args={{ x: 1, y: 2, z: 3, profile: `<svg><circle r="3" /></svg>` }}>
+  {Prism.bind({})}
+</Story>
+
+### React icon prism
+
+A prism with a more complex SVG shape.
+
+<Source language="jsx" code={`
+  import reactIcon from './react-icon.svg';
+
+<prism z={10} profile={reactIcon} />
+`} />
+
+<Story name="svg-prism" args={{ z: 10, profile: reactIcon([0,0]) }}>
+  {Prism.bind({})}
+</Story>

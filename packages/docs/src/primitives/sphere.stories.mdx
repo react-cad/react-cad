@@ -1,7 +1,7 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
 
-<Meta title="Primitives/<sphere>" />
+<Meta title="Reference/Primitives/Sphere" />
 
 # sphere
 
@@ -70,6 +70,8 @@ export const Sphere = (props) => <sphere {...props} />;
 
 ### Sphere
 
+A sphere of radius 1.
+
 <Source language="jsx" code={`
   <sphere radius={1} />
 `} />
@@ -80,6 +82,8 @@ export const Sphere = (props) => <sphere {...props} />;
 
 ### Sphere limited by an angle
 
+A sphere of radius 1, limited to 3 quarters of a turn.
+
 <Source language="jsx" code={`
   <sphere radius={1} angle={3 * Math.PI / 2} />
 `} />
@@ -89,6 +93,8 @@ export const Sphere = (props) => <sphere {...props} />;
 </Story>
 
 ### Spherical segment
+
+A spherical segmend of radius 1, limited to 1 radian above the xy plane and 0.1 radians below it.
 
 <Source language="jsx" code={`
   <sphere radius={1} segmentAngle1={1} segmentAngle2={-0.1} />

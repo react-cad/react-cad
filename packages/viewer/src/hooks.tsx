@@ -284,9 +284,11 @@ export function useProgressQueue(): [
 
     if (progress) {
       setProgressIndicator((p) => {
+        p?.cancel();
         p?.delete();
         return progress;
       });
+      progressRef.current = progress;
     }
 
     return progress;
@@ -317,6 +319,18 @@ export function useProgressQueue(): [
       return promise;
     },
     [progressIndicator, then]
+  );
+
+  // Cancel last task on unmount
+  const progressRef = React.useRef<ProgressIndicator>();
+  React.useEffect(
+    () => () => {
+      if (progressRef.current && !progressRef.current.isDeleted()) {
+        progressRef.current.cancel();
+        progressRef.current.delete();
+      }
+    },
+    []
   );
 
   return [progressIndicator, addTask, queueLength];
