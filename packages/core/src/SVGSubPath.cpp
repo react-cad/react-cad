@@ -7,6 +7,7 @@
 #include <BRep_Tool.hxx>
 #include <IntTools_Context.hxx>
 #include <Precision.hxx>
+#include <ShapeFix_Face.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
@@ -107,7 +108,10 @@ void SVGSubPath::BuildFaceNonZero(NCollection_List<TopoDS_Face> &allFaces, BRepB
       child->BuildFaceNonZero(allFaces, makeFace, newCount);
     }
 
-    allFaces.Append(makeFace);
+    ShapeFix_Face faceFix(makeFace.Face());
+    faceFix.Perform();
+
+    allFaces.Append(faceFix.Face());
     return;
   }
   else if (newCount == 0)
@@ -141,7 +145,10 @@ void SVGSubPath::BuildFaceEvenOdd(NCollection_List<TopoDS_Face> &allFaces, BRepB
       child->BuildFaceEvenOdd(allFaces, makeFace, newCount);
     }
 
-    allFaces.Append(makeFace);
+    ShapeFix_Face faceFix(makeFace.Face());
+    faceFix.Perform();
+
+    allFaces.Append(faceFix.Face());
   }
   else
   {

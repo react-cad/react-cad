@@ -1,0 +1,46 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import model from "./model.ast";
+
+<Meta title="Reference/Imports/STL" />
+
+# stl
+
+The `stl` element imports a tesselated mesh in STL format. The `data` prop takes a string or ArrayBuffer containing the STL file data. For binary format STL `data` must be an ArrayBuffer. Meshes in the file must not overlap.
+
+Note that an STL file contains a triangulated mesh. Not only is this less accurate than the exact geometry in STEP or BREP files, it will be slow to work with as React CAD createds exact geometric representations of every triangle. Use STEP or BREP instead if it is at all possible.
+
+<ArgsTable
+  rows={{
+    data: {
+      name: "data",
+      type: {
+        required: true,
+      },
+      description: "The STL file data.",
+      table: {
+        type: {
+          summary: "string | ArrayBuffer",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const STL = (props) => <stl {...props} />;
+
+### STL file
+
+A model made in FreeCAD and imported as a STL file.
+
+<Source language="jsx" code={`
+// Configure your module loader to import this file as a string
+import model from './model.ast';
+<stl data={model} />
+`} />
+
+<Story name="stl" args={{ data: model }}>
+  {STL.bind({})}
+</Story>

@@ -11,39 +11,19 @@ module.exports = {
   webpackFinal: async (config, { configType }) => {
     config.module.rules.push({
       test: /\.brep$/,
-      type: "asset/inline",
-      generator: {
-        dataUrl: {
-          mimetype: "application/octet-stream",
-        },
-      },
+      type: "asset/source",
     });
     config.module.rules.push({
       test: /\.step$/,
-      type: "asset/inline",
-      generator: {
-        dataUrl: {
-          mimetype: "application/STEP",
-        },
-      },
+      type: "asset/source",
     });
     config.module.rules.push({
-      test: /\.stl$/,
-      type: "asset/inline",
-      generator: {
-        dataUrl: {
-          mimetype: "application/sla",
-        },
-      },
+      test: /\.ast$/,
+      type: "asset/source",
     });
     config.module.rules.push({
       test: /\.obj$/,
-      type: "asset/inline",
-      generator: {
-        dataUrl: {
-          mimetype: "application/octet-stream",
-        },
-      },
+      type: "asset/source",
     });
 
     return config;

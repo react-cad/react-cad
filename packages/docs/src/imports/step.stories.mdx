@@ -1,0 +1,44 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import model from "./model.step";
+
+<Meta title="Reference/Imports/STEP" />
+
+# step
+
+The `step` element imports a CAD model in STEP format. The `data` prop takes a string or ArrayBuffer containing the STEP file data.
+
+<ArgsTable
+  rows={{
+    data: {
+      name: "data",
+      type: {
+        required: true,
+      },
+      description: "The STEP file data.",
+      table: {
+        type: {
+          summary: "string | ArrayBuffer",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const STEP = (props) => <step {...props} />;
+
+### STEP file
+
+A model made in FreeCAD and imported as a STEP file.
+
+<Source language="jsx" code={`
+// Configure your module loader to import this file as a string
+import model from './model.step';
+<step data={model} />
+`} />
+
+<Story name="step" args={{ data: model }}>
+  {STEP.bind({})}
+</Story>

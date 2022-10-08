@@ -70,7 +70,6 @@ void PipeNode::setSpineSVG(const std::string &pathData)
       fixWire.Perform();
 
       TopoDS_Wire wire = fixWire.Wire();
-      wire.Orientation(TopAbs_REVERSED);
 
       m_spine = wire;
 
