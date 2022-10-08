@@ -1,8 +1,8 @@
 #include "operations.hpp"
 
-#include <BRepAlgoAPI_BuilderAlgo.hxx>
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
+#include <BRepAlgoAPI_Fuse.hxx>
 
 TopoDS_Shape unionOp(TopTools_ListOfShape shapes, const Message_ProgressRange &theRange)
 {
@@ -13,9 +13,14 @@ TopoDS_Shape unionOp(TopTools_ListOfShape shapes, const Message_ProgressRange &t
   case 1:
     return shapes.First();
   default: {
-    BRepAlgoAPI_BuilderAlgo aBuilder;
+    BRepAlgoAPI_Fuse aBuilder;
 
-    aBuilder.SetArguments(shapes);
+    TopTools_ListOfShape arguments;
+    arguments.Append(shapes.First());
+    shapes.RemoveFirst();
+
+    aBuilder.SetArguments(arguments);
+    aBuilder.SetTools(shapes);
 
     aBuilder.Build(/*theRange*/);
     if (aBuilder.HasErrors())

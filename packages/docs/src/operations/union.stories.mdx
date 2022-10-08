@@ -1,0 +1,31 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+
+export const Union = (props) => <union {...props} />;
+
+<Meta title="Reference/Operations/Union" />
+
+# union
+
+The `union` element creates a shape that is the sum of its children. It takes no props.
+
+<br/><br/>
+
+## Examples
+
+<br />
+
+### Union of a cube and a sphere
+
+<Source language="jsx" code={`
+<union>
+  <box x={2} y={2} z={2} center />
+  <sphere radius={Math.sqrt(2)} />
+</union>
+`} />
+
+<Story name="union" args={{ children: [
+  <box x={2} y={2} z={2} center />,
+  <sphere radius={Math.sqrt(2)} />
+]}}>
+  {Union.bind({})}
+</Story>

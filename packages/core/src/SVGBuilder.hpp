@@ -8,17 +8,15 @@
 
 #include "SVGImage.hpp"
 
-typedef NCollection_List<TopoDS_Compound> SVGBuilder_ListOfShapes;
-
 class SVGBuilder
 {
 public:
   SVGBuilder(const Handle(SVGImage) & image);
 
-  TopoDS_Compound Shape();
+  TopoDS_Shape Shape();
 
 private:
-  TopoDS_Compound m_compound;
+  TopoDS_Shape m_shape;
   Handle(SVGImage) m_image;
 };
 

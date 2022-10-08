@@ -1,0 +1,31 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+
+export const Intersection = (props) => <intersection {...props} />;
+
+<Meta title="Reference/Operations/Intersection" />
+
+# intersection
+
+The `intersection` element creates a shape made up of the overlapping sections of its children. It takes no props.
+
+<br/><br/>
+
+## Examples
+
+<br />
+
+### Intersection of a cube and a sphere
+
+<Source language="jsx" code={`
+<intersection>
+  <box x={2} y={2} z={2} center />
+  <sphere radius={Math.sqrt(2)} />
+</intersection>
+`} />
+
+<Story name="intersection" args={{ children: [
+  <box x={2} y={2} z={2} center />,
+  <sphere radius={Math.sqrt(2)} />
+]}}>
+  {Intersection.bind({})}
+</Story>

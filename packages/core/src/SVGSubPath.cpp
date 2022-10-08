@@ -11,6 +11,8 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
+#include "operations.hpp"
+
 SVGSubPath::SVGSubPath(TopoDS_Wire wire, TopoDS_Face face, Direction direction)
     : m_parent(), m_wire(wire), m_direction(direction), m_box(), m_children(), m_face(face)
 {
@@ -50,13 +52,9 @@ Standard_Boolean SVGSubPath::HasParent()
   return !m_parent.IsNull();
 }
 
-TopoDS_Compound SVGSubPath::BuildFaces(NSVGfillRule fillRule)
+TopoDS_Shape SVGSubPath::BuildFaces(NSVGfillRule fillRule)
 {
-  BRep_Builder builder;
-  TopoDS_Compound compound;
-  builder.MakeCompound(compound);
-
-  NCollection_List<TopoDS_Face> faces;
+  TopTools_ListOfShape faces;
   BRepBuilderAPI_MakeFace makeFace;
 
   switch (fillRule)
@@ -71,12 +69,7 @@ TopoDS_Compound SVGSubPath::BuildFaces(NSVGfillRule fillRule)
     break;
   }
 
-  for (auto face : faces)
-  {
-    builder.Add(compound, face);
-  }
-
-  return compound;
+  return unionOp(faces);
 }
 
 void SVGSubPath::Dump(std::iostream &out, std::string indent)
@@ -93,8 +86,7 @@ void SVGSubPath::Dump(std::iostream &out, std::string indent)
   }
 }
 
-void SVGSubPath::BuildFaceNonZero(NCollection_List<TopoDS_Face> &allFaces, BRepBuilderAPI_MakeFace &currentFace,
-                                  int oldCount)
+void SVGSubPath::BuildFaceNonZero(TopTools_ListOfShape &allFaces, BRepBuilderAPI_MakeFace &currentFace, int oldCount)
 {
   int newCount = oldCount + (m_direction == Direction::CW ? 1 : -1);
 
@@ -130,8 +122,7 @@ void SVGSubPath::BuildFaceNonZero(NCollection_List<TopoDS_Face> &allFaces, BRepB
   }
 }
 
-void SVGSubPath::BuildFaceEvenOdd(NCollection_List<TopoDS_Face> &allFaces, BRepBuilderAPI_MakeFace &currentFace,
-                                  int oldCount)
+void SVGSubPath::BuildFaceEvenOdd(TopTools_ListOfShape &allFaces, BRepBuilderAPI_MakeFace &currentFace, int oldCount)
 {
   int newCount = oldCount + (m_direction == Direction::CW ? 1 : -1);
 

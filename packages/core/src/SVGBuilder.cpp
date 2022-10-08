@@ -17,13 +17,15 @@
 
 #include <TopoDS_Wire.hxx>
 
-SVGBuilder::SVGBuilder(const Handle(SVGImage) & image) : m_compound(), m_image(image){};
+#include "operations.hpp"
 
-TopoDS_Compound SVGBuilder::Shape()
+SVGBuilder::SVGBuilder(const Handle(SVGImage) & image) : m_shape(), m_image(image){};
+
+TopoDS_Shape SVGBuilder::Shape()
 {
-  if (!m_compound.IsNull())
+  if (!m_shape.IsNull())
   {
-    return m_compound;
+    return m_shape;
   }
 
   Handle(Geom_Plane) surface = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()));
@@ -31,9 +33,7 @@ TopoDS_Compound SVGBuilder::Shape()
   ShapeFix_Wire fixWire;
   fixWire.SetSurface(surface);
 
-  BRep_Builder builder;
-  m_compound = TopoDS_Compound();
-  builder.MakeCompound(m_compound);
+  TopTools_ListOfShape svgShapes;
 
   for (auto shape = m_image->begin(); shape != m_image->end(); ++shape)
   {
@@ -58,14 +58,12 @@ TopoDS_Compound SVGBuilder::Shape()
       }
 
       TopoDS_Wire suspiciousWire = makeWire;
-
-      BRepLib::BuildCurves3d(suspiciousWire);
+      suspiciousWire.Reverse();
 
       fixWire.Load(suspiciousWire);
       fixWire.Perform();
 
       TopoDS_Wire wire = fixWire.Wire();
-      wire.Orientation(TopAbs_REVERSED);
 
       BRepBuilderAPI_MakeFace face(surface, wire);
 
@@ -96,11 +94,10 @@ TopoDS_Compound SVGBuilder::Shape()
     {
       if (!subpath->HasParent())
       {
-        TopoDS_Compound faceCompound = subpath->BuildFaces((NSVGfillRule)shape->fillRule);
-        builder.Add(m_compound, faceCompound);
+        svgShapes.Append(subpath->BuildFaces((NSVGfillRule)shape->fillRule));
       }
     }
   }
 
-  return m_compound;
+  return unionOp(svgShapes);
 }
