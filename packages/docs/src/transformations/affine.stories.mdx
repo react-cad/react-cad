@@ -1,0 +1,68 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Transformations/Affine" />
+
+# affine
+
+The `affine` element performs an affine transformation on its children. The transformation is defined by a 4x4 `matrix`. As an affine transformation the last row of the matrix must equal `[0, 0, 0, 1]`.
+
+<ArgsTable
+  rows={{
+    matrix: {
+      name: "matrix",
+      description: "A 4x4 matrix describing the transformation.",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: "number[][]",
+          detail: "a 4-row array of 4-column arrays of numbers"
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Affine = (props) => <affine {...props} />;
+
+### Identity transformation
+
+A cube transform by an identity matrix (having no effect).
+
+<Source language="jsx" code={`
+<affine matrix={[
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 0, 1],
+]}>
+  <box x={5} y={5} z={5} />
+</affine>
+`} />
+
+<Story name="affine" args={{ matrix: [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]], children: [<box x={5} y={5} z={5} />] }}>
+  {Affine.bind({})}
+</Story>
+
+### Shear transformation
+
+A cube transform by a shear matrix.
+
+<Source language="jsx" code={`
+<affine matrix={[
+  [  1, 0, 0, 0],
+  [0.5, 1, 0, 0],
+  [0.5, 0, 1, 0],
+  [  0, 0, 0, 1],
+]}>
+  <box x={5} y={5} z={5} />
+</affine>
+`} />
+
+<Story name="affine shear" args={{ matrix: [[1,0,0,0],[0.5,1,0,0],[0.5,0,1,0],[0,0,0,1]], children: [<box x={5} y={5} z={5} />] }}>
+  {Affine.bind({})}
+</Story>

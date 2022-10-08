@@ -1,0 +1,110 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Transformations/Translation" />
+
+# translation
+
+The `translation` element translates its children along a vector. This can be defined by the `vector` prop, or by the `x`, `y` and `z` props.
+
+<ArgsTable
+  rows={{
+    x: {
+      name: "x",
+      description: "The x-component of the translation vector.",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    y: {
+      name: "y",
+      description: "The y-component of the translation vector.",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    z: {
+      name: "z",
+      description: "The z-component of the translation vector.",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    vector: {
+      name: "vector",
+      type: {
+        required: true,
+      },
+      description: "The translation vector.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+        },
+        defaultValue: {
+          summary: '[0, 0, 0]'
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Translation = (props) => <translation {...props} />;
+
+### Translation with a vector
+
+A cube translated by a vector.
+
+<Source language="jsx" code={`
+<translation vector={[3,-1,-2]}>
+  <box x={5} y={5} z={5} />
+</translation>
+`} />
+
+<Story name="translation" args={{ vector: [3,-1,-2], children: [<box x={5} y={5} z={5} />] }}>
+  {Translation.bind({})}
+</Story>
+
+### Translation with x, y and z
+
+A cube translated by `x`, `y` and `z` props.
+
+<Source language="jsx" code={`
+<translation x={3} y={2} z={1}>
+  <box x={5} y={5} z={5} />
+</translation>
+`} />
+
+<Story name="translation x y z" args={{ x: 3, y: 2, z: 1, children: [<box x={5} y={5} z={5} />] }}>
+  {Translation.bind({})}
+</Story>
+
+### Translation along a single axis
+
+A cube translated by the `x` prop only.
+
+<Source language="jsx" code={`
+<translation x={3} >
+  <box x={5} y={5} z={5} />
+</translation>
+`} />
+
+<Story name="translation x" args={{ x: 3, children: [<box x={5} y={5} z={5} />] }}>
+  {Translation.bind({})}
+</Story>

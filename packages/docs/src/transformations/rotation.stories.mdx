@@ -1,0 +1,128 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Transformations/Rotation" />
+
+# rotation
+
+The `rotation` element rotates its children. The rotation can be defined in one of three ways:
+
+- an `axis` vector and an `angle` in radians
+- Euler angles in radians around the `x`, `y` and `z` axes
+- a `quaternion`
+
+<ArgsTable
+  rows={{
+    axis: {
+      name: "axis",
+      description: "The axis of the rotation.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a vector [x,y,z]",
+        },
+      },
+    },
+    angle: {
+      name: "angle",
+      description: "The angle of the rotation.",
+      table: {
+        type: {
+          summary: "number",
+        },
+      },
+    },
+    x: {
+      name: "x",
+      description: "The angle around the x-axis.",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    y: {
+      name: "y",
+      description: "The angle around the y-axis.",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    z: {
+      name: "z",
+      description: "The angle around the z-axis.",
+      table: {
+        type: {
+          summary: "number",
+        },
+        defaultValue: {
+          summary: '0'
+        },
+      },
+    },
+    quaternion: {
+      name: "quaternion",
+      description: "A quaternion describing the rotation.",
+      table: {
+        type: {
+          summary: "[number, number, number, number]",
+          detail: "a quaternion [x,y,z,w]",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Rotation = (props) => <rotation {...props} />;
+
+### Rotation with axis and angle
+
+A cube rotated around the z-axis.
+
+<Source language="jsx" code={`
+<rotation axis={[0, 0, 1]} angle={Math.PI / 4}>
+  <box x={5} y={5} z={5} />
+</rotation>
+`} />
+
+<Story name="rotation" args={{ axis: [0, 0, 1], angle: Math.PI / 4, children: [<box x={5} y={5} z={5} />] }}>
+  {Rotation.bind({})}
+</Story>
+
+### Rotation with Euler angles
+
+A cube rotated around the x, y and z-axes.
+
+<Source language="jsx" code={`
+<rotation x={Math.PI / 4} y={Math.PI / 4} z={Math.PI / 4}>
+  <box x={5} y={5} z={5} />
+</rotation>
+`} />
+
+<Story name="rotation-euler" args={{ x: Math.PI / 4, y: Math.PI / 4, z: Math.PI / 4, children: [<box x={5} y={5} z={5} />] }}>
+  {Rotation.bind({})}
+</Story>
+
+### Rotation with a quaternion
+
+A cube rotated by a quaternion.
+
+<Source language="jsx" code={`
+<rotation quaternion={[1, 0, 5, 2]}>
+  <box x={5} y={5} z={5} />
+</rotation>
+`} />
+
+<Story name="rotation-quaternion" args={{ quaternion: [1, 0, 5, 2], children: [<box x={5} y={5} z={5} />] }}>
+  {Rotation.bind({})}
+</Story>

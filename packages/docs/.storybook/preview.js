@@ -21,6 +21,7 @@ export const parameters = {
           "Imports",
           ["Introduction", "BREP", "STEP", "STL", "OBJ"],
           "Transformations",
+          ["Translation", "Rotation", "Scale", "Mirror", "Affine"],
           "Operations",
           ["Union", "Intersection", "Difference"],
           "Examples",

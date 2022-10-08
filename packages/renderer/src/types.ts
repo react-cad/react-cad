@@ -116,11 +116,16 @@ export interface ReactCADElements {
       }
     | { quaternion: Quaternion }
   >;
-  translation: React.PropsWithChildren<{
-    x?: number;
-    y?: number;
-    z?: number;
-  }>;
+  translation: React.PropsWithChildren<
+    | {
+        x?: number;
+        y?: number;
+        z?: number;
+      }
+    | {
+        vector: Vector;
+      }
+  >;
   scale: React.PropsWithChildren<
     { center?: Point } & (
       | {
@@ -130,8 +135,8 @@ export interface ReactCADElements {
     )
   >;
   mirror: React.PropsWithChildren<{
-    origin: Point;
-    normal: Vector;
+    point?: Point;
+    normal?: Vector;
   }>;
 
   brep: {

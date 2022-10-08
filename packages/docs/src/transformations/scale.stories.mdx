@@ -1,0 +1,121 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Transformations/Scale" />
+
+# scale
+
+The `scale` element scales its children. They can be scaled by a uniform `factor`, or by separate factors in the `x`, `y` and `z` directions. By default the scale centers on the origin but it can optionally center on a `center` point.
+
+<ArgsTable
+  rows={{
+    factor: {
+      name: "factor",
+      description: "The uniform scale factor.",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+      },
+    },
+    x: {
+      name: "x",
+      description: "The scale factor in the x-direction.",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+        defaultValue: {
+          summary: '1',
+        },
+      },
+    },
+    y: {
+      name: "y",
+      description: "The scale factor in the y-direction.",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+        defaultValue: {
+          summary: '1',
+        },
+      },
+    },
+    z: {
+      name: "z",
+      description: "The scale factor in the z-direction.",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+        defaultValue: {
+          summary: '1',
+        },
+      },
+    },
+    center: {
+      name: "center",
+      description: "The origin of the scale operation.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a point [x,y,z]",
+        },
+        defaultValue: {
+          summary: '[0, 0, 0]',
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Scale = (props) => <scale {...props} />;
+
+### Uniform scale
+
+A cube scaled by a uniform factor.
+
+<Source language="jsx" code={`
+<scale factor={5}>
+  <box x={1} y={1} z={1} />
+</scale>
+`} />
+
+<Story name="scale" args={{ factor: 5, children: [<box x={1} y={1} z={1} />] }}>
+  {Scale.bind({})}
+</Story>
+
+### Separate scale factors in each axis
+
+A sphere scaled by different factors in x and y, and not scaled in z.
+
+<Source language="jsx" code={`
+<scale x={3} y={2}>
+  <sphere radius={1} />
+</scale>
+`} />
+
+<Story name="scale non uniform" args={{ x: 5, y: 3, children: [<sphere radius={1} />] }}>
+  {Scale.bind({})}
+</Story>
+
+### Scale with a custom origin
+
+A cube scaled by a uniform factor centered on the center of the cube.
+
+<Source language="jsx" code={`
+<scale factor={2} center={[1, 1, 1]}>
+  <box x={2} y={2} z={2} />
+</scale>
+`} />
+
+<Story name="scale custom origin" args={{ factor: 2, center: [1, 1, 1], children: [<box x={2} y={2} z={2} />] }}>
+  {Scale.bind({})}
+</Story>
