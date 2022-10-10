@@ -75,6 +75,8 @@ TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
 
 void HelixNode::computeShape(const Message_ProgressRange &theRange)
 {
+  TopoDS_Shape profile = getProfile();
+
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
 #endif
@@ -86,7 +88,7 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
 
   TopExp_Explorer Faces;
   int nbFaces = 0;
-  for (Faces.Init(m_profile, TopAbs_FACE); Faces.More(); Faces.Next())
+  for (Faces.Init(profile, TopAbs_FACE); Faces.More(); Faces.Next())
   {
     ++nbFaces;
   }

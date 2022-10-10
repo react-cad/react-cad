@@ -1,23 +1,24 @@
-#ifndef SVGBuilder_Headerfile
-#define SVGBuilder_Headerfile
+#ifndef SVGPathBuilder_Headerfile
+#define SVGPathBuilder_Headerfile
 
+#include <Geom_Plane.hxx>
 #include <NCollection_List.hxx>
 #include <Standard_Handle.hxx>
-#include <TopoDS_Compound.hxx>
 #include <TopoDS_Wire.hxx>
 #include <string>
 
 #include "ShapeBuilder.hpp"
 
-class SVGBuilder : public ShapeBuilder
+class SVGPathBuilder : public ShapeBuilder
 {
 public:
-  SVGBuilder(const std::string &svg);
+  SVGPathBuilder(const std::string &pathData, const Handle(Geom_Plane) & plane);
   TopoDS_Shape Shape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
+  Handle(Geom_Plane) m_plane;
   TopoDS_Shape m_shape;
-  std::string m_svg;
+  std::string m_pathData;
 };
 
 #endif

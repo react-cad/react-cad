@@ -58,7 +58,7 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s EXPORT_NAME=reactCad \
   -s OFFSCREEN_FRAMEBUFFER=1 \
   -s TEXTDECODER=0 \
-  -s EXCEPTION_CATCHING_ALLOWED=['RevolutionNode::computeShape'] \
+  -s EXCEPTION_CATCHING_ALLOWED=['RevolutionNode::computeShape','HelixNode::computeShape','PipeNode::computeShape','EvolutionNode::computeShape','PrismNode::computeShape'] \
 ")
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_RELEASE "\

@@ -25,9 +25,11 @@ void PrismNode::computeShape(const Message_ProgressRange &theRange)
   PerformanceTimer timer("Compute prism");
 #endif
 
+  TopoDS_Shape profile = getProfile();
+
   Message_ProgressScope scope(theRange, "Computing prism", 1);
 
-  BRepPrimAPI_MakePrism prism(m_profile, m_vector);
+  BRepPrimAPI_MakePrism prism(profile, m_vector);
 
   shape = prism;
 
