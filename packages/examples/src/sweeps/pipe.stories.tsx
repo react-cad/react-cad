@@ -50,5 +50,5 @@ const Template: Story<StoryProps> = ({ profileName, ...args }) => {
 export const pipe = Template.bind({});
 pipe.args = {
   profileName: "Triangle",
-  spine: "M 0 0 L 0 -10 Q 0 -30 20 -30 Q 40 -30 30 -50",
+  spine: "M 0 0 L 0 -10 Q 0 -30 20 -30 T 50 -50",
 };

@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "ES2015",
-    "moduleResolution": "node16",
+    "target": "es5",
+    "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "jsx": "react",
@@ -10,7 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "rootDir": "./src",
-    "outDir": "./dist/esm",
+    "outDir": "./dist/cjs",
     "typeRoots": [
       "node_modules/@types",
       "node_modules/react-cad/types"

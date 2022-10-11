@@ -1,0 +1,52 @@
+import { Meta, Source } from "@storybook/addon-docs";
+import Link from './Link';
+import { TbFileDownload } from 'react-icons/tb';
+
+<Meta title="Publishing components" />
+
+# Publishing components
+
+To export your component for use in other CAD programs, to share with friends or 3D print, click the Download button <TbFileDownload /> and select a format. STEP and BREP are the best formats to use as they export exact geometry rather than mesh approximations, but your 3D printer software might require STL.
+
+Now you've made a component, time to share it with others. You can publish to NPM so that other ReactCAD developers can import it into their own designs, or publish to the web so visitors can customize and download your model without doing any coding themselves.
+
+### Publishing to NPM
+
+Before publishing to NPM, check out the `src/index.ts` file:
+
+<Source language="tsx" code={`
+// src/index.ts
+export { Example } from "./Example.js";
+`} />
+
+This is the main file that will be imported when others use your NPM package. Make sure it exports all the parts you want to include in the library. You can add a default export if there is one main component.
+
+Next edit `package.json` to make sure the `name` field isn't already taken in the NPM registry. The simplest way is to scope it to your username, eg `"name": "@username/my-component"`.
+
+Make sure you're logged in to npm using `npm login`, and then `npm publish`. Your component will be compiled to commonjs and ES module format and published to NPM!
+
+To use your published library from another package, `npm add @username/my-component` and then you can use the components like so:
+
+<Source language="tsx" code={`
+import { Example } from "@username/my-component";
+ 
+const AnotherComponent = () => <Example boxSize={1} sphereSize={2} />;
+`} />
+
+### Publishing to the web
+
+Create an optimized production build of the project viewer with:
+
+<Source language="bash" code={`
+npm run build:web
+`} />
+
+This outputs a static website to the `storybook-static` directory. You can preview it using:
+
+<Source language="bash" code={`
+npx http-server storybook-static
+`} />
+
+Upload this directory to any static hosting provider to share your models with the world.
+
+That's it for the tutorial. Check out the <Link to="reference-introduction">reference</Link> to learn more about the elements you can use in ReactCAD models.

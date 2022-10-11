@@ -1,0 +1,37 @@
+import { Meta } from "@storybook/addon-docs";
+import Link from './Link';
+import Example from './Example';
+import part from './images/part.png'
+
+<Meta title="Home" />
+
+# ReactCAD
+## Code solid 3D objects with React
+
+ReactCAD is an open-source 3D modelling system for programmers. Models are written as React components in TypeScript or JavaScript and compiled in the browser by a fast WebAssembly library.
+
+Create your design as code in your favorite editor and view a hot-reloading preview as you work. Export to STEP, BREP or STL, or publish your part to NPM so others can incorporate it into their own models.
+
+Publish to the web on GitHub Pages or your own hosting - visitors can view, customize and export your model directly from the browser without downloading any software.
+
+Learn how to create your first component on the <Link to="getting-started">Getting Started</Link> page.
+
+<Example imgSrc={part} code={`
+<difference>
+  <box x={12} y={12} z={1} />
+  <translation x={3} y={3}>
+    <cylinder height={1} radius={1} />
+  </translation>
+  <translation x={9} y={3}>
+    <cylinder height={1} radius={1} />
+  </translation>
+  <translation x={3} y={9}>
+    <cylinder height={1} radius={1} />
+  </translation>
+  <translation x={9} y={9}>
+    <cylinder height={1} radius={1} />
+  </translation>
+</difference>
+`} />
+
+ReactCAD is free software and is made possible by other great open-source projects. The core geometry library is built in C++ with [Open CASCADE](https://dev.opencascade.org/). A [React](https://reactjs.org) renderer allows control of the core library from React components. [Storybook](https://storybook.js.org/) provides the user interface and customization controls.

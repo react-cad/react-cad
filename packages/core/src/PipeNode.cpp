@@ -44,8 +44,6 @@ void PipeNode::setSpineSVG(const std::string &pathData)
 
 TopoDS_Shape makePipe(const TopoDS_Shape &profile, const TopoDS_Shape &spine)
 {
-  Message::DefaultMessenger()->Send(TCollection_AsciiString("is null ") + spine.IsNull());
-
   TopoDS_Wire wire = TopoDS::Wire(spine);
   BRepOffsetAPI_MakePipeShell pipe(wire);
   // TODO: Expose homothety to user?

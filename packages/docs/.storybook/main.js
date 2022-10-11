@@ -6,24 +6,16 @@ module.exports = {
     builder: "webpack5",
   },
   reactOptions: {
-    fastRefresh: true,
+    fastRefresh: false,
   },
   webpackFinal: async (config, { configType }) => {
     config.module.rules.push({
-      test: /\.brep$/,
+      test: /\.(brep|step|ast|obj)$/,
       type: "asset/source",
     });
     config.module.rules.push({
-      test: /\.step$/,
-      type: "asset/source",
-    });
-    config.module.rules.push({
-      test: /\.ast$/,
-      type: "asset/source",
-    });
-    config.module.rules.push({
-      test: /\.obj$/,
-      type: "asset/source",
+      test: /\.(png|jpg)$/,
+      type: "asset/resource",
     });
 
     return config;

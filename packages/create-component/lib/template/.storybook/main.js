@@ -7,6 +7,7 @@ module.exports = {
   framework: "@react-cad/storybook-framework",
   core: {
     builder: "webpack5",
+    manager: "webpack5",
   },
   reactOptions: {
     fastRefresh: false,

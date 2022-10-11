@@ -6,6 +6,7 @@
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.12.10",
+    "@emotion/react": "^11.10.4",
     "@react-cad/storybook-framework": "^0.18.0",
     "@storybook/addon-actions": "^6.5.12",
     "@storybook/addon-essentials": "^6.5.12",
@@ -23,5 +24,12 @@
   "scripts": {
     "start": "start-storybook -p 6007 --docs --no-manager-cache",
     "build": "build-storybook --docs --no-manager-cache"
+  },
+  "dependencies": {
+    "@storybook/addon-docs": "^6.5.12",
+    "@storybook/addon-links": "^6.5.12",
+    "@storybook/components": "^6.5.12",
+    "@storybook/theming": "^6.5.12",
+    "react-icons": "^4.4.0"
   }
 }

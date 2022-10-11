@@ -1,0 +1,44 @@
+import { Meta, Source } from "@storybook/addon-docs";
+import Link from './Link';
+import { SyntaxHighlighter } from "@storybook/components";
+import preview from './images/preview.jpg'
+
+<Meta title="Getting started" />
+
+# Getting started
+
+<br />
+
+## Requirements
+Before using ReactCAD you must have [Node.js](https://nodejs.org/) installed.
+
+This document assumes you are familiar with React. If you aren't, the [official tutorial](https://reactjs.org/tutorial/tutorial.html) is a good place to start.
+
+## Setting up a project
+Create a new component named `my-component` with the following commands:
+
+<Source language="bash" code={`
+npx @react-cad/create-component my-component
+cd my-component
+npm install
+`} />
+
+This will scaffold a ReactCAD project and install all the dependencies. Start the development environment with:
+
+<Source language="bash" code={`
+npm start
+`} />
+
+A new browser window will pop open like the one below. It shows the example component provided in the project scaffold.
+
+<img src={preview} style={{ width: '100%', height: 'auto' }} alt="Screenshot of the ReactCAD graphical user interface. To the left, a sidebar listing the Example component. The main section is a 3D view of a shape made by subtracing a cube from a sphere. Below, slider controls allow changing the size of the cube and the sphere." />
+
+This graphical user interface has 3 main sections.
+
+1. The **viewer** displays a 3D preview of the component along with a toolbar for zooming, viewing angles, perspective projection, preview quality as well as export to various file formats.
+2. The **controls** allow customization of the component both during development and once published to the web.
+3. The **sidebar** lists all the components in the project. Currently it's just the `Example` component.
+
+The example component is a <Link to="reference-primitives-sphere">`<sphere>`</Link> with a <Link to="reference-primitives-box">`<box>`</Link> subtracted from it. Try changing the size of the box and the sphere using the control sliders, and see how it affects the component.
+
+Next: <Link to="writing-components">Editing your component</Link>

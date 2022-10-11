@@ -66,7 +66,6 @@ TopoDS_Shape SVGPathBuilder::Shape(const Message_ProgressRange &theRange)
       wire.Orientation(TopAbs_REVERSED);
 
       shape = wire;
-      Message::DefaultMessenger()->Send("Path built");
     }
   }
 
