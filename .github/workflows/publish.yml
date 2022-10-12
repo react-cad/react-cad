@@ -59,3 +59,13 @@ jobs:
         run: yarn lerna publish from-package --yes --no-verify-access
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Deploy docs
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          repository-name: react-cad/react-cad.github.io
+          branch: main
+          folder: packages/docs/storybook-static
+          git-config-name: "React CAD Bot"
+          git-config-email: "react.cad.dev+bot@gmail.com"
+          tag: ${{github.ref_name}}
