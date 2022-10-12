@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/react-cad/react-cad/compare/v0.18.0...v0.19.0) (2022-10-12)
+
+
+### Bug Fixes
+
+* viewer tweaks ([a785bc1](https://github.com/react-cad/react-cad/commit/a785bc1e7d6a134a946ea36fad07c9aec71dd089))
+
+
+### Features
+
+* add docs site ([5552672](https://github.com/react-cad/react-cad/commit/5552672f6f2d77f50bf8ec1f5d2519af2ad22bb6))
+
+
+
+
+
 # [0.18.0](https://github.com/react-cad/react-cad/compare/v0.17.0...v0.18.0) (2022-10-04)
 
 

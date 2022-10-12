@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/react-cad/react-cad/compare/v0.18.0...v0.19.0) (2022-10-12)
+
+
+### Bug Fixes
+
+* build svg during computeshape ([618f2c8](https://github.com/react-cad/react-cad/commit/618f2c8254ef00f39cb9f71fb46a571539af87c7))
+* revert occt upgrade as it breaks evolutions ([e264e26](https://github.com/react-cad/react-cad/commit/e264e263b2f43e052868694c03e0fcae82b9566b))
+* viewer tweaks ([a785bc1](https://github.com/react-cad/react-cad/commit/a785bc1e7d6a134a946ea36fad07c9aec71dd089))
+
+
+### Features
+
+* add docs site ([5552672](https://github.com/react-cad/react-cad/commit/5552672f6f2d77f50bf8ec1f5d2519af2ad22bb6))
+* update opencascade to 7.6.3 ([1b0ffc0](https://github.com/react-cad/react-cad/commit/1b0ffc0ad878da069b6f1955e7646a3f648a4731))
+
+
+
+
+
 # [0.18.0](https://github.com/react-cad/react-cad/compare/v0.17.0...v0.18.0) (2022-10-04)
 
 
