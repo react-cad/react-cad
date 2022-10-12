@@ -68,4 +68,3 @@ jobs:
           folder: packages/docs/storybook-static
           git-config-name: "React CAD Bot"
           git-config-email: "react.cad.dev+bot@gmail.com"
-          tag: ${{github.ref_name}}
