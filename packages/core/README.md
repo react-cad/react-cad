@@ -1,6 +1,6 @@
 # @react-cad/core
 
-Core @react-cad WebAssembly library, providing primitives for constructing the shape tree and a viewer to render shape trees into an HTML canvas.
+Core ReactCAD WebAssembly library, providing primitives for constructing the shape tree and a viewer to render shape trees into an HTML canvas.
 
 The viewer code is derived from the [Open CASCADE WebGL Sample application](https://dev.opencascade.org/doc/overview/html/occt_samples_webgl.html).
 
@@ -9,25 +9,23 @@ The viewer code is derived from the [Open CASCADE WebGL Sample application](http
 ```typescript
   import reactCadCore from "@react-cad/core";
 
-  const canvas = document.getElementById("my-canvas");
+  const core = await reactCadCore();
+  const cube = core.createCADNode("box");
+  cube.setSize([2, 2, 2]);
 
-  reactCadCore({ canvas: canvas }).then((core) => {
-    const cube = core.createCADNode("box");
-    cube.setProps({ x: 2:, y: 2, z: 2 });
-    core.render(cube, true);
-  });
+  core.renderSTEP(cube).then(contents => fs.writeFileSync("cube.step", contents));;
 ```
 
-The JS module must be able to find the WebAssembly file at run time. You can provide a URI with the `locateFile` option:
+Use on the web requires more complex loading. See `@react-cad/storybook-framework` for a webpack example. One you have the core object:
 
 ```typescript
-  import reactCadCore from "@react-cad/core";
-  /* Get URL from webpack file-loader */
-  import reactCadCoreWasmUrl from "file-loader!@react-cad/core/lib/react-cad-core.wasm";
+  const cube = core.createCADNode("box");
+  cube.setSize([2, 2, 2]);
 
-  reactCadCore({ locateFile: () => reactCadCoreWasmUrl }).then((core) => {
-    // ...
-  });
+  const canvas = document.getElementById("my-canvas");
+  const view = core.createView(canvas);
+
+  core.renderNodeAsync(cube, view);
 ```
 
-See `src/main.cpp` for available node types and the relevant shape factory `.cpp` file for available props.
+See [src/react-cad-core.d.ts](./src/react-cad-core.d.ts) for the TypeScript API.

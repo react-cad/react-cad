@@ -95,6 +95,17 @@ export function webpack(config: Configuration): Configuration {
         ],
       })
     );
+
+    config.plugins?.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: require.resolve("../../.nojekyll"),
+            to: ".nojekyll",
+          },
+        ],
+      })
+    );
   }
 
   config.resolve = {

@@ -6,7 +6,8 @@
   "files": [
     "lib/**/*",
     "README.md",
-    "*.js"
+    "*.js",
+    ".nojekyll"
   ],
   "keywords": [
     "storybook",
