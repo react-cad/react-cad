@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.1](https://github.com/react-cad/react-cad/compare/v0.19.0...v0.19.1) (2022-10-12)
+
+
+### Bug Fixes
+
+* prevent closure minitfy fs calls ([aa5b811](https://github.com/react-cad/react-cad/commit/aa5b811716e961a3addec377f80c082f5d89ee8c))
+
+
+
+
+
 # [0.19.0](https://github.com/react-cad/react-cad/compare/v0.18.0...v0.19.0) (2022-10-12)
 
 
