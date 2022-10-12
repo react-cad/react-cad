@@ -3,11 +3,18 @@ import { Props, Instance, UpdatePayload } from "../types";
 type Cone = "cone";
 
 function validateProps(props: Props<Cone>): boolean {
-  if (props.radius1 <= 0) {
-    throw new Error(`cylinder: "radius1" prop must be greater than 0`);
+  if (props.radius1 < 0) {
+    throw new Error(
+      `cylinder: "radius1" prop must be greater than or equal to 0`
+    );
   }
-  if (props.radius2 <= 0) {
-    throw new Error(`cylinder: "radius2" prop must be greater than 0"`);
+  if (props.radius2 < 0) {
+    throw new Error(
+      `cylinder: "radius2" prop must be greater than or equal to 0"`
+    );
+  }
+  if (props.radius1 === props.radius2) {
+    throw new Error(`cylinder: "radius1" and "radius2" must not be equal`);
   }
   if (props.height <= 0) {
     throw new Error(`cylinder: "height" prop must be greater than 0`);

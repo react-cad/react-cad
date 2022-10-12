@@ -1,0 +1,44 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import model from "./model.brep";
+
+<Meta title="Reference/Imports/BREP" />
+
+# brep
+
+The `brep` element imports a CAD model in Boundary Representation format. The `data` prop takes a string or ArrayBuffer containing the BREP file data.
+
+<ArgsTable
+  rows={{
+    data: {
+      name: "data",
+      type: {
+        required: true,
+      },
+      description: "The BREP file data.",
+      table: {
+        type: {
+          summary: "string | ArrayBuffer",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const BREP = (props) => <brep {...props} />;
+
+### BREP file
+
+A model made in FreeCAD and imported as a BREP file.
+
+<Source language="jsx" code={`
+// Configure your module loader to import this file as a string
+import model from './model.brep';
+<brep data={model} />
+`} />
+
+<Story name="brep" args={{ data: model }}>
+  {BREP.bind({})}
+</Story>

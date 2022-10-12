@@ -27,6 +27,7 @@ const ProgressBar: React.FC<Props> = ({
 
       setShow(true);
       setProgress(0);
+      setMessage("Waiting for renderer...");
       progressIndicator.subscribe(observer);
       progressIndicator.then(
         () => setShow(false),

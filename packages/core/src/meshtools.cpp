@@ -27,10 +27,7 @@ TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh, const Message_Progr
 
   Message_ProgressScope scope(theRange, "Building shape from mesh", 9);
 
-  const TColgp_Array1OfPnt &aNodes = aMesh->Nodes();
-  const Poly_Array1OfTriangle &aTriangles = aMesh->Triangles();
-
-  Message_ProgressScope meshScope(scope.Next(4), "Making faces from triangles ", aTriangles.Size());
+  Message_ProgressScope meshScope(scope.Next(4), "Making faces from triangles ", aMesh->NbTriangles());
 
   TopoDS_Vertex aTriVertexes[3];
   TopoDS_Face aFace;
@@ -42,16 +39,16 @@ TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh, const Message_Progr
   BRep_Builder BuildTool;
   BuildTool.MakeCompound(aComp);
 
-  for (Standard_Integer aTriIdx = aTriangles.Lower(); aTriIdx <= aTriangles.Upper() && meshScope.More(); ++aTriIdx)
+  for (Standard_Integer aTriIdx = 1; aTriIdx <= aMesh->NbTriangles() && meshScope.More(); ++aTriIdx)
   {
-    const Poly_Triangle &aTriangle = aTriangles(aTriIdx);
+    const Poly_Triangle &aTriangle = aMesh->Triangle(aTriIdx);
 
     Standard_Integer anId[3];
     aTriangle.Get(anId[0], anId[1], anId[2]);
 
-    const gp_Pnt &aPnt1 = aNodes(anId[0]);
-    const gp_Pnt &aPnt2 = aNodes(anId[1]);
-    const gp_Pnt &aPnt3 = aNodes(anId[2]);
+    const gp_Pnt &aPnt1 = aMesh->Node(anId[0]);
+    const gp_Pnt &aPnt2 = aMesh->Node(anId[1]);
+    const gp_Pnt &aPnt3 = aMesh->Node(anId[2]);
     if ((!(aPnt1.IsEqual(aPnt2, 0.0))) && (!(aPnt1.IsEqual(aPnt3, 0.0))))
     {
       aTriVertexes[0] = BRepBuilderAPI_MakeVertex(aPnt1);

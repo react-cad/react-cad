@@ -4,10 +4,10 @@ import { arrayEqual } from "./helpers";
 type Mirror = "mirror";
 
 function validateProps(props: Props<Mirror>): boolean {
-  if (props.origin.length !== 3) {
+  if (props.point && props.point.length !== 3) {
     throw new Error(`mirror: "normal" must be array with size 3`);
   }
-  if (props.normal.length !== 3) {
+  if (props.normal && props.normal.length !== 3) {
     throw new Error(`mirror: "normal" must be array with size 3`);
   }
 
@@ -19,7 +19,7 @@ export function prepareUpdate(
   newProps: Props<Mirror>
 ): UpdatePayload<Mirror> | null {
   if (
-    !arrayEqual(oldProps.origin, newProps.origin) ||
+    !arrayEqual(oldProps.point, newProps.point) ||
     !arrayEqual(oldProps.normal, newProps.normal)
   ) {
     validateProps(newProps);
@@ -33,5 +33,8 @@ export function commitUpdate(
   updatePayload: UpdatePayload<Mirror>
 ): void {
   validateProps(updatePayload);
-  instance.node.setPlane(updatePayload.origin, updatePayload.normal);
+  instance.node.setPlane(
+    updatePayload.point ?? [0, 0, 0],
+    updatePayload.normal ?? [1, 0, 0]
+  );
 }

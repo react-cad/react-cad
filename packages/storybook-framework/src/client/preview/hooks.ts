@@ -13,23 +13,27 @@ const importCore = Function(`return import("./${esmUrl}")`) as () => Promise<
 
 let core: ReactCADCore | undefined;
 
-const corePromise = importCore()
-  .then(({ default: reactCadCore }) =>
-    reactCadCore({
-      mainScriptUrlOrBlob: jsUrl,
-      locateFile: (path: string) =>
-        path.includes("wasm")
-          ? process.env.REACTCAD_WASM || localWasmUrl
-          : workerUrl,
-    })
-  )
-  .then((c) => {
-    core = c;
-    return c;
-  });
+let corePromise: Promise<ReactCADCore> | undefined;
+
+const loadCore = () =>
+  importCore()
+    .then(({ default: reactCadCore }) =>
+      reactCadCore({
+        mainScriptUrlOrBlob: jsUrl,
+        locateFile: (path: string) =>
+          path.includes("wasm")
+            ? process.env.REACTCAD_WASM || localWasmUrl
+            : workerUrl,
+      })
+    )
+    .then((c) => {
+      core = c;
+      return c;
+    });
 
 export function useReactCADCore(): ReactCADCore | undefined {
   const [, setLoaded] = React.useState(false);
+  corePromise = corePromise ?? loadCore();
   corePromise.then(() => setLoaded(true));
 
   return core;

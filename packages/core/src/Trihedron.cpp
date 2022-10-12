@@ -94,7 +94,7 @@ Trihedron::Trihedron()
   for (Standard_Integer anIt = 0; anIt < 3; ++anIt)
   {
     myArrowShadingAspects[anIt] = new Prs3d_ShadingAspect();
-    myArrowLineAspects[anIt] = new Prs3d_LineAspect(Quantity_NOC_WHITE, Aspect_TOL_SOLID, 1.0);
+    myArrowLineAspects[anIt] = new Prs3d_LineAspect(Quantity_NOC_WHITE, Aspect_TOL_SOLID, 2.0);
 
     // mark texture map ON to actually disable environment map
     myArrowShadingAspects[anIt]->Aspect()->SetTextureMapOn();

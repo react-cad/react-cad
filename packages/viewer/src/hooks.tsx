@@ -64,51 +64,54 @@ export function useReactCADRenderer(
 }
 
 export function useReactCADView(
+  canvasContainerRef: React.RefObject<HTMLDivElement>,
   core: ReactCADCore,
   options: ViewOptions,
   addTask: AddTask
-): [
-  React.MutableRefObject<ReactCADView | undefined>,
-  (canvas: HTMLCanvasElement | null) => void,
-  () => void
-] {
+): React.MutableRefObject<ReactCADView | undefined> {
+  const canvasRef = React.useRef<HTMLCanvasElement>();
   const view = React.useRef<ReactCADView>();
-  const [onResize, setOnResize] = React.useState(() => () => {});
-
-  const canvasRef = React.useCallback((canvas: HTMLCanvasElement | null) => {
-    if (canvas) {
-      if (view.current) {
-        view.current.delete();
-        view.current = undefined;
-      }
-      view.current = core.createView(canvas);
-      setOnResize(() => () => {
-        if (view.current) {
-          canvas.width = canvas.clientWidth * window.devicePixelRatio;
-          canvas.height = canvas.clientHeight * window.devicePixelRatio;
-          view.current.onResize();
-        }
-      });
-    }
-  }, []);
-
-  React.useEffect(
-    () => () => {
-      if (view.current) {
-        view.current.delete();
-        view.current = undefined;
-      }
-    },
-    []
-  );
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    if (onResize) {
-      onResize();
-      window.addEventListener("resize", onResize);
-      return () => window.removeEventListener("resize", onResize);
+    canvasRef.current = canvasContainerRef.current?.getElementsByTagName(
+      "canvas"
+    )[0];
+    if (canvasRef.current) {
+      view.current = core.createView(canvasRef.current);
+
+      const onResize = () => {
+        if (view.current && canvasRef.current) {
+          canvasRef.current.width =
+            canvasRef.current.clientWidth * window.devicePixelRatio;
+          canvasRef.current.height =
+            canvasRef.current.clientHeight * window.devicePixelRatio;
+          view.current.onResize();
+        }
+      };
+
+      const observer = new ResizeObserver(onResize);
+      observer.observe(canvasRef.current, {});
+
+      const quality =
+        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
+      view.current?.setQuality(...quality);
+
+      setLoaded(true);
+
+      return () => {
+        observer.disconnect();
+        if (canvasContainerRef.current) {
+          canvasContainerRef.current.innerHTML = "";
+          canvasRef.current = undefined;
+        }
+        if (view.current) {
+          view.current.delete();
+          view.current = undefined;
+        }
+      };
     }
-  }, [onResize]);
+  }, []);
 
   React.useEffect(() => {
     if (view.current) {
@@ -119,7 +122,7 @@ export function useReactCADView(
       view.current.setProjection(core.Projection[options.projection]);
     }
   }, [
-    onResize,
+    loaded,
     options.showAxes,
     options.showGrid,
     options.showShaded,
@@ -127,22 +130,17 @@ export function useReactCADView(
     options.projection,
   ]);
 
-  const [loaded, setLoaded] = React.useState(false);
-
   React.useEffect(() => {
-    const quality =
-      options.detail === "HIGH" ? options.highDetail : options.lowDetail;
     if (loaded) {
+      const quality =
+        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
       addTask(
         () => view.current && core.setRenderQuality(view.current, ...quality)
       );
-    } else {
-      view.current?.setQuality(...quality);
     }
-    setLoaded(true);
   }, [options.detail, ...options.highDetail, ...options.lowDetail]);
 
-  return [view, canvasRef, onResize];
+  return view;
 }
 
 function download(
@@ -286,9 +284,11 @@ export function useProgressQueue(): [
 
     if (progress) {
       setProgressIndicator((p) => {
+        p?.cancel();
         p?.delete();
         return progress;
       });
+      progressRef.current = progress;
     }
 
     return progress;
@@ -319,6 +319,18 @@ export function useProgressQueue(): [
       return promise;
     },
     [progressIndicator, then]
+  );
+
+  // Cancel last task on unmount
+  const progressRef = React.useRef<ProgressIndicator>();
+  React.useEffect(
+    () => () => {
+      if (progressRef.current && !progressRef.current.isDeleted()) {
+        progressRef.current.cancel();
+        progressRef.current.delete();
+      }
+    },
+    []
   );
 
   return [progressIndicator, addTask, queueLength];

@@ -14,7 +14,7 @@ interface Props {
   name?: string;
   reset?: boolean;
   focus?: boolean;
-  resizable?: boolean;
+  borderless?: boolean;
   highDetail?: [number, number];
   lowDetail?: [number, number];
   setDetail?: (detail: ViewOptions["detail"]) => void;
@@ -30,7 +30,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       name,
       reset,
       focus,
-      resizable,
+      borderless,
       highDetail = [0.001, 0.5],
       lowDetail = [0.002, 1],
       setDetail,
@@ -58,7 +58,9 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const [progressIndicator, addTask, queuedTasks] = useProgressQueue();
 
-    const [view, canvasRef, onResize] = useReactCADView(core, options, addTask);
+    const canvasContainerRef = React.useRef<HTMLDivElement>(null);
+
+    const view = useReactCADView(canvasContainerRef, core, options, addTask);
 
     const shouldReset = React.useRef(false);
 
@@ -131,13 +133,19 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           onFit={handleFit}
           onResetView={handleResetView}
           focus={focus}
-          onResize={resizable ? onResize : undefined}
+          borderless={borderless}
         >
           <ProgressBar
             progressIndicator={progressIndicator}
             queuedTasks={queuedTasks}
           >
-            <canvas style={{ width: "100%", height: "100%" }} ref={canvasRef} />
+            <div
+              style={{ width: "100%", height: "100%" }}
+              ref={canvasContainerRef}
+              dangerouslySetInnerHTML={{
+                __html: '<canvas style="width: 100%; height: 100%" />',
+              }}
+            />
           </ProgressBar>
         </Toolbar>
       </div>

@@ -1,16 +1,21 @@
 import { Props, Instance, UpdatePayload } from "../types";
+import { arrayEqual } from "./helpers";
 
 type Translation = "translation";
+
+function getVector(props: Props<Translation>): [number, number, number] {
+  return "vector" in props
+    ? props.vector
+    : [props.x || 0, props.y || 0, props.z || 0];
+}
 
 export function prepareUpdate(
   oldProps: Props<Translation>,
   newProps: Props<Translation>
 ): UpdatePayload<Translation> | null {
-  if (
-    oldProps.x !== newProps.x ||
-    oldProps.y !== newProps.y ||
-    oldProps.z !== newProps.z
-  ) {
+  const oldVector = getVector(oldProps);
+  const newVector = getVector(newProps);
+  if (!arrayEqual(oldVector, newVector)) {
     return newProps;
   }
   return null;
@@ -20,6 +25,6 @@ export function commitUpdate(
   instance: Instance<Translation>,
   updatePayload: UpdatePayload<Translation>
 ): void {
-  const { x = 0, y = 0, z = 0 } = updatePayload;
-  instance.node.setVector([x, y, z]);
+  const vector = getVector(updatePayload);
+  instance.node.setVector(vector);
 }

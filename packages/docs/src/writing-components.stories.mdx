@@ -1,0 +1,98 @@
+import { Meta, Source } from "@storybook/addon-docs";
+import Link from './Link';
+import intersection from './images/intersection.png'
+import union from './images/union.png'
+
+<Meta title="Writing components" />
+
+# Writing components
+
+Leave ReactCAD running and open the file `src/Example.tsx` in whichever code editor you prefer. An editor with TypeScript support is strongly recommended, [VS Code](https://code.visualstudio.com/) works fine.
+
+<Source language="tsx" code={`
+// src/Example.tsx
+import React from "react";
+ 
+export interface Props {
+  boxSize: number;
+  sphereSize: number;
+}
+ 
+export const Example: React.FunctionComponent<Props> = ({ boxSize, sphereSize }) => (
+  <difference>
+    <sphere radius={sphereSize} />
+    <box x={boxSize} y={boxSize} z={boxSize} center />
+  </difference>
+);
+ 
+export default Example;
+`} />
+
+As you can see it's a simple React component with TypeScript annotations for the prop types. It takes two number props, one to specify the box size and the other the sphere radius. These are passed to the appropriate props on the the `<sphere>` and `<box>` elements.
+
+> You'll notice that `<difference>`, `<sphere>` and `<box>` are all lowercase. In React this means they are intrinsic elements provided by the renderer. When you build a React website, intrinsic elements are html elements like `<div>`, `<span>` and `<p>`. In ReactCAD, they are 3D shapes (like `<box>`), transformations (like `<rotation>`) and operations (like `<intersection>`). You can see a full list of available elements in the <Link to="reference-introduction">reference section</Link>.
+
+Try swapping the order of the `<sphere>` and `<box>` elements and saving the file. ReactCAD will detect the file change, recompile the component and rerender the preview. You'll see the sphere is now subtracted from the box. Now change it back!
+
+Now try changing the `<difference>` element to an `<intersection>` element. Remember to change both the opening and closing tags, and to save the file. You can also try changing it to a `<union>`.
+
+<img src={intersection} style={{ width: '50%', height: 'auto' }} alt="A 3D view of the intersection of a cube and a sphere." />
+
+<img src={union} style={{ width: '50%', height: 'auto' }} alt="A 3D view of a cube and a sphere added together." />
+
+This should give you an idea of how 3D shapes can be combined to form more complicated models. Check the <Link to="reference-introduction">element reference</Link> for a full listing of the elements you can use. As well as the primitives and operations you've come across, there are also swept shapes, imported shapes and transformations.
+
+## Writing stories
+
+Earlier we said the sidebar lists all the components in your project. This isn't quite true. A component will only be listed here if it has a **story** associated with it. A story tells ReactCAD which components to include in the viewer as well as setting any necessary props, or exposing props as customization options in the controls section.
+
+You can see how the Example story is set up in `src/Example.stories.tsx`:
+
+<Source language="tsx" code={`
+// src/Example.stories.tsx
+import React from "react";
+import { Story, Meta } from "@react-cad/storybook-framework";
+ 
+import { Example, Props } from "./Example.js";
+ 
+export default {
+  title: "Example",
+  component: Example,
+  argTypes: {
+    boxSize: {
+      control: {
+        type: "range",
+        min: 5,
+        max: 15,
+        step: 0.1,
+      },
+    },
+    sphereSize: {
+      control: {
+        type: "range",
+        min: 3,
+        max: 10,
+        step: 0.1
+      },
+    },
+  },
+} as Meta;
+ 
+const Template: Story<Props> = (args) => <Example {...args} />;
+ 
+export const example = Template.bind({});
+example.args = {
+  boxSize: 5,
+  sphereSize: 3.5 
+};
+`} />
+
+At the bottom of the file it exports a story called `example` which uses default args `boxSize = 5` and `sphereSize = 3.5`. These arges will be passed to the `Template` which sets them as props on our `Example` component.
+
+There's also the default export of a meta object. This tells Storybook the name of our component and what kind of form controls we want for the `boxSize` and `sphereSize` args.
+
+The concept of a story comes from [Storybook](https://storybook.js.org/docs/react/writing-stories/introduction), which ReactCAD's GUI is based on. Storybook's documentation on [Writing stories](https://storybook.js.org/docs/react/writing-stories/introduction) is the best place to learn about them.
+
+>The only difference is the use of React hooks - you can use hooks in your ReactCAD components, but you can't use hooks within a ReactCAD story function. If you absolutely need to use hooks, move them from the story function down into a wrapper component.
+
+Next: <Link to="publishing-components">Sharing your component</Link>

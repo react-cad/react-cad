@@ -1,0 +1,104 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Primitives/Cylinder" />
+
+# cylinder
+
+The `cylinder` element creates a cylinder centered on the z-axis. It has a `height` and a `radius`. An optional `angle` prop limits the shape to the portion of the cylinder within that angle around the z-axis. The cylinder can optionally be centered on the origin. 
+
+<ArgsTable
+  rows={{
+    height: {
+      name: "height",
+      type: {
+        required: true,
+      },
+      description: "The height of the cylinder in the z-axis",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+      },
+    },
+    radius: {
+      name: "radius",
+      type: {
+        required: true,
+      },
+      description: "The radius of the cylinder.",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+      },
+    },
+    angle: {
+      name: "angle",
+      description: "The angle around the z-axis to limit the cylinder to",
+      table: {
+        type: {
+          summary: 'number',
+          detail: 'a number between one and `2π`'
+        },
+        defaultValue: {
+          summary: '2π'
+        },
+      },
+    },
+    center: {
+      name: "center",
+      description: "Whether to center the cylinder on the origin",
+      table: {
+        type: {
+          summary: 'boolean'
+        },
+        defaultValue: {
+          summary: 'false'
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Cylinder = (props) => <cylinder {...props} />;
+
+### Cylinder
+
+A cylinder of height 5 and radius 2.
+
+<Source language="jsx" code={`
+  <cylinder height={5} radius={2} />
+`} />
+
+<Story name="cylinder" args={{ height: 5, radius: 2 }}>
+  {Cylinder.bind({})}
+</Story>
+
+### Cylinder limited by an angle
+
+A cylinder of height 5 and radius 2, limited to 3 quarters of a turn.
+
+<Source language="jsx" code={`
+  <cylinder height={5} radius={2} angle={3 * Math.PI / 2} />
+`} />
+
+<Story name="cylinder limited by an angle" args={{  height: 5, radius: 2, angle: 3 * Math.PI / 2 }}>
+  {Cylinder.bind({})}
+</Story>
+
+### Centered cylinder
+
+A cylinder centered at the origin.
+
+<Source language="jsx" code={`
+  <cylinder height={5} radius={2} center />
+`} />
+
+<Story name="centered cylinder" args={{ height: 5, radius: 2, center: true }}>
+  {Cylinder.bind({})}
+</Story>

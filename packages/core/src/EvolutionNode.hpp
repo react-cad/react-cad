@@ -19,8 +19,8 @@ protected:
   void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
-  TopoDS_Wire m_profile;
-  TopoDS_Shape m_spine;
+  Handle(ShapeBuilder) m_spineBuilder;
+  Handle(ShapeBuilder) m_profileBuilder;
 };
 
 #endif

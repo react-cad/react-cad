@@ -1,5 +1,5 @@
 import React from "react";
-import { css, keyframes } from "@emotion/react";
+import { css, keyframes } from "@storybook/theming";
 import { TbFileDownload, TbRefresh } from "react-icons/tb";
 import { useClickOutside } from "./hooks";
 import { ExportFns } from "./types";

@@ -9,6 +9,8 @@
 #include <TopoDS_Wire.hxx>
 #include <gp_Pnt.hxx>
 
+#include "ShapeBuilder.hpp"
+
 #include <utility>
 
 class SweepNode : public ReactCADNode
@@ -19,13 +21,10 @@ public:
   void setProfileSVG(const std::string &svg);
 
 protected:
-  TopoDS_Shape m_profile;
-  Standard_Boolean m_profileChanged = false;
+  TopoDS_Shape getProfile();
 
 private:
-  NCollection_Array1<gp_Pnt> m_points;
-  std::string m_svg;
-  Standard_Boolean m_isSVG;
+  Handle(ShapeBuilder) m_profileBuilder;
 };
 
 #endif

@@ -20,7 +20,7 @@ const profiles: Record<string, Profile> = {
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
-  SVG: reactIcon([24, 0]),
+  SVG: reactIcon([3, 0]),
 };
 
 export const Revolution: React.FC<Props> = (props) => <revolution {...props} />;

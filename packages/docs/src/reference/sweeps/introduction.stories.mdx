@@ -1,0 +1,23 @@
+import { Meta } from "@storybook/addon-docs";
+import Link from '../../Link';
+
+<Meta title="Reference/Sweeps/Introduction" />
+
+# Sweeps
+
+ReactCAD provides various elements to construct 3-dimensional solids by sweeping a profile along a spine. Prisms, pipes, revolutions and helices take a 2d shape as a profile and sweep it along a path. Evolutions take a 2d shape as a spine, and sweep a path along it to describe a 3d solid. 
+
+- <Link to="reference-sweeps--prism">Prism</Link>
+- <Link to="reference-sweeps--helix">Helix</Link>
+- <Link to="reference-sweeps--revolution">Revolution</Link>
+- <Link to="reference-sweeps--pipe">Pipe</Link>
+- <Link to="reference-sweeps--evolution">Evolution</Link>
+
+The 2d shapes are defined either as a list of points describing a planar polygon or using SVGs, which are drawn in the xy plane.
+
+Most SVGs should work, but the full spec is not supported. In particular;
+- text is not supported (text can be extruded by creating an SVG `path` in the shape of the text)
+- path stroke and fill attributes are ignored - all shapes are filled.
+- self-intersecting shapes cause undefined behaviour.
+
+Also note that the SVG coordinate system begins at the top left of the image, so SVGs will be placed with their top left corner at the origin, extending in the positive x- and negative y-directions.

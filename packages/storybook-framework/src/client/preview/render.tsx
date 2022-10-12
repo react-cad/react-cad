@@ -36,28 +36,26 @@ export function renderToDOM(
     showMain,
     forceRemount,
     id,
-    name,
     storyContext,
   }: RenderContext<ReactCadFramework>,
   domElement: Element
 ): void {
   showMain();
 
-  const { highDetail, lowDetail, resizable } =
-    storyContext.parameters.reactCad || {};
+  const { highDetail, lowDetail } = storyContext.parameters.reactCad || {};
 
   ReactDOM.render(
     <>
-      <style>{`html, body, #root { height: 100% }`}</style>
+      <style>{`html, body, #root { height: 100%; padding: 0 !important; }`}</style>
       <ViewContainer
         forceRemount={forceRemount}
         id={id}
         shape={storyFn()}
-        name={name}
+        name={id}
         focus
         highDetail={highDetail}
         lowDetail={lowDetail}
-        resizable={resizable}
+        borderless
       />
     </>,
     domElement,

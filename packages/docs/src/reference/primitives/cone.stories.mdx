@@ -1,0 +1,129 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Primitives/Cone" />
+
+# cone
+
+The `cone` element creates a truncated cone centered on the z-axis. It has a `height`, a radius at `z = 0` of `radius1` and a radius at `z = height` of `radius2`. An optional `angle` prop limits the shape to the portion of the cone within that angle around the z-axis. The cone can optionally be centered on the origin. 
+
+<ArgsTable
+  rows={{
+    height: {
+      name: "height",
+      type: {
+        required: true,
+      },
+      description: "The height of the cone in the z-axis",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+      },
+    },
+    radius1: {
+      name: "radius1",
+      type: {
+        required: true,
+      },
+      description: "The radius of the cone at its base. This can be zero to form a full cone.",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than or equal to zero",
+        },
+      },
+    },
+    radius2: {
+      name: "radius2",
+      type: {
+        required: true,
+      },
+      description: "The radius of the cone at `z = height`. This can be zero to form a full cone, but it must not be equal to `radius1` (use a cylinder instead).",
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than or equal to zero",
+        },
+      },
+    },
+    angle: {
+      name: "angle",
+      description: "The angle around the z-axis to limit the cone to",
+      table: {
+        type: {
+          summary: 'number',
+          detail: 'a number between one and `2π`'
+        },
+        defaultValue: {
+          summary: '2π'
+        },
+      },
+    },
+    center: {
+      name: "center",
+      description: "Whether to center the cone on the origin",
+      table: {
+        type: {
+          summary: 'boolean'
+        },
+        defaultValue: {
+          summary: 'false'
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Cone = (props) => <cone {...props} />;
+
+### Sharp cone
+
+A full cone 5 units high with a base radius of 2.
+
+<Source language="jsx" code={`
+  <cone height={5} radius1={2} radius2={0} />
+`} />
+
+<Story name="cone" args={{ height: 5, radius1: 2, radius2: 0 }}>
+  {Cone.bind({})}
+</Story>
+
+### Truncated cone
+
+A truncated cone 5 units high with a base radius of 3 and a top radius of 2.
+
+<Source language="jsx" code={`
+  <cone height={5} radius1={3} radius2={2} />
+`} />
+
+<Story name="truncated cone" args={{  height: 5, radius1: 3, radius2: 2  }}>
+  {Cone.bind({})}
+</Story>
+
+### Cone limited by an angle
+
+A full cone 5 units high with a base radius of 2, limited to 3 quarters of a turn.
+
+<Source language="jsx" code={`
+  <cone height={5} radius1={2} radius2={0} angle={3 * Math.PI / 2} />
+`} />
+
+<Story name="cone limited by an angle" args={{  height: 5, radius1: 2, radius2: 0, angle: 3 * Math.PI / 2 }}>
+  {Cone.bind({})}
+</Story>
+
+### Centered cone
+
+A cone centered on the origin (according to the center of its bounding box, not its center of mass).
+
+<Source language="jsx" code={`
+  <cone height={5} radius1={2} radius2={0} center />
+`} />
+
+<Story name="centered cone" args={{ height: 5, radius1: 2, radius2: 0, center: true }}>
+  {Cone.bind({})}
+</Story>

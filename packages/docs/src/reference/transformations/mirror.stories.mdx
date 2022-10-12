@@ -1,0 +1,73 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+
+<Meta title="Reference/Transformations/Mirror" />
+
+# mirror
+
+The `mirror` element reflects its children in a plane. The plane is defined by a `point` and a vector `normal`. By default the children are reflected in the yz plane.
+
+Note that the children are trasnformed, not duplicated, so you are left with only the mirrored copy.
+
+<ArgsTable
+  rows={{
+    point: {
+      name: "point",
+      description: "A point on the reflection plane",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a point [x,y,z]",
+        },
+        defaultValue: {
+          summary: "[0, 0, 0]",
+        },
+      },
+    },
+    normal: {
+      name: "normal",
+      description: "The normal of the refrlection plane.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a vector [x,y,z]",
+        },
+        defaultValue: {
+          summary: '[1, 0, 0]'
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Mirror = (props) => <mirror {...props} />;
+
+### Mirror in the yz plane
+
+A cube mirrored in the yz plane.
+
+<Source language="jsx" code={`
+<mirror>
+  <box x={5} y={5} z={5} />
+</mirror>
+`} />
+
+<Story name="mirror" args={{ children: [<box x={5} y={5} z={5} />] }}>
+  {Mirror.bind({})}
+</Story>
+
+### Mirror in a diagonal plane
+
+A cube mirrored in a diagonal plane away from the origin.
+
+<Source language="jsx" code={`
+<mirror point={[0, 5, 5]} normal={[0, 1, 2]}>
+  <box x={5} y={5} z={5} />
+</mirror>
+`} />
+
+<Story name="mirror diagonal" args={{ point: [0, 5, 5], normal: [0,1,2], children: [<box x={5} y={5} z={5} />] }}>
+  {Mirror.bind({})}
+</Story>

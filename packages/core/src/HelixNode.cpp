@@ -6,6 +6,7 @@
 #include <BRep_Builder.hxx>
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom_CylindricalSurface.hxx>
+#include <Message.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -74,6 +75,8 @@ TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
 
 void HelixNode::computeShape(const Message_ProgressRange &theRange)
 {
+  TopoDS_Shape profile = getProfile();
+
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
 #endif
@@ -85,7 +88,7 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
 
   TopExp_Explorer Faces;
   int nbFaces = 0;
-  for (Faces.Init(m_profile, TopAbs_FACE); Faces.More(); Faces.Next())
+  for (Faces.Init(profile, TopAbs_FACE); Faces.More(); Faces.Next())
   {
     ++nbFaces;
   }
@@ -103,7 +106,7 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
       ++nbWires;
     }
 
-    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires);
+    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires * 2);
 
     TopoDS_Wire outerWire = BRepTools::OuterWire(face);
     TopoDS_Shape solid = makeHelix(outerWire);
@@ -123,7 +126,7 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
       faceScope.Next();
     }
 
-    TopoDS_Shape helix = differenceOp(solid, holes);
+    TopoDS_Shape helix = differenceOp(solid, holes, faceScope.Next(nbWires));
     builder.Add(compound, helix);
   }
 

@@ -1,0 +1,46 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import model from "./model.obj";
+
+<Meta title="Reference/Imports/OBJ" />
+
+# obj
+
+The `obj` element imports a tesselated mesh in Wavefront OBJ format. The `data` prop takes a string or ArrayBuffer containing the OBJ file data.
+
+Note that an OBJ file contains a triangulated mesh. Not only is this less accurate than the exact geometry in STEP or BREP files, it will be slow to work with as React CAD createds exact geometric representations of every triangle. Use STEP or BREP instead if it is at all possible.
+
+<ArgsTable
+  rows={{
+    data: {
+      name: "data",
+      type: {
+        required: true,
+      },
+      description: "The OBJ file data.",
+      table: {
+        type: {
+          summary: "string | ArrayBuffer",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const OBJ = (props) => <obj {...props} />;
+
+### OBJ file
+
+A model made in FreeCAD and imported as a OBJ file.
+
+<Source language="jsx" code={`
+// Configure your module loader to import this file as a string
+import model from './model.obj';
+<obj data={model} />
+`} />
+
+<Story name="obj" args={{ data: model }}>
+  {OBJ.bind({})}
+</Story>

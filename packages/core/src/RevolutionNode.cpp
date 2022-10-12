@@ -23,13 +23,15 @@ void RevolutionNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 
 void RevolutionNode::computeShape(const Message_ProgressRange &theRange)
 {
+  TopoDS_Shape profile = getProfile();
+
   gp_Ax1 axis(gp::Origin(), m_axis);
 
   Standard_Real angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
   try
   {
-    BRepPrimAPI_MakeRevol revolution(m_profile, axis, angle);
+    BRepPrimAPI_MakeRevol revolution(profile, axis, angle);
     shape = revolution;
   }
   catch (const StdFail_NotDone &e)

@@ -34,7 +34,7 @@ interface Props {
   onResetView: () => void;
   onFit: () => void;
   focus?: boolean;
-  onResize?: () => void;
+  borderless?: boolean;
 }
 
 const Toolbar: React.FC<Props> = ({
@@ -46,7 +46,7 @@ const Toolbar: React.FC<Props> = ({
   onResetView,
   onFit,
   focus,
-  onResize,
+  borderless,
   children,
 }) => {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -56,23 +56,6 @@ const Toolbar: React.FC<Props> = ({
       wrapperRef.current?.focus();
     }
   }, [focus]);
-
-  React.useEffect(() => {
-    if (onResize && wrapperRef.current) {
-      const div = wrapperRef.current;
-      let mounted = false;
-
-      const observer = new ResizeObserver(() => {
-        if (mounted) {
-          onResize();
-        }
-        mounted = true;
-      });
-      observer.observe(div, {});
-
-      return () => observer.disconnect();
-    }
-  }, [onResize]);
 
   const toggleShaded = React.useCallback(
     () =>
@@ -199,18 +182,13 @@ const Toolbar: React.FC<Props> = ({
         alignItems: "stretch",
         width: "100%",
         height: "100%",
-        overflow: "hidden",
+        ...(borderless ? {} : { border: "1px solid rgba(0,0,0,0.1)" }),
         "&:focus": {
           outline: "rgba(30,167,253,0.5) solid 1px",
         },
-        " *": {
+        "&, & *": {
           boxSizing: "border-box",
         },
-        ...(onResize
-          ? {
-              resize: "both",
-            }
-          : {}),
       }}
       tabIndex={0}
       onKeyPress={handleKeyPress}
@@ -222,7 +200,7 @@ const Toolbar: React.FC<Props> = ({
           flexWrap: "wrap",
           flexGrow: 0,
           alignContent: "flex-start",
-          border: "1px solid rgba(0,0,0,0.1)",
+          borderRight: "1px solid rgba(0,0,0,0.1)",
           padding: "2px 1px",
           writingMode: "vertical-lr",
         }}

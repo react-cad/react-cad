@@ -6,7 +6,7 @@ module.exports = {
     builder: "webpack5",
   },
   reactOptions: {
-    fastRefresh: true,
+    fastRefresh: false,
   },
   webpackFinal: async (config, { configType }) => {
     config.module.rules.push({

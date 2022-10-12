@@ -48,7 +48,13 @@ export async function babelDefault(
 export function webpack(config: Configuration): Configuration {
   config.module?.rules?.push({
     test: /react-cad-core\.wasm$/,
-    use: "file-loader",
+    use: {
+      loader: "file-loader",
+      options: {
+        emitFile:
+          config.mode !== "production" || !!process.env.REACTCAD_LOCAL_WASM,
+      },
+    },
   });
   config.module?.rules?.push({
     test: /react-cad-core\.js$/,
@@ -89,6 +95,17 @@ export function webpack(config: Configuration): Configuration {
         ],
       })
     );
+
+    config.plugins?.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: require.resolve("../../.nojekyll"),
+            to: ".nojekyll",
+          },
+        ],
+      })
+    );
   }
 
   config.resolve = {
@@ -98,6 +115,10 @@ export function webpack(config: Configuration): Configuration {
       fs: false,
       path: false,
       "perf-hooks": false,
+    },
+    extensionAlias: {
+      ...config.resolve?.extensionAlias,
+      ".js": [".ts", ".tsx", ".js", ".jsx"],
     },
   };
 

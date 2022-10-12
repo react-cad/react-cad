@@ -1162,10 +1162,17 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.17.8", "@babel/runtime@^7.18.3", "@babel/runtime@^7.7.6":
+"@babel/runtime@^7.17.8", "@babel/runtime@^7.7.6":
   version "7.18.9"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.9.tgz#b4fcfce55db3d2e5e080d2490f608a3b9f407f4a"
   integrity sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
+"@babel/runtime@^7.18.3":
+  version "7.19.0"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.19.0.tgz#22b11c037b094d27a8a2504ea4dcff00f50e2259"
+  integrity sha512-eR8Lo9hnDS7tqkO7NsV+mKvCmv5boaXFSZ70DnfhcgiEne8hv9oCEd36Klw74EtizEqLsy4YnW8UWwpBVolHZA==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -2817,7 +2824,7 @@
     lodash "^4.17.21"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-docs@6.5.12":
+"@storybook/addon-docs@6.5.12", "@storybook/addon-docs@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/addon-docs/-/addon-docs-6.5.12.tgz#84d27147b044b1e3ed7354aba635bf71f3750000"
   integrity sha512-T+QTkmF7QlMVfXHXEberP8CYti/XMTo9oi6VEbZLx+a2N3qY4GZl7X2g26Sf5V4Za+xnapYKBMEIiJ5SvH9weQ==
@@ -3154,7 +3161,7 @@
     core-js "^3.8.2"
     global "^4.4.0"
 
-"@storybook/components@6.5.12":
+"@storybook/components@6.5.12", "@storybook/components@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/components/-/components-6.5.12.tgz#e137f0683ea92e22de116bfa62cfd65ce4efe01d"
   integrity sha512-NAAGl5PDXaHdVLd6hA+ttmLwH3zAVGXeUmEubzKZ9bJzb+duhFKxDa9blM4YEkI+palumvgAMm0UgS7ou680Ig==
@@ -3620,7 +3627,7 @@
     read-pkg-up "^7.0.1"
     regenerator-runtime "^0.13.7"
 
-"@storybook/theming@6.5.12":
+"@storybook/theming@6.5.12", "@storybook/theming@^6.5.12":
   version "6.5.12"
   resolved "https://registry.yarnpkg.com/@storybook/theming/-/theming-6.5.12.tgz#7df1b52913d49c5e84fc1f2e837c02d9fa8cc639"
   integrity sha512-uWOo84qMQ2R6c1C0faZ4Q0nY01uNaX7nXoJKieoiJ6ZqY9PSYxJl1kZLi3uPYnrxLZjzjVyXX8MgdxzbppYItA==
@@ -3909,6 +3916,13 @@
   integrity sha512-VjnqEmqGnasQKV0CWLevqMTXBYG9GbwuE6x3VetERLh0cq2LTptFE73MrQi2S7GkKXCf2GgwItB/melLnxfnsg==
   dependencies:
     "@types/react" "^17"
+
+"@types/react-lazyload@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@types/react-lazyload/-/react-lazyload-3.2.0.tgz#b763f8f0c724df2c969d7e0b3a56c6aa2720fa1f"
+  integrity sha512-4+r+z8Cf7L/mgxA1vl5uHx5GS/8gY2jqq2p5r5WCm+nUsg9KilwQ+8uaJA3EUlLj57AOzOfGGwwRJ5LOVl8fwA==
+  dependencies:
+    "@types/react" "*"
 
 "@types/react-reconciler@^0.18.0":
   version "0.18.0"
@@ -13416,6 +13430,11 @@ react-is@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
+
+react-lazyload@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-lazyload/-/react-lazyload-3.2.0.tgz#497bd06a6dbd7015e3376e1137a67dc47d2dd021"
+  integrity sha512-zJlrG8QyVZz4+xkYZH5v1w3YaP5wEFaYSUWC4CT9UXfK75IfRAIEdnyIUF+dXr3kX2MOtL1lUaZmaQZqrETwgw==
 
 react-reconciler@^0.26.1:
   version "0.26.1"

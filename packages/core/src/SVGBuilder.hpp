@@ -1,25 +1,23 @@
-#ifndef SVGTools_Headerfile
-#define SVGTools_Headerfile
+#ifndef SVGBuilder_Headerfile
+#define SVGBuilder_Headerfile
 
 #include <NCollection_List.hxx>
 #include <Standard_Handle.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Wire.hxx>
+#include <string>
 
-#include "SVGImage.hpp"
+#include "ShapeBuilder.hpp"
 
-typedef NCollection_List<TopoDS_Compound> SVGBuilder_ListOfShapes;
-
-class SVGBuilder
+class SVGBuilder : public ShapeBuilder
 {
 public:
-  SVGBuilder(const Handle(SVGImage) & image);
-
-  TopoDS_Compound Shape();
+  SVGBuilder(const std::string &svg);
+  TopoDS_Shape Shape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
-  TopoDS_Compound m_compound;
-  Handle(SVGImage) m_image;
+  TopoDS_Shape m_shape;
+  std::string m_svg;
 };
 
 #endif

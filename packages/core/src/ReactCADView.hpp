@@ -175,7 +175,6 @@ private:
   EMSCRIPTEN_WEBGL_CONTEXT_HANDLE myWebglContext;
   Handle(AIS_InteractiveContext) myContext; //!< interactive context
   Handle(V3d_View) myView;                  //!< 3D view
-  Handle(Prs3d_TextAspect) myTextStyle;     //!< text style for OSD elements
   Handle(Trihedron) myTrihedron;
   Aspect_Touch myClickTouch;     //!< single touch position for handling clicks
   OSD_Timer myDoubleTapTimer;    //!< timer for handling double tap

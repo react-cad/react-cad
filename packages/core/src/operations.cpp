@@ -1,10 +1,10 @@
 #include "operations.hpp"
 
-#include <BRepAlgoAPI_BuilderAlgo.hxx>
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
+#include <BRepAlgoAPI_Fuse.hxx>
 
-TopoDS_Shape unionOp(TopTools_ListOfShape shapes)
+TopoDS_Shape unionOp(TopTools_ListOfShape shapes, const Message_ProgressRange &theRange)
 {
   switch (shapes.Size())
   {
@@ -13,11 +13,16 @@ TopoDS_Shape unionOp(TopTools_ListOfShape shapes)
   case 1:
     return shapes.First();
   default: {
-    BRepAlgoAPI_BuilderAlgo aBuilder;
+    BRepAlgoAPI_Fuse aBuilder;
 
-    aBuilder.SetArguments(shapes);
+    TopTools_ListOfShape arguments;
+    arguments.Append(shapes.First());
+    shapes.RemoveFirst();
 
-    aBuilder.Build();
+    aBuilder.SetArguments(arguments);
+    aBuilder.SetTools(shapes);
+
+    aBuilder.Build(/*theRange*/);
     if (aBuilder.HasErrors())
     {
       TopoDS_Shape nullShape;
@@ -28,7 +33,7 @@ TopoDS_Shape unionOp(TopTools_ListOfShape shapes)
   }
 }
 
-TopoDS_Shape differenceOp(TopoDS_Shape positive, TopTools_ListOfShape negative)
+TopoDS_Shape differenceOp(TopoDS_Shape positive, TopTools_ListOfShape negative, const Message_ProgressRange &theRange)
 {
   if (negative.Size() == 0)
   {
@@ -43,7 +48,7 @@ TopoDS_Shape differenceOp(TopoDS_Shape positive, TopTools_ListOfShape negative)
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(negative);
 
-  aBuilder.Build();
+  aBuilder.Build(/*theRange*/);
   if (aBuilder.HasErrors())
   {
     TopoDS_Shape nullShape;
@@ -52,14 +57,14 @@ TopoDS_Shape differenceOp(TopoDS_Shape positive, TopTools_ListOfShape negative)
   return aBuilder.Shape();
 }
 
-TopoDS_Shape differenceOp(TopoDS_Shape positive, TopoDS_Shape negative)
+TopoDS_Shape differenceOp(TopoDS_Shape positive, TopoDS_Shape negative, const Message_ProgressRange &theRange)
 {
   TopTools_ListOfShape aLT;
   aLT.Append(negative);
-  return differenceOp(positive, aLT);
+  return differenceOp(positive, aLT, theRange);
 }
 
-TopoDS_Shape intersectionOp(TopoDS_Shape positive, TopoDS_Shape negative)
+TopoDS_Shape intersectionOp(TopoDS_Shape positive, TopoDS_Shape negative, const Message_ProgressRange &theRange)
 {
   TopTools_ListOfShape aLS;
   aLS.Append(positive);
@@ -70,7 +75,7 @@ TopoDS_Shape intersectionOp(TopoDS_Shape positive, TopoDS_Shape negative)
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(aLT);
 
-  aBuilder.Build();
+  aBuilder.Build(/*theRange*/);
 
   if (aBuilder.HasErrors())
   {
@@ -81,7 +86,7 @@ TopoDS_Shape intersectionOp(TopoDS_Shape positive, TopoDS_Shape negative)
   return aBuilder.Shape();
 }
 
-TopoDS_Shape intersectionOp(TopTools_ListOfShape shapes)
+TopoDS_Shape intersectionOp(TopTools_ListOfShape shapes, const Message_ProgressRange &theRange)
 {
   if (shapes.Size() == 0)
   {
@@ -96,7 +101,7 @@ TopoDS_Shape intersectionOp(TopTools_ListOfShape shapes)
     TopoDS_Shape shape = shapes.First();
     shapes.RemoveFirst();
 
-    result = intersectionOp(result, shape);
+    result = intersectionOp(result, shape, theRange);
   }
 
   return result;

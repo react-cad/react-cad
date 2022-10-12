@@ -1,7 +1,21 @@
 {
   "name": "%PACKAGE_NAME%",
-  "version": "1.0",
+  "version": "1.0.0",
   "license": "MIT",
+  "keywords": ["react-cad"],
+  "main": "dist/cjs/index.js",
+  "files": ["dist/**/*"],
+  "type": "module",
+  "exports": {
+    "node": {
+      "module": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "default": "./dist/esm/index.js"
+  },
+  "dependencies": {
+    "react": "^17.0.1"
+  },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.12",
     "@storybook/addon-essentials": "^6.5.12",
@@ -10,10 +24,14 @@
     "@storybook/core": "^6.5.12",
     "@storybook/manager-webpack5": "^6.5.12",
     "@types/react": "^17.0.1",
-    "react": "^17.0.1"
+    "react-dom": "^17.0.1"
   },
   "scripts": {
     "start": "start-storybook -p 6006",
-    "build": "build-storybook"
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:esm": "tsc",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:web": "build-storybook --no-manager-cache",
+    "prepublishOnly": "npm run build"
   }
 }

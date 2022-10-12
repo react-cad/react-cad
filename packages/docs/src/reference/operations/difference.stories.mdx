@@ -1,0 +1,110 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import reactIcon from '../sweeps/react-icon';
+
+export const Difference = (props) => <difference {...props} />;
+
+<Meta title="Reference/Operations/Difference" />
+
+# difference
+
+The `difference` element takes its first child and subtracts all the the other children from it. It takes no props.
+
+<br/><br/>
+
+## Examples
+
+<br />
+
+### Difference of a cube and a sphere
+
+A sphere subtracted from a cube.
+
+<Source language="jsx" code={`
+<difference>
+  <box x={2} y={2} z={2} center />
+  <sphere radius={Math.sqrt(2)} />
+</difference>
+`} />
+
+<Story name="difference" args={{ children: [
+  <box x={2} y={2} z={2} center />,
+  <sphere radius={Math.sqrt(2)} />
+]}}>
+  {Difference.bind({})}
+</Story>
+
+### Difference of a sphere and a cube
+
+The same shapes as above, but with the cube subtracted from the sphere.
+
+<Source language="jsx" code={`
+<difference>
+  <sphere radius={Math.sqrt(2)} />
+  <box x={2} y={2} z={2} center />
+</difference>
+`} />
+
+<Story name="difference opposite" args={{ children: [
+  <sphere radius={Math.sqrt(2)} />,
+  <box x={2} y={2} z={2} center />
+]}}>
+  {Difference.bind({})}
+</Story>
+
+### Difference of a box and several cylinders
+
+<Source language="jsx" code={`
+<difference>
+  <box x={12} y={12} z={1} />
+  <translation x={3} y={3}>
+    <cylinder height={1} radius={1} />
+  </translation>
+  <translation x={9} y={3}>
+    <cylinder height={1} radius={1} />
+  </translation>
+  <translation x={3} y={9}>
+    <cylinder height={1} radius={1} />
+  </translation>
+  <translation x={9} y={9}>
+    <cylinder height={1} radius={1} />
+  </translation>
+</difference>
+`} />
+
+<Story name="difference multiple cylinders" args={{ children: [
+  <box x={12} y={12} z={1} />,
+  <translation x={3} y={3}>
+    <cylinder height={1} radius={1} />
+  </translation>,
+  <translation x={9} y={3}>
+    <cylinder height={1} radius={1} />
+  </translation>,
+  <translation x={3} y={9}>
+    <cylinder height={1} radius={1} />
+  </translation>,
+  <translation x={9} y={9}>
+    <cylinder height={1} radius={1} />
+  </translation>
+]}}>
+  {Difference.bind({})}
+</Story>
+
+### Subtracted React icon
+
+A complex SVG prism subtracted from a box.
+
+<Source language="jsx" code={`
+import reactIcon from './react-icon.svg';
+
+<difference>
+  <box x={8} y={8} z={1} />
+  <prism z={1} profile={reactIcon} />
+</difference>
+`} />
+
+<Story name="difference react icon" args={{ children: [
+  <box x={8} y={8} z={1} />,
+  <prism z={1} profile={reactIcon([4,-4])} />
+]}}>
+  {Difference.bind({})}
+</Story>

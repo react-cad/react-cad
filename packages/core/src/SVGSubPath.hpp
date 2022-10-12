@@ -33,7 +33,7 @@ public:
   Standard_Boolean IsInside(const Handle(SVGSubPath) & other);
   Bnd_Box GetBndBox();
 
-  TopoDS_Compound BuildFaces(NSVGfillRule fillRule);
+  TopoDS_Shape BuildFaces(NSVGfillRule fillRule);
 
   void Dump(std::iostream &out, std::string indent = "");
 
@@ -51,8 +51,8 @@ public:
   };
 
 private:
-  void BuildFaceNonZero(NCollection_List<TopoDS_Face> &allFaces, BRepBuilderAPI_MakeFace &makeFace, int count);
-  void BuildFaceEvenOdd(NCollection_List<TopoDS_Face> &allFaces, BRepBuilderAPI_MakeFace &makeFace, int count);
+  void BuildFaceNonZero(TopTools_ListOfShape &allFaces, BRepBuilderAPI_MakeFace &makeFace, int count);
+  void BuildFaceEvenOdd(TopTools_ListOfShape &allFaces, BRepBuilderAPI_MakeFace &makeFace, int count);
 
   Handle(SVGSubPath) m_parent;
   Direction m_direction;

@@ -31,7 +31,7 @@ void DifferenceNode::computeChildren(TopTools_ListOfShape children, const Messag
   default: {
     TopoDS_Shape positive = children.First();
     children.RemoveFirst();
-    m_childShape = differenceOp(positive, children);
+    m_childShape = differenceOp(positive, children, scope.Next());
     break;
   }
   }

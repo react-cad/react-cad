@@ -1,4 +1,5 @@
 import React from "react";
+import LazyLoad from "react-lazyload";
 import ReactCADViewer from "@react-cad/viewer";
 import {
   extractComponentDescription,
@@ -17,9 +18,9 @@ const ViewContainer: React.FC<ContainerProps> = (props) => {
   const core = useReactCADCore();
 
   return (
-    <div style={{ height: 480 }}>
+    <LazyLoad style={{ height: 480, overflow: "hidden", resize: "vertical" }}>
       {core ? <ReactCADViewer core={core} reset={true} {...props} /> : null}
-    </div>
+    </LazyLoad>
   );
 };
 
@@ -28,17 +29,16 @@ export const parameters = {
     inlineStories: true,
     prepareForInline: (
       storyFn: PartialStoryFn<any>,
-      { parameters }: StoryContext<ReactCadFramework>
+      { id, parameters }: StoryContext<ReactCadFramework>
     ): React.ReactNode => {
-      const { highDetail, lowDetail, resizable = true } =
-        parameters.reactCad || {};
+      const { highDetail, lowDetail } = parameters.reactCad || {};
 
       return (
         <ViewContainer
           shape={storyFn()}
+          name={id}
           highDetail={highDetail}
           lowDetail={lowDetail}
-          resizable={resizable}
         />
       );
     },
