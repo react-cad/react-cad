@@ -3,7 +3,8 @@ module.exports = {
   scripts: {
     build: {
       default: "lerna run --stream build",
-      ts: "lerna run --stream --ignore '@react-cad/{core,examples}' build",
+      ts: "lerna run --stream --ignore '@react-cad/{core,examples,docs}' build",
+      web: "lerna run --stream --scope @react-cad/docs build",
     },
     default: "lerna run --parallel start",
     test: "jest --forceExit",

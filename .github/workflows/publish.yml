@@ -59,6 +59,8 @@ jobs:
         run: yarn lerna publish from-package --yes --no-verify-access
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Build docs
+        run: yarn nps build.web
       - name: Deploy docs
         uses: JamesIves/github-pages-deploy-action@v4
         with:
