@@ -52,7 +52,7 @@ export function webpack(config: Configuration): Configuration {
       loader: "file-loader",
       options: {
         emitFile:
-          config.mode !== "production" || process.env.REACTCAD_LOCAL_WASM,
+          config.mode !== "production" || !!process.env.REACTCAD_LOCAL_WASM,
       },
     },
   });

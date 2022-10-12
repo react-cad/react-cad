@@ -15,45 +15,45 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
     promiseReject = reject;
   });
 
-  progressObject.fulfilled = false;
-  progressObject.subscribers = [];
+  progressObject["fulfilled"] = false;
+  progressObject["subscribers"] = [];
   const fulfill = (fn) => (...args) => {
-    progressObject.fulfilled = true;
-    progressObject.subscribers.length = 0;
+    progressObject["fulfilled"] = true;
+    progressObject["subscribers"].length = 0;
     fn(...args);
   };
-  progressObject.resolve = fulfill(promiseResolve);
-  progressObject.reject = fulfill(promiseReject);
+  progressObject["resolve"] = fulfill(promiseResolve);
+  progressObject["reject"] = fulfill(promiseReject);
 
   let lastProgress;
   let lastMessage;
-  progressObject.subscribe = (fn) => {
-    if (progressObject.fulfilled) {
+  progressObject["subscribe"] = (fn) => {
+    if (progressObject["fulfilled"]) {
       return;
     }
     if (lastProgress !== undefined) {
       fn(lastProgress, lastMessage);
     }
-    progressObject.subscribers.push(fn);
+    progressObject["subscribers"].push(fn);
   };
-  progressObject.unsubscribe = (fn) => {
-    const index = progressObject.subscribers.indexOf(fn);
+  progressObject["unsubscribe"] = (fn) => {
+    const index = progressObject["subscribers"].indexOf(fn);
     if (index > -1) {
-      progressObject.subscribers.splice(index, 1);
+      progressObject["subscribers"].splice(index, 1);
     }
   };
-  progressObject.notify = (progress, message) => {
-    if (progressObject.fulfilled) {
+  progressObject["notify"] = (progress, message) => {
+    if (progressObject["fulfilled"]) {
       return;
     }
 
     lastProgress = progress;
     lastMessage = message;
 
-    progressObject.subscribers.forEach(fn => fn(progress, message));
+    progressObject["subscribers"].forEach(fn => fn(progress, message));
   };
-  progressObject.cancel = (...args) => {
-    if (!progressObject.fulfilled) {
+  progressObject["cancel"] = (...args) => {
+    if (!progressObject["fulfilled"]) {
       progressObject.notify(lastProgress, "Cancelling");
       progressObject.reject(...args);
     }
@@ -121,10 +121,10 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
             const progress = $2;
             const resolveWhenComplete = $3;
 
-            progressObject.notify(progress, name);
+            progressObject["notify"](progress, name);
 
             if (resolveWhenComplete && progress > 0.9999999999) {
-              progressObject.resolve();
+              progressObject["resolve"]();
             }
           } catch (e) {
             // progressObject probably deleted before the async function ran

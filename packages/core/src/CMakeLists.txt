@@ -44,6 +44,7 @@ target_link_libraries(
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -lembind \
   -fexceptions \
+  --closure 1 \
   -s EXPORTED_RUNTIME_METHODS=['FS'] \
   -s EXPORTED_FUNCTIONS=['_main'] \
   -s WASM=1 \

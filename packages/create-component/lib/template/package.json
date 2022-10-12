@@ -31,7 +31,7 @@
     "build": "npm run build:cjs && npm run build:esm",
     "build:esm": "tsc",
     "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:web": "build-storybook",
+    "build:web": "build-storybook --no-manager-cache",
     "prepublishOnly": "npm run build"
   }
 }
