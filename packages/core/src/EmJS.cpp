@@ -6,8 +6,8 @@
 // clang-format off
 EM_JS(emscripten::EM_VAL, jsGetFileContentsAndDelete, (const char *filenameStr), {
   const filename = UTF8ToString(filenameStr);
-  const content = Module.FS.readFile(filename);
-  Module.FS.unlink(filename);
+  const content = Module["FS"].readFile(filename);
+  Module["FS"].unlink(filename);
   return Emval.toHandle(content);
 });
 
@@ -30,19 +30,19 @@ EM_JS(int, jsCanvasGetHeight, (const char* idStr), {
 EM_JS(void, jsWriteFile, (const char *filenameStr, emscripten::EM_VAL contents_handle), {
   const filename = UTF8ToString(filenameStr);
   const contents = Emval.toValue(contents_handle);
-  Module.FS.writeFile(filename, typeof contents == "string" ? contents : new Uint8Array(contents));
+  Module["FS"].writeFile(filename, typeof contents == "string" ? contents : new Uint8Array(contents));
 })
 
 EM_JS(void, jsCopyFile, (const char *srcStr, const char *destStr), {
   const src = UTF8ToString(srcStr);
   const dest = UTF8ToString(destStr);
-  Module.FS.symlink(src, dest);
+  Module["FS"].symlink(src, dest);
 })
 
 EM_JS(void, jsDeleteFile, (const char *filenameStr), {
   const filename = UTF8ToString(filenameStr);
   try {
-    Module.FS.unlink(filename);
+    Module["FS"].unlink(filename);
   } catch(e) {}
 });
 // clang-format on

@@ -101,7 +101,6 @@ export function webpack(config: Configuration): Configuration {
         patterns: [
           {
             from: require.resolve("../../.nojekyll"),
-            to: ".nojekyll",
           },
         ],
       })
