@@ -1,5 +1,5 @@
 import React from "react";
-import { Point, Profile } from "react-cad";
+import type { Point, Profile } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
 import { makePolygon } from "./helpers";

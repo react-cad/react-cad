@@ -1,11 +1,11 @@
 import React from "react";
-import {
-  createRoot,
+import type {
   ReactCADCore,
   ReactCADView,
   ReactCADNode,
   ProgressIndicator,
-} from "react-cad";
+} from "@react-cad/core";
+import { createRoot } from "@react-cad/renderer";
 import { ExportFns, ViewOptions } from "./types";
 
 import DetailContext from "./DetailContext";

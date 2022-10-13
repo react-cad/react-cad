@@ -1,5 +1,5 @@
 import React from "react";
-import { Profile } from "react-cad";
+import type { Profile } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
 import reactIcon from "./react-icon";

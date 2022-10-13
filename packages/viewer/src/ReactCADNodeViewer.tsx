@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactCADCore, ReactCADNode } from "react-cad";
+import type { ReactCADCore, ReactCADNode } from "@react-cad/core";
 
 import { useExport, useProgressQueue, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
