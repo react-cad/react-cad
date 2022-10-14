@@ -1,4 +1,4 @@
-import { Point, Polygon } from "react-cad";
+import type { Point, Polygon } from "@react-cad/core";
 
 export function makePolygon(sides: number): Polygon {
   return [...Array(sides)].map(

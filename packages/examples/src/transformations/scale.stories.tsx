@@ -1,5 +1,5 @@
 import React from "react";
-import { Point } from "react-cad";
+import type { Point } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
 type Props = JSX.IntrinsicElements["scale"];

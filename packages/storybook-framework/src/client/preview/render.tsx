@@ -44,13 +44,15 @@ export function renderToDOM(
 
   const { highDetail, lowDetail } = storyContext.parameters.reactCad || {};
 
+  const Component = storyFn;
+
   ReactDOM.render(
     <>
       <style>{`html, body, #root { height: 100%; padding: 0 !important; }`}</style>
       <ViewContainer
         forceRemount={forceRemount}
         id={id}
-        shape={storyFn()}
+        shape={<Component />}
         name={id}
         focus
         highDetail={highDetail}

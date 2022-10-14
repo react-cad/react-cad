@@ -28,7 +28,7 @@ void TorusNode::computeShape(const Message_ProgressRange &theRange)
 {
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
-  TopoDS_Shell torus;
+  TopoDS_Solid torus;
 
   if (m_angle == 0)
   {

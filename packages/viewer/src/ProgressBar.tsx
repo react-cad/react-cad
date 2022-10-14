@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ProgressIndicator } from "react-cad";
+import type { ProgressIndicator } from "@react-cad/core";
 
 interface Props {
   progressIndicator?: ProgressIndicator;
