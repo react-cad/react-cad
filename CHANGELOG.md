@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.2](https://github.com/react-cad/react-cad/compare/v0.19.1...v0.19.2) (2022-10-14)
+
+
+### Bug Fixes
+
+* make torus solid ([c85d84a](https://github.com/react-cad/react-cad/commit/c85d84aa8215ba318f5f0c897968184f92d9e3f7))
+* remove core from main package ([649e476](https://github.com/react-cad/react-cad/commit/649e47655806f162f6f1ca006abce62afe1cfd74))
+
+
+
+
+
 ## [0.19.1](https://github.com/react-cad/react-cad/compare/v0.19.0...v0.19.1) (2022-10-12)
 
 
