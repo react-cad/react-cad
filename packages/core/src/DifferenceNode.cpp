@@ -8,22 +8,22 @@ DifferenceNode::DifferenceNode()
 {
 }
 
-void DifferenceNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
+bool DifferenceNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate difference");
 #endif
+  m_childShape = TopoDS_Shape();
 
   Message_ProgressScope scope(theRange, "Computing difference", 1);
   if (!scope.More())
   {
-    return;
+    return true;
   }
 
   switch (children.Size())
   {
   case 0:
-    m_childShape = TopoDS_Shape();
     break;
   case 1:
     m_childShape = children.First();
@@ -39,4 +39,6 @@ void DifferenceNode::computeChildren(TopTools_ListOfShape children, const Messag
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
+
+  return true;
 }

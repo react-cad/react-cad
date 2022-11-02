@@ -24,20 +24,30 @@ void TorusNode::setAngle(Standard_Real angle)
   }
 }
 
-void TorusNode::computeShape(const Message_ProgressRange &theRange)
+bool TorusNode::computeShape(const Message_ProgressRange &theRange)
 {
+  shape = TopoDS_Shape();
+
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
-  TopoDS_Solid torus;
+  BRepPrimAPI_MakeTorus makeTorus(1, 1);
 
   if (m_angle == 0)
   {
-    torus = BRepPrimAPI_MakeTorus(m_radius1, m_radius2);
+    makeTorus = BRepPrimAPI_MakeTorus(m_radius1, m_radius2);
   }
   else
   {
-    torus = BRepPrimAPI_MakeTorus(m_radius1, m_radius2, angle);
+    makeTorus = BRepPrimAPI_MakeTorus(m_radius1, m_radius2, angle);
   }
 
-  shape = torus;
+  makeTorus.Build(/*theRange*/);
+  if (!makeTorus.IsDone())
+  {
+    addError("Could not construct torus");
+    return false;
+  }
+
+  shape = makeTorus.Solid();
+  return true;
 }

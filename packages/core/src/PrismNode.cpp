@@ -19,21 +19,30 @@ void PrismNode::setVector(gp_Vec vector)
   }
 }
 
-void PrismNode::computeShape(const Message_ProgressRange &theRange)
+bool PrismNode::computeShape(const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Compute prism");
 #endif
+  shape = TopoDS_Shape();
 
   TopoDS_Shape profile = getProfile();
 
   Message_ProgressScope scope(theRange, "Computing prism", 1);
 
   BRepPrimAPI_MakePrism prism(profile, m_vector);
+  prism.Build(/*theRange*/);
+  if (!prism.IsDone())
+  {
+    addError("Prism could not be constructed");
+    return false;
+  }
 
-  shape = prism;
+  shape = prism.Shape();
 
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
+
+  return true;
 }

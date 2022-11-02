@@ -30,20 +30,23 @@ public:
 
 protected:
   void propsChanged();
+  void addError(const std::string &error);
 
-  virtual void computeChildren(TopTools_ListOfShape children,
+  virtual bool computeChildren(TopTools_ListOfShape children,
                                const Message_ProgressRange &theRange = Message_ProgressRange());
-  virtual void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange());
+  virtual bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange());
 
   TopoDS_Shape m_childShape;
 
 private:
   Handle(ReactCADNode) m_parent;
   std::vector<Handle(ReactCADNode)> m_children;
+  std::vector<std::string> m_errors;
 
   bool m_propsChanged;
   bool m_childrenChanged;
   void notifyAncestors();
+  bool m_hasErrors;
 };
 
 #endif // ReactCADNode_HeaderFile

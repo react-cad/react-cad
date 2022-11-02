@@ -51,9 +51,16 @@ void RotationNode::setRotation(Quaternion quaternion)
   }
 }
 
-void RotationNode::computeShape(const Message_ProgressRange &theRange)
+bool RotationNode::computeShape(const Message_ProgressRange &theRange)
 {
+  shape = m_childShape;
   BRepBuilderAPI_Transform theTransform(m_transform);
   theTransform.Perform(m_childShape, true);
-  shape = theTransform.Shape();
+  if (theTransform.IsDone())
+  {
+    shape = theTransform.Shape();
+    return true;
+  }
+  addError("Could not perform transform");
+  return false;
 }

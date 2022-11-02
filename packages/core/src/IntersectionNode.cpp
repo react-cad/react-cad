@@ -8,21 +8,22 @@ IntersectionNode::IntersectionNode()
 {
 }
 
-void IntersectionNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
+bool IntersectionNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate intersection");
 #endif
+  m_childShape = TopoDS_Shape();
+
   Message_ProgressScope scope(theRange, "Computing intersection", 1);
   if (!scope.More())
   {
-    return;
+    return true;
   }
 
   switch (children.Size())
   {
   case 0:
-    m_childShape = TopoDS_Shape();
     break;
   case 1:
     m_childShape = children.First();
@@ -35,4 +36,6 @@ void IntersectionNode::computeChildren(TopTools_ListOfShape children, const Mess
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
+
+  return true;
 }

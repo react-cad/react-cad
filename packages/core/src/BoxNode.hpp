@@ -13,7 +13,7 @@ public:
   void setCentered(Standard_Boolean centered);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   gp_Pnt m_size;

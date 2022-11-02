@@ -14,7 +14,7 @@ public:
   void setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real zmin, Standard_Real zmax);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   Standard_Boolean m_useLtx;

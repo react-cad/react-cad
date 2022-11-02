@@ -11,7 +11,7 @@ public:
   DifferenceNode();
 
 protected:
-  void computeChildren(TopTools_ListOfShape children,
+  bool computeChildren(TopTools_ListOfShape children,
                        const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 };
 

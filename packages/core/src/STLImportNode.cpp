@@ -12,15 +12,21 @@ STLImportNode::STLImportNode()
 {
 }
 
-void STLImportNode::importFile(const Message_ProgressRange &theRange)
+bool STLImportNode::importFile(const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Triangulating STL");
 #endif
+  shape = TopoDS_Shape();
 
   Message_ProgressScope scope(theRange, "Importing STL file", 3);
 
   Handle(Poly_Triangulation) mesh = RWStl::ReadFile(m_filename.c_str(), scope.Next());
+  if (mesh.IsNull())
+  {
+    addError("File missing, corrupt or contains no shapes");
+    return false;
+  }
 
 #ifdef REACTCAD_DEBUG
   timer.end();
@@ -32,10 +38,17 @@ void STLImportNode::importFile(const Message_ProgressRange &theRange)
     PerformanceTimer timer2("Sewing STL mesh");
 #endif
 
-    shape = shapeFromMesh(mesh, scope.Next(2));
+    bool success = shapeFromMesh(mesh, shape, scope.Next(2));
+    if (!success)
+    {
+      addError("Could not build topology from mesh");
+      return false;
+    }
 
 #ifdef REACTCAD_DEBUG
     timer2.end();
 #endif
   }
+
+  return true;
 }

@@ -41,18 +41,28 @@ void WedgeNode::setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real 
   }
 }
 
-void WedgeNode::computeShape(const Message_ProgressRange &theRange)
+bool WedgeNode::computeShape(const Message_ProgressRange &theRange)
 {
-  TopoDS_Solid wedge;
+  shape = TopoDS_Shape();
+
+  BRepPrimAPI_MakeWedge makeWedge(1, 1, 1, 1);
 
   if (m_useLtx)
   {
-    wedge = BRepPrimAPI_MakeWedge(m_size.X(), m_size.Y(), m_size.Z(), m_ltx);
+    makeWedge = BRepPrimAPI_MakeWedge(m_size.X(), m_size.Y(), m_size.Z(), m_ltx);
   }
   else
   {
-    wedge = BRepPrimAPI_MakeWedge(m_size.X(), m_size.Y(), m_size.Z(), m_xmin, m_zmin, m_xmax, m_zmax);
+    makeWedge = BRepPrimAPI_MakeWedge(m_size.X(), m_size.Y(), m_size.Z(), m_xmin, m_zmin, m_xmax, m_zmax);
   }
 
-  shape = wedge;
+  makeWedge.Build(/*theRange*/);
+  if (!makeWedge.IsDone())
+  {
+    addError("Could not construct wedge");
+    return false;
+  }
+
+  shape = makeWedge.Solid();
+  return true;
 }

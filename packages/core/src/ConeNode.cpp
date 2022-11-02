@@ -35,19 +35,31 @@ void ConeNode::setAngle(Standard_Real angle)
   }
 }
 
-void ConeNode::computeShape(const Message_ProgressRange &theRange)
+bool ConeNode::computeShape(const Message_ProgressRange &theRange)
 {
+  shape = TopoDS_Shape();
+
   TopoDS_Solid cone;
+
+  BRepPrimAPI_MakeCone makeCone(1, 0, 1);
 
   if (m_angle == 0)
   {
-    cone = BRepPrimAPI_MakeCone(m_radius1, m_radius2, m_height);
+    makeCone = BRepPrimAPI_MakeCone(m_radius1, m_radius2, m_height);
   }
   else
   {
     Standard_Real a = fmin(fmax(m_angle, 0), 2 * M_PI);
-    cone = BRepPrimAPI_MakeCone(m_radius1, m_radius2, m_height, a);
+    makeCone = BRepPrimAPI_MakeCone(m_radius1, m_radius2, m_height, a);
   }
+
+  makeCone.Build(/*theRange*/);
+  if (!makeCone.IsDone())
+  {
+    addError("Could not construct cone");
+    return false;
+  }
+  cone = makeCone.Solid();
 
   if (m_centered)
   {
@@ -57,4 +69,6 @@ void ConeNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   shape = cone;
+
+  return true;
 }

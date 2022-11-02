@@ -36,7 +36,7 @@ void ImportNode::setFileContents(emscripten::val contents)
   propsChanged();
 }
 
-void ImportNode::computeShape(const Message_ProgressRange &theRange)
+bool ImportNode::computeShape(const Message_ProgressRange &theRange)
 {
-  importFile(theRange);
+  return importFile(theRange);
 }

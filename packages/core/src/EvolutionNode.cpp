@@ -54,9 +54,12 @@ void EvolutionNode::setSpineSVG(const std::string &svg)
   propsChanged();
 }
 
-void EvolutionNode::computeShape(const Message_ProgressRange &theRange)
+bool EvolutionNode::computeShape(const Message_ProgressRange &theRange)
 {
   PerformanceTimer timer("Build evolution");
+  shape = TopoDS_Shape();
+  bool success = true;
+
   GeomAbs_JoinType aJoinType = GeomAbs_Arc;
   Standard_Boolean aIsGlobalCS = Standard_True;
   Standard_Boolean aIsSolid = Standard_True;
@@ -77,17 +80,30 @@ void EvolutionNode::computeShape(const Message_ProgressRange &theRange)
 
   Message_ProgressScope scope(theRange, "Computing evolution", nbFaces);
 
+  int faceId = 0;
   for (Ex.ReInit(); Ex.More() && scope.More(); Ex.Next())
   {
     // TODO: Parallel
     BRepOffsetAPI_MakeEvolved anAlgo(Ex.Current(), TopoDS::Wire(profile), aJoinType, aIsGlobalCS, aIsSolid);
     anAlgo.Build();
 
-    builder.Add(compound, anAlgo.Shape());
+    if (anAlgo.IsDone())
+    {
+      builder.Add(compound, anAlgo.Shape());
+    }
+    else
+    {
+      addError("Could not make evolved for face " + std::to_string(faceId));
+      success = false;
+    }
     scope.Next();
+
+    ++faceId;
   }
 
   shape = compound;
 
   timer.end();
+
+  return success;
 }

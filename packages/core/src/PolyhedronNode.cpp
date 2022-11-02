@@ -78,16 +78,20 @@ void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
   propsChanged();
 }
 
-void PolyhedronNode::computeShape(const Message_ProgressRange &theRange)
+bool PolyhedronNode::computeShape(const Message_ProgressRange &theRange)
 {
+  shape = TopoDS_Shape();
+
   BRepBuilderAPI_Sewing polyhedron;
 
   Message_ProgressScope scope(theRange, "Computing polyhedron", 9);
 
   Message_ProgressScope meshScope(scope.Next(4), "Building faces", m_faces.Size());
 
+  int faceId = -1;
   for (auto face = m_faces.begin(); face != m_faces.end() && meshScope.More(); ++face)
   {
+    ++faceId;
     BRepBuilderAPI_MakePolygon polygon;
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
@@ -98,32 +102,46 @@ void PolyhedronNode::computeShape(const Message_ProgressRange &theRange)
     BRepBuilderAPI_MakeFace f(polygon.Wire());
     if (!f.IsDone())
     {
-      shape = TopoDS_Shape();
-      return;
+      addError("Could not make face " + std::to_string(faceId));
+      return false;
     }
     polyhedron.Add(f);
 
     meshScope.Next();
   }
 
-  if (scope.More())
+  if (!scope.More())
   {
-    polyhedron.Perform(scope.Next(4));
-    TopoDS_Shape sewedShape = polyhedron.SewedShape();
-
-    if (sewedShape.ShapeType() == TopAbs_SHELL && scope.More())
-    {
-      TopoDS_Shell shell = TopoDS::Shell(sewedShape);
-      BRepBuilderAPI_MakeSolid makeSolid;
-      makeSolid.Add(shell);
-      makeSolid.Build();
-      TopoDS_Solid solid = makeSolid.Solid();
-      BRepLib::OrientClosedSolid(solid);
-      shape = solid;
-      scope.Next(1);
-      return;
-    }
+    return true;
   }
 
-  shape = TopoDS_Shape();
+  polyhedron.Perform(scope.Next(4));
+  TopoDS_Shape sewedShape = polyhedron.SewedShape();
+
+  if (!scope.More())
+  {
+    return true;
+  }
+
+  if (sewedShape.ShapeType() != TopAbs_SHELL)
+  {
+    addError("Could not make shell from faces");
+    return false;
+  }
+
+  TopoDS_Shell shell = TopoDS::Shell(sewedShape);
+  BRepBuilderAPI_MakeSolid makeSolid;
+  makeSolid.Add(shell);
+  makeSolid.Build();
+
+  if (!makeSolid.IsDone())
+  {
+    addError("Could not make solid from shell");
+    return false;
+  }
+
+  TopoDS_Solid solid = makeSolid.Solid();
+  BRepLib::OrientClosedSolid(solid);
+  shape = solid;
+  return true;
 }

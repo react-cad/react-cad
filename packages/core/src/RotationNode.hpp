@@ -20,7 +20,7 @@ public:
   void setRotation(Quaternion quaternion);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   void setTransform();

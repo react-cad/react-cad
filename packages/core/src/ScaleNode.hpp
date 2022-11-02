@@ -19,7 +19,7 @@ public:
   void setCenter(gp_Pnt center);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   gp_Pnt m_center;

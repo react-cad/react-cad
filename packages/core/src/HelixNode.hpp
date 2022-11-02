@@ -14,7 +14,7 @@ public:
   void setHeight(Standard_Real height);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   void buildSpineAndGuide();
@@ -25,7 +25,7 @@ private:
   TopoDS_Wire m_spine;
   TopoDS_Wire m_guide;
 
-  TopoDS_Shape makeHelix(const TopoDS_Wire &profile);
+  bool makeHelix(const TopoDS_Wire &profile, TopoDS_Shape &shape);
 };
 
 #endif

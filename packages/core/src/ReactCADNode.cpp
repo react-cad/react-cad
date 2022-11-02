@@ -14,7 +14,7 @@
 
 ReactCADNode::ReactCADNode()
     : m_parent(), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
-      m_childShape(TopoDS_Shape())
+      m_childShape(TopoDS_Shape()), m_errors()
 {
 }
 
@@ -83,6 +83,9 @@ void ReactCADNode::notifyAncestors()
 
 bool ReactCADNode::computeGeometry(const Message_ProgressRange &theRange)
 {
+  m_hasErrors = false;
+  m_errors.clear();
+
   Message_ProgressScope scope(theRange, "Computing geometry", 1);
   if (m_propsChanged || m_childrenChanged)
   {
@@ -92,41 +95,41 @@ bool ReactCADNode::computeGeometry(const Message_ProgressRange &theRange)
       TopTools_ListOfShape shapes;
       for (auto child = m_children.begin(); child != m_children.end() && childScope.More(); ++child)
       {
-        (*child)->computeGeometry(childScope.Next());
+        m_hasErrors |= !(*child)->computeGeometry(childScope.Next());
         shapes.Append((*child)->shape);
       }
 
-      computeChildren(shapes, childScope.Next());
+      m_hasErrors |= !computeChildren(shapes, childScope.Next());
 
       if (!childScope.More())
       {
-        return false;
+        return m_hasErrors;
       }
 
-      computeShape(childScope.Next());
+      m_hasErrors |= !computeShape(childScope.Next());
 
       if (childScope.More())
       {
         m_childrenChanged = false;
         m_propsChanged = false;
-        return true;
+        return m_hasErrors;
       }
     }
     else
     {
-      computeShape(scope.Next());
+      m_hasErrors |= !computeShape(scope.Next());
       if (scope.More())
       {
         m_propsChanged = false;
-        return true;
+        return m_hasErrors;
       }
     }
   }
 
-  return false;
+  return m_hasErrors;
 }
 
-void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
+bool ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate union");
@@ -141,9 +144,20 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
+
+  return true;
 }
 
-void ReactCADNode::computeShape(const Message_ProgressRange &theRange)
+bool ReactCADNode::computeShape(const Message_ProgressRange &theRange)
 {
   shape = m_childShape;
+  return true;
+}
+
+void ReactCADNode::addError(const std::string &error)
+{
+  m_errors.push_back(error);
+#ifdef REACTCAD_DEBUG
+  Message::DefaultMessenger()->Send(error.c_str());
+#endif
 }

@@ -61,25 +61,35 @@ void HelixNode::buildSpineAndGuide()
   m_guide = makeGuide;
 }
 
-TopoDS_Shape HelixNode::makeHelix(const TopoDS_Wire &profile)
+bool HelixNode::makeHelix(const TopoDS_Wire &profile, TopoDS_Shape &shape)
 {
   BRepOffsetAPI_MakePipeShell pipe(m_spine);
   pipe.SetMode(m_guide, false);
   pipe.Add(profile);
 
   pipe.Build();
-  pipe.MakeSolid();
+  if (pipe.IsDone())
+  {
+    pipe.MakeSolid();
 
-  return pipe;
+    shape = pipe;
+    return true;
+  }
+
+  shape = TopoDS_Solid();
+  return false;
 }
 
-void HelixNode::computeShape(const Message_ProgressRange &theRange)
+bool HelixNode::computeShape(const Message_ProgressRange &theRange)
 {
-  TopoDS_Shape profile = getProfile();
-
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
 #endif
+  bool success = true;
+  shape = TopoDS_Shape();
+
+  TopoDS_Shape profile = getProfile();
+
   buildSpineAndGuide();
 
   BRep_Builder builder;
@@ -95,8 +105,10 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
 
   Message_ProgressScope scope(theRange, "Computing helix", nbFaces);
 
+  int faceId = -1;
   for (Faces.ReInit(); Faces.More() && scope.More(); Faces.Next())
   {
+    ++faceId;
     TopoDS_Face face = TopoDS::Face(Faces.Current());
 
     TopExp_Explorer Wires;
@@ -109,20 +121,39 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
     Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires * 2);
 
     TopoDS_Wire outerWire = BRepTools::OuterWire(face);
-    TopoDS_Shape solid = makeHelix(outerWire);
+    TopoDS_Shape solid;
+    bool solidSuccess = makeHelix(outerWire, solid);
+    if (!solidSuccess)
+    {
+      addError("Could not make helix for outer wire of face " + std::to_string(faceId));
+      success = false;
+      continue;
+    }
 
     faceScope.Next();
 
     TopTools_ListOfShape holes;
 
+    int wireId = -1;
     for (Wires.ReInit(); Wires.More() && faceScope.More(); Wires.Next())
     {
+      ++wireId;
       TopoDS_Wire wire = TopoDS::Wire(Wires.Current());
       if (wire.IsEqual(outerWire))
       {
         continue;
       }
-      holes.Append(makeHelix(wire));
+      TopoDS_Shape hole;
+      bool holeSuccess = makeHelix(wire, hole);
+      if (holeSuccess)
+      {
+        holes.Append(hole);
+      }
+      else
+      {
+        addError("Could not make helix for wire " + std::to_string(wireId) + " of face " + std::to_string(faceId));
+        success = false;
+      }
       faceScope.Next();
     }
 
@@ -134,4 +165,6 @@ void HelixNode::computeShape(const Message_ProgressRange &theRange)
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
+
+  return success;
 }

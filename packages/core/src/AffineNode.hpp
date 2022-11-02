@@ -13,7 +13,7 @@ public:
   void setMatrix(Matrix matrix);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   gp_GTrsf m_transform;

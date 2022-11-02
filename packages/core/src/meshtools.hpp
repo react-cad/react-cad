@@ -5,7 +5,7 @@
 #include <Poly_Triangulation.hxx>
 #include <TopoDS_Shape.hxx>
 
-TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) mesh,
-                           const Message_ProgressRange &theRange = Message_ProgressRange());
+bool shapeFromMesh(Handle(Poly_Triangulation) mesh, TopoDS_Shape &shape,
+                   const Message_ProgressRange &theRange = Message_ProgressRange());
 
 #endif

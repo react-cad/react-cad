@@ -5,7 +5,7 @@
 #include "SweepNode.hpp"
 
 #include <NCollection_Array1.hxx>
-#include <TopoDS_Wire.hxx>
+#include <TopoDS_Shape.hxx>
 #include <gp_Pnt.hxx>
 
 class PipeNode : public SweepNode
@@ -16,10 +16,11 @@ public:
   void setSpineSVG(const std::string &svg);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   Handle(ShapeBuilder) m_spineBuilder;
+  bool makePipe(const TopoDS_Shape &profile, const TopoDS_Shape &spine, TopoDS_Shape &shape);
 };
 
 #endif

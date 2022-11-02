@@ -40,41 +40,70 @@ void ScaleNode::setScale(gp_Vec scale)
   }
 }
 
-TopoDS_Shape scaleAxis(TopoDS_Shape shape, gp_Pnt center, gp_Dir direction, Standard_Real scale)
+bool scaleAxis(TopoDS_Shape &shape, gp_Pnt center, gp_Dir direction, Standard_Real scale)
 {
   gp_Ax2 axis(center, direction);
   gp_GTrsf affinity;
   affinity.SetAffinity(axis, scale);
-  BRepBuilderAPI_GTransform aBRepGTrsf(shape, affinity, Standard_False);
+  BRepBuilderAPI_GTransform aBRepGTrsf(shape, affinity, Standard_True);
   aBRepGTrsf.Build();
-  return aBRepGTrsf.Shape();
+  if (aBRepGTrsf.IsDone())
+  {
+    shape = aBRepGTrsf.Shape();
+    return true;
+  }
+  return false;
 }
 
-void ScaleNode::computeShape(const Message_ProgressRange &theRange)
+bool ScaleNode::computeShape(const Message_ProgressRange &theRange)
 {
+  shape = m_childShape;
   TopoDS_Shape tmp = m_childShape;
   if (IsEqual(m_scaleX, m_scaleY) && IsEqual(m_scaleY, m_scaleZ))
   {
     gp_Trsf transform;
     transform.SetScale(m_center, m_scaleX);
     BRepBuilderAPI_Transform aBRepTrsf(tmp, transform);
-    aBRepTrsf.Build();
+    aBRepTrsf.Build(/*theRange*/);
+    if (!aBRepTrsf.IsDone())
+    {
+      addError("Could not perform transform");
+      return false;
+    }
     shape = aBRepTrsf.Shape();
   }
   else
   {
+    bool success = true;
+
     if (!IsEqual(m_scaleX, 1.0))
     {
-      tmp = scaleAxis(tmp, m_center, gp::DX(), m_scaleX);
+      bool xSuccess = scaleAxis(tmp, m_center, gp::DX(), m_scaleX);
+      if (!xSuccess)
+      {
+        addError("Could not perform x-axis scale");
+        success = false;
+      }
     }
     if (!IsEqual(m_scaleY, 1.0))
     {
-      tmp = scaleAxis(tmp, m_center, gp::DY(), m_scaleY);
+      bool ySuccess = scaleAxis(tmp, m_center, gp::DY(), m_scaleY);
+      if (!ySuccess)
+      {
+        addError("Could not perform y-axis scale");
+        success = false;
+      }
     }
     if (!IsEqual(m_scaleZ, 1.0))
     {
-      tmp = scaleAxis(tmp, m_center, gp::DZ(), m_scaleZ);
+      bool zSuccess = scaleAxis(tmp, m_center, gp::DZ(), m_scaleZ);
+      if (!zSuccess)
+      {
+        addError("Could not perform z-axis scale");
+        success = false;
+      }
     }
     shape = tmp;
+    return success;
   }
 }

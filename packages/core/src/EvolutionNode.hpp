@@ -16,7 +16,7 @@ public:
   void setProfileSVG(const std::string &pathData);
 
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
 
 private:
   Handle(ShapeBuilder) m_spineBuilder;
