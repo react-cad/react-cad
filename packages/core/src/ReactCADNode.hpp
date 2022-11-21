@@ -13,6 +13,8 @@
 
 #include <emscripten/bind.h>
 
+#include "ProgressHandler.hpp"
+
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADNode : public Standard_Transient
 {
@@ -25,28 +27,25 @@ public:
   void removeChild(Handle(ReactCADNode) & child);
   bool hasParent();
 
-  bool computeGeometry(const Message_ProgressRange &theRange = Message_ProgressRange());
+  void computeGeometry(const ProgressHandler &handler);
+  virtual std::string getName() = 0;
   TopoDS_Shape shape;
 
 protected:
   void propsChanged();
-  void addError(const std::string &error);
 
-  virtual bool computeChildren(TopTools_ListOfShape children,
-                               const Message_ProgressRange &theRange = Message_ProgressRange());
-  virtual bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange());
+  virtual void computeChildren(TopTools_ListOfShape children, const ProgressHandler &handler);
+  virtual void computeShape(const ProgressHandler &handler);
 
   TopoDS_Shape m_childShape;
 
 private:
   Handle(ReactCADNode) m_parent;
   std::vector<Handle(ReactCADNode)> m_children;
-  std::vector<std::string> m_errors;
 
   bool m_propsChanged;
   bool m_childrenChanged;
   void notifyAncestors();
-  bool m_hasErrors;
 };
 
 #endif // ReactCADNode_HeaderFile

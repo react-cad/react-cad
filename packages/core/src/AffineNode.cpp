@@ -19,7 +19,7 @@ void AffineNode::setMatrix(Matrix matrix)
   propsChanged();
 }
 
-bool AffineNode::computeShape(const Message_ProgressRange &theRange)
+void AffineNode::computeShape(const ProgressHandler &handler)
 {
   shape = m_childShape;
   BRepBuilderAPI_GTransform theTransform(m_transform);
@@ -27,8 +27,9 @@ bool AffineNode::computeShape(const Message_ProgressRange &theRange)
   if (theTransform.IsDone())
   {
     shape = theTransform.Shape();
-    return true;
   }
-  addError("Could not perform transform");
-  return false;
+  else
+  {
+    handler.Abort("affine: could not perform transform");
+  }
 }

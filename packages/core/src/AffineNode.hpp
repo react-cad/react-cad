@@ -11,9 +11,13 @@ class AffineNode : public ReactCADNode
 public:
   AffineNode();
   void setMatrix(Matrix matrix);
+  std::string getName() override
+  {
+    return "Affine";
+  }
 
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   gp_GTrsf m_transform;

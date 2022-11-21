@@ -8,8 +8,13 @@ class BRepImportNode : public ImportNode
 public:
   BRepImportNode();
 
+  std::string getName() override
+  {
+    return "BRepImport";
+  }
+
 protected:
-  bool importFile(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void importFile(const ProgressHandler &handler) override;
 };
 
 #endif

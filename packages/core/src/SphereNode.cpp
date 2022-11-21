@@ -34,7 +34,7 @@ void SphereNode::setSegment(Standard_Real angle1, Standard_Real angle2)
   }
 }
 
-bool SphereNode::computeShape(const Message_ProgressRange &theRange)
+void SphereNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
 
@@ -70,12 +70,12 @@ bool SphereNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   makeSphere.Build(/*theRange*/);
-  if (!makeSphere.IsDone())
+  if (makeSphere.IsDone())
   {
-    addError("Could not construct sphere");
-    return false;
+    shape = makeSphere.Solid();
   }
-
-  shape = makeSphere.Solid();
-  return true;
+  else
+  {
+    handler.Abort("sphere: construction failed");
+  }
 }

@@ -28,7 +28,7 @@ void BoxNode::setCentered(Standard_Boolean centered)
   }
 }
 
-bool BoxNode::computeShape(const Message_ProgressRange &theRange)
+void BoxNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
 
@@ -36,7 +36,8 @@ bool BoxNode::computeShape(const Message_ProgressRange &theRange)
   makeBox.Build(/*theRange*/);
   if (!makeBox.IsDone())
   {
-    addError("Could not construct box");
+    handler.Abort("box: construction failed");
+    return;
   }
 
   TopoDS_Solid box = makeBox.Solid();
@@ -49,5 +50,4 @@ bool BoxNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   shape = box;
-  return true;
 }

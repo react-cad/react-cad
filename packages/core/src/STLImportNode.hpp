@@ -8,8 +8,13 @@ class STLImportNode : public ImportNode
 public:
   STLImportNode();
 
+  std::string getName() override
+  {
+    return "STLImport";
+  }
+
 protected:
-  bool importFile(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void importFile(const ProgressHandler &handler) override;
 };
 
 #endif

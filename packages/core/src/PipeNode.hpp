@@ -15,8 +15,13 @@ public:
   void setSpine(const NCollection_Array1<gp_Pnt> &points);
   void setSpineSVG(const std::string &svg);
 
+  std::string getName() override
+  {
+    return "Pipe";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Handle(ShapeBuilder) m_spineBuilder;

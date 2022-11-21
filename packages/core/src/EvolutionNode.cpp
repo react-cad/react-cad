@@ -19,7 +19,6 @@
 #include "EvolutionNode.hpp"
 
 #include "PerformanceTimer.hpp"
-#include "operations.hpp"
 
 #include "PolygonBuilder.hpp"
 #include "SVGBuilder.hpp"
@@ -54,18 +53,30 @@ void EvolutionNode::setSpineSVG(const std::string &svg)
   propsChanged();
 }
 
-bool EvolutionNode::computeShape(const Message_ProgressRange &theRange)
+void EvolutionNode::computeShape(const ProgressHandler &handler)
 {
   PerformanceTimer timer("Build evolution");
   shape = TopoDS_Shape();
-  bool success = true;
 
   GeomAbs_JoinType aJoinType = GeomAbs_Arc;
   Standard_Boolean aIsGlobalCS = Standard_True;
   Standard_Boolean aIsSolid = Standard_True;
 
-  TopoDS_Shape spine = m_spineBuilder->Shape();
-  TopoDS_Shape profile = m_profileBuilder->Shape();
+  m_spineBuilder->Build(handler);
+  if (!m_spineBuilder->IsDone())
+  {
+    handler.Abort("evolution: could not build spine");
+    return;
+  }
+  TopoDS_Shape spine = m_spineBuilder->Shape(handler);
+
+  m_profileBuilder->Build(handler);
+  if (!m_profileBuilder->IsDone())
+  {
+    handler.Abort("evolution: could not build profile");
+    return;
+  }
+  TopoDS_Shape profile = m_profileBuilder->Shape(handler);
 
   BRep_Builder builder;
   TopoDS_Compound compound;
@@ -78,7 +89,7 @@ bool EvolutionNode::computeShape(const Message_ProgressRange &theRange)
     ++nbFaces;
   }
 
-  Message_ProgressScope scope(theRange, "Computing evolution", nbFaces);
+  Message_ProgressScope scope(handler, "Computing evolution", nbFaces);
 
   int faceId = 0;
   for (Ex.ReInit(); Ex.More() && scope.More(); Ex.Next())
@@ -93,8 +104,8 @@ bool EvolutionNode::computeShape(const Message_ProgressRange &theRange)
     }
     else
     {
-      addError("Could not make evolved for face " + std::to_string(faceId));
-      success = false;
+      handler.Abort("evolution: could not construct evolution for face " + std::to_string(faceId));
+      return;
     }
     scope.Next();
 
@@ -104,6 +115,4 @@ bool EvolutionNode::computeShape(const Message_ProgressRange &theRange)
   shape = compound;
 
   timer.end();
-
-  return success;
 }

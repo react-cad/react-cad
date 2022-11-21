@@ -24,7 +24,7 @@ void TorusNode::setAngle(Standard_Real angle)
   }
 }
 
-bool TorusNode::computeShape(const Message_ProgressRange &theRange)
+void TorusNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
 
@@ -42,12 +42,12 @@ bool TorusNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   makeTorus.Build(/*theRange*/);
-  if (!makeTorus.IsDone())
+  if (makeTorus.IsDone())
   {
-    addError("Could not construct torus");
-    return false;
+    shape = makeTorus.Solid();
   }
-
-  shape = makeTorus.Solid();
-  return true;
+  else
+  {
+    handler.Abort("torus: construction failed");
+  }
 }

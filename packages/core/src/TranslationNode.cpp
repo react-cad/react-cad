@@ -16,18 +16,19 @@ void TranslationNode::setVector(gp_Vec vector)
   }
 }
 
-bool TranslationNode::computeShape(const Message_ProgressRange &theRange)
+void TranslationNode::computeShape(const ProgressHandler &handler)
 {
   shape = m_childShape;
   gp_Trsf transform;
   transform.SetTranslation(m_vector);
   BRepBuilderAPI_Transform theTransform(transform);
   theTransform.Perform(m_childShape, true);
-  if (!theTransform.IsDone())
+  if (theTransform.IsDone())
   {
-    addError("Could not perform transform");
-    return false;
+    shape = theTransform.Shape();
   }
-  shape = theTransform.Shape();
-  return true;
+  else
+  {
+    handler.Abort("translation: could not perform transform");
+  }
 }

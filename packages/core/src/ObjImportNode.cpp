@@ -12,21 +12,21 @@ ObjImportNode::ObjImportNode()
 {
 }
 
-bool ObjImportNode::importFile(const Message_ProgressRange &theRange)
+void ObjImportNode::importFile(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Triangulating obj");
 #endif
   shape = TopoDS_Shape();
 
-  Message_ProgressScope scope(theRange, "Importing obj file", 3);
+  Message_ProgressScope scope(handler, "Importing obj file", 3);
 
   Handle(Poly_Triangulation) mesh = RWObj::ReadFile(m_filename.c_str(), scope.Next());
 
   if (mesh.IsNull())
   {
-    addError("File missing, corrupt or contains no shapes");
-    return false;
+    handler.Abort("objimport: file missing, corrupt or contains no shapes");
+    return;
   }
 
 #ifdef REACTCAD_DEBUG
@@ -37,17 +37,14 @@ bool ObjImportNode::importFile(const Message_ProgressRange &theRange)
 
   if (scope.More())
   {
-    bool success = shapeFromMesh(mesh, shape, scope.Next(2));
+    bool success = shapeFromMesh(mesh, shape, handler.WithRange(scope.Next(2)));
     if (!success)
     {
-      addError("Could not build topology from mesh");
-      return false;
+      handler.Abort("objimport: mesh sewing failed");
     }
   }
 
 #ifdef REACTCAD_DEBUG
   timer2.end();
 #endif
-
-  return true;
 }

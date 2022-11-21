@@ -12,8 +12,13 @@ public:
   PrismNode();
   void setVector(gp_Vec vector);
 
+  std::string getName() override
+  {
+    return "Prism";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   gp_Vec m_vector;

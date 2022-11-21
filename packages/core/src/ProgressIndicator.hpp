@@ -18,6 +18,8 @@ public:
   void Show(const Message_ProgressScope &theScope, const Standard_Boolean isForce) override;
   void Reset() override;
 
+  void Abort(const std::string &reason, const std::string &route);
+
   void subscribe(emscripten::val fn);
   void unsubscribe(emscripten::val fn);
   emscripten::val then(emscripten::val thenFn);

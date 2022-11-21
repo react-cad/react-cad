@@ -232,6 +232,10 @@ export interface ReactCADCore extends EmscriptenModule {
   testProgress?: () => ProgressIndicator;
 }
 
+export class GeometryError extends Error {
+  public route: string;
+}
+
 declare const reactCadCore: EmscriptenModuleFactory<ReactCADCore>;
 
 export default reactCadCore;

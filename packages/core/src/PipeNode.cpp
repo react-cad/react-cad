@@ -16,10 +16,10 @@
 
 #include "PipeNode.hpp"
 
+#include "BooleanOperation.hpp"
 #include "PerformanceTimer.hpp"
 #include "PolygonBuilder.hpp"
 #include "SVGPathBuilder.hpp"
-#include "operations.hpp"
 
 PipeNode::PipeNode() : m_spineBuilder()
 {
@@ -61,16 +61,15 @@ bool PipeNode::makePipe(const TopoDS_Shape &profile, const TopoDS_Shape &spine, 
   return false;
 }
 
-bool PipeNode::computeShape(const Message_ProgressRange &theRange)
+void PipeNode::computeShape(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate pipe");
 #endif
-  bool success = true;
   shape = TopoDS_Shape();
 
-  TopoDS_Shape profile = getProfile();
-  TopoDS_Shape spine = m_spineBuilder->Shape();
+  TopoDS_Shape profile = getProfile(handler);
+  TopoDS_Shape spine = m_spineBuilder->Shape(handler);
 
   BRep_Builder builder;
   TopoDS_Compound compound;
@@ -83,7 +82,7 @@ bool PipeNode::computeShape(const Message_ProgressRange &theRange)
     ++nbFaces;
   }
 
-  Message_ProgressScope scope(theRange, "Computing pipe", nbFaces);
+  Message_ProgressScope scope(handler, "Computing pipe", nbFaces);
 
   int faceId = -1;
   for (Faces.ReInit(); Faces.More() && scope.More(); Faces.Next())
@@ -105,8 +104,7 @@ bool PipeNode::computeShape(const Message_ProgressRange &theRange)
     bool solidSuccess = makePipe(outerWire, spine, solid);
     if (!solidSuccess)
     {
-      addError("Could not make pipe for outer wire of face " + std::to_string(faceId));
-      success = false;
+      handler.Abort("pipe: could not make pipe for outer wire of face " + std::to_string(faceId));
       continue;
     }
 
@@ -131,20 +129,30 @@ bool PipeNode::computeShape(const Message_ProgressRange &theRange)
       }
       else
       {
-        addError("Could not make pipe for wire " + std::to_string(wireId) + " of face " + std::to_string(faceId));
-        success = false;
+        handler.Abort("pipe: could not make pipe for wire " + std::to_string(wireId) + " of face " +
+                      std::to_string(faceId));
+        continue;
       }
       faceScope.Next();
     }
 
-    TopoDS_Shape pipe = differenceOp(solid, holes, faceScope.Next(nbWires));
-    builder.Add(compound, pipe);
+    if (faceScope.More())
+    {
+      BooleanOperation op;
+      op.Difference(solid, holes, handler.WithRange(faceScope.Next(nbWires)));
+      if (op.HasErrors())
+      {
+        handler.Abort("pipe: boolean operation failed\n\n" + op.Errors());
+      }
+      else
+      {
+        builder.Add(compound, op.Shape());
+      }
+    }
   }
 
   shape = compound;
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
-
-  return success;
 }

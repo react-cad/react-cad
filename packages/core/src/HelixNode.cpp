@@ -15,8 +15,8 @@
 
 #include "HelixNode.hpp"
 
+#include "BooleanOperation.hpp"
 #include "PerformanceTimer.hpp"
-#include "operations.hpp"
 
 HelixNode::HelixNode() : m_pitch(10), m_height(10)
 {
@@ -80,15 +80,14 @@ bool HelixNode::makeHelix(const TopoDS_Wire &profile, TopoDS_Shape &shape)
   return false;
 }
 
-bool HelixNode::computeShape(const Message_ProgressRange &theRange)
+void HelixNode::computeShape(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
 #endif
-  bool success = true;
   shape = TopoDS_Shape();
 
-  TopoDS_Shape profile = getProfile();
+  TopoDS_Shape profile = getProfile(handler);
 
   buildSpineAndGuide();
 
@@ -103,7 +102,7 @@ bool HelixNode::computeShape(const Message_ProgressRange &theRange)
     ++nbFaces;
   }
 
-  Message_ProgressScope scope(theRange, "Computing helix", nbFaces);
+  Message_ProgressScope scope(handler, "Computing helix", nbFaces);
 
   int faceId = -1;
   for (Faces.ReInit(); Faces.More() && scope.More(); Faces.Next())
@@ -125,8 +124,7 @@ bool HelixNode::computeShape(const Message_ProgressRange &theRange)
     bool solidSuccess = makeHelix(outerWire, solid);
     if (!solidSuccess)
     {
-      addError("Could not make helix for outer wire of face " + std::to_string(faceId));
-      success = false;
+      handler.Abort("helix: could not make helix for outer wire of face " + std::to_string(faceId));
       continue;
     }
 
@@ -151,20 +149,32 @@ bool HelixNode::computeShape(const Message_ProgressRange &theRange)
       }
       else
       {
-        addError("Could not make helix for wire " + std::to_string(wireId) + " of face " + std::to_string(faceId));
-        success = false;
+        handler.Abort("helix: could not make helix for wire " + std::to_string(wireId) + " of face " +
+                      std::to_string(faceId));
+        continue;
       }
       faceScope.Next();
     }
 
-    TopoDS_Shape helix = differenceOp(solid, holes, faceScope.Next(nbWires));
-    builder.Add(compound, helix);
+    if (!faceScope.More())
+    {
+      continue;
+    }
+
+    BooleanOperation op;
+    op.Difference(solid, holes, handler.WithRange(faceScope.Next(nbWires)));
+    if (op.HasErrors())
+    {
+      handler.Abort("helix: boolean operation failed\n\n" + op.Errors());
+    }
+    else
+    {
+      builder.Add(compound, op.Shape());
+    }
   }
 
   shape = compound;
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
-
-  return success;
 }

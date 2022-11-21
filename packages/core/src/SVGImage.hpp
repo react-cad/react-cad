@@ -34,6 +34,7 @@ public:
 
   float Height();
   float Width();
+  bool IsDone();
 
   struct SVGBezierCurve
   {

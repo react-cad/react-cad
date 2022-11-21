@@ -13,8 +13,13 @@ public:
   void setLtx(Standard_Real ltx);
   void setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real zmin, Standard_Real zmax);
 
+  std::string getName() override
+  {
+    return "Wedge";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Standard_Boolean m_useLtx;

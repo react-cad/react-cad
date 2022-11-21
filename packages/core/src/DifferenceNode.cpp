@@ -1,6 +1,6 @@
 #include "DifferenceNode.hpp"
+#include "BooleanOperation.hpp"
 #include "PerformanceTimer.hpp"
-#include "operations.hpp"
 
 #include <TopTools_ListOfShape.hxx>
 
@@ -8,17 +8,17 @@ DifferenceNode::DifferenceNode()
 {
 }
 
-bool DifferenceNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
+void DifferenceNode::computeChildren(TopTools_ListOfShape children, const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate difference");
 #endif
   m_childShape = TopoDS_Shape();
 
-  Message_ProgressScope scope(theRange, "Computing difference", 1);
+  Message_ProgressScope scope(handler, "Computing difference", 1);
   if (!scope.More())
   {
-    return true;
+    return;
   }
 
   switch (children.Size())
@@ -31,7 +31,16 @@ bool DifferenceNode::computeChildren(TopTools_ListOfShape children, const Messag
   default: {
     TopoDS_Shape positive = children.First();
     children.RemoveFirst();
-    m_childShape = differenceOp(positive, children, scope.Next());
+    BooleanOperation op;
+    op.Difference(positive, children, handler.WithRange(scope.Next()));
+    if (op.HasErrors())
+    {
+      handler.Abort("difference: " + op.Errors());
+    }
+    else
+    {
+      m_childShape = op.Shape();
+    }
     break;
   }
   }
@@ -39,6 +48,4 @@ bool DifferenceNode::computeChildren(TopTools_ListOfShape children, const Messag
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
-
-  return true;
 }

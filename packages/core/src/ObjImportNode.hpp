@@ -8,8 +8,13 @@ class ObjImportNode : public ImportNode
 public:
   ObjImportNode();
 
+  std::string getName() override
+  {
+    return "ObjImport";
+  }
+
 protected:
-  bool importFile(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void importFile(const ProgressHandler &handler) override;
 };
 
 #endif

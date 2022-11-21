@@ -41,7 +41,7 @@ void WedgeNode::setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real 
   }
 }
 
-bool WedgeNode::computeShape(const Message_ProgressRange &theRange)
+void WedgeNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
 
@@ -57,12 +57,12 @@ bool WedgeNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   makeWedge.Build(/*theRange*/);
-  if (!makeWedge.IsDone())
+  if (makeWedge.IsDone())
   {
-    addError("Could not construct wedge");
-    return false;
+    shape = makeWedge.Solid();
   }
-
-  shape = makeWedge.Solid();
-  return true;
+  else
+  {
+    handler.Abort("wedge: construction failed");
+  }
 }

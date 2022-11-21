@@ -2,7 +2,20 @@ import { Props, Instance, UpdatePayload } from "../types";
 
 type Evolution = "evolution";
 
-function validateProps(_props: Props<Evolution>): boolean {
+function validateProps(props: Props<Evolution>): boolean {
+  if (
+    !props.profile ||
+    (typeof props.profile === "string" && props.profile.length < 1)
+  ) {
+    throw new Error(`evolution: "profile" prop must be set`);
+  }
+  if (
+    !props.spine ||
+    (typeof props.spine === "string" && props.spine.length < 1)
+  ) {
+    throw new Error(`evolution: "spine" prop must be set`);
+  }
+
   return true;
 }
 

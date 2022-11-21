@@ -13,7 +13,8 @@ class SVGPathBuilder : public ShapeBuilder
 {
 public:
   SVGPathBuilder(const std::string &pathData, const Handle(Geom_Plane) & plane);
-  TopoDS_Shape Shape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void Build(const ProgressHandler &handler) override;
+  TopoDS_Shape Shape(const ProgressHandler &handler) override;
 
 private:
   Handle(Geom_Plane) m_plane;

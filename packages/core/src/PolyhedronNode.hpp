@@ -2,6 +2,7 @@
 #define PolyhedronNode_HeaderFile
 
 #include "Geometry.hpp"
+#include "ProgressHandler.hpp"
 #include "ReactCADNode.hpp"
 
 #include <NCollection_Array1.hxx>
@@ -14,8 +15,13 @@ public:
   void setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
                          const NCollection_Array1<NCollection_Array1<int>> &faces);
 
+  std::string getName() override
+  {
+    return "Polyhedron";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   NCollection_Array1<gp_Pnt> m_points;

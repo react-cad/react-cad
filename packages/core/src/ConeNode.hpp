@@ -11,8 +11,13 @@ public:
   void setSize(Standard_Real radius1, Standard_Real radius2, Standard_Real height);
   void setAngle(Standard_Real angle);
 
+  std::string getName() override
+  {
+    return "Cone";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Standard_Boolean m_centered;

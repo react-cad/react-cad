@@ -1,4 +1,5 @@
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import type {
   ReactCADCore,
   ReactCADView,
@@ -9,20 +10,33 @@ import { createRoot } from "@react-cad/renderer";
 import { ExportFns, ViewOptions } from "./types";
 
 import DetailContext from "./DetailContext";
-import CADErrorBoundary from "./CADErrorBoundary";
+
+const NullComponent = () => null;
+
+const originalConsoleError = console["error"];
+
+const subscribers: any[] = [];
+
+console["error"] = (message) => {
+  if (message.startsWith("The above error")) {
+    subscribers.forEach((subscriber) => subscriber(message));
+  }
+  originalConsoleError(message);
+};
 
 export function useReactCADRenderer(
   core: ReactCADCore,
   shape: React.ReactElement,
   detail: ViewOptions["detail"],
   reset?: boolean
-): [ReactCADNode, number, boolean, unknown | undefined] {
+): [ReactCADNode, number, boolean, Error | undefined, string | undefined] {
   const rootNode = React.useMemo(() => core.createCADNode("union"), [core]);
   const root = React.useMemo(() => createRoot(rootNode, core), [core]);
 
   const [renderFrameId, setRenderFrameId] = React.useState(0);
   const [renderReset, setRenderReset] = React.useState(false);
-  const [renderError, setRenderError] = React.useState<unknown>();
+  const [renderError, setRenderError] = React.useState<Error>();
+  const [renderErrorContext, setRenderErrorContext] = React.useState<string>();
 
   const renderCallback = React.useMemo(() => {
     let shouldReset = Boolean(reset);
@@ -36,31 +50,40 @@ export function useReactCADRenderer(
   }, [core, rootNode, reset]);
 
   React.useEffect(() => {
+    setRenderError(undefined);
+    setRenderErrorContext(undefined);
+
     root.render(
-      <CADErrorBoundary shape={shape} log={setRenderError}>
+      <ErrorBoundary
+        FallbackComponent={NullComponent}
+        onError={setRenderError}
+        resetKeys={[shape]}
+      >
         <DetailContext.Provider value={detail}>{shape}</DetailContext.Provider>
-      </CADErrorBoundary>,
+      </ErrorBoundary>,
       renderCallback
     );
-
-    return () => setRenderError(undefined);
   }, [shape, detail, root, rootNode]);
 
   React.useEffect(() => {
-    if (renderError) {
-      console.error(renderError);
-    }
-  }, [renderError]);
-
-  React.useEffect(
-    () => () => {
+    subscribers.push(setRenderErrorContext);
+    return () => {
+      const index = subscribers.findIndex(setRenderErrorContext);
+      if (index >= 0) {
+        subscribers.splice(index, 1);
+      }
       root.delete();
       rootNode.delete();
-    },
-    []
-  );
+    };
+  }, []);
 
-  return [rootNode, renderFrameId, renderReset, renderError];
+  return [
+    rootNode,
+    renderFrameId,
+    renderReset,
+    renderError,
+    renderErrorContext,
+  ];
 }
 
 export function useReactCADView(

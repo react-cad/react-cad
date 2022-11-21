@@ -18,7 +18,7 @@
 
 #include <string>
 
-bool shapeFromMesh(Handle(Poly_Triangulation) aMesh, TopoDS_Shape &shape, const Message_ProgressRange &theRange)
+bool shapeFromMesh(Handle(Poly_Triangulation) aMesh, TopoDS_Shape &shape, const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
   if (aMesh.IsNull())
@@ -26,7 +26,7 @@ bool shapeFromMesh(Handle(Poly_Triangulation) aMesh, TopoDS_Shape &shape, const 
     return false;
   }
 
-  Message_ProgressScope scope(theRange, "Building shape from mesh", 9);
+  Message_ProgressScope scope(handler, "Building shape from mesh", 9);
 
   Message_ProgressScope meshScope(scope.Next(4), "Making faces from triangles ", aMesh->NbTriangles());
 

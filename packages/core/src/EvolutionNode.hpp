@@ -15,8 +15,13 @@ public:
   void setProfile(const NCollection_Array1<gp_Pnt> &points);
   void setProfileSVG(const std::string &pathData);
 
+  std::string getName() override
+  {
+    return "Evolution";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Handle(ShapeBuilder) m_spineBuilder;

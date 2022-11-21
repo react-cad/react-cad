@@ -11,8 +11,13 @@ public:
   void setAngle(Standard_Real angle);
   void setCentered(Standard_Boolean centered);
 
+  std::string getName() override
+  {
+    return "Cylinder";
+  }
+
 protected:
-  bool computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Standard_Real m_radius;

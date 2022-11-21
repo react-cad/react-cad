@@ -1,5 +1,9 @@
 import React from "react";
-import type { ReactCADCore, ReactCADNode } from "@react-cad/core";
+import type {
+  GeometryError,
+  ReactCADCore,
+  ReactCADNode,
+} from "@react-cad/core";
 
 import { useExport, useProgressQueue, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
@@ -19,9 +23,10 @@ interface Props {
   lowDetail?: [number, number];
   setDetail?: (detail: ViewOptions["detail"]) => void;
   rerender?: any;
+  onError?: (error: GeometryError) => void;
 }
 
-const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
+const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
   (
     {
       className,
@@ -35,6 +40,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       lowDetail = [0.002, 1],
       setDetail,
       rerender,
+      onError,
     },
     forwardedRef
   ) => {
@@ -77,7 +83,10 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
                   shouldReset.current = false;
                 }
               },
-              () => {
+              (error) => {
+                if (error instanceof Error) {
+                  onError?.(error as GeometryError);
+                }
                 shouldReset.current = Boolean(reset || shouldReset.current);
               }
             );
@@ -86,7 +95,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           }
         });
       }
-    }, [node, rerender]);
+    }, [node, rerender, onError]);
 
     React.useEffect(
       () => setOptions((options) => ({ ...options, highDetail, lowDetail })),
@@ -153,4 +162,4 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
   }
 );
 
-export default ReactCADViewer;
+export default ReactCADNodeViewer;

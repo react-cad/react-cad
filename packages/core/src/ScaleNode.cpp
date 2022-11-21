@@ -55,7 +55,7 @@ bool scaleAxis(TopoDS_Shape &shape, gp_Pnt center, gp_Dir direction, Standard_Re
   return false;
 }
 
-bool ScaleNode::computeShape(const Message_ProgressRange &theRange)
+void ScaleNode::computeShape(const ProgressHandler &handler)
 {
   shape = m_childShape;
   TopoDS_Shape tmp = m_childShape;
@@ -65,24 +65,24 @@ bool ScaleNode::computeShape(const Message_ProgressRange &theRange)
     transform.SetScale(m_center, m_scaleX);
     BRepBuilderAPI_Transform aBRepTrsf(tmp, transform);
     aBRepTrsf.Build(/*theRange*/);
-    if (!aBRepTrsf.IsDone())
+    if (aBRepTrsf.IsDone())
     {
-      addError("Could not perform transform");
-      return false;
+      shape = aBRepTrsf.Shape();
     }
-    shape = aBRepTrsf.Shape();
+    else
+    {
+      handler.Abort("scale: could not perform transform");
+    }
   }
   else
   {
-    bool success = true;
-
     if (!IsEqual(m_scaleX, 1.0))
     {
       bool xSuccess = scaleAxis(tmp, m_center, gp::DX(), m_scaleX);
       if (!xSuccess)
       {
-        addError("Could not perform x-axis scale");
-        success = false;
+        handler.Abort("scale: could not perform x-axis scale");
+        return;
       }
     }
     if (!IsEqual(m_scaleY, 1.0))
@@ -90,8 +90,8 @@ bool ScaleNode::computeShape(const Message_ProgressRange &theRange)
       bool ySuccess = scaleAxis(tmp, m_center, gp::DY(), m_scaleY);
       if (!ySuccess)
       {
-        addError("Could not perform y-axis scale");
-        success = false;
+        handler.Abort("scale: could not perform y-axis scale");
+        return;
       }
     }
     if (!IsEqual(m_scaleZ, 1.0))
@@ -99,11 +99,10 @@ bool ScaleNode::computeShape(const Message_ProgressRange &theRange)
       bool zSuccess = scaleAxis(tmp, m_center, gp::DZ(), m_scaleZ);
       if (!zSuccess)
       {
-        addError("Could not perform z-axis scale");
-        success = false;
+        handler.Abort("scale: could not perform z-axis scale");
+        return;
       }
     }
     shape = tmp;
-    return success;
   }
 }

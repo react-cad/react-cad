@@ -7,6 +7,11 @@ class UnionNode : public ReactCADNode
 {
 public:
   UnionNode();
+
+  std::string getName() override
+  {
+    return "Union";
+  }
 };
 
 #endif

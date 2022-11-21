@@ -35,7 +35,7 @@ void ConeNode::setAngle(Standard_Real angle)
   }
 }
 
-bool ConeNode::computeShape(const Message_ProgressRange &theRange)
+void ConeNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
 
@@ -56,8 +56,8 @@ bool ConeNode::computeShape(const Message_ProgressRange &theRange)
   makeCone.Build(/*theRange*/);
   if (!makeCone.IsDone())
   {
-    addError("Could not construct cone");
-    return false;
+    handler.Abort("cone: construction failed");
+    return;
   }
   cone = makeCone.Solid();
 
@@ -69,6 +69,4 @@ bool ConeNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   shape = cone;
-
-  return true;
 }

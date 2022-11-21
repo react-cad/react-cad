@@ -18,19 +18,23 @@
 #include <TopoDS_Wire.hxx>
 
 #include "SVGImage.hpp"
-#include "operations.hpp"
 
 SVGPathBuilder::SVGPathBuilder(const std::string &pathData, const Handle(Geom_Plane) & plane)
     : m_shape(), m_pathData(pathData), m_plane(plane){};
 
-TopoDS_Shape SVGPathBuilder::Shape(const Message_ProgressRange &theRange)
+void SVGPathBuilder::Build(const ProgressHandler &handler)
 {
-  if (!m_shape.IsNull())
+  if (m_done)
   {
-    return m_shape;
+    return;
   }
 
   SVGImage image = SVGImage::FromPathData(m_pathData);
+
+  if (!image.IsDone())
+  {
+    return;
+  }
 
   TopoDS_Shape shape;
 
@@ -69,5 +73,15 @@ TopoDS_Shape SVGPathBuilder::Shape(const Message_ProgressRange &theRange)
     }
   }
 
-  return shape;
+  m_shape = shape;
+  m_done = true;
+}
+
+TopoDS_Shape SVGPathBuilder::Shape(const ProgressHandler &handler)
+{
+  if (!m_done)
+  {
+    Build(handler);
+  }
+  return m_shape;
 }

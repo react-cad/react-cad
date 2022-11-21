@@ -24,7 +24,7 @@ void MirrorNode::setPlane(gp_Pnt origin, gp_Vec normal)
   }
 }
 
-bool MirrorNode::computeShape(const Message_ProgressRange &theRange)
+void MirrorNode::computeShape(const ProgressHandler &handler)
 {
   shape = m_childShape;
   BRepBuilderAPI_Transform theTransform(m_trsf);
@@ -32,8 +32,9 @@ bool MirrorNode::computeShape(const Message_ProgressRange &theRange)
   if (theTransform.IsDone())
   {
     shape = theTransform.Shape();
-    return true;
   }
-  addError("Could not perform transform");
-  return false;
+  else
+  {
+    handler.Abort("mirror: could not perform transform");
+  }
 }

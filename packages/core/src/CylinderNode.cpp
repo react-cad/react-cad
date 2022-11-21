@@ -34,7 +34,7 @@ void CylinderNode::setCentered(Standard_Boolean centered)
   }
 }
 
-bool CylinderNode::computeShape(const Message_ProgressRange &theRange)
+void CylinderNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Shape();
 
@@ -55,8 +55,8 @@ bool CylinderNode::computeShape(const Message_ProgressRange &theRange)
   makeCylinder.Build(/*theRange*/);
   if (!makeCylinder.IsDone())
   {
-    addError("Could not construct cylinder");
-    return false;
+    handler.Abort("cylinder: construction failed");
+    return;
   }
   cylinder = makeCylinder.Solid();
 
@@ -68,6 +68,4 @@ bool CylinderNode::computeShape(const Message_ProgressRange &theRange)
   }
 
   shape = cylinder;
-
-  return true;
 }
