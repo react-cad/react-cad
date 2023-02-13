@@ -11,7 +11,7 @@ const NullComponent = () => null;
 
 function useReactCADRenderer(
   core: ReactCADCore,
-  shape: React.ReactElement,
+  shape: React.ReactElement | undefined,
   detail: ViewOptions["detail"],
   reset?: boolean
 ): [ReactCADNode, number, boolean, Error | undefined, string | undefined] {
@@ -24,7 +24,7 @@ function useReactCADRenderer(
   const [renderErrorContext, setRenderErrorContext] = React.useState<string>();
 
   useConsoleError((message) => {
-    if (message.startsWith("The above error")) {
+    if (typeof message === "string" && message.startsWith("The above error")) {
       setRenderErrorContext(message);
     }
   });

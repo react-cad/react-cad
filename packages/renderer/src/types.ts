@@ -175,7 +175,7 @@ export interface Instance<T extends Type = Type> {
   type: T;
   node: ReactCADNodeTypes[T];
 }
-export type TextInstance = Instance;
+export type TextInstance = string;
 export type HydratableInstance = never;
 export type PublicInstance = ReactCADNode;
 export type UpdatePayload<T extends Type = Type> = Props<T>;

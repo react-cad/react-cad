@@ -20,12 +20,14 @@ interface Props {
   geometryError?: GeometryError;
   renderError?: Error;
   renderErrorContext?: string;
+  showStackTrace?: boolean;
 }
 
 const RenderError: React.FC<Props> = ({
   geometryError,
   renderError,
   renderErrorContext,
+  showStackTrace = true,
 }) => {
   const geometryContext = React.useMemo(() => {
     if (!geometryError) {
@@ -80,6 +82,7 @@ const RenderError: React.FC<Props> = ({
                   "\nReact will try to recreate this"
                 )[0]
               }
+              showStackTrace={showStackTrace}
             />
           )}
           {geometryError && (

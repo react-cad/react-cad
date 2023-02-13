@@ -1,0 +1,16 @@
+.header {
+  background-color: whitesmoke;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  margin: 1rem;
+  font-size: 1.35rem;
+  font-weight: normal;
+}
+
+.header p {
+  margin: 1rem;
+}
