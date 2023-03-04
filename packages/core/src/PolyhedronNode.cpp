@@ -3,6 +3,7 @@
 #include <BRepBuilderAPI_MakeSolid.hxx>
 #include <BRepBuilderAPI_Sewing.hxx>
 #include <BRepLib.hxx>
+#include <Message.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shell.hxx>
 #include <TopoDS_Solid.hxx>
@@ -44,7 +45,7 @@ bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>
     return false;
   }
 
-  for (auto face = m_faces.begin(); face != m_faces.end(); ++face)
+  for (auto face = faces.begin(); face != faces.end(); ++face)
   {
     if (face->Size() < 3)
     {
@@ -53,7 +54,7 @@ bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>
 
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
-      if (*pointIndex < 0 || *pointIndex >= m_points.Size())
+      if (*pointIndex < m_points.Lower() || *pointIndex > m_points.Upper())
       {
         return false;
       }
@@ -67,15 +68,12 @@ void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
                                        const NCollection_Array1<NCollection_Array1<int>> &faces)
 {
   m_points = points;
+
   if (checkFaces(faces))
   {
     m_faces = faces;
+    propsChanged();
   }
-  else
-  {
-    m_faces = NCollection_Array1<NCollection_Array1<int>>();
-  }
-  propsChanged();
 }
 
 void PolyhedronNode::computeShape(const ProgressHandler &handler)
@@ -95,6 +93,13 @@ void PolyhedronNode::computeShape(const ProgressHandler &handler)
     BRepBuilderAPI_MakePolygon polygon;
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
+      if (*pointIndex < m_points.Lower() || *pointIndex > m_points.Upper())
+      {
+        std::stringstream message;
+        message << "polyhedron: point index " << *pointIndex << " out of bounds for face " << faceId;
+        handler.Abort(message.str());
+        return;
+      }
       gp_Pnt point = m_points[*pointIndex];
       polygon.Add(point);
     }
