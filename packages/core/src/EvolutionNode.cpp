@@ -112,7 +112,10 @@ void EvolutionNode::computeShape(const ProgressHandler &handler)
     ++faceId;
   }
 
-  shape = compound;
+  if (scope.More())
+  {
+    shape = compound;
+  }
 
   timer.end();
 }

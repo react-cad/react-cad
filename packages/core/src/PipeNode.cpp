@@ -151,7 +151,11 @@ void PipeNode::computeShape(const ProgressHandler &handler)
     }
   }
 
-  shape = compound;
+  if (scope.More())
+  {
+    shape = compound;
+  }
+
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
