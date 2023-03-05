@@ -12,8 +12,13 @@ public:
   void setSize(gp_Pnt size);
   void setCentered(Standard_Boolean centered);
 
+  std::string getName() override
+  {
+    return "Box";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   gp_Pnt m_size;

@@ -7,8 +7,8 @@
 
 #include <mutex>
 
+#include "BooleanOperation.hpp"
 #include "ReactCADNode.hpp"
-#include "operations.hpp"
 
 #include "PerformanceTimer.hpp"
 
@@ -81,61 +81,71 @@ void ReactCADNode::notifyAncestors()
   }
 }
 
-bool ReactCADNode::computeGeometry(const Message_ProgressRange &theRange)
+void ReactCADNode::computeGeometry(const ProgressHandler &handler)
 {
-  Message_ProgressScope scope(theRange, "Computing geometry", 1);
+  Message_ProgressScope scope(handler, "Computing geometry", 1);
   if (m_propsChanged || m_childrenChanged)
   {
     if (m_childrenChanged)
     {
       Message_ProgressScope childScope(scope.Next(), "Computing child geometry", m_children.size() + 2);
       TopTools_ListOfShape shapes;
+      int i = 0;
       for (auto child = m_children.begin(); child != m_children.end() && childScope.More(); ++child)
       {
-        (*child)->computeGeometry(childScope.Next());
+        std::stringstream name;
+        name << handler.Name() << "/" << i << "-" << (*child)->getName();
+        (*child)->computeGeometry(handler.WithRangeAndName(childScope.Next(), name.str()));
         shapes.Append((*child)->shape);
+        ++i;
       }
 
-      computeChildren(shapes, childScope.Next());
+      computeChildren(shapes, handler.WithRange(childScope.Next()));
 
       if (!childScope.More())
       {
-        return false;
+        return;
       }
 
-      computeShape(childScope.Next());
+      computeShape(handler.WithRange(childScope.Next()));
 
       if (childScope.More())
       {
         m_childrenChanged = false;
         m_propsChanged = false;
-        return true;
       }
     }
     else
     {
-      computeShape(scope.Next());
+      computeShape(handler.WithRange(scope.Next()));
+
       if (scope.More())
       {
         m_propsChanged = false;
-        return true;
       }
     }
   }
-
-  return false;
 }
 
-void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_ProgressRange &theRange)
+void ReactCADNode::computeChildren(TopTools_ListOfShape children, const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate union");
 #endif
 
-  Message_ProgressScope scope(theRange, "Computing union", 1);
+  Message_ProgressScope scope(handler, "Computing union", 1);
   if (scope.More())
   {
-    m_childShape = unionOp(children, scope.Next());
+    BooleanOperation op;
+    op.Union(children, handler.WithRange(scope.Next()));
+    if (op.HasErrors())
+    {
+      handler.Abort("union: boolean operation failed\n\n" + op.Errors());
+    }
+    else
+    {
+      m_childShape = op.Shape();
+    }
   }
 
 #ifdef REACTCAD_DEBUG
@@ -143,7 +153,7 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Message_
 #endif
 }
 
-void ReactCADNode::computeShape(const Message_ProgressRange &theRange)
+void ReactCADNode::computeShape(const ProgressHandler &handler)
 {
   shape = m_childShape;
 }

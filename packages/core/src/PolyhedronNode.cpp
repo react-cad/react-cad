@@ -3,6 +3,7 @@
 #include <BRepBuilderAPI_MakeSolid.hxx>
 #include <BRepBuilderAPI_Sewing.hxx>
 #include <BRepLib.hxx>
+#include <Message.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shell.hxx>
 #include <TopoDS_Solid.hxx>
@@ -44,7 +45,7 @@ bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>
     return false;
   }
 
-  for (auto face = m_faces.begin(); face != m_faces.end(); ++face)
+  for (auto face = faces.begin(); face != faces.end(); ++face)
   {
     if (face->Size() < 3)
     {
@@ -53,7 +54,7 @@ bool PolyhedronNode::checkFaces(const NCollection_Array1<NCollection_Array1<int>
 
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
-      if (*pointIndex < 0 || *pointIndex >= m_points.Size())
+      if (*pointIndex < m_points.Lower() || *pointIndex > m_points.Upper())
       {
         return false;
       }
@@ -67,30 +68,38 @@ void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
                                        const NCollection_Array1<NCollection_Array1<int>> &faces)
 {
   m_points = points;
+
   if (checkFaces(faces))
   {
     m_faces = faces;
+    propsChanged();
   }
-  else
-  {
-    m_faces = NCollection_Array1<NCollection_Array1<int>>();
-  }
-  propsChanged();
 }
 
-void PolyhedronNode::computeShape(const Message_ProgressRange &theRange)
+void PolyhedronNode::computeShape(const ProgressHandler &handler)
 {
+  shape = TopoDS_Shape();
+
   BRepBuilderAPI_Sewing polyhedron;
 
-  Message_ProgressScope scope(theRange, "Computing polyhedron", 9);
+  Message_ProgressScope scope(handler, "Computing polyhedron", 9);
 
   Message_ProgressScope meshScope(scope.Next(4), "Building faces", m_faces.Size());
 
+  int faceId = -1;
   for (auto face = m_faces.begin(); face != m_faces.end() && meshScope.More(); ++face)
   {
+    ++faceId;
     BRepBuilderAPI_MakePolygon polygon;
     for (auto pointIndex = face->begin(); pointIndex != face->end(); ++pointIndex)
     {
+      if (*pointIndex < m_points.Lower() || *pointIndex > m_points.Upper())
+      {
+        std::stringstream message;
+        message << "polyhedron: point index " << *pointIndex << " out of bounds for face " << faceId;
+        handler.Abort(message.str());
+        return;
+      }
       gp_Pnt point = m_points[*pointIndex];
       polygon.Add(point);
     }
@@ -98,32 +107,45 @@ void PolyhedronNode::computeShape(const Message_ProgressRange &theRange)
     BRepBuilderAPI_MakeFace f(polygon.Wire());
     if (!f.IsDone())
     {
-      shape = TopoDS_Shape();
-      return;
+      handler.Abort("polyhedron: could not make face " + std::to_string(faceId));
+      continue;
     }
     polyhedron.Add(f);
 
     meshScope.Next();
   }
 
-  if (scope.More())
+  if (!scope.More())
   {
-    polyhedron.Perform(scope.Next(4));
-    TopoDS_Shape sewedShape = polyhedron.SewedShape();
-
-    if (sewedShape.ShapeType() == TopAbs_SHELL && scope.More())
-    {
-      TopoDS_Shell shell = TopoDS::Shell(sewedShape);
-      BRepBuilderAPI_MakeSolid makeSolid;
-      makeSolid.Add(shell);
-      makeSolid.Build();
-      TopoDS_Solid solid = makeSolid.Solid();
-      BRepLib::OrientClosedSolid(solid);
-      shape = solid;
-      scope.Next(1);
-      return;
-    }
+    return;
   }
 
-  shape = TopoDS_Shape();
+  polyhedron.Perform(scope.Next(4));
+  TopoDS_Shape sewedShape = polyhedron.SewedShape();
+
+  if (!scope.More())
+  {
+    return;
+  }
+
+  if (sewedShape.ShapeType() != TopAbs_SHELL)
+  {
+    handler.Abort("polyhedron: could not make shell from faces");
+    return;
+  }
+
+  TopoDS_Shell shell = TopoDS::Shell(sewedShape);
+  BRepBuilderAPI_MakeSolid makeSolid;
+  makeSolid.Add(shell);
+  makeSolid.Build();
+
+  if (!makeSolid.IsDone())
+  {
+    handler.Abort("polyhedron: could not make solid from shell");
+    return;
+  }
+
+  TopoDS_Solid solid = makeSolid.Solid();
+  BRepLib::OrientClosedSolid(solid);
+  shape = solid;
 }

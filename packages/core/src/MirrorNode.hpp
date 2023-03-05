@@ -15,8 +15,13 @@ public:
   MirrorNode();
   void setPlane(gp_Pnt origin, gp_Vec normal);
 
+  std::string getName() override
+  {
+    return "Mirror";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   gp_Trsf m_trsf;

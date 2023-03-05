@@ -34,21 +34,23 @@ void SphereNode::setSegment(Standard_Real angle1, Standard_Real angle2)
   }
 }
 
-void SphereNode::computeShape(const Message_ProgressRange &theRange)
+void SphereNode::computeShape(const ProgressHandler &handler)
 {
+  shape = TopoDS_Shape();
+
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
-  TopoDS_Solid sphere;
+  BRepPrimAPI_MakeSphere makeSphere(1, 1, 1);
 
   if (m_segmentAngle1 == 0 && m_segmentAngle2 == 0)
   {
     if (m_angle == 0)
     {
-      sphere = BRepPrimAPI_MakeSphere(m_radius);
+      makeSphere = BRepPrimAPI_MakeSphere(m_radius);
     }
     else
     {
-      sphere = BRepPrimAPI_MakeSphere(m_radius, angle);
+      makeSphere = BRepPrimAPI_MakeSphere(m_radius, angle);
     }
   }
   else
@@ -58,14 +60,22 @@ void SphereNode::computeShape(const Message_ProgressRange &theRange)
 
     if (m_angle == 0)
     {
-      sphere = BRepPrimAPI_MakeSphere(m_radius, segmentAngle2, segmentAngle1);
+      makeSphere = BRepPrimAPI_MakeSphere(m_radius, segmentAngle2, segmentAngle1);
     }
     else
     {
 
-      sphere = BRepPrimAPI_MakeSphere(m_radius, segmentAngle2, segmentAngle1, angle);
+      makeSphere = BRepPrimAPI_MakeSphere(m_radius, segmentAngle2, segmentAngle1, angle);
     }
   }
 
-  shape = sphere;
+  makeSphere.Build(/*theRange*/);
+  if (makeSphere.IsDone())
+  {
+    shape = makeSphere.Solid();
+  }
+  else
+  {
+    handler.Abort("sphere: construction failed");
+  }
 }

@@ -11,8 +11,13 @@ public:
   void setAngle(Standard_Real angle);
   void setSegment(Standard_Real angle1, Standard_Real angle2);
 
+  std::string getName() override
+  {
+    return "Sphere";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Standard_Real m_radius;

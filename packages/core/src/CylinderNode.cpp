@@ -34,19 +34,31 @@ void CylinderNode::setCentered(Standard_Boolean centered)
   }
 }
 
-void CylinderNode::computeShape(const Message_ProgressRange &theRange)
+void CylinderNode::computeShape(const ProgressHandler &handler)
 {
+  shape = TopoDS_Shape();
+
   TopoDS_Solid cylinder;
+
+  BRepPrimAPI_MakeCylinder makeCylinder(1, 1);
 
   if (m_angle == 0)
   {
-    cylinder = BRepPrimAPI_MakeCylinder(m_radius, m_height);
+    makeCylinder = BRepPrimAPI_MakeCylinder(m_radius, m_height);
   }
   else
   {
     Standard_Real a = fmin(fmax(m_angle, 0), 2 * M_PI);
-    cylinder = BRepPrimAPI_MakeCylinder(m_radius, m_height, a);
+    makeCylinder = BRepPrimAPI_MakeCylinder(m_radius, m_height, a);
   }
+
+  makeCylinder.Build(/*theRange*/);
+  if (!makeCylinder.IsDone())
+  {
+    handler.Abort("cylinder: construction failed");
+    return;
+  }
+  cylinder = makeCylinder.Solid();
 
   if (m_centered)
   {

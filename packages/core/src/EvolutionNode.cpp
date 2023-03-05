@@ -19,7 +19,6 @@
 #include "EvolutionNode.hpp"
 
 #include "PerformanceTimer.hpp"
-#include "operations.hpp"
 
 #include "PolygonBuilder.hpp"
 #include "SVGBuilder.hpp"
@@ -54,15 +53,30 @@ void EvolutionNode::setSpineSVG(const std::string &svg)
   propsChanged();
 }
 
-void EvolutionNode::computeShape(const Message_ProgressRange &theRange)
+void EvolutionNode::computeShape(const ProgressHandler &handler)
 {
   PerformanceTimer timer("Build evolution");
+  shape = TopoDS_Shape();
+
   GeomAbs_JoinType aJoinType = GeomAbs_Arc;
   Standard_Boolean aIsGlobalCS = Standard_True;
   Standard_Boolean aIsSolid = Standard_True;
 
-  TopoDS_Shape spine = m_spineBuilder->Shape();
-  TopoDS_Shape profile = m_profileBuilder->Shape();
+  m_spineBuilder->Build(handler);
+  if (!m_spineBuilder->IsDone())
+  {
+    handler.Abort("evolution: could not build spine");
+    return;
+  }
+  TopoDS_Shape spine = m_spineBuilder->Shape(handler);
+
+  m_profileBuilder->Build(handler);
+  if (!m_profileBuilder->IsDone())
+  {
+    handler.Abort("evolution: could not build profile");
+    return;
+  }
+  TopoDS_Shape profile = m_profileBuilder->Shape(handler);
 
   BRep_Builder builder;
   TopoDS_Compound compound;
@@ -75,19 +89,33 @@ void EvolutionNode::computeShape(const Message_ProgressRange &theRange)
     ++nbFaces;
   }
 
-  Message_ProgressScope scope(theRange, "Computing evolution", nbFaces);
+  Message_ProgressScope scope(handler, "Computing evolution", nbFaces);
 
+  int faceId = 0;
   for (Ex.ReInit(); Ex.More() && scope.More(); Ex.Next())
   {
     // TODO: Parallel
     BRepOffsetAPI_MakeEvolved anAlgo(Ex.Current(), TopoDS::Wire(profile), aJoinType, aIsGlobalCS, aIsSolid);
     anAlgo.Build();
 
-    builder.Add(compound, anAlgo.Shape());
+    if (anAlgo.IsDone())
+    {
+      builder.Add(compound, anAlgo.Shape());
+    }
+    else
+    {
+      handler.Abort("evolution: could not construct evolution for face " + std::to_string(faceId));
+      return;
+    }
     scope.Next();
+
+    ++faceId;
   }
 
-  shape = compound;
+  if (scope.More())
+  {
+    shape = compound;
+  }
 
   timer.end();
 }

@@ -43,8 +43,6 @@ target_link_libraries(
 )
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -lembind \
-  -fexceptions \
-  --closure 1 \
   -s EXPORTED_RUNTIME_METHODS=['FS'] \
   -s EXPORTED_FUNCTIONS=['_main'] \
   -s WASM=1 \
@@ -59,14 +57,13 @@ set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS "\
   -s EXPORT_NAME=reactCad \
   -s OFFSCREEN_FRAMEBUFFER=1 \
   -s TEXTDECODER=0 \
-  -s EXCEPTION_CATCHING_ALLOWED=['RevolutionNode::computeShape','HelixNode::computeShape','PipeNode::computeShape','EvolutionNode::computeShape','PrismNode::computeShape'] \
 ")
 
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_RELEASE "\
   -O2 \
+  --closure 1 \
 ")
 set_target_properties(${APP_TARGET} PROPERTIES LINK_FLAGS_DEBUG "\
-  -s EXCEPTION_DEBUG=1 \
   -g3 \
   -gsourcemap \
   --source-map-base 'http://localhost:6006/' \

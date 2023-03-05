@@ -7,14 +7,28 @@ type Polyhedron = "polyhedron";
 
 function validateProps(props: Props<Polyhedron>): boolean {
   if (props.points.length < 4) {
-    throw new Error(
-      `polyhedron: "points" prop must be contain at least 4 points`
-    );
+    throw new Error(`polyhedron: "points" prop must contain at least 4 points`);
   }
   if (props.faces.length < 4) {
-    throw new Error(
-      `polyhedron: "faces" prop must be contain at least 4 faces`
-    );
+    throw new Error(`polyhedron: "faces" prop must contain at least 4 faces`);
+  }
+  for (let face = 0; face < props.faces.length; ++face) {
+    if (props.faces[face].length < 3) {
+      throw new Error(
+        `polyhedron: "faces[${face}]" face must contain at least 3 points`
+      );
+    }
+
+    for (let point = 0; point < props.faces[face].length; ++point) {
+      if (
+        props.faces[face][point] < 0 ||
+        props.faces[face][point] >= props.points.length
+      ) {
+        throw new Error(
+          `polyhedron: "faces[${face}][${point}]" point ${props.faces[face][point]} out of bounds`
+        );
+      }
+    }
   }
   return true;
 }

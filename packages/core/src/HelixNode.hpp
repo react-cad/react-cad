@@ -13,8 +13,13 @@ public:
   void setPitch(Standard_Real pitch);
   void setHeight(Standard_Real height);
 
+  std::string getName() override
+  {
+    return "Helix";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   void buildSpineAndGuide();
@@ -25,7 +30,7 @@ private:
   TopoDS_Wire m_spine;
   TopoDS_Wire m_guide;
 
-  TopoDS_Shape makeHelix(const TopoDS_Wire &profile);
+  bool makeHelix(const TopoDS_Wire &profile, TopoDS_Shape &shape);
 };
 
 #endif

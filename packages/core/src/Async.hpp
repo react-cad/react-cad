@@ -7,14 +7,15 @@
 #include <pthread.h>
 #include <string>
 
+#include "ProgressHandler.hpp"
 #include "ProgressIndicator.hpp"
 
 class Async
 {
 public:
-  static Handle(ProgressIndicator) Perform(std::function<void(const Message_ProgressRange &progressRange)> &&func);
+  static Handle(ProgressIndicator) Perform(std::function<void(const ProgressHandler &handler)> &&func);
   static Handle(ProgressIndicator)
-      GenerateFile(const std::string &filename, std::function<void(const Message_ProgressRange &progressRange)> &&func);
+      GenerateFile(const std::string &filename, std::function<void(const ProgressHandler &handler)> &&func);
 
 private:
   static void thread_function();

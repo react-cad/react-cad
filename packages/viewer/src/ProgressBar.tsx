@@ -31,7 +31,14 @@ const ProgressBar: React.FC<Props> = ({
       progressIndicator.subscribe(observer);
       progressIndicator.then(
         () => setShow(false),
-        () => setMessage("Options changed, waiting for renderer...")
+        (reason) => {
+          if (reason) {
+            setMessage(`Aborting: ${reason}`);
+            setShow(false);
+          } else {
+            setMessage("Options changed, waiting for renderer...");
+          }
+        }
       );
 
       return () => {

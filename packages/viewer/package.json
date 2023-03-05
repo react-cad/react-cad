@@ -31,7 +31,10 @@
     "@emotion/react": "^11.10.4",
     "@react-cad/renderer": "^0.19.2",
     "@storybook/theming": "^6.5.12",
-    "react-icons": "^4.4.0"
+    "error-stack-parser": "^2.1.4",
+    "react-error-boundary": "^3.1.4",
+    "react-icons": "^4.4.0",
+    "sourcemapped-stacktrace": "^1.1.11"
   },
   "scripts": {
     "build": "tsc",

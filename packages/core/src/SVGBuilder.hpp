@@ -13,7 +13,8 @@ class SVGBuilder : public ShapeBuilder
 {
 public:
   SVGBuilder(const std::string &svg);
-  TopoDS_Shape Shape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void Build(const ProgressHandler &handler) override;
+  TopoDS_Shape Shape(const ProgressHandler &handler) override;
 
 private:
   TopoDS_Shape m_shape;

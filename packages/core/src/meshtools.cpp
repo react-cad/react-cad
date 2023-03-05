@@ -18,14 +18,15 @@
 
 #include <string>
 
-TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh, const Message_ProgressRange &theRange)
+bool shapeFromMesh(Handle(Poly_Triangulation) aMesh, TopoDS_Shape &shape, const ProgressHandler &handler)
 {
+  shape = TopoDS_Shape();
   if (aMesh.IsNull())
   {
-    return TopoDS_Shape();
+    return false;
   }
 
-  Message_ProgressScope scope(theRange, "Building shape from mesh", 9);
+  Message_ProgressScope scope(handler, "Building shape from mesh", 9);
 
   Message_ProgressScope meshScope(scope.Next(4), "Making faces from triangles ", aMesh->NbTriangles());
 
@@ -69,25 +70,30 @@ TopoDS_Shape shapeFromMesh(Handle(Poly_Triangulation) aMesh, const Message_Progr
     meshScope.Next();
   }
 
-  if (scope.More())
+  if (!scope.More())
   {
-    aSewingTool.Load(aComp);
-    aSewingTool.Perform(scope.Next(4));
+    return true;
+  }
 
-    TopoDS_Shape theShape = aSewingTool.SewedShape();
+  aSewingTool.Load(aComp);
+  aSewingTool.Perform(scope.Next(4));
 
-    if (theShape.ShapeType() == TopAbs_SHELL)
+  TopoDS_Shape theShape = aSewingTool.SewedShape();
+
+  if (theShape.ShapeType() == TopAbs_SHELL)
+  {
+    TopoDS_Shell shell = TopoDS::Shell(theShape);
+    BRepBuilderAPI_MakeSolid makeSolid;
+    makeSolid.Add(shell);
+    makeSolid.Build();
+    if (makeSolid.IsDone())
     {
-      TopoDS_Shell shell = TopoDS::Shell(theShape);
-      BRepBuilderAPI_MakeSolid makeSolid;
-      makeSolid.Add(shell);
-      makeSolid.Build();
       TopoDS_Solid solid = makeSolid.Solid();
       BRepLib::OrientClosedSolid(solid);
-
-      return solid;
+      shape = solid;
+      return true;
     }
   }
 
-  return TopoDS_Shape();
+  return false;
 }

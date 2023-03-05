@@ -10,9 +10,13 @@ class IntersectionNode : public ReactCADNode
 public:
   IntersectionNode();
 
+  std::string getName() override
+  {
+    return "Intersection";
+  }
+
 protected:
-  void computeChildren(TopTools_ListOfShape children,
-                       const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeChildren(TopTools_ListOfShape children, const ProgressHandler &handler) override;
 };
 
 #endif

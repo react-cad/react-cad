@@ -12,6 +12,7 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Wire.hxx>
 
+#include "ProgressHandler.hpp"
 #include "nanosvg.h"
 
 class SVGSubPath : public Standard_Transient
@@ -33,7 +34,7 @@ public:
   Standard_Boolean IsInside(const Handle(SVGSubPath) & other);
   Bnd_Box GetBndBox();
 
-  TopoDS_Shape BuildFaces(NSVGfillRule fillRule);
+  TopoDS_Shape BuildFaces(NSVGfillRule fillRule, const ProgressHandler &handler);
 
   void Dump(std::iostream &out, std::string indent = "");
 

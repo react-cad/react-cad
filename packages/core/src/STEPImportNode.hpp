@@ -8,8 +8,13 @@ class STEPImportNode : public ImportNode
 public:
   STEPImportNode();
 
+  std::string getName() override
+  {
+    return "STEPImport";
+  }
+
 protected:
-  void importFile(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void importFile(const ProgressHandler &handler) override;
 };
 
 #endif

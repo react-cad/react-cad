@@ -21,7 +21,7 @@ public:
   void setProfileSVG(const std::string &svg);
 
 protected:
-  TopoDS_Shape getProfile();
+  TopoDS_Shape getProfile(const ProgressHandler &handler);
 
 private:
   Handle(ShapeBuilder) m_profileBuilder;

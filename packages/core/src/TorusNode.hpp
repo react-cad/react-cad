@@ -10,8 +10,13 @@ public:
   void setSize(Standard_Real radius1, Standard_Real radius2);
   void setAngle(Standard_Real angle);
 
+  std::string getName() override
+  {
+    return "Torus";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   Standard_Real m_radius1;

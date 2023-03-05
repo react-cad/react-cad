@@ -43,9 +43,9 @@ void SweepNode::setProfileSVG(const std::string &svg)
   propsChanged();
 }
 
-TopoDS_Shape SweepNode::getProfile()
+TopoDS_Shape SweepNode::getProfile(const ProgressHandler &handler)
 {
-  return m_profileBuilder->Shape();
+  return m_profileBuilder->Shape(handler);
 }
 
 void SweepNode::setProfile(const NCollection_Array1<gp_Pnt> &points)

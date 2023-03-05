@@ -11,8 +11,8 @@ class PolygonBuilder : public ShapeBuilder
 {
 public:
   PolygonBuilder(const NCollection_Array1<gp_Pnt> &points, Standard_Boolean closed);
-
-  TopoDS_Shape Shape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void Build(const ProgressHandler &handler) override;
+  TopoDS_Shape Shape(const ProgressHandler &handler) override;
 
 private:
   Standard_Boolean m_closed;

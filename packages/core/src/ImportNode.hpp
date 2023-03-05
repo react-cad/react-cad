@@ -16,11 +16,16 @@ public:
 
   void setFileContents(emscripten::val contents);
 
+  std::string getName() override
+  {
+    return "Import";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
   std::string m_filename;
-  virtual void importFile(const Message_ProgressRange &theRange) = 0;
+  virtual void importFile(const ProgressHandler &handler) = 0;
 };
 
 #endif

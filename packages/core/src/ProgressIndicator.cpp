@@ -52,10 +52,10 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
 
     progressObject["subscribers"].forEach(fn => fn(progress, message));
   };
-  progressObject["cancel"] = (...args) => {
+  progressObject["cancel"] = () => {
     if (!progressObject["fulfilled"]) {
       progressObject.notify(lastProgress, "Cancelling");
-      progressObject.reject(...args);
+      progressObject.reject("Cancelled");
     }
   };
 
@@ -109,7 +109,7 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
       /* progressed 1% */ progress - m_last_progress > ONE_PERCENT || /* message changed */ name != m_last_name)
   {
     // clang-format off
-    MAIN_THREAD_ASYNC_EM_ASM(
+    MAIN_THREAD_EM_ASM(
         {
           try {
             const progressObject = Emval.toValue($0);
@@ -136,6 +136,32 @@ void ProgressIndicator::Show(const Message_ProgressScope &theScope, const Standa
 
   m_last_progress = progress;
   m_last_name = name;
+}
+
+void ProgressIndicator::Abort(const std::string &reason, const std::string &route)
+{
+  m_cancelled = true;
+
+  Standard_CString reason_str = reason.c_str();
+  Standard_CString route_str = route.c_str();
+
+  // clang-format off
+  MAIN_THREAD_EM_ASM(
+    {
+      try {
+        const progressObject = Emval.toValue($0);
+        const reason = UTF8ToString($1);
+        const route = UTF8ToString($2);
+        const error = new Error(reason);
+        error.route = route;
+        progressObject["reject"](error);
+      } catch (e) {
+        // progressObject probably deleted before the async function ran
+      }
+    },
+    m_js_progress.as_handle(), reason_str, route_str
+  );
+  // clang-format on
 }
 
 void ProgressIndicator::subscribe(emscripten::val fn)
@@ -171,7 +197,7 @@ emscripten::val ProgressIndicator::isFulfilled()
 void ProgressIndicator::cancel()
 {
   m_cancelled = true;
-  m_js_progress.call<void>("cancel", 99);
+  m_js_progress.call<void>("cancel");
 }
 
 void ProgressIndicator::resolve(emscripten::val result)

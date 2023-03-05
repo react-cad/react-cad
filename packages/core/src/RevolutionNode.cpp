@@ -21,21 +21,24 @@ void RevolutionNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
   }
 }
 
-void RevolutionNode::computeShape(const Message_ProgressRange &theRange)
+void RevolutionNode::computeShape(const ProgressHandler &handler)
 {
-  TopoDS_Shape profile = getProfile();
+  shape = TopoDS_Solid();
+
+  TopoDS_Shape profile = getProfile(handler);
 
   gp_Ax1 axis(gp::Origin(), m_axis);
 
   Standard_Real angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
-  try
+  BRepPrimAPI_MakeRevol revolution(profile, axis, angle);
+  revolution.Build(/*theRange*/);
+  if (revolution.IsDone())
   {
-    BRepPrimAPI_MakeRevol revolution(profile, axis, angle);
-    shape = revolution;
+    shape = revolution.Shape();
   }
-  catch (const StdFail_NotDone &e)
+  else
   {
-    shape = TopoDS_Solid();
+    handler.Abort("revolution: construction failed. Does shape intersect axis?");
   }
 }

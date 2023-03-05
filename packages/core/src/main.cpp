@@ -59,6 +59,7 @@
 #include <emscripten/html5.h>
 
 #include "Async.hpp"
+#include "ProgressHandler.hpp"
 #include "ProgressIndicator.hpp"
 #include "UUID.hpp"
 #include "export.hpp"
@@ -172,15 +173,15 @@ Handle(ReactCADView) createView(emscripten::val canvas)
 
 Handle(ProgressIndicator) computeNodeAsync(Handle(ReactCADNode) & node)
 {
-  return Async::Perform([=](const Message_ProgressRange &progressRange) { node->computeGeometry(progressRange); });
+  return Async::Perform([=](const ProgressHandler &handler) { node->computeGeometry(handler); });
 }
 
 Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
 {
-  return Async::Perform([=](const Message_ProgressRange &progressRange) {
-    Message_ProgressScope scope(progressRange, "Computing shape", 101);
+  return Async::Perform([=](const ProgressHandler &handler) {
+    Message_ProgressScope scope(handler, "Computing shape", 101);
     scope.Next();
-    node->computeGeometry(scope.Next(50));
+    node->computeGeometry(handler.WithRange(scope.Next(50)));
     if (scope.More())
     {
       view->render(node->shape, scope.Next(50));

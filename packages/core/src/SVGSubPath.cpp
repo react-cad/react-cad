@@ -11,7 +11,7 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
-#include "operations.hpp"
+#include "BooleanOperation.hpp"
 
 SVGSubPath::SVGSubPath(TopoDS_Wire wire, TopoDS_Face face, Direction direction)
     : m_parent(), m_wire(wire), m_direction(direction), m_box(), m_children(), m_face(face)
@@ -52,7 +52,7 @@ Standard_Boolean SVGSubPath::HasParent()
   return !m_parent.IsNull();
 }
 
-TopoDS_Shape SVGSubPath::BuildFaces(NSVGfillRule fillRule)
+TopoDS_Shape SVGSubPath::BuildFaces(NSVGfillRule fillRule, const ProgressHandler &handler)
 {
   TopTools_ListOfShape faces;
   BRepBuilderAPI_MakeFace makeFace;
@@ -69,7 +69,17 @@ TopoDS_Shape SVGSubPath::BuildFaces(NSVGfillRule fillRule)
     break;
   }
 
-  return unionOp(faces);
+  BooleanOperation op;
+  op.Union(faces, handler);
+  if (op.HasErrors())
+  {
+    handler.Abort("svg parse: boolean operation failed\n\n" + op.Errors());
+    return TopoDS_Shape();
+  }
+  else
+  {
+    return op.Shape();
+  }
 }
 
 void SVGSubPath::Dump(std::iostream &out, std::string indent)

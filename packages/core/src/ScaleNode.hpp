@@ -18,8 +18,13 @@ public:
   void setScale(gp_Vec scale);
   void setCenter(gp_Pnt center);
 
+  std::string getName() override
+  {
+    return "Scale";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   gp_Pnt m_center;

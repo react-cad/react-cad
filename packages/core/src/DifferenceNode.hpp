@@ -10,9 +10,13 @@ class DifferenceNode : public ReactCADNode
 public:
   DifferenceNode();
 
+  std::string getName() override
+  {
+    return "Difference";
+  }
+
 protected:
-  void computeChildren(TopTools_ListOfShape children,
-                       const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeChildren(TopTools_ListOfShape children, const ProgressHandler &handler) override;
 };
 
 #endif

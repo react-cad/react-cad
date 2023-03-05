@@ -19,8 +19,13 @@ public:
   void setEulerAngles(Standard_Real xAngle, Standard_Real yAngle, Standard_Real zAngle);
   void setRotation(Quaternion quaternion);
 
+  std::string getName() override
+  {
+    return "Rotation";
+  }
+
 protected:
-  void computeShape(const Message_ProgressRange &theRange = Message_ProgressRange()) override;
+  void computeShape(const ProgressHandler &handler) override;
 
 private:
   void setTransform();

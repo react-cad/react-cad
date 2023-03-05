@@ -18,19 +18,24 @@
 
 #include <TopoDS_Wire.hxx>
 
+#include "BooleanOperation.hpp"
 #include "SVGImage.hpp"
-#include "operations.hpp"
 
 SVGBuilder::SVGBuilder(const std::string &svg) : m_shape(), m_svg(svg){};
 
-TopoDS_Shape SVGBuilder::Shape(const Message_ProgressRange &theRange)
+void SVGBuilder::Build(const ProgressHandler &handler)
 {
-  if (!m_shape.IsNull())
+  if (m_done)
   {
-    return m_shape;
+    return;
   }
 
   SVGImage image(m_svg);
+
+  if (!image.IsDone())
+  {
+    return;
+  }
 
   Handle(Geom_Plane) surface = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()));
 
@@ -98,10 +103,29 @@ TopoDS_Shape SVGBuilder::Shape(const Message_ProgressRange &theRange)
     {
       if (!subpath->HasParent())
       {
-        svgShapes.Append(subpath->BuildFaces((NSVGfillRule)shape->fillRule));
+        svgShapes.Append(subpath->BuildFaces((NSVGfillRule)shape->fillRule, handler));
       }
     }
   }
 
-  return unionOp(svgShapes);
+  BooleanOperation op;
+  op.Union(svgShapes, handler);
+  if (op.HasErrors())
+  {
+    handler.Abort("svg parse: boolean operation failed\n\n" + op.Errors());
+  }
+  else
+  {
+    m_shape = op.Shape();
+    m_done = true;
+  }
+}
+
+TopoDS_Shape SVGBuilder::Shape(const ProgressHandler &handler)
+{
+  if (!m_done)
+  {
+    Build(handler);
+  }
+  return m_shape;
 }

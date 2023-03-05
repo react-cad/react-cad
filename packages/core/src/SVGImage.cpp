@@ -121,6 +121,11 @@ SVGImage &SVGImage::operator=(const SVGImage &other)
   return *this;
 }
 
+bool SVGImage::IsDone()
+{
+  return m_image != NULL && m_image->shapes != NULL;
+}
+
 float SVGImage::Height()
 {
   return m_image->height;
