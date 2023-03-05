@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/react-cad/react-cad/compare/v0.19.2...v0.20.0) (2023-03-05)
+
+
+### Bug Fixes
+
+* allow interaction with canvas when there are no errors ([ad5aeed](https://github.com/react-cad/react-cad/commit/ad5aeed6bf3bdb14a4ccb28e2521d2e64a80a9a0))
+
+
+### Features
+
+* abort on error and display errors ([c63912a](https://github.com/react-cad/react-cad/commit/c63912a48556bbf8819c61f23156322bd2932ac5))
+
+
+
+
+
 ## [0.19.2](https://github.com/react-cad/react-cad/compare/v0.19.1...v0.19.2) (2022-10-14)
 
 

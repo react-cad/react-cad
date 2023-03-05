@@ -1,6 +1,6 @@
 {
   "name": "@react-cad/viewer",
-  "version": "0.19.2",
+  "version": "0.20.0",
   "description": "React component to view @react-cad projects in the browser",
   "main": "lib/index.js",
   "files": [
@@ -25,11 +25,11 @@
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "@react-cad/core": "^0.19.2"
+    "@react-cad/core": "^0.20.0"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
-    "@react-cad/renderer": "^0.19.2",
+    "@react-cad/renderer": "^0.20.0",
     "@storybook/theming": "^6.5.12",
     "error-stack-parser": "^2.1.4",
     "react-error-boundary": "^3.1.4",

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/react-cad/react-cad/compare/v0.19.2...v0.20.0) (2023-03-05)
+
+
+### Bug Fixes
+
+* **core:** fix polyhedron error reporting ([05e126c](https://github.com/react-cad/react-cad/commit/05e126c6c61e7abf2fe3bf57d7dd1cfba619f0e3))
+
+
+### Features
+
+* abort on error and display errors ([c63912a](https://github.com/react-cad/react-cad/commit/c63912a48556bbf8819c61f23156322bd2932ac5))
+
+
+
+
+
 ## [0.19.2](https://github.com/react-cad/react-cad/compare/v0.19.1...v0.19.2) (2022-10-14)
 
 **Note:** Version bump only for package @react-cad/renderer
