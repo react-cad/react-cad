@@ -61,31 +61,37 @@ const RenderError: React.FC<Props> = ({
   }, [geometryError]);
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: "0",
-        left: "0",
-        height: "100%",
-        width: "100%",
-      }}
-    >
-      {renderError && (
-        <RedBox
-          error={renderError}
-          context={
-            renderErrorContext?.split("\nReact will try to recreate this")[0]
-          }
-        />
+    <>
+      {(renderError || geometryError) && (
+        <div
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            height: "100%",
+            width: "100%",
+          }}
+        >
+          {renderError && (
+            <RedBox
+              error={renderError}
+              context={
+                renderErrorContext?.split(
+                  "\nReact will try to recreate this"
+                )[0]
+              }
+            />
+          )}
+          {geometryError && (
+            <RedBox
+              error={geometryError}
+              context={geometryContext}
+              showStackTrace={false}
+            />
+          )}
+        </div>
       )}
-      {geometryError && (
-        <RedBox
-          error={geometryError}
-          context={geometryContext}
-          showStackTrace={false}
-        />
-      )}
-    </div>
+    </>
   );
 };
 
