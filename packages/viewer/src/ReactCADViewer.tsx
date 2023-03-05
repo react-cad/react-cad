@@ -26,6 +26,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       renderError,
       renderErrorContext,
     ] = useReactCADRenderer(core, shape, detail, reset);
+
     const [geometryError, setGeometryError] = React.useState<GeometryError>();
 
     React.useEffect(() => setGeometryError(undefined), [frameID]);
