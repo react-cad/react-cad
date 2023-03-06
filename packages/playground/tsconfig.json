@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.build.json",
+  "compilerOptions": {
+    "lib": ["ES2021", "DOM"],
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "target": "es6",
+    "allowJs": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/react-cad/types",
+      "../react-cad/types"
+    ],
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/editor.js"]
+}

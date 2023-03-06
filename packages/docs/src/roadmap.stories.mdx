@@ -6,10 +6,11 @@ import { Meta } from "@storybook/addon-docs";
 
 ReactCAD is in pre-alpha and undergoing active development. This is a rough priority order of features it needs before a 1.0 release.
 
-- Error handling: sweep and import components currently fail silently or crash the runtime. Catch and report all errors to the user.
-- Quality of life improvements for the web viewer: remember user preferences, configurable mesh granularity, embed codes, etc
+- ~~Error handling: sweep and import components currently fail silently or crash the runtime. Catch and report all errors to the user.~~ Done 2023-03-05
+- ~~ReactCAD Playground, an online typescript playground for trying out and sharing designs.~~ Done 2023-03-06, see [ReactCAD Playground](https://react-cad.github.io/playground)
 - Finish the API, including:
   - First class 2D elements created on arbitrary surfaces
   - A `<loft>` element
   - Homothety laws for swept elements
 - A fast preview renderer similar to OpenCSG: the current renderer performs all slow CSG operations then meshes the final shape, wich has to be done every render. An implementation of the Goldfeather algorithm would avoid the CSG operations and allow caching of primitive meshes.
+- Quality of life improvements for the web viewer: remember user preferences, configurable mesh granularity, embed codes, etc

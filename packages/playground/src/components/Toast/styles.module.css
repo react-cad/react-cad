@@ -1,0 +1,23 @@
+.toast {
+  position: fixed;
+  margin: auto;
+  background-color: rgba(0,0,0,0.75);
+  color: white;
+  visibility: hidden;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  z-index: 99999;
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.toast.hide {
+  visibility: visible;
+  transition: opacity 3s;
+  opacity: 0;
+}

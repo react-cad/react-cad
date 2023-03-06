@@ -1,0 +1,47 @@
+{
+  "name": "@react-cad/playground",
+  "version": "0.20.0",
+  "main": "index.js",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
+    "@react-cad/core": "^0.20.0",
+    "@react-cad/renderer": "^0.20.0",
+    "@react-cad/viewer": "^0.20.0",
+    "@types/node": "^18.13.0",
+    "@types/react": "^17.0.1",
+    "@types/react-dom": "^17.0.1",
+    "@typescript-deploys/monaco-editor": "^4.5.1-rc",
+    "@typescript/sandbox": "^0.1.0",
+    "babel-loader": "^8.2.5",
+    "coi-serviceworker": "^0.1.6",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "monaco-editor": "^0.34.0",
+    "prettier": "^2.7.1",
+    "raw-loader": "^4.0.2",
+    "react": "^17.0.1",
+    "react-cad": "^0.20.0",
+    "react-dom": "^17.0.1",
+    "style-loader": "^3.3.1",
+    "typescript": "^4.8.4",
+    "typescript-plugin-css-modules": "^3.4.0",
+    "vscode-loader": "^1.0.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
+  },
+  "description": "My webpack project",
+  "scripts": {
+    "build": "node node_modules/webpack-cli/bin/cli --mode=production --node-env=production",
+    "start": "node node_modules/webpack-cli/bin/cli.js serve"
+  },
+  "dependencies": {
+    "babel-plugin-module-resolver": "^5.0.0"
+  }
+}

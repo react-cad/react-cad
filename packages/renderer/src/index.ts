@@ -85,7 +85,9 @@ export const HostConfig: ReactReconciler.HostConfig<
     root.removeChild(child.node);
   },
   insertBefore(parent, child, before) {
-    parent.node.insertChildBefore(child.node, before.node);
+    if (typeof child !== "string" && typeof before !== "string") {
+      parent.node.insertChildBefore(child.node, before.node);
+    }
   },
   removeChild(parent: Instance, child: Instance) {
     parent.node.removeChild(child.node);
@@ -123,19 +125,15 @@ export const HostConfig: ReactReconciler.HostConfig<
     return false;
   },
   createTextInstance(
-    _text: string,
+    text: string,
     _rootContainerInstance: Container,
     _hostContext: HostContext,
     _internalInstanceHandle: InstanceHandle
   ): TextInstance {
-    throw Error("Text not supported");
+    return text;
   },
-  commitTextUpdate() {
-    throw Error("Text not supported");
-  },
-  resetTextContent() {
-    throw Error("Text not supported");
-  },
+  commitTextUpdate() {},
+  resetTextContent() {},
   shouldDeprioritizeSubtree(_type: Type, _props: Props) {
     return false;
   },
@@ -157,11 +155,18 @@ export const HostConfig: ReactReconciler.HostConfig<
     commitUpdate(instance, props, type);
     return instance;
   },
-  appendInitialChild(parentInstance: Instance, childInstance: Instance): void {
-    parentInstance.node.appendChild(childInstance.node);
+  appendInitialChild(
+    parentInstance: Instance,
+    childInstance: Instance | TextInstance
+  ): void {
+    if (typeof childInstance !== "string") {
+      parentInstance.node.appendChild(childInstance.node);
+    }
   },
   appendChild(parentInstance: Instance, childInstance: Instance): void {
-    parentInstance.node.appendChild(childInstance.node);
+    if (typeof childInstance !== "string") {
+      parentInstance.node.appendChild(childInstance.node);
+    }
   },
   prepareUpdate,
   commitUpdate,

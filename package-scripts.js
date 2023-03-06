@@ -3,8 +3,10 @@ module.exports = {
   scripts: {
     build: {
       default: "lerna run --stream build",
-      ts: "lerna run --stream --ignore '@react-cad/{core,examples,docs}' build",
-      web: "lerna run --stream --scope @react-cad/docs build",
+      ts:
+        "lerna run --stream --ignore '@react-cad/{core,examples,docs,playground}' build",
+      web:
+        "lerna run --stream --scope '@react-cad/{docs,playground}' build && mv packages/playground/lib packages/docs/storybook-static/playground",
     },
     default: "lerna run --parallel start",
     test: "jest --forceExit",

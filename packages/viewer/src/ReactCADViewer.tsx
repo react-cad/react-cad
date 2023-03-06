@@ -12,11 +12,15 @@ interface Props
     React.ComponentProps<typeof ReactCADNodeViewer>,
     "node" | "rerender" | "setDetail"
   > {
-  shape: React.ReactElement<unknown>;
+  shape?: React.ReactElement<unknown>;
+  showStackTraceOnError?: boolean;
 }
 
 const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
-  ({ core, shape, reset, ...props }, forwardedRef) => {
+  (
+    { core, shape, reset, showStackTraceOnError = true, ...props },
+    forwardedRef
+  ) => {
     const [detail, setDetail] = React.useState<Detail>("LOW");
 
     const [
@@ -48,6 +52,7 @@ const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           geometryError={geometryError}
           renderError={renderError}
           renderErrorContext={renderErrorContext}
+          showStackTrace={showStackTraceOnError}
         />
       </div>
     );
