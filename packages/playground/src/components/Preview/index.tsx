@@ -18,17 +18,13 @@ const Preview: React.FC<Props> = ({ shape }) => {
   }, [shape]);
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      {core && (
-        <ReactCADViewer
-          borderless
-          core={core}
-          reset={reset}
-          shape={oldShape}
-          showStackTraceOnError={false}
-        />
-      )}
-    </div>
+    <ReactCADViewer
+      borderless
+      core={core}
+      reset={reset}
+      shape={oldShape}
+      showStackTraceOnError={false}
+    />
   );
 };
 

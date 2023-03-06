@@ -203,6 +203,7 @@ const Toolbar: React.FC<Props> = ({
           borderRight: "1px solid rgba(0,0,0,0.1)",
           padding: "2px 1px",
           writingMode: "vertical-lr",
+          backgroundColor: "white",
         }}
       >
         <Section>

@@ -1,11 +1,11 @@
 import React from "react";
+import { GeometryError } from "@react-cad/core";
 
 import { useReactCADRenderer } from "./hooks";
 import { Detail } from "./types";
 
 import ReactCADNodeViewer from "./ReactCADNodeViewer";
 import RenderError from "./ErrorOverlay";
-import { GeometryError } from "@react-cad/core";
 
 interface Props
   extends Omit<

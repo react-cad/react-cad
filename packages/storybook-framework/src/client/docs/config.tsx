@@ -19,7 +19,7 @@ const ViewContainer: React.FC<ContainerProps> = (props) => {
 
   return (
     <LazyLoad style={{ height: 480, overflow: "hidden", resize: "vertical" }}>
-      {core ? <ReactCADViewer core={core} reset={true} {...props} /> : null}
+      <ReactCADViewer core={core} reset={true} {...props} />
     </LazyLoad>
   );
 };

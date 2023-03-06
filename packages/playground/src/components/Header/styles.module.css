@@ -14,3 +14,11 @@
 .header p {
   margin: 1rem;
 }
+
+.header a:link,
+.header a:visited,
+.header a:hover,
+.header a:active {
+  color: #1ea7fd;
+  text-decoration: none;
+}

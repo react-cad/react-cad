@@ -25,9 +25,7 @@ const ViewContainer: React.FC<ContainerProps> = ({
 
   const shouldReset = useShouldReset(forceRemount, id, core);
 
-  return core ? (
-    <ReactCADViewer core={core} reset={shouldReset} {...props} />
-  ) : null;
+  return <ReactCADViewer core={core} reset={shouldReset} {...props} />;
 };
 
 export function renderToDOM(
