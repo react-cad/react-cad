@@ -115,6 +115,7 @@ export class ReactCADPipeNode extends ReactCADNode {
 export class ReactCADHelixNode extends ReactCADNode {
   public setPitch(pitch: number): void;
   public setHeight(height: number): void;
+  public setLeftHanded(leftHanded: boolean): void;
 }
 
 // Imports

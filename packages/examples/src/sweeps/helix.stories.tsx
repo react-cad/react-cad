@@ -52,12 +52,19 @@ interface StoryProps {
   rotated: boolean;
   pitch: number;
   height: number;
+  leftHanded: boolean;
 }
 
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
   return (
     <Helix {...args}>
-      <surface>{profiles[profileName]}</surface>
+      <surface
+        normal={rotated ? [0, 1, 0] : [0, 0, 1]}
+        xDirection={[1, 0, 0]}
+        origin={rotated ? [5, 0, 0] : [0, 0, 0]}
+      >
+        {profiles[profileName]}
+      </surface>
     </Helix>
   );
 };
@@ -68,4 +75,5 @@ helix.args = {
   rotated: false,
   pitch: 10,
   height: 5,
+  leftHanded: false,
 };

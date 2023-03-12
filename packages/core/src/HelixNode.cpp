@@ -18,7 +18,7 @@
 #include "BooleanOperation.hpp"
 #include "PerformanceTimer.hpp"
 
-HelixNode::HelixNode() : m_pitch(10), m_height(10)
+HelixNode::HelixNode() : m_pitch(10), m_height(10), m_leftHanded(Standard_False)
 {
 }
 
@@ -40,6 +40,15 @@ void HelixNode::setHeight(Standard_Real height)
   }
 }
 
+void HelixNode::setLeftHanded(Standard_Boolean leftHanded)
+{
+  if (leftHanded != m_leftHanded)
+  {
+    m_leftHanded = leftHanded;
+    propsChanged();
+  }
+}
+
 void HelixNode::buildSpineAndGuide()
 {
   BRepBuilderAPI_MakeEdge edge(gp_Pnt(0, 0, 0), gp_Pnt(0, 0, m_height));
@@ -54,7 +63,10 @@ void HelixNode::buildSpineAndGuide()
   Handle_Geom2d_TrimmedCurve aSegment = GCE2d_MakeSegment(aLine2d, 0.0, length);
 
   gp_Ax3 position(gp::Origin(), gp::DZ(), gp::DX());
-  position.XReverse();
+  if (!m_leftHanded)
+  {
+    position.XReverse();
+  }
   Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(position, radius);
   TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length);
   BRepLib::BuildCurve3d(aHelixEdge);

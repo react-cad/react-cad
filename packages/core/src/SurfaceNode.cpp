@@ -7,19 +7,18 @@
 
 #include "BooleanOperation.hpp"
 
-SurfaceNode::SurfaceNode() : m_children()
+SurfaceNode::SurfaceNode()
+    : m_children(), m_origin(gp::Origin()), m_normal(gp::DZ()), m_xDirection(gp::DX()), m_planeChanged(false)
 {
-  gp_Ax3 position(gp::Origin(), gp::DZ(), gp::DX());
-  m_surface = new Geom_Plane(position);
+  m_surface = new Geom_Plane(gp_Ax3(m_origin, m_normal, m_xDirection));
 }
 
 void SurfaceNode::setOrigin(gp_Pnt origin)
 {
-  gp_Ax3 position = m_surface->Position();
-  if (!position.Location().IsEqual(origin, Precision::Confusion()))
+  if (!m_origin.IsEqual(origin, Precision::Confusion()))
   {
-    position.SetLocation(origin);
-    m_surface = new Geom_Plane(position);
+    m_origin = origin;
+    m_planeChanged = true;
     propsChanged();
   }
 }
@@ -27,11 +26,10 @@ void SurfaceNode::setOrigin(gp_Pnt origin)
 void SurfaceNode::setNormal(gp_Vec normal)
 {
   gp_Dir normalDirection(normal);
-  gp_Ax3 position = m_surface->Position();
-  if (!position.Direction().IsEqual(normalDirection, Precision::Angular()))
+  if (!m_normal.IsEqual(normalDirection, Precision::Angular()))
   {
-    position.SetDirection(normalDirection);
-    m_surface = new Geom_Plane(position);
+    m_normal = normalDirection;
+    m_planeChanged = true;
     propsChanged();
   }
 }
@@ -39,11 +37,10 @@ void SurfaceNode::setNormal(gp_Vec normal)
 void SurfaceNode::setXDirection(gp_Vec xDirection)
 {
   gp_Dir xDir(xDirection);
-  gp_Ax3 position = m_surface->Position();
-  if (!position.XDirection().IsEqual(xDir, Precision::Angular()))
+  if (!m_xDirection.IsEqual(xDir, Precision::Angular()))
   {
-    position.SetXDirection(xDir);
-    m_surface = new Geom_Plane(position);
+    m_xDirection = xDir;
+    m_planeChanged = true;
     propsChanged();
   }
 }
@@ -93,6 +90,17 @@ void SurfaceNode::computeShape(const ProgressHandler &handler)
   Message_ProgressScope scope(handler, "Constructing SVGs on surface", m_children.size() + 1);
 
   setShape(TopoDS_Shape());
+
+  if (m_planeChanged)
+  {
+    if (!m_xDirection.IsNormal(m_normal, Precision::Angular()))
+    {
+      handler.Abort("surface: x direction does not lie on the surface");
+      return;
+    }
+    m_surface = new Geom_Plane(gp_Ax3(m_origin, m_normal, m_xDirection));
+    m_planeChanged = false;
+  }
 
   TopTools_ListOfShape svgShapes;
 

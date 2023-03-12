@@ -12,6 +12,7 @@ public:
   HelixNode();
   void setPitch(Standard_Real pitch);
   void setHeight(Standard_Real height);
+  void setLeftHanded(Standard_Boolean leftHanded);
 
   std::string getName() override
   {
@@ -26,6 +27,7 @@ private:
 
   Standard_Real m_pitch;
   Standard_Real m_height;
+  Standard_Boolean m_leftHanded;
 
   TopoDS_Wire m_spine;
   TopoDS_Wire m_guide;

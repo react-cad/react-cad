@@ -20,7 +20,8 @@ export function prepareUpdate(
 ): UpdatePayload<Helix> | null {
   if (
     oldProps.pitch !== newProps.pitch ||
-    oldProps.height !== newProps.height
+    oldProps.height !== newProps.height ||
+    oldProps.leftHanded !== newProps.leftHanded
   ) {
     validateProps(newProps);
     return newProps;
@@ -34,6 +35,8 @@ export function commitUpdate(
   updatePayload: UpdatePayload<Helix>
 ): void {
   validateProps(updatePayload);
-  instance.node.setPitch(updatePayload.pitch);
-  instance.node.setHeight(updatePayload.height);
+  const { pitch, height, leftHanded = false } = updatePayload;
+  instance.node.setPitch(pitch);
+  instance.node.setHeight(height);
+  instance.node.setLeftHanded(leftHanded);
 }

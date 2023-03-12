@@ -95,6 +95,7 @@ export interface ReactCADElements {
   helix: React.PropsWithChildren<{
     pitch: number;
     height: number;
+    leftHanded?: boolean;
   }>;
 
   affine: React.PropsWithChildren<{
@@ -148,11 +149,17 @@ export interface ReactCADElements {
     data: string | ArrayBuffer;
   };
 
-  surface: React.PropsWithChildren<{
-    origin?: Point;
-    normal?: Vector;
-    xDirection?: Vector;
-  }>;
+  surface: React.PropsWithChildren<
+    {
+      origin?: Point;
+    } & (
+      | { normal?: never; xDirection?: never }
+      | {
+          normal: number[];
+          xDirection: number[];
+        }
+    )
+  >;
 
   union: React.PropsWithChildren<unknown>;
   difference: React.PropsWithChildren<unknown>;

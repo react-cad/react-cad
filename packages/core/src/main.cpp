@@ -407,7 +407,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<HelixNode, emscripten::base<ReactCADNode>>("ReactCADHelixNode")
       .smart_ptr<Handle(HelixNode)>("ReactCADHelixNode")
       .function("setPitch", &HelixNode::setPitch)
-      .function("setHeight", &HelixNode::setHeight);
+      .function("setHeight", &HelixNode::setHeight)
+      .function("setLeftHanded", &HelixNode::setLeftHanded);
 
   emscripten::class_<PipeNode, emscripten::base<ReactCADNode>>("ReactCADPipeNode")
       .smart_ptr<Handle(PipeNode)>("ReactCADPipeNode")

@@ -4,7 +4,7 @@ import { arrayEqual } from "./helpers";
 
 type Surface = "surface";
 
-function validateVector(name: string, vector?: [number, number, number]): void {
+function validateVector(name: string, vector?: number[]): void {
   if (vector) {
     if (vector.length < 3) {
       throw new Error(`surface: "${name}" must be an array of 3 numbers`);
@@ -18,7 +18,10 @@ function validateVector(name: string, vector?: [number, number, number]): void {
 }
 
 function validateProps(props: Props<Surface>): boolean {
-  (["origin", "normal", "xDirection"] as const).forEach((prop) =>
+  if (origin && origin.length < 3) {
+    throw new Error(`surface: "origin" must be an array of 3 numbers`);
+  }
+  (["normal", "xDirection"] as const).forEach((prop) =>
     validateVector(prop, props[prop])
   );
 
@@ -52,6 +55,6 @@ export function commitUpdate(
     xDirection = [1, 0, 0],
   } = updatePayload;
   instance.node.setOrigin(origin);
-  instance.node.setNormal(normal);
-  instance.node.setXDirection(xDirection);
+  instance.node.setNormal(normal as [number, number, number]);
+  instance.node.setXDirection(xDirection as [number, number, number]);
 }

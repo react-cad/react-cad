@@ -31,6 +31,11 @@ protected:
   void computeShape(const ProgressHandler &handler) override;
 
 private:
+  gp_Pnt m_origin;
+  gp_Dir m_normal;
+  gp_Dir m_xDirection;
+  Standard_Boolean m_planeChanged;
+
   std::vector<Handle(SVG)> m_children;
   Handle(Geom_Plane) m_surface;
 };
