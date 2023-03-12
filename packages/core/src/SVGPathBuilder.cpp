@@ -51,7 +51,7 @@ void SVGPathBuilder::Build(const ProgressHandler &handler)
         Handle(Geom2d_Curve) c = curve;
         if (!c.IsNull())
         {
-          c->Translate(gp_Vec2d(0, image.Height()));
+          c->Translate(gp_Vec2d(0, -image.Height()));
           BRepBuilderAPI_MakeEdge edge(c, m_plane);
           makeWire.Add(edge);
         }
@@ -67,7 +67,6 @@ void SVGPathBuilder::Build(const ProgressHandler &handler)
       fixWire.Perform();
 
       TopoDS_Wire wire = fixWire.Wire();
-      wire.Orientation(TopAbs_REVERSED);
 
       shape = wire;
     }

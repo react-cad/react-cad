@@ -16,6 +16,7 @@ public:
   void setOrigin(gp_Pnt origin);
   void setNormal(gp_Vec normal);
   void setXDirection(gp_Vec xDirection);
+  void setRightHanded(bool rightHanded);
 
   void appendSVG(Handle(SVG) & child);
   void insertSVGBefore(Handle(SVG) & child, const Handle(SVG) & before);

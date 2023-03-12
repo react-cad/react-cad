@@ -32,7 +32,8 @@ export function prepareUpdate(
   if (
     !arrayEqual(oldProps.normal, newProps.normal) ||
     !arrayEqual(oldProps.origin, newProps.origin) ||
-    !arrayEqual(oldProps.xDirection, newProps.xDirection)
+    !arrayEqual(oldProps.xDirection, newProps.xDirection) ||
+    oldProps.rightHanded !== newProps.rightHanded
   ) {
     validateProps(newProps);
     return newProps;
@@ -46,7 +47,14 @@ export function commitUpdate(
   updatePayload: UpdatePayload<Surface>
 ): void {
   validateProps(updatePayload);
-  instance.node.setOrigin(updatePayload.origin ?? [0, 0, 0]);
-  instance.node.setNormal(updatePayload.normal ?? [0, 0, 1]);
-  instance.node.setXDirection(updatePayload.xDirection ?? [1, 0, 0]);
+  const {
+    origin = [0, 0, 0],
+    normal = [0, 0, 1],
+    xDirection = [1, 0, 0],
+    rightHanded = false,
+  } = updatePayload;
+  instance.node.setOrigin(origin);
+  instance.node.setNormal(normal);
+  instance.node.setXDirection(xDirection);
+  instance.node.setRightHanded(rightHanded);
 }

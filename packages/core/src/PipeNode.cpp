@@ -26,7 +26,9 @@ PipeNode::PipeNode() : m_spineBuilder()
 
 void PipeNode::setSpine(const std::string &pathData)
 {
-  Handle(Geom_Plane) xzPlane = new Geom_Plane(gp_Ax3(gp::Origin(), -gp::DY(), gp::DX()));
+  gp_Ax3 position(gp::Origin(), -gp::DY(), gp::DX());
+  position.YReverse();
+  Handle(Geom_Plane) xzPlane = new Geom_Plane(position);
   m_spineBuilder = new SVGPathBuilder(pathData, xzPlane);
   propsChanged();
 }

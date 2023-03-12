@@ -114,7 +114,6 @@ void SVG::Build(const ProgressHandler &handler)
       }
 
       TopoDS_Wire suspiciousWire = makeWire;
-      suspiciousWire.Reverse();
 
       fixWire.Load(suspiciousWire);
       fixWire.Perform();
@@ -123,7 +122,7 @@ void SVG::Build(const ProgressHandler &handler)
 
       BRepBuilderAPI_MakeFace face(m_surface, wire);
 
-      SVGSubPath::Direction direction = orientation >= 0 ? SVGSubPath::Direction::CW : SVGSubPath::Direction::CCW;
+      SVGSubPath::Direction direction = orientation < 0 ? SVGSubPath::Direction::CW : SVGSubPath::Direction::CCW;
       Handle(SVGSubPath) subpath = new SVGSubPath(wire, face, direction);
       Bnd_Box box = subpath->GetBndBox();
       avgSize += box.CornerMin().Distance(box.CornerMax());

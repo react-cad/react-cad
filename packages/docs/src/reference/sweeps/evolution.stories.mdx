@@ -1,12 +1,12 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
-import reactIcon from './react-icon';
+import reactIcon from "./react-icon";
 
 <Meta title="Reference/Sweeps/Evolution" />
 
 # evolution
 
-The `evolution` element sweeps a 2-dimensional path around the edges of a 2-dimensional shape and fills the enclosed shape. The 2d shape is passed to the `spine` prop, which can either be a list of points describing a planar polygon, or a string containing an SVG image. The path is passed to `profile` as a string of SVG path commands (the same format used for the `d` attribute of an SVG `path` element).
+The `evolution` element sweeps a 2-dimensional "profile" path around the edges of a 2-dimensional "spine" shape and fills the enclosed shape. The path is passed to `profile` as a string of SVG path commands (the same format used for the `d` attribute of an SVG `path` element). The 2d spine is passed as chidren of the element.
 
 The path will be traced in the yz plane, with x-values mapped to the y-axis, and positive y-values mapped to negative z-values (due to the nature of the SVG coordinate system).
 
@@ -20,21 +20,8 @@ The path will be traced in the yz plane, with x-values mapped to the y-axis, and
       },
       table: {
         type: {
-          summary: 'string',
+          summary: "string",
           detail: "a series of SVG path commands",
-        },
-      },
-    },
-    spine: {
-      name: "spine",
-      description: "The shape to sweep the profile around.",
-      type: {
-        required: true,
-      },
-      table: {
-        type: {
-          summary: 'string | [number, number, number][]',
-          detail: "an SVG image, or a list of [x, y, z] points describing a planar polygon",
         },
       },
     },
@@ -49,11 +36,31 @@ export const Evolution = (props) => <evolution {...props} />;
 
 A bezier curve profile swept along the edges of a square.
 
-<Source language="jsx" code={`
-  <evolution spine={[[0,0,0], [5,0,0], [5,5,0], [0,5,0]]} profile="M 0 0 C 0 -1 1 -1 1 -2" />
-`} />
+<Source
+  language="jsx"
+  code={`<evolution profile="M 0 0 C 0 -1 1 -1 1 -2">
+  <surface>
+    <svg>
+      <polygon points="0,0 5,0 5,5 0,5" />
+    </svg>
+  </surface>
+</evolution>
+`}
+/>
 
-<Story name="evolution" args={{ spine: [[0,0,0], [5,0,0], [5,5,0], [0,5,0]], profile: "M 0 0 C 0 -1 1 -1 1 -2" }}>
+<Story
+  name="evolution"
+  args={{
+    children: [
+      <surface>
+        <svg>
+          <polygon points="0,0 5,0 5,5 0,5" />
+        </svg>
+      </surface>,
+    ],
+    profile: "M 0 0 C 0 -1 1 -1 1 -2",
+  }}
+>
   {Evolution.bind({})}
 </Story>
 
@@ -61,11 +68,33 @@ A bezier curve profile swept along the edges of a square.
 
 A convex profile swept along the edge of a circle to form a bowl.
 
-<Source language="jsx" code={`
-  <evolution spine={\`<svg><circle r="3" /></svg>\`} profile="M 0.006 0 C -0.881 -0.781 -0.921 -1.487 -0.494 -1.996 L -0.295 -1.99 C -0.835 -1.253 -0.406 -0.793 -0.006 -0.286" />
-`} />
+<Source
+  language="jsx"
+  code={`
+  <evolution profile="M 0.006 0 C -0.881 -0.781 -0.921 -1.487 -0.494 -1.996 L -0.295 -1.99 C -0.835 -1.253 -0.406 -0.793 -0.006 -0.286">
+    <surface>
+      <svg>
+        <circle r="3" />
+      </svg>
+    </surface>
+  </evolution>
+`}
+/>
 
-<Story name="bowl" args={{ spine: `<svg><circle r="3" /></svg>`, profile: "M 0.006 0 C -0.881 -0.781 -0.921 -1.487 -0.494 -1.996 L -0.295 -1.99 C -0.835 -1.253 -0.406 -0.793 -0.006 -0.286" }}>
+<Story
+  name="bowl"
+  args={{
+    children: [
+      <surface>
+        <svg>
+          <circle r="3" />
+        </svg>
+      </surface>,
+    ],
+    profile:
+      "M 0.006 0 C -0.881 -0.781 -0.921 -1.487 -0.494 -1.996 L -0.295 -1.99 C -0.835 -1.253 -0.406 -0.793 -0.006 -0.286",
+  }}
+>
   {Evolution.bind({})}
 </Story>
 
@@ -73,11 +102,32 @@ A convex profile swept along the edge of a circle to form a bowl.
 
 A circular arc used to create a fillet on a triangular spine.
 
-<Source language="jsx" code={`
-  <evolution spine={[[0,0,0], [5,0,0], [0,5 * Math.sqrt(3)/2,0]]} profile="M 0 0 A 1 1 0 0 1 1 -1" />
-`} />
+<Source
+  language="jsx"
+  code={`
+  <evolution profile="M 0 0 A 1 1 0 0 1 1 -1">
+    <surface>
+      <svg>
+        <polygon points={\`0,0 10,0, 5,\${(10 * Math.sqrt(3)) / 2}\`} />
+      </svg>
+    </surface>
+  </evolution>
+`}
+/>
 
-<Story name="fillet" args={{ spine: [[0,0,0], [10,0,0], [5,10 * Math.sqrt(3)/2,0]], profile: "M 0 0 A 1 1 0 0 1 1 -1" }}>
+<Story
+  name="fillet"
+  args={{
+    children: [
+      <surface>
+        <svg>
+          <polygon points={`0,0 10,0, 5,${(10 * Math.sqrt(3)) / 2}`} />
+        </svg>
+      </surface>,
+    ],
+    profile: "M 0 0 A 1 1 0 0 1 1 -1",
+  }}
+>
   {Evolution.bind({})}
 </Story>
 
@@ -85,20 +135,39 @@ A circular arc used to create a fillet on a triangular spine.
 
 A diagonal profile used to create a chamfer on an SVG.
 
-<Source language="jsx" code={`
-  <evolution
-    spine={\`
+<Source
+  language="jsx"
+  code={`
+  <evolution profile="M 0 0 L 1 -1">
+    <surface>
       <svg>
         <path
           fill-rule="evenodd"
-          d="M 0 0 h 10 v 10 h -10 Z M 3.5 3 l 0 4 l \${2 * Math.sqrt(3)} -2 Z"
+          d={\`M 0 0 h 10 v 10 h -10 Z M 3.5 3 l 0 4 l \${2 * Math.sqrt(3)} -2 Z\`}
         />
       </svg>
-    \`}
-    profile="M 0 0 L 1 -1"
-  />
-`} />
+    </surface>
+  </evolution>
+`}
+/>
 
-<Story name="chamfer" args={{ spine: `<svg><path fill-rule="evenodd" d="M 0 0 h 10 v 10 h -10 Z M 3.5 3 l 0 4 l ${2 * Math.sqrt(3)} -2 Z" /></svg>`, profile: "M 0 0 L 1 -1" }}>
+<Story
+  name="chamfer"
+  args={{
+    children: [
+      <surface>
+        <svg>
+          <path
+            fill-rule="evenodd"
+            d={`M 0 0 h 10 v 10 h -10 Z M 3.5 3 l 0 4 l ${
+              2 * Math.sqrt(3)
+            } -2 Z`}
+          />
+        </svg>
+      </surface>,
+    ],
+    profile: "M 0 0 L 1 -1",
+  }}
+>
   {Evolution.bind({})}
 </Story>

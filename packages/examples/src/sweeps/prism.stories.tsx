@@ -46,11 +46,12 @@ interface StoryProps {
   x: number;
   y: number;
   z: number;
+  rightHanded: boolean;
 }
 
-const Template: Story<StoryProps> = ({ profileName, ...args }) => (
+const Template: Story<StoryProps> = ({ profileName, rightHanded, ...args }) => (
   <Prism {...args}>
-    <surface>{profiles[profileName]}</surface>
+    <surface rightHanded={rightHanded}>{profiles[profileName]}</surface>
   </Prism>
 );
 
@@ -60,4 +61,5 @@ prism.args = {
   x: 0,
   y: 0,
   z: 1,
+  rightHanded: false,
 };

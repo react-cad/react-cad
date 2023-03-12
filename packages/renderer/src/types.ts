@@ -152,6 +152,7 @@ export interface ReactCADElements {
     origin?: Point;
     normal?: Vector;
     xDirection?: Vector;
+    rightHanded?: boolean;
   }>;
 
   union: React.PropsWithChildren<unknown>;

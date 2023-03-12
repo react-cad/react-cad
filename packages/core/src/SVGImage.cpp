@@ -167,27 +167,27 @@ SVGImage::SVGBezierCurve::operator Handle(Geom2d_Curve)()
 
 float SVGImage::SVGBezierCurve::orientation()
 {
-  return (m_ptr[6] - m_ptr[0]) * (-m_ptr[7] + -m_ptr[1]);
+  return (m_ptr[6] - m_ptr[0]) * (m_ptr[7] + m_ptr[1]);
 }
 
 gp_Pnt2d SVGImage::SVGBezierCurve::p0()
 {
-  return gp_Pnt2d(m_ptr[0], -m_ptr[1]);
+  return gp_Pnt2d(m_ptr[0], m_ptr[1]);
 }
 
 gp_Pnt2d SVGImage::SVGBezierCurve::p1()
 {
-  return gp_Pnt2d(m_ptr[2], -m_ptr[3]);
+  return gp_Pnt2d(m_ptr[2], m_ptr[3]);
 }
 
 gp_Pnt2d SVGImage::SVGBezierCurve::p2()
 {
-  return gp_Pnt2d(m_ptr[4], -m_ptr[5]);
+  return gp_Pnt2d(m_ptr[4], m_ptr[5]);
 }
 
 gp_Pnt2d SVGImage::SVGBezierCurve::p3()
 {
-  return gp_Pnt2d(m_ptr[6], -m_ptr[7]);
+  return gp_Pnt2d(m_ptr[6], m_ptr[7]);
 }
 
 Standard_Boolean SVGImage::SVGBezierCurve::IsZeroLength()

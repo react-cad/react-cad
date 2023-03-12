@@ -28,7 +28,9 @@ EvolutionNode::EvolutionNode() : m_profileBuilder()
 
 void EvolutionNode::setProfile(const std::string &pathData)
 {
-  Handle(Geom_Plane) yzPlane = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DX(), gp::DY()));
+  gp_Ax3 position(gp::Origin(), gp::DX(), gp::DY());
+  position.YReverse();
+  Handle(Geom_Plane) yzPlane = new Geom_Plane(position);
   m_profileBuilder = new SVGPathBuilder(pathData, yzPlane);
   propsChanged();
 }

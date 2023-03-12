@@ -159,6 +159,7 @@ export class ReactCADSurfaceNode extends ReactCADNode {
   public setOrigin(origin: Point): void;
   public setNormal(normal: Vector): void;
   public setXDirection(xDirection: Vector): void;
+  public setRightHanded(rightHanded: boolean): void;
   public appendSVG(child: ReactCADSVG): void;
   public insertSVGBefore(child: ReactCADSVG, before: ReactCADSVG): void;
   public removeSVG(child: ReactCADSVG): void;
