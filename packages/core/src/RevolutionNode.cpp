@@ -23,7 +23,7 @@ void RevolutionNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 
 void RevolutionNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Solid();
+  setShape(TopoDS_Solid());
   if (m_childShape.IsNull())
   {
     return;
@@ -37,7 +37,7 @@ void RevolutionNode::computeShape(const ProgressHandler &handler)
   revolution.Build(/*theRange*/);
   if (revolution.IsDone())
   {
-    shape = revolution.Shape();
+    setShape(revolution.Shape());
   }
   else
   {

@@ -195,7 +195,8 @@ Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(Re
     node->computeGeometry(handler.WithRange(scope.Next(50)));
     if (scope.More())
     {
-      view->render(node->shape, scope.Next(50));
+      TopoDS_Shape shape = node->getShape();
+      view->render(shape, scope.Next(50));
     }
   });
 }
@@ -462,7 +463,6 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("setOrigin", &SurfaceNode::setOrigin)
       .function("setNormal", &SurfaceNode::setNormal)
       .function("setXDirection", &SurfaceNode::setXDirection)
-      .function("setRightHanded", &SurfaceNode::setRightHanded)
       .function("appendSVG", &SurfaceNode::appendSVG)
       .function("insertSVGBefore", &SurfaceNode::insertSVGBefore)
       .function("removeSVG", &SurfaceNode::removeSVG)

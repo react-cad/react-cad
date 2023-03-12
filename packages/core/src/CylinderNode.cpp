@@ -36,7 +36,7 @@ void CylinderNode::setCentered(Standard_Boolean centered)
 
 void CylinderNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   TopoDS_Solid cylinder;
 
@@ -67,5 +67,5 @@ void CylinderNode::computeShape(const ProgressHandler &handler)
     cylinder.Move(translation);
   }
 
-  shape = cylinder;
+  setShape(cylinder);
 }

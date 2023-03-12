@@ -25,7 +25,7 @@ void PrismNode::computeShape(const ProgressHandler &handler)
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Compute prism");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   Message_ProgressScope scope(handler, "Computing prism", 1);
 
@@ -38,7 +38,7 @@ void PrismNode::computeShape(const ProgressHandler &handler)
 
   if (scope.More())
   {
-    shape = prism.Shape();
+    setShape(prism.Shape());
   }
 
 #ifdef REACTCAD_DEBUG

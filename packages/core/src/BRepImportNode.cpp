@@ -18,7 +18,7 @@ void BRepImportNode::importFile(const ProgressHandler &handler)
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import BRep");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   Message_ProgressScope scope(handler, "Importing BREP file", 1);
 
@@ -28,7 +28,7 @@ void BRepImportNode::importFile(const ProgressHandler &handler)
 
   if (success)
   {
-    shape = brep;
+    setShape(brep);
   }
   else
   {

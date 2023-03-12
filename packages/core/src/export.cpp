@@ -19,11 +19,13 @@ Handle(ProgressIndicator) renderSTL(const Handle(ReactCADNode) & node, const Sta
     Message_ProgressScope scope(handler, "Writing STL", 5);
     node->computeGeometry(handler.WithRange(scope.Next(2)));
 
+    TopoDS_Shape shape = node->getShape();
+
     Handle(BRepMesh_DiscretRoot) aMeshAlgo =
-        BRepMesh_DiscretFactory::Get().Discret(node->shape, theLinDeflection, theAngDeflection);
+        BRepMesh_DiscretFactory::Get().Discret(shape, theLinDeflection, theAngDeflection);
     aMeshAlgo->Perform(scope.Next(2));
 
-    StlAPI::Write(node->shape, filename.c_str());
+    StlAPI::Write(shape, filename.c_str());
   });
 }
 
@@ -33,7 +35,7 @@ Handle(ProgressIndicator) renderBREP(const Handle(ReactCADNode) & node)
   return Async::GenerateFile(filename, [=](const ProgressHandler &handler) {
     Message_ProgressScope scope(handler, "Writing BREP", 4);
     node->computeGeometry(handler.WithRange(scope.Next(3)));
-    BRepTools::Write(node->shape, filename.c_str(), scope.Next());
+    BRepTools::Write(node->getShape(), filename.c_str(), scope.Next());
   });
 }
 
@@ -44,7 +46,7 @@ Handle(ProgressIndicator) renderSTEP(const Handle(ReactCADNode) & node)
     Message_ProgressScope scope(handler, "Writing BREP", 5);
     node->computeGeometry(handler.WithRange(scope.Next(2)));
     STEPControl_Writer writer;
-    writer.Transfer(node->shape, STEPControl_AsIs, Standard_True, scope.Next(2));
+    writer.Transfer(node->getShape(), STEPControl_AsIs, Standard_True, scope.Next(2));
     writer.Write(filename.c_str());
   });
 }

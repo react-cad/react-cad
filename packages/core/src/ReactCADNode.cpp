@@ -2,10 +2,11 @@
 #include <math.h>
 
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
 #include <Message.hxx>
 #include <Message_ProgressScope.hxx>
-
-#include <mutex>
+#include <gp_Ax2.hxx>
+#include <gp_Trsf.hxx>
 
 #include "BooleanOperation.hpp"
 #include "ReactCADNode.hpp"
@@ -13,13 +14,27 @@
 #include "PerformanceTimer.hpp"
 
 ReactCADNode::ReactCADNode()
-    : m_parent(), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
-      m_childShape(TopoDS_Shape())
+    : m_parent(), m_shape(), m_propsChanged(true), m_children(), m_childrenChanged(false), m_childShape(TopoDS_Shape())
 {
 }
 
 ReactCADNode::~ReactCADNode()
 {
+}
+
+void ReactCADNode::setShape(const TopoDS_Shape &shape)
+{
+  m_shape = shape;
+}
+
+TopoDS_Shape ReactCADNode::getShape()
+{
+  gp_Ax2 mirror(gp::Origin(), gp::DY());
+  gp_Trsf trsf;
+  trsf.SetMirror(mirror);
+  BRepBuilderAPI_Transform transform(trsf);
+  transform.Perform(m_shape, true);
+  return transform.Shape();
 }
 
 void ReactCADNode::appendChild(Handle(ReactCADNode) & child)
@@ -96,7 +111,7 @@ void ReactCADNode::computeGeometry(const ProgressHandler &handler)
         std::stringstream name;
         name << handler.Name() << "/" << i << "-" << (*child)->getName();
         (*child)->computeGeometry(handler.WithRangeAndName(childScope.Next(), name.str()));
-        shapes.Append((*child)->shape);
+        shapes.Append((*child)->m_shape);
         ++i;
       }
 
@@ -155,5 +170,5 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Progress
 
 void ReactCADNode::computeShape(const ProgressHandler &handler)
 {
-  shape = m_childShape;
+  m_shape = m_childShape;
 }

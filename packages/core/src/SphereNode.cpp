@@ -36,7 +36,7 @@ void SphereNode::setSegment(Standard_Real angle1, Standard_Real angle2)
 
 void SphereNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
@@ -72,7 +72,7 @@ void SphereNode::computeShape(const ProgressHandler &handler)
   makeSphere.Build(/*theRange*/);
   if (makeSphere.IsDone())
   {
-    shape = makeSphere.Solid();
+    setShape(makeSphere.Solid());
   }
   else
   {

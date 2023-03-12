@@ -57,7 +57,7 @@ bool scaleAxis(TopoDS_Shape &shape, gp_Pnt center, gp_Dir direction, Standard_Re
 
 void ScaleNode::computeShape(const ProgressHandler &handler)
 {
-  shape = m_childShape;
+  setShape(m_childShape);
   TopoDS_Shape tmp = m_childShape;
   if (IsEqual(m_scaleX, m_scaleY) && IsEqual(m_scaleY, m_scaleZ))
   {
@@ -67,7 +67,7 @@ void ScaleNode::computeShape(const ProgressHandler &handler)
     aBRepTrsf.Build(/*theRange*/);
     if (aBRepTrsf.IsDone())
     {
-      shape = aBRepTrsf.Shape();
+      setShape(aBRepTrsf.Shape());
     }
     else
     {
@@ -103,6 +103,6 @@ void ScaleNode::computeShape(const ProgressHandler &handler)
         return;
       }
     }
-    shape = tmp;
+    setShape(tmp);
   }
 }

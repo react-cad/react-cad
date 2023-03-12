@@ -30,7 +30,7 @@ void BoxNode::setCentered(Standard_Boolean centered)
 
 void BoxNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   BRepPrimAPI_MakeBox makeBox(gp::Origin(), m_size);
   makeBox.Build(/*theRange*/);
@@ -49,5 +49,5 @@ void BoxNode::computeShape(const ProgressHandler &handler)
     box.Move(translation);
   }
 
-  shape = box;
+  setShape(box);
 }

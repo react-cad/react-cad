@@ -320,7 +320,7 @@ void Trihedron::compute()
 
   // Display axes.
   {
-    const gp_Ax1 anAxes[3] = {gp::OX(), gp::OY(), gp::OZ()};
+    const gp_Ax1 anAxes[3] = {gp::OX(), gp::OY().Reversed(), gp::OZ()};
     for (Standard_Integer anIter = 0; anIter < 3; ++anIter)
     {
       Handle(Graphic3d_Group) anAxisGroup = addGroup(myStructure, aGroupIter);
@@ -349,7 +349,7 @@ void Trihedron::compute()
     Handle(Graphic3d_Group) aLabelGroup = addGroup(myStructure, aGroupIter);
     const TCollection_ExtendedString aLabels[3] = {"X", "Y", "Z"};
     const gp_Pnt aPoints[3] = {gp_Pnt(aScale + 2.0 * aRayon, 0.0, -aRayon),
-                               gp_Pnt(aRayon, aScale + 3.0 * aRayon, 2.0 * aRayon),
+                               gp_Pnt(-4.0 * aRayon, -(aScale + 6.0 + 3.0 * aRayon), -aRayon),
                                gp_Pnt(-2.0 * aRayon, 0.5 * aRayon, aScale + 3.0 * aRayon)};
     for (Standard_Integer anAxisIter = 0; anAxisIter < 3; ++anAxisIter)
     {

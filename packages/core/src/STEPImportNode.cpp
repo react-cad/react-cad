@@ -16,7 +16,7 @@ void STEPImportNode::importFile(const ProgressHandler &handler)
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import STEP");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   Message_ProgressScope scope(handler, "Importing STEP file", 1);
 
@@ -43,7 +43,7 @@ void STEPImportNode::importFile(const ProgressHandler &handler)
     return;
   }
 
-  shape = reader.OneShape();
+  setShape(reader.OneShape());
 
 #ifdef REACTCAD_DEBUG
   timer.end();

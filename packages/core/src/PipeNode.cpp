@@ -27,7 +27,6 @@ PipeNode::PipeNode() : m_spineBuilder()
 void PipeNode::setSpine(const std::string &pathData)
 {
   gp_Ax3 position(gp::Origin(), -gp::DY(), gp::DX());
-  position.YReverse();
   Handle(Geom_Plane) xzPlane = new Geom_Plane(position);
   m_spineBuilder = new SVGPathBuilder(pathData, xzPlane);
   propsChanged();
@@ -57,7 +56,7 @@ void PipeNode::computeShape(const ProgressHandler &handler)
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate pipe");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   TopoDS_Shape spine = m_spineBuilder->Shape(handler);
 
@@ -143,7 +142,7 @@ void PipeNode::computeShape(const ProgressHandler &handler)
 
   if (scope.More())
   {
-    shape = compound;
+    setShape(compound);
   }
 
 #ifdef REACTCAD_DEBUG

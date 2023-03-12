@@ -26,7 +26,7 @@ void TorusNode::setAngle(Standard_Real angle)
 
 void TorusNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   double angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
@@ -44,7 +44,7 @@ void TorusNode::computeShape(const ProgressHandler &handler)
   makeTorus.Build(/*theRange*/);
   if (makeTorus.IsDone())
   {
-    shape = makeTorus.Solid();
+    setShape(makeTorus.Solid());
   }
   else
   {

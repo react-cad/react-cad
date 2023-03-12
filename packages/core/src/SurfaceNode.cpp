@@ -10,7 +10,6 @@
 SurfaceNode::SurfaceNode() : m_children()
 {
   gp_Ax3 position(gp::Origin(), gp::DZ(), gp::DX());
-  position.YReverse();
   m_surface = new Geom_Plane(position);
 }
 
@@ -44,18 +43,6 @@ void SurfaceNode::setXDirection(gp_Vec xDirection)
   if (!position.XDirection().IsEqual(xDir, Precision::Angular()))
   {
     position.SetXDirection(xDir);
-    m_surface = new Geom_Plane(position);
-    propsChanged();
-  }
-}
-
-void SurfaceNode::setRightHanded(bool rightHanded)
-{
-  gp_Ax3 position = m_surface->Position();
-  gp_Dir mainDirection = position.XDirection().Crossed(position.YDirection());
-  if (mainDirection.IsEqual(position.Direction(), Precision::Angular()) != rightHanded)
-  {
-    position.YReverse();
     m_surface = new Geom_Plane(position);
     propsChanged();
   }
@@ -105,6 +92,8 @@ void SurfaceNode::computeShape(const ProgressHandler &handler)
 {
   Message_ProgressScope scope(handler, "Constructing SVGs on surface", m_children.size() + 1);
 
+  setShape(TopoDS_Shape());
+
   TopTools_ListOfShape svgShapes;
 
   for (auto it = std::begin(m_children); it != std::end(m_children) && scope.More(); ++it)
@@ -135,6 +124,6 @@ void SurfaceNode::computeShape(const ProgressHandler &handler)
   }
   else
   {
-    shape = op.Shape();
+    setShape(op.Shape());
   }
 }

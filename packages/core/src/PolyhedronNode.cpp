@@ -78,7 +78,7 @@ void PolyhedronNode::setPointsAndFaces(const NCollection_Array1<gp_Pnt> &points,
 
 void PolyhedronNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   BRepBuilderAPI_Sewing polyhedron;
 
@@ -147,5 +147,5 @@ void PolyhedronNode::computeShape(const ProgressHandler &handler)
 
   TopoDS_Solid solid = makeSolid.Solid();
   BRepLib::OrientClosedSolid(solid);
-  shape = solid;
+  setShape(solid);
 }

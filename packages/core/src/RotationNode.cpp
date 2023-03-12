@@ -53,12 +53,12 @@ void RotationNode::setRotation(Quaternion quaternion)
 
 void RotationNode::computeShape(const ProgressHandler &handler)
 {
-  shape = m_childShape;
+  setShape(m_childShape);
   BRepBuilderAPI_Transform theTransform(m_transform);
   theTransform.Perform(m_childShape, true);
   if (theTransform.IsDone())
   {
-    shape = theTransform.Shape();
+    setShape(theTransform.Shape());
   }
   else
   {

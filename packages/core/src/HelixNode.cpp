@@ -53,7 +53,9 @@ void HelixNode::buildSpineAndGuide()
   gp_Lin2d aLine2d(gp_Pnt2d(0.0, 0.0), gp_Dir2d(circumference, m_pitch));
   Handle_Geom2d_TrimmedCurve aSegment = GCE2d_MakeSegment(aLine2d, 0.0, length);
 
-  Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(gp::XOY(), radius);
+  gp_Ax3 position(gp::Origin(), gp::DZ(), gp::DX());
+  position.XReverse();
+  Handle_Geom_CylindricalSurface aCylinder = new Geom_CylindricalSurface(position, radius);
   TopoDS_Edge aHelixEdge = BRepBuilderAPI_MakeEdge(aSegment, aCylinder, 0.0, length);
   BRepLib::BuildCurve3d(aHelixEdge);
 
@@ -85,7 +87,7 @@ void HelixNode::computeShape(const ProgressHandler &handler)
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Calculate helix");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   buildSpineAndGuide();
 
@@ -173,7 +175,7 @@ void HelixNode::computeShape(const ProgressHandler &handler)
 
   if (scope.More())
   {
-    shape = compound;
+    setShape(compound);
   }
 
 #ifdef REACTCAD_DEBUG
