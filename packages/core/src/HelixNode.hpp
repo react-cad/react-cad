@@ -2,11 +2,11 @@
 #define HelixNode_HeaderFile
 
 #include "Geometry.hpp"
-#include "SweepNode.hpp"
+#include "ReactCADNode.hpp"
 
 #include <TopoDS_Wire.hxx>
 
-class HelixNode : public SweepNode
+class HelixNode : public ReactCADNode
 {
 public:
   HelixNode();

@@ -2,14 +2,14 @@
 #define RevolutionNode_HeaderFile
 
 #include "Geometry.hpp"
-#include "SweepNode.hpp"
+#include "ReactCADNode.hpp"
 
 #include <string>
 
 #include <TopoDS_Shape.hxx>
 #include <gp_Vec.hxx>
 
-class RevolutionNode : public SweepNode
+class RevolutionNode : public ReactCADNode
 {
 public:
   RevolutionNode();

@@ -1,4 +1,5 @@
-import { Props, Instance, UpdatePayload } from "../types";
+import { ReactCADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
 type Mirror = "mirror";
@@ -29,7 +30,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<Mirror>,
+  instance: ReactCADInstance<Mirror>,
   updatePayload: UpdatePayload<Mirror>
 ): void {
   validateProps(updatePayload);

@@ -17,7 +17,8 @@ import {
   ElementProps,
 } from "./types";
 
-import { prepareUpdate, commitUpdate } from "./elements";
+import { isReactCADType } from "./elements";
+import { ReactCADInstance, SVGInstance } from "./instance";
 
 export const HostConfig: ReactReconciler.HostConfig<
   Type,
@@ -43,9 +44,9 @@ export const HostConfig: ReactReconciler.HostConfig<
   now: Date.now,
   // @ts-expect-error reconciler types don't include clearContainer but omitting causes a crash
   clearContainer(rootContainerInstance: Container) {
-    const { rootNodes, root } = rootContainerInstance;
-    rootNodes.forEach((node) => root.removeChild(node));
-    rootContainerInstance.rootNodes = [];
+    const { rootInstances, root } = rootContainerInstance;
+    rootInstances.forEach((instance) => root.removeChild(instance));
+    rootContainerInstance.rootInstances = [];
   },
   getPublicInstance(instance: Instance) {
     return instance.node;
@@ -62,61 +63,68 @@ export const HostConfig: ReactReconciler.HostConfig<
     return parentHostContext;
   },
   appendChildToContainer(rootContainerInstance: Container, child: Instance) {
-    const { rootNodes, root } = rootContainerInstance;
-    root.appendChild(child.node);
-    rootNodes.push(child.node);
+    const { rootInstances, root } = rootContainerInstance;
+    root.appendChild(child);
+    rootInstances.push(child);
   },
   insertInContainerBefore(
     rootContainerInstance: Container,
     child: Instance,
     before: Instance
   ) {
-    const { rootNodes, root } = rootContainerInstance;
-    root.insertChildBefore(child.node, before.node);
-    rootNodes.push(child.node);
+    const { root, rootInstances } = rootContainerInstance;
+    root.insertBefore(child, before);
+    rootInstances.push(child);
   },
   removeChildFromContainer(rootContainerInstance: Container, child: Instance) {
-    const { root, rootNodes } = rootContainerInstance;
-    const index = rootNodes.indexOf(child.node);
+    const { root, rootInstances } = rootContainerInstance;
+    const index = rootInstances.indexOf(child);
     if (index < 0) {
       throw new Error(`removeChildFromContainer child does not exist`);
     }
-    rootNodes.splice(index, 1);
-    root.removeChild(child.node);
+    rootInstances.splice(index, 1);
+    root.removeChild(child);
   },
   insertBefore(parent, child, before) {
-    if (typeof child !== "string" && typeof before !== "string") {
-      parent.node.insertChildBefore(child.node, before.node);
+    if (typeof child === "string" || typeof before === "string") {
+      return;
     }
+    parent.insertBefore(child, before);
   },
   removeChild(parent: Instance, child: Instance) {
-    parent.node.removeChild(child.node);
+    parent.removeChild(child);
   },
   finalizeInitialChildren<T extends Type>(
-    _instance: Instance<T>,
+    _instance: Instance,
     _type: T,
-    _props: ElementProps[T],
+    _props: ElementProps[keyof ElementProps],
     _rootContainerInstance: Container,
     _hostContext: HostContext
   ): boolean {
     return false;
   },
-  prepareForCommit(_containerInfo: Container) {
+  prepareForCommit(containerInfo: Container) {
+    const { instances } = containerInfo;
+    instances.forEach(
+      (instance) => instance instanceof SVGInstance && instance.commitSVG()
+    );
     return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { rootNodes, nodes, callback } = rootContainerInstance;
+    const { rootInstances, instances, callback } = rootContainerInstance;
 
     // Free memory of removed nodes
-    const removedNodes = nodes.filter((node) => !node.hasParent());
-    removedNodes.forEach((node) => node.delete());
+    const removedInstances = instances.filter(
+      (instance) => !instance.hasParent()
+    );
+    removedInstances.forEach((instance) => instance.delete());
 
     // Remove deleted nodes from list
-    rootContainerInstance.nodes = rootContainerInstance.nodes.filter(
-      (node) => !removedNodes.includes(node)
+    rootContainerInstance.instances = instances.filter(
+      (instance) => !removedInstances.includes(instance)
     );
-    rootContainerInstance.rootNodes = rootNodes.filter(
-      (node) => !removedNodes.includes(node)
+    rootContainerInstance.rootInstances = rootInstances.filter(
+      (instance) => !removedInstances.includes(instance)
     );
 
     callback?.();
@@ -144,32 +152,44 @@ export const HostConfig: ReactReconciler.HostConfig<
     _hostContext: HostContext,
     _internalInstanceHandle: InstanceHandle
   ): Instance {
-    const { core, nodes } = rootContainerInstance;
-    const node = core.createCADNode(type);
-    nodes.push(node);
-    const instance = {
-      core,
-      type,
-      node,
-    };
-    commitUpdate(instance, props, type);
+    const { core, instances } = rootContainerInstance;
+    const instance: Instance = isReactCADType(type)
+      ? new ReactCADInstance(core, type)
+      : new SVGInstance(core, type);
+    instances.push(instance);
+    instance.commitUpdate(props);
     return instance;
   },
-  appendInitialChild(
-    parentInstance: Instance,
-    childInstance: Instance | TextInstance
-  ): void {
-    if (typeof childInstance !== "string") {
-      parentInstance.node.appendChild(childInstance.node);
+  appendInitialChild(parent: Instance, child: Instance | TextInstance): void {
+    if (typeof child === "string") {
+      return;
     }
+    parent.appendChild(child);
   },
-  appendChild(parentInstance: Instance, childInstance: Instance): void {
-    if (typeof childInstance !== "string") {
-      parentInstance.node.appendChild(childInstance.node);
+  appendChild(parent: Instance, child: Instance): void {
+    if (typeof child === "string") {
+      return;
     }
+    parent.appendChild(child);
   },
-  prepareUpdate,
-  commitUpdate,
+  prepareUpdate<T extends Type>(
+    instance: Instance,
+    _type: T,
+    oldProps: Props<T>,
+    newProps: Props<T>,
+    rootContainerInstance: Container,
+    hostContext: HostContext
+  ): UpdatePayload | null {
+    return instance.prepareUpdate(
+      oldProps,
+      newProps,
+      rootContainerInstance,
+      hostContext
+    );
+  },
+  commitUpdate(instance: Instance, updatePayload: UpdatePayload): void {
+    instance.commitUpdate(updatePayload);
+  },
 };
 
 const reconcilerInstance = ReactReconciler(HostConfig);
@@ -185,9 +205,9 @@ class ReactCADRoot {
 
     this.context = {
       core,
-      nodes: [],
-      rootNodes: [],
-      root: rootNode,
+      instances: [],
+      rootInstances: [],
+      root: new ReactCADInstance(core, "union", rootNode),
     };
 
     this.container = reconcilerInstance.createContainer(
@@ -208,7 +228,7 @@ class ReactCADRoot {
   }
 
   public delete() {
-    this.context.nodes.forEach((node) => node.delete());
+    this.context.instances.forEach((instance) => instance.delete());
     this.isDeleted = true;
   }
 }

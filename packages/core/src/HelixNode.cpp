@@ -87,8 +87,6 @@ void HelixNode::computeShape(const ProgressHandler &handler)
 #endif
   shape = TopoDS_Shape();
 
-  TopoDS_Shape profile = getProfile(handler);
-
   buildSpineAndGuide();
 
   BRep_Builder builder;
@@ -97,7 +95,7 @@ void HelixNode::computeShape(const ProgressHandler &handler)
 
   TopExp_Explorer Faces;
   int nbFaces = 0;
-  for (Faces.Init(profile, TopAbs_FACE); Faces.More(); Faces.Next())
+  for (Faces.Init(m_childShape, TopAbs_FACE); Faces.More(); Faces.Next())
   {
     ++nbFaces;
   }

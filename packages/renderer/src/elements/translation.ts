@@ -1,4 +1,5 @@
-import { Props, Instance, UpdatePayload } from "../types";
+import { ReactCADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
 type Translation = "translation";
@@ -22,7 +23,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<Translation>,
+  instance: ReactCADInstance<Translation>,
   updatePayload: UpdatePayload<Translation>
 ): void {
   const vector = getVector(updatePayload);

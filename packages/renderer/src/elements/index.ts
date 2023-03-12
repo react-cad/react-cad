@@ -1,4 +1,13 @@
-import { Element, Props, Instance, Type, UpdatePayload } from "../types";
+import {
+  Element,
+  Props,
+  Type,
+  UpdatePayload,
+  Container,
+  HostContext,
+  ReactCADNodeType,
+} from "../types";
+import { ReactCADInstance } from "../instance";
 
 import * as box from "./box";
 import * as wedge from "./wedge";
@@ -22,11 +31,13 @@ import * as mirror from "./mirror";
 
 import * as importElement from "./import";
 
+import * as surface from "./surface";
+
 import * as union from "./union";
 import * as difference from "./difference";
 import * as intersection from "./intersection";
 
-const elements: Record<Type, Element> = {
+const elements: Record<ReactCADNodeType, Element> = {
   box,
   wedge,
   cone,
@@ -52,16 +63,24 @@ const elements: Record<Type, Element> = {
   stl: importElement,
   obj: importElement,
 
+  surface,
+
   union,
   difference,
   intersection,
 };
 
-export function prepareUpdate<T extends Type>(
-  _instance: Instance<T>,
+export function isReactCADType(t: Type): t is ReactCADNodeType {
+  return t in elements;
+}
+
+export function prepareUpdate<T extends ReactCADNodeType>(
+  _instance: ReactCADInstance<T>,
   type: T,
   oldProps: Props<T>,
-  newProps: Props<T>
+  newProps: Props<T>,
+  _rootContainerInstance: Container,
+  _hostContext: HostContext
 ): UpdatePayload | null {
   const element = elements[type];
   if (element) {
@@ -70,8 +89,8 @@ export function prepareUpdate<T extends Type>(
   return null;
 }
 
-export function commitUpdate<T extends Type>(
-  instance: Instance<T>,
+export function commitUpdate<T extends ReactCADNodeType>(
+  instance: ReactCADInstance<T>,
   updatePayload: UpdatePayload<T>,
   type: T
 ): void {

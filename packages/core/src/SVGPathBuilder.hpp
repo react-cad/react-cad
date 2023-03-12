@@ -7,19 +7,24 @@
 #include <TopoDS_Wire.hxx>
 #include <string>
 
-#include "ShapeBuilder.hpp"
+#include "ProgressHandler.hpp"
 
-class SVGPathBuilder : public ShapeBuilder
+class SVGPathBuilder : public Standard_Transient
 {
 public:
   SVGPathBuilder(const std::string &pathData, const Handle(Geom_Plane) & plane);
-  void Build(const ProgressHandler &handler) override;
-  TopoDS_Shape Shape(const ProgressHandler &handler) override;
+  void Build(const ProgressHandler &handler);
+  TopoDS_Shape Shape(const ProgressHandler &handler);
+  bool IsDone()
+  {
+    return m_done;
+  }
 
 private:
   Handle(Geom_Plane) m_plane;
   TopoDS_Shape m_shape;
   std::string m_pathData;
+  bool m_done = false;
 };
 
 #endif

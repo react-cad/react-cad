@@ -7,7 +7,6 @@
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
 #include <Geom_Plane.hxx>
-#include <Message.hxx>
 #include <ShapeFix_Wire.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
@@ -18,24 +17,14 @@
 
 #include "BooleanOperation.hpp"
 #include "PerformanceTimer.hpp"
-#include "PolygonBuilder.hpp"
 #include "SVGPathBuilder.hpp"
 
 PipeNode::PipeNode() : m_spineBuilder()
 {
-  NCollection_Array1<gp_Pnt> points(0, 1);
-  points[0] = gp_Pnt(0, 0, 0);
-  points[1] = gp_Pnt(0, 0, 1);
-  setSpine(points);
+  setSpine("M 0 0 L 0 -1");
 }
 
-void PipeNode::setSpine(const NCollection_Array1<gp_Pnt> &points)
-{
-  m_spineBuilder = new PolygonBuilder(points, false);
-  propsChanged();
-}
-
-void PipeNode::setSpineSVG(const std::string &pathData)
+void PipeNode::setSpine(const std::string &pathData)
 {
   Handle(Geom_Plane) xzPlane = new Geom_Plane(gp_Ax3(gp::Origin(), -gp::DY(), gp::DX()));
   m_spineBuilder = new SVGPathBuilder(pathData, xzPlane);
@@ -68,7 +57,6 @@ void PipeNode::computeShape(const ProgressHandler &handler)
 #endif
   shape = TopoDS_Shape();
 
-  TopoDS_Shape profile = getProfile(handler);
   TopoDS_Shape spine = m_spineBuilder->Shape(handler);
 
   BRep_Builder builder;
@@ -77,7 +65,7 @@ void PipeNode::computeShape(const ProgressHandler &handler)
 
   TopExp_Explorer Faces;
   int nbFaces = 0;
-  for (Faces.Init(profile, TopAbs_FACE); Faces.More(); Faces.Next())
+  for (Faces.Init(m_childShape, TopAbs_FACE); Faces.More(); Faces.Next())
   {
     ++nbFaces;
   }

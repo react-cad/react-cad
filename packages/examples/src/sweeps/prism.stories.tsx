@@ -1,19 +1,18 @@
 import React from "react";
-import type { Profile } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-import reactIcon from "./react-icon";
+import ReactIcon from "./react-icon";
 
 import { makePolygon } from "./helpers";
 
 type Props = JSX.IntrinsicElements["prism"];
 
-const profiles: Record<string, Profile> = {
+const profiles: Record<string, React.ReactElement> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
-  SVG: reactIcon([0, 0]),
+  SVG: <ReactIcon />,
 };
 
 export const Prism: React.FC<Props> = (props) => <prism {...props} />;
@@ -50,7 +49,9 @@ interface StoryProps {
 }
 
 const Template: Story<StoryProps> = ({ profileName, ...args }) => (
-  <Prism profile={profiles[profileName]} {...args} />
+  <Prism {...args}>
+    <surface>{profiles[profileName]}</surface>
+  </Prism>
 );
 
 export const prism = Template.bind({});

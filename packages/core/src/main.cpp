@@ -27,7 +27,6 @@
 #include "PipeNode.hpp"
 #include "PrismNode.hpp"
 #include "RevolutionNode.hpp"
-#include "SweepNode.hpp"
 
 #include "BRepImportNode.hpp"
 #include "ImportNode.hpp"
@@ -40,6 +39,9 @@
 #include "RotationNode.hpp"
 #include "ScaleNode.hpp"
 #include "TranslationNode.hpp"
+
+#include "SVG.hpp"
+#include "SurfaceNode.hpp"
 
 #include <Graphic3d_Camera.hxx>
 #include <Message.hxx>
@@ -162,8 +164,17 @@ Handle(ReactCADNode) createCADNode(std::string type)
   {
     return new STLImportNode();
   }
+  if (type == "surface")
+  {
+    return new SurfaceNode();
+  }
 
   return new BoxNode();
+}
+
+Handle(SVG) createSVG()
+{
+  return new SVG();
 }
 
 Handle(ReactCADView) createView(emscripten::val canvas)
@@ -274,6 +285,7 @@ struct TypeID<
 
 } // namespace internal
 } // namespace emscripten
+//
 
 EMSCRIPTEN_BINDINGS(react_cad)
 {
@@ -379,35 +391,26 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("setPointsAndFaces", &PolyhedronNode::setPointsAndFaces);
 
   // Sweeps
-  emscripten::class_<SweepNode, emscripten::base<ReactCADNode>>("ReactCADSweepNode")
-      .smart_ptr<Handle(SweepNode)>("ReactCADSweepNode")
-      .function("setProfile", &SweepNode::setProfile)
-      .function("setProfileSVG", &SweepNode::setProfileSVG);
-
-  emscripten::class_<PrismNode, emscripten::base<SweepNode>>("ReactCADPrismNode")
+  emscripten::class_<PrismNode, emscripten::base<ReactCADNode>>("ReactCADPrismNode")
       .smart_ptr<Handle(PrismNode)>("ReactCADPrismNode")
       .function("setVector", &PrismNode::setVector);
 
   emscripten::class_<EvolutionNode, emscripten::base<ReactCADNode>>("ReactCADEvolutionNode")
       .smart_ptr<Handle(EvolutionNode)>("ReactCADEvolutionNode")
-      .function("setProfile", &EvolutionNode::setProfile)
-      .function("setProfileSVG", &EvolutionNode::setProfileSVG)
-      .function("setSpine", &EvolutionNode::setSpine)
-      .function("setSpineSVG", &EvolutionNode::setSpineSVG);
+      .function("setProfile", &EvolutionNode::setProfile);
 
-  emscripten::class_<RevolutionNode, emscripten::base<SweepNode>>("ReactCADRevolutionNode")
+  emscripten::class_<RevolutionNode, emscripten::base<ReactCADNode>>("ReactCADRevolutionNode")
       .smart_ptr<Handle(RevolutionNode)>("ReactCADRevolutionNode")
       .function("setAxisAngle", &RevolutionNode::setAxisAngle);
 
-  emscripten::class_<HelixNode, emscripten::base<SweepNode>>("ReactCADHelixNode")
+  emscripten::class_<HelixNode, emscripten::base<ReactCADNode>>("ReactCADHelixNode")
       .smart_ptr<Handle(HelixNode)>("ReactCADHelixNode")
       .function("setPitch", &HelixNode::setPitch)
       .function("setHeight", &HelixNode::setHeight);
 
-  emscripten::class_<PipeNode, emscripten::base<SweepNode>>("ReactCADPipeNode")
+  emscripten::class_<PipeNode, emscripten::base<ReactCADNode>>("ReactCADPipeNode")
       .smart_ptr<Handle(PipeNode)>("ReactCADPipeNode")
-      .function("setSpine", &PipeNode::setSpine)
-      .function("setSpineSVG", &PipeNode::setSpineSVG);
+      .function("setSpine", &PipeNode::setSpine);
 
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
@@ -451,6 +454,19 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("setScaleFactor", &ScaleNode::setScaleFactor)
       .function("setScale", &ScaleNode::setScale);
 
+  // Surfaces
+  emscripten::class_<SVG>("ReactCADSVG").smart_ptr<Handle(SVG)>("ReactCADSVG").function("setSource", &SVG::setSource);
+
+  emscripten::class_<SurfaceNode, emscripten::base<ReactCADNode>>("ReactCADSurfaceNode")
+      .smart_ptr<Handle(SurfaceNode)>("ReactCADSurfaceNode")
+      .function("setOrigin", &SurfaceNode::setOrigin)
+      .function("setNormal", &SurfaceNode::setNormal)
+      .function("setXDirection", &SurfaceNode::setXDirection)
+      .function("appendSVG", &SurfaceNode::appendSVG)
+      .function("insertSVGBefore", &SurfaceNode::insertSVGBefore)
+      .function("removeSVG", &SurfaceNode::removeSVG)
+      .function("updateSVGs", &SurfaceNode::updateSVGs);
+
   emscripten::enum_<Graphic3d_Camera::Projection>("Projection")
       .value("ORTHOGRAPHIC", Graphic3d_Camera::Projection_Orthographic)
       .value("PERSPECTIVE", Graphic3d_Camera::Projection_Perspective);
@@ -464,6 +480,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .value("BACK", ReactCADView::Viewpoint::Back);
 
   emscripten::function("createCADNode", &createCADNode);
+  emscripten::function("createSVG", &createSVG);
   emscripten::function("createView", &createView);
   emscripten::function("renderSTL", &renderSTL);
   emscripten::function("renderBREP", &renderBREP);

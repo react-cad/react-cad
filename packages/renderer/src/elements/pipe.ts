@@ -1,4 +1,5 @@
-import { Props, Instance, UpdatePayload } from "../types";
+import { ReactCADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 
 type Pipe = "pipe";
 
@@ -10,10 +11,7 @@ export function prepareUpdate(
   oldProps: Props<Pipe>,
   newProps: Props<Pipe>
 ): UpdatePayload<Pipe> | null {
-  if (
-    oldProps.profile !== newProps.profile ||
-    oldProps.spine !== newProps.spine
-  ) {
+  if (oldProps.spine !== newProps.spine) {
     validateProps(newProps);
     return newProps;
   }
@@ -22,21 +20,9 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<Pipe>,
+  instance: ReactCADInstance<Pipe>,
   updatePayload: UpdatePayload<Pipe>
 ): void {
   validateProps(updatePayload);
-  const { spine, profile } = updatePayload;
-
-  if (typeof profile === "string") {
-    instance.node.setProfileSVG(profile);
-  } else {
-    instance.node.setProfile(profile);
-  }
-
-  if (typeof spine === "string") {
-    instance.node.setSpineSVG(spine);
-  } else {
-    instance.node.setSpine(spine);
-  }
+  instance.node.setSpine(updatePayload.spine);
 }

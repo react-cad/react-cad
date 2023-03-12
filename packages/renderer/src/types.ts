@@ -2,20 +2,22 @@ import { Fiber } from "react-reconciler";
 import {
   ReactCADCore,
   ReactCADNode,
-  Profile,
   Point,
-  ReactCADNodeTypes,
   Vector,
   Quaternion,
   Matrix,
 } from "@react-cad/core";
+import { ReactCADInstance, SVGInstance } from "instance";
 
-export interface Element<T extends Type = Type> {
+export interface Element<T extends ReactCADNodeType = ReactCADNodeType> {
   prepareUpdate(
-    oldProps: Props<T>,
-    newProps: Props<T>
+    oldProps: Props<ReactCADNodeType>,
+    newProps: Props<ReactCADNodeType>
   ): UpdatePayload<T> | null;
-  commitUpdate(instance: Instance<T>, updatePayload: UpdatePayload<T>): void;
+  commitUpdate(
+    instance: ReactCADInstance<T>,
+    updatePayload: UpdatePayload<T>
+  ): void;
 }
 
 export interface ReactCADElements {
@@ -70,17 +72,13 @@ export interface ReactCADElements {
     faces: number[][];
   };
 
-  evolution: {
-    profile: Point[] | string;
-    spine: Profile;
-  };
-  pipe: {
-    profile: Profile;
-    spine: Point[] | string;
-  };
-  prism: {
-    profile: Profile;
-  } & (
+  evolution: React.PropsWithChildren<{
+    profile: string;
+  }>;
+  pipe: React.PropsWithChildren<{
+    spine: string;
+  }>;
+  prism: React.PropsWithChildren<
     | {
         x?: number;
         y?: number;
@@ -89,17 +87,15 @@ export interface ReactCADElements {
     | {
         vector: Vector;
       }
-  );
-  revolution: {
-    profile: Profile;
+  >;
+  revolution: React.PropsWithChildren<{
     axis: Vector;
     angle: number;
-  };
-  helix: {
-    profile: Profile;
+  }>;
+  helix: React.PropsWithChildren<{
     pitch: number;
     height: number;
-  };
+  }>;
 
   affine: React.PropsWithChildren<{
     matrix: Matrix;
@@ -152,6 +148,12 @@ export interface ReactCADElements {
     data: string | ArrayBuffer;
   };
 
+  surface: React.PropsWithChildren<{
+    origin?: Point;
+    normal?: Vector;
+    xDirection?: Vector;
+  }>;
+
   union: React.PropsWithChildren<unknown>;
   difference: React.PropsWithChildren<unknown>;
   intersection: React.PropsWithChildren<unknown>;
@@ -161,23 +163,27 @@ export type ElementProps = ReactCADElements;
 
 export type Container = {
   core: ReactCADCore;
-  root: ReactCADNode;
-  nodes: ReactCADNode[];
-  rootNodes: ReactCADNode[];
+  root: Instance;
+  instances: Instance[];
+  rootInstances: Instance[];
   callback?: () => void;
 };
 
 export type HostContext = unknown;
-export type Type = keyof ElementProps;
-export type Props<T extends Type = Type> = ElementProps[T];
-export interface Instance<T extends Type = Type> {
-  core: ReactCADCore;
-  type: T;
-  node: ReactCADNodeTypes[T];
-}
+
+export type ReactCADNodeType = keyof ElementProps;
+export type SVGNodeType = keyof JSX.IntrinsicElements;
+export type Type = ReactCADNodeType | SVGNodeType;
+export type Props<T extends Type = Type> = T extends SVGNodeType
+  ? JSX.IntrinsicElements[T]
+  : T extends ReactCADNodeType
+  ? ElementProps[T]
+  : never;
+export type Instance = SVGInstance | ReactCADInstance;
+
 export type TextInstance = string;
 export type HydratableInstance = never;
-export type PublicInstance = ReactCADNode;
+export type PublicInstance = ReactCADNode | SVGElement;
 export type UpdatePayload<T extends Type = Type> = Props<T>;
 
 export type ChildSet = never;

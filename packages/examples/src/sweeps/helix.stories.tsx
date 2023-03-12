@@ -1,19 +1,18 @@
 import React from "react";
-import type { Profile } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-import reactIcon from "./react-icon";
+import ReactIcon from "./react-icon";
 
-import { makePolygon, offsetPolygon, rotatePolygon } from "./helpers";
+import { makePolygon } from "./helpers";
 
 type Props = JSX.IntrinsicElements["helix"];
 
-const profiles: Record<string, Profile> = {
+const profiles: Record<string, React.ReactElement> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
-  SVG: reactIcon([0, 0]),
+  SVG: <ReactIcon />,
 };
 
 export const Helix: React.FC<Props> = (props) => <helix {...props} />;
@@ -56,12 +55,11 @@ interface StoryProps {
 }
 
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
-  let profile = profiles[profileName];
-  if (rotated && typeof profile !== "string") {
-    profile = offsetPolygon(rotatePolygon(profile));
-  }
-
-  return <Helix profile={profile} {...args} />;
+  return (
+    <Helix {...args}>
+      <surface>{profiles[profileName]}</surface>
+    </Helix>
+  );
 };
 
 export const helix = Template.bind({});

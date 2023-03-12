@@ -1,4 +1,4 @@
-#include "SVGBuilder.hpp"
+#include "SVG.hpp"
 #include "SVGSubPath.hpp"
 
 #include <Geom_Plane.hxx>
@@ -20,10 +20,44 @@
 
 #include "BooleanOperation.hpp"
 #include "SVGImage.hpp"
+#include "SurfaceNode.hpp"
 
-SVGBuilder::SVGBuilder(const std::string &svg) : m_shape(), m_svg(svg){};
+#include <Geom_Plane.hxx>
+#include <gp_Ax3.hxx>
+#include <gp_Pln.hxx>
 
-void SVGBuilder::Build(const ProgressHandler &handler)
+SVG::SVG() : m_shape(), m_parent(), m_svg(), m_surface(new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()))){};
+
+void SVG::setParent(const opencascade::handle<SurfaceNode> &parent)
+{
+  m_parent = parent;
+}
+
+void SVG::setSource(const std::string &svg)
+{
+  if (svg.compare(m_svg) != 0)
+  {
+    m_svg = svg;
+    m_done = false;
+    m_shape = TopoDS_Shape();
+    if (!m_parent.IsNull())
+    {
+      m_parent->updateSVGs();
+    }
+  }
+}
+
+void SVG::SetSurface(const Handle(Geom_Surface) & surface)
+{
+  if (surface != m_surface)
+  {
+    m_surface = surface;
+    m_done = false;
+    m_shape = TopoDS_Shape();
+  }
+}
+
+void SVG::Build(const ProgressHandler &handler)
 {
   if (m_done)
   {
@@ -37,19 +71,32 @@ void SVGBuilder::Build(const ProgressHandler &handler)
     return;
   }
 
-  Handle(Geom_Plane) surface = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()));
-
   ShapeFix_Wire fixWire;
-  fixWire.SetSurface(surface);
+  fixWire.SetSurface(m_surface);
 
+  int nbShape = 0;
+  for (auto shape = image.begin(); shape != image.end(); ++shape)
+  {
+    ++nbShape;
+  }
+
+  Message_ProgressScope scope(handler, "Parsing SVG", nbShape + 1);
   TopTools_ListOfShape svgShapes;
 
-  for (auto shape = image.begin(); shape != image.end(); ++shape)
+  for (auto shape = image.begin(); shape != image.end() && scope.More(); ++shape)
   {
     NCollection_List<Handle(SVGSubPath)> subpaths;
     Standard_Real avgSize = 0;
 
+    int nbPaths = 0;
     for (auto path = shape.begin(); path != shape.end(); ++path)
+    {
+      ++nbPaths;
+    }
+
+    Message_ProgressScope pathScope(scope.Next(), "Parsing SVG path", nbPaths * 2);
+
+    for (auto path = shape.begin(); path != shape.end() && pathScope.More(); ++path)
     {
       float orientation = 0;
       BRepBuilderAPI_MakeWire makeWire;
@@ -59,7 +106,7 @@ void SVGBuilder::Build(const ProgressHandler &handler)
         Handle(Geom2d_Curve) c = curve;
         if (!c.IsNull())
         {
-          BRepBuilderAPI_MakeEdge edge(c, surface);
+          BRepBuilderAPI_MakeEdge edge(c, m_surface);
           makeWire.Add(edge);
 
           orientation += curve.orientation();
@@ -74,7 +121,7 @@ void SVGBuilder::Build(const ProgressHandler &handler)
 
       TopoDS_Wire wire = fixWire.Wire();
 
-      BRepBuilderAPI_MakeFace face(surface, wire);
+      BRepBuilderAPI_MakeFace face(m_surface, wire);
 
       SVGSubPath::Direction direction = orientation >= 0 ? SVGSubPath::Direction::CW : SVGSubPath::Direction::CCW;
       Handle(SVGSubPath) subpath = new SVGSubPath(wire, face, direction);
@@ -82,6 +129,11 @@ void SVGBuilder::Build(const ProgressHandler &handler)
       avgSize += box.CornerMin().Distance(box.CornerMax());
 
       subpaths.Append(subpath);
+    }
+
+    if (!pathScope.More())
+    {
+      continue;
     }
 
     avgSize /= subpaths.Size();
@@ -108,8 +160,13 @@ void SVGBuilder::Build(const ProgressHandler &handler)
     }
   }
 
+  if (!scope.More())
+  {
+    return;
+  }
+
   BooleanOperation op;
-  op.Union(svgShapes, handler);
+  op.Union(svgShapes, handler.WithRange(scope.Next()));
   if (op.HasErrors())
   {
     handler.Abort("svg parse: boolean operation failed\n\n" + op.Errors());
@@ -121,11 +178,8 @@ void SVGBuilder::Build(const ProgressHandler &handler)
   }
 }
 
-TopoDS_Shape SVGBuilder::Shape(const ProgressHandler &handler)
+TopoDS_Shape SVG::Shape(const ProgressHandler &handler)
 {
-  if (!m_done)
-  {
-    Build(handler);
-  }
+  Build(handler);
   return m_shape;
 }

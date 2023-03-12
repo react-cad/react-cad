@@ -1,26 +1,18 @@
 import React from "react";
-import type { Profile, Point, Vector } from "@react-cad/core";
+import type { Vector } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-import reactIcon from "./react-icon";
+import ReactIcon from "./react-icon";
+import { makePolygon } from "./helpers";
 
 type Props = JSX.IntrinsicElements["revolution"];
 
-function makePolygon(sides: number) {
-  return [...Array(sides)].map(
-    (_, i): Point => {
-      const theta = (i / sides) * 2 * Math.PI;
-      return [0, 2 + Math.sin(theta), Math.cos(theta)];
-    }
-  );
-}
-
-const profiles: Record<string, Profile> = {
+const profiles: Record<string, React.ReactElement> = {
   Triangle: makePolygon(3),
   Square: makePolygon(4),
   Pentagon: makePolygon(5),
   Hexagon: makePolygon(6),
-  SVG: reactIcon([3, 0]),
+  SVG: <ReactIcon />,
 };
 
 export const Revolution: React.FC<Props> = (props) => <revolution {...props} />;
@@ -53,16 +45,14 @@ interface StoryProps {
 }
 
 const Template: Story<StoryProps> = ({ profileName, angle, ...args }) => (
-  <Revolution
-    profile={profiles[profileName]}
-    angle={(angle / 180) * Math.PI}
-    {...args}
-  />
+  <Revolution angle={(angle / 180) * Math.PI} {...args}>
+    <surface origin={[0, 10, 0]}>{profiles[profileName]}</surface>
+  </Revolution>
 );
 
 export const revolution = Template.bind({});
 revolution.args = {
   profileName: "Square",
-  axis: [0, 0, 1],
+  axis: [1, 0, 0],
   angle: 90,
 };

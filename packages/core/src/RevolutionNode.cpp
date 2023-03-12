@@ -24,14 +24,16 @@ void RevolutionNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 void RevolutionNode::computeShape(const ProgressHandler &handler)
 {
   shape = TopoDS_Solid();
-
-  TopoDS_Shape profile = getProfile(handler);
+  if (m_childShape.IsNull())
+  {
+    return;
+  }
 
   gp_Ax1 axis(gp::Origin(), m_axis);
 
   Standard_Real angle = fmin(fmax(m_angle, 0), 2 * M_PI);
 
-  BRepPrimAPI_MakeRevol revolution(profile, axis, angle);
+  BRepPrimAPI_MakeRevol revolution(m_childShape, axis, angle);
   revolution.Build(/*theRange*/);
   if (revolution.IsDone())
   {

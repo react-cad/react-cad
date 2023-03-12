@@ -39,7 +39,6 @@ export type Vector = [number, number, number];
 export type Point = [number, number, number];
 export type Quaternion = [number, number, number, number];
 export type Polygon = Point[];
-export type Profile = Polygon | string;
 export type Matrix = [
   [number, number, number, number],
   [number, number, number, number],
@@ -97,32 +96,23 @@ export class ReactCADPolyhedronNode extends ReactCADNode {
 }
 
 // Sweeps
-export class ReactCADSweepNode extends ReactCADNode {
-  public setProfile(path: Polygon): void;
-  public setProfileSVG(svg: string): void;
-}
-
-export class ReactCADRevolutionNode extends ReactCADSweepNode {
+export class ReactCADRevolutionNode extends ReactCADNode {
   public setAxisAngle(axis: Vector, angle: number): void;
 }
 
-export class ReactCADPrismNode extends ReactCADSweepNode {
+export class ReactCADPrismNode extends ReactCADNode {
   public setVector(vector: Vector): void;
 }
 
 export class ReactCADEvolutionNode extends ReactCADNode {
-  public setProfile(profile: Point[]): void;
-  public setProfileSVG(pathData: string): void;
-  public setSpine(spine: Point[]): void;
-  public setSpineSVG(svg: string): void;
+  public setProfile(pathData: string): void;
 }
 
-export class ReactCADPipeNode extends ReactCADSweepNode {
-  public setSpine(spine: Point[]): void;
-  public setSpineSVG(pathData: string): void;
+export class ReactCADPipeNode extends ReactCADNode {
+  public setSpine(pathData: string): void;
 }
 
-export class ReactCADHelixNode extends ReactCADSweepNode {
+export class ReactCADHelixNode extends ReactCADNode {
   public setPitch(pitch: number): void;
   public setHeight(height: number): void;
 }
@@ -144,7 +134,6 @@ export class ReactCADObjImportNode extends ReactCADImportNode {}
 export class ReactCADTranslationNode extends ReactCADNode {
   public setVector(vector: Vector): void;
 }
-
 export class ReactCADMirrorNode extends ReactCADNode {
   public setPlane(origin: Point, normal: Vector): void;
 }
@@ -160,6 +149,20 @@ export class ReactCADScaleNode extends ReactCADNode {
   public setCenter(center: Point): void;
   public setScaleFactor(scaleFactor: number): void;
   public setScale(scale: Vector): void;
+}
+
+// Surfaces
+export class ReactCADSVG extends EmClass {
+  public setSource(svg: string): void;
+}
+export class ReactCADSurfaceNode extends ReactCADNode {
+  public setOrigin(origin: Point): void;
+  public setNormal(normal: Vector): void;
+  public setXDirection(xDirection: Vector): void;
+  public appendSVG(child: ReactCADSVG): void;
+  public insertSVGBefore(child: ReactCADSVG, before: ReactCADSVG): void;
+  public removeSVG(child: ReactCADSVG): void;
+  public updateSVGs(): void;
 }
 
 export interface ReactCADNodeTypes {
@@ -187,11 +190,13 @@ export interface ReactCADNodeTypes {
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
+  surface: ReactCADSurfaceNode;
 }
 
 export interface ReactCADCore extends EmscriptenModule {
   ReactCADNode: typeof ReactCADNode;
   ReactCADView: typeof ReactCADView;
+  ReactCADSVG: typeof ReactCADSVG;
   Projection: {
     ORTHOGRAPHIC: Projection;
     PERSPECTIVE: Projection;
@@ -207,6 +212,7 @@ export interface ReactCADCore extends EmscriptenModule {
   createCADNode<T extends keyof ReactCADNodeTypes = "union">(
     type: T
   ): ReactCADNodeTypes[T];
+  createSVG(): ReactCADSVG;
   createView(canvas: HTMLCanvasElement): ReactCADView;
   computeNodeAsync(node: ReactCADNode): ProgressIndicator;
   renderNodeAsync(node: ReactCADNode, view: ReactCADView): ProgressIndicator;

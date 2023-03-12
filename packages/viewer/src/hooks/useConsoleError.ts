@@ -16,9 +16,7 @@ function useConsoleError(onError: (message: string) => void): void {
     subscribers.push(onError);
 
     return () => {
-      const index = subscribers.findIndex(
-        (subscriber) => subscriber === onError
-      );
+      const index = subscribers.indexOf(onError);
       if (index >= 0) {
         subscribers.splice(index, 1);
       }
