@@ -71,6 +71,7 @@ export interface ReactCADElements {
     points: Point[];
     faces: number[][];
   };
+  solid: React.PropsWithChildren<unknown>;
 
   evolution: React.PropsWithChildren<{
     profile: string;

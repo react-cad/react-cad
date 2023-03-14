@@ -14,6 +14,7 @@
 #include "ConeNode.hpp"
 #include "CylinderNode.hpp"
 #include "PolyhedronNode.hpp"
+#include "SolidNode.hpp"
 #include "SphereNode.hpp"
 #include "TorusNode.hpp"
 #include "WedgeNode.hpp"
@@ -107,6 +108,10 @@ Handle(ReactCADNode) createCADNode(std::string type)
   if (type == "intersection")
   {
     return new IntersectionNode();
+  }
+  if (type == "solid")
+  {
+    return new SolidNode();
   }
   if (type == "polyhedron")
   {
@@ -402,6 +407,9 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::class_<PolyhedronNode, emscripten::base<ReactCADNode>>("ReactCADPolyhedronNode")
       .smart_ptr<Handle(PolyhedronNode)>("ReactCADPolyhedronNode")
       .function("setPointsAndFaces", &PolyhedronNode::setPointsAndFaces);
+
+  emscripten::class_<SolidNode, emscripten::base<ReactCADNode>>("ReactCADSolidNode")
+      .smart_ptr<Handle(SolidNode)>("ReactCADSolidNode");
 
   // Sweeps
   emscripten::class_<PrismNode, emscripten::base<ReactCADNode>>("ReactCADPrismNode")

@@ -16,6 +16,7 @@ import * as cylinder from "./cylinder";
 import * as sphere from "./sphere";
 import * as torus from "./torus";
 import * as polyhedron from "./polyhedron";
+import * as solid from "./solid";
 
 import * as helix from "./helix";
 import * as prism from "./prism";
@@ -47,6 +48,7 @@ const elements: Record<ReactCADNodeType, Element> = {
   sphere,
   torus,
   polyhedron,
+  solid,
 
   helix,
   prism,

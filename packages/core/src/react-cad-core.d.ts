@@ -95,6 +95,8 @@ export class ReactCADPolyhedronNode extends ReactCADNode {
   public setPointsAndFaces(points: Point[], faces: number[][]): void;
 }
 
+export class ReactCADSolidNode extends ReactCADNode {}
+
 // Sweeps
 export class ReactCADRevolutionNode extends ReactCADNode {
   public setAxisAngle(axis: Vector, angle: number): void;
@@ -182,6 +184,7 @@ export interface ReactCADNodeTypes {
   cone: ReactCADConeNode;
   cylinder: ReactCADCylinderNode;
   polyhedron: ReactCADPolyhedronNode;
+  solid: ReactCADSolidNode;
   sphere: ReactCADSphereNode;
   torus: ReactCADTorusNode;
   wedge: ReactCADWedgeNode;
