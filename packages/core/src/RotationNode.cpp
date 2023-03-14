@@ -9,14 +9,6 @@ RotationNode::RotationNode() : m_angle(0), m_axis(gp::DX()), m_quaternion(gp::DX
 {
 }
 
-void RotationNode::setTransform()
-{
-}
-
-void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
-{
-}
-
 void RotationNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 {
   if (!IsEqual(angle, m_angle) || !axis.IsParallel(m_axis, RealEpsilon()))

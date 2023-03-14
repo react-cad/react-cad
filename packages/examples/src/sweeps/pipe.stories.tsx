@@ -47,7 +47,7 @@ interface StoryProps {
 const Template: Story<StoryProps> = ({ profileName, ...args }) => {
   return (
     <Pipe {...args}>
-      <surface>{profiles[profileName]}</surface>
+      <plane>{profiles[profileName]}</plane>
     </Pipe>
   );
 };

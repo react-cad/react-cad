@@ -153,7 +153,7 @@ export interface ReactCADElements {
     data: string | ArrayBuffer;
   };
 
-  surface: React.PropsWithChildren<
+  plane: React.PropsWithChildren<
     {
       origin?: Point;
     } & (
@@ -164,6 +164,10 @@ export interface ReactCADElements {
         }
     )
   >;
+  sphericalSurface: React.PropsWithChildren<{
+    origin?: Point;
+    radius?: number;
+  }>;
 
   union: React.PropsWithChildren<unknown>;
   difference: React.PropsWithChildren<unknown>;
@@ -185,6 +189,7 @@ export type HostContext = unknown;
 export type ReactCADNodeType = keyof ElementProps;
 export type SVGNodeType = keyof JSX.IntrinsicElements;
 export type Type = ReactCADNodeType | SVGNodeType;
+export type SurfaceType = "plane" | "sphericalSurface";
 export type Props<T extends Type = Type> = T extends SVGNodeType
   ? JSX.IntrinsicElements[T]
   : T extends ReactCADNodeType

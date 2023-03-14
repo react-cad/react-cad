@@ -6,6 +6,7 @@ import {
   Container,
   HostContext,
   UpdatePayload,
+  SurfaceType,
 } from "types";
 import { prepareUpdate, commitUpdate } from "./elements";
 
@@ -24,6 +25,10 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
     return this.type === type;
   }
 
+  isSurface(): this is ReactCADInstance<SurfaceType> {
+    return ["plane", "sphericalSurface"].includes(this.type);
+  }
+
   hasParent(): boolean {
     return this.node.hasParent();
   }
@@ -33,7 +38,7 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
   }
 
   appendChild(child: ReactCADInstance | SVGInstance): void {
-    if (this.isType("surface")) {
+    if (this.isSurface()) {
       if (child instanceof SVGInstance && child.node.tagName === "svg") {
         child.parent = this;
         this.node.appendSVG(child.svg);
@@ -52,7 +57,7 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
     child: ReactCADInstance | SVGInstance,
     before: ReactCADInstance | SVGInstance
   ): void {
-    if (this.isType("surface")) {
+    if (this.isSurface()) {
       if (
         child instanceof SVGInstance &&
         before instanceof SVGInstance &&
@@ -75,7 +80,7 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
     }
   }
   removeChild(child: ReactCADInstance | SVGInstance): void {
-    if (this.isType("surface")) {
+    if (this.isSurface()) {
       if (child instanceof SVGInstance) {
         child.parent = undefined;
         this.node.removeSVG(child.svg);
@@ -111,7 +116,7 @@ export class SVGInstance<
 > {
   public node: SVGElement;
   public readonly type: keyof JSX.IntrinsicElements;
-  public parent: ReactCADInstance<"surface"> | SVGInstance | undefined;
+  public parent: ReactCADInstance<SurfaceType> | SVGInstance | undefined;
   private readonly core: ReactCADCore;
   private children: SVGInstance[] = [];
   private svgNode: ReactCADSVG | undefined;

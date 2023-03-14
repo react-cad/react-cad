@@ -49,7 +49,7 @@ interface StoryProps {
 
 const Template: Story<StoryProps> = ({ profileName, ...args }) => (
   <Prism {...args}>
-    <surface>{profiles[profileName]}</surface>
+    <plane>{profiles[profileName]}</plane>
   </Prism>
 );
 

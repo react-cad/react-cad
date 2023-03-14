@@ -32,7 +32,8 @@ import * as mirror from "./mirror";
 
 import * as importElement from "./import";
 
-import * as surface from "./surface";
+import * as plane from "./plane";
+import * as sphericalSurface from "./sphericalSurface";
 
 import * as union from "./union";
 import * as difference from "./difference";
@@ -65,7 +66,8 @@ const elements: Record<ReactCADNodeType, Element> = {
   stl: importElement,
   obj: importElement,
 
-  surface,
+  plane,
+  sphericalSurface,
 
   union,
   difference,

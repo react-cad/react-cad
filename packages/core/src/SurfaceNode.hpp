@@ -13,31 +13,18 @@ class SurfaceNode : public ReactCADNode
 {
 public:
   SurfaceNode();
-  void setOrigin(gp_Pnt origin);
-  void setNormal(gp_Vec normal);
-  void setXDirection(gp_Vec xDirection);
 
   void appendSVG(Handle(SVG) & child);
   void insertSVGBefore(Handle(SVG) & child, const Handle(SVG) & before);
   void removeSVG(Handle(SVG) & child);
   void updateSVGs();
 
-  std::string getName() override
-  {
-    return "Surface";
-  }
-
 protected:
   void computeShape(const ProgressHandler &handler) override;
+  virtual Handle(Geom_Surface) getSurface(const ProgressHandler &handler) = 0;
 
 private:
-  gp_Pnt m_origin;
-  gp_Dir m_normal;
-  gp_Dir m_xDirection;
-  Standard_Boolean m_planeChanged;
-
   std::vector<Handle(SVG)> m_children;
-  Handle(Geom_Plane) m_surface;
 };
 
 #endif

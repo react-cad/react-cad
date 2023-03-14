@@ -42,6 +42,9 @@
 #include "TranslationNode.hpp"
 
 #include "SVG.hpp"
+
+#include "PlaneNode.hpp"
+#include "SphericalSurfaceNode.hpp"
 #include "SurfaceNode.hpp"
 
 #include <Graphic3d_Camera.hxx>
@@ -169,9 +172,13 @@ Handle(ReactCADNode) createCADNode(std::string type)
   {
     return new STLImportNode();
   }
-  if (type == "surface")
+  if (type == "plane")
   {
-    return new SurfaceNode();
+    return new PlaneNode();
+  }
+  if (type == "sphericalSurface")
+  {
+    return new SphericalSurfaceNode();
   }
 
   return new BoxNode();
@@ -471,13 +478,21 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   emscripten::class_<SurfaceNode, emscripten::base<ReactCADNode>>("ReactCADSurfaceNode")
       .smart_ptr<Handle(SurfaceNode)>("ReactCADSurfaceNode")
-      .function("setOrigin", &SurfaceNode::setOrigin)
-      .function("setNormal", &SurfaceNode::setNormal)
-      .function("setXDirection", &SurfaceNode::setXDirection)
       .function("appendSVG", &SurfaceNode::appendSVG)
       .function("insertSVGBefore", &SurfaceNode::insertSVGBefore)
       .function("removeSVG", &SurfaceNode::removeSVG)
       .function("updateSVGs", &SurfaceNode::updateSVGs);
+
+  emscripten::class_<PlaneNode, emscripten::base<SurfaceNode>>("ReactCADPlaneNode")
+      .smart_ptr<Handle(PlaneNode)>("ReactCADPlaneNode")
+      .function("setOrigin", &PlaneNode::setOrigin)
+      .function("setNormal", &PlaneNode::setNormal)
+      .function("setXDirection", &PlaneNode::setXDirection);
+
+  emscripten::class_<SphericalSurfaceNode, emscripten::base<SurfaceNode>>("ReactCADSphericalSurfaceNode")
+      .smart_ptr<Handle(SphericalSurfaceNode)>("ReactCADSphericalSurfaceNode")
+      .function("setOrigin", &SphericalSurfaceNode::setOrigin)
+      .function("setRadius", &SphericalSurfaceNode::setRadius);
 
   emscripten::enum_<Graphic3d_Camera::Projection>("Projection")
       .value("ORTHOGRAPHIC", Graphic3d_Camera::Projection_Orthographic)

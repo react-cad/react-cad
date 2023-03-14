@@ -2,24 +2,24 @@ import { ReactCADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
-type Surface = "surface";
+type Plane = "plane";
 
 function validateVector(name: string, vector?: number[]): void {
   if (vector) {
     if (vector.length < 3) {
-      throw new Error(`surface: "${name}" must be an array of 3 numbers`);
+      throw new Error(`plane: "${name}" must be an array of 3 numbers`);
     }
     const total =
       Math.abs(vector[0]) + Math.abs(vector[1]) + Math.abs(vector[2]);
     if (total == 0) {
-      throw new Error(`surface: "${name}" must have length > 0`);
+      throw new Error(`plane: "${name}" must have length > 0`);
     }
   }
 }
 
-function validateProps(props: Props<Surface>): boolean {
+function validateProps(props: Props<Plane>): boolean {
   if (origin && origin.length < 3) {
-    throw new Error(`surface: "origin" must be an array of 3 numbers`);
+    throw new Error(`plane: "origin" must be an array of 3 numbers`);
   }
   (["normal", "xDirection"] as const).forEach((prop) =>
     validateVector(prop, props[prop])
@@ -29,9 +29,9 @@ function validateProps(props: Props<Surface>): boolean {
 }
 
 export function prepareUpdate(
-  oldProps: Props<Surface>,
-  newProps: Props<Surface>
-): UpdatePayload<Surface> | null {
+  oldProps: Props<Plane>,
+  newProps: Props<Plane>
+): UpdatePayload<Plane> | null {
   if (
     !arrayEqual(oldProps.normal, newProps.normal) ||
     !arrayEqual(oldProps.origin, newProps.origin) ||
@@ -45,8 +45,8 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: ReactCADInstance<Surface>,
-  updatePayload: UpdatePayload<Surface>
+  instance: ReactCADInstance<Plane>,
+  updatePayload: UpdatePayload<Plane>
 ): void {
   validateProps(updatePayload);
   const {

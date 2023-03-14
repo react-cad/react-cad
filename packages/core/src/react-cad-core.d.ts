@@ -162,13 +162,19 @@ export class ReactCADSVG extends EmClass {
   public setSource(svg: string): void;
 }
 export class ReactCADSurfaceNode extends ReactCADNode {
-  public setOrigin(origin: Point): void;
-  public setNormal(normal: Vector): void;
-  public setXDirection(xDirection: Vector): void;
   public appendSVG(child: ReactCADSVG): void;
   public insertSVGBefore(child: ReactCADSVG, before: ReactCADSVG): void;
   public removeSVG(child: ReactCADSVG): void;
   public updateSVGs(): void;
+}
+export class ReactCADPlaneNode extends ReactCADSurfaceNode {
+  public setOrigin(origin: Point): void;
+  public setNormal(normal: Vector): void;
+  public setXDirection(xDirection: Vector): void;
+}
+export class ReactCADSphericalSurfaceNode extends ReactCADSurfaceNode {
+  public setOrigin(origin: Point): void;
+  public setRadius(radius: number): void;
 }
 
 export interface ReactCADNodeTypes {
@@ -197,7 +203,8 @@ export interface ReactCADNodeTypes {
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
-  surface: ReactCADSurfaceNode;
+  plane: ReactCADPlaneNode;
+  sphericalSurface: ReactCADSphericalSurfaceNode;
 }
 
 export interface ReactCADCore extends EmscriptenModule {

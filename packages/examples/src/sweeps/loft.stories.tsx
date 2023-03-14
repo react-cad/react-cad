@@ -15,41 +15,45 @@ export default {
 
 export const loft: Story = (args) => (
   <Loft {...args}>
-    <surface>
-      <svg>
-        <polygon points="5,0 10,5 5,10 0,5" />
-      </svg>
-    </surface>
-    <surface origin={[0, 0, 5]}>
-      <svg>
-        <circle cx="5" cy="5" r="6" />
-      </svg>
-    </surface>
-    <surface origin={[0, 0, 15]}>
+    <rotation axis={[0, 1, 0]} angle={-Math.PI / 2}>
+      <sphericalSurface radius={5}>
+        <svg viewBox="0.5 0.5 1 1">
+          <g transform="scale(0.1,0.1) ">
+            <polygon points="5,0 10,5 5,10 0,5" />
+          </g>
+        </svg>
+      </sphericalSurface>
+    </rotation>
+    <plane origin={[0, 0, 10]}>
       <svg viewBox="0 0 10 10">
-        <ellipse cx="5" cy="5" rx="6" ry="4" />
+        <circle r="6" />
       </svg>
-    </surface>
-    <surface origin={[0, 0, 30]} normal={[0.3, 0, 1]} xDirection={[0, 1, 0]}>
+    </plane>
+    <plane origin={[0, 0, 20]}>
       <svg viewBox="0 0 10 10">
-        <circle cx="5" cy="-5" r="5" />
+        <ellipse rx="6" ry="4" />
       </svg>
-    </surface>
+    </plane>
+    <plane origin={[0, 0, 30]} normal={[0.3, 0, 1]} xDirection={[0, 1, 0]}>
+      <svg viewBox="0 0 10 10">
+        <circle r="5" />
+      </svg>
+    </plane>
   </Loft>
 );
 
 export const loft2: Story = (args) => {
   return (
     <Loft compatible {...args}>
-      <surface>
+      <plane>
         <Polygon sides={6} />
-      </surface>
-      <surface origin={[0, 0, 5]}>
+      </plane>
+      <plane origin={[0, 0, 5]}>
         <Circle vertices={6} />
-      </surface>
-      <surface origin={[0, 0, 10]}>
+      </plane>
+      <plane origin={[0, 0, 10]}>
         <Polygon sides={3} pointsPerVertex={2} />
-      </surface>
+      </plane>
     </Loft>
   );
 };
@@ -57,7 +61,7 @@ export const loft2: Story = (args) => {
 export const loft3: Story = (args) => {
   return (
     <Loft {...args}>
-      <surface>
+      <plane>
         <svg
           width="100"
           height="100"
@@ -79,8 +83,8 @@ export const loft3: Story = (args) => {
             />
           </g>
         </svg>
-      </surface>
-      <surface origin={[0, 0, 50]}>
+      </plane>
+      <plane origin={[0, 0, 50]}>
         <svg
           width="100"
           height="100"
@@ -99,8 +103,8 @@ export const loft3: Story = (args) => {
             <path d="M -50 -50 l 100 0 a 50 50 0 1 1 0 100 l -100 0 l 0 -100 Z M -25 -25 l 50 0 a 25 25 0 1 1 0 50 l -50 0 l 0 -50 Z" />
           </g>
         </svg>
-      </surface>
-      <surface origin={[0, 0, 100]}>
+      </plane>
+      <plane origin={[0, 0, 100]}>
         <svg
           width="100"
           height="100"
@@ -122,7 +126,7 @@ export const loft3: Story = (args) => {
             />
           </g>
         </svg>
-      </surface>
+      </plane>
     </Loft>
   );
 };
