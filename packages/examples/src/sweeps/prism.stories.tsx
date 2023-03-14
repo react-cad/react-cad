@@ -7,10 +7,10 @@ import Polygon from "./Polygon";
 type Props = JSX.IntrinsicElements["prism"];
 
 const profiles: Record<string, React.ReactElement> = {
-  Triangle: <Polygon sides={3} />,
-  Square: <Polygon sides={4} />,
-  Pentagon: <Polygon sides={5} />,
-  Hexagon: <Polygon sides={6} />,
+  Triangle: <Polygon sides={3} radius={1} />,
+  Square: <Polygon sides={4} radius={1} />,
+  Pentagon: <Polygon sides={5} radius={1} />,
+  Hexagon: <Polygon sides={6} radius={1} />,
   SVG: <ReactIcon />,
 };
 

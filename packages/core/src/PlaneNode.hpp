@@ -13,8 +13,6 @@ class PlaneNode : public SurfaceNode
 public:
   PlaneNode();
   void setOrigin(gp_Pnt origin);
-  void setNormal(gp_Vec normal);
-  void setXDirection(gp_Vec xDirection);
 
   std::string getName() override
   {
@@ -26,8 +24,6 @@ protected:
 
 private:
   gp_Pnt m_origin;
-  gp_Dir m_normal;
-  gp_Dir m_xDirection;
   Standard_Boolean m_planeChanged;
 
   Handle(Geom_Plane) m_surface;

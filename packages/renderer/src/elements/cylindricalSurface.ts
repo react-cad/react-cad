@@ -1,12 +1,12 @@
 import { ReactCADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 
-type SphericalSurface = "sphericalSurface";
+type CylindricalSurface = "cylindricalSurface";
 
 export function prepareUpdate(
-  oldProps: Props<SphericalSurface>,
-  newProps: Props<SphericalSurface>
-): UpdatePayload<SphericalSurface> | null {
+  oldProps: Props<CylindricalSurface>,
+  newProps: Props<CylindricalSurface>
+): UpdatePayload<CylindricalSurface> | null {
   if (oldProps.radius !== newProps.radius) {
     return newProps;
   }
@@ -15,8 +15,8 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: ReactCADInstance<SphericalSurface>,
-  updatePayload: UpdatePayload<SphericalSurface>
+  instance: ReactCADInstance<CylindricalSurface>,
+  updatePayload: UpdatePayload<CylindricalSurface>
 ): void {
   const { radius = 1 } = updatePayload;
   instance.node.setRadius(radius);

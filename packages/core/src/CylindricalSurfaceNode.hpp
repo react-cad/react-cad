@@ -1,31 +1,31 @@
-#ifndef SphericalSurfaceNode_HeaderFile
-#define SphericalSurfaceNode_HeaderFile
+#ifndef CylindricalSurfaceNode_HeaderFile
+#define CylindricalSurfaceNode_HeaderFile
 
 #include "SurfaceNode.hpp"
 
-#include <Geom_SphericalSurface.hxx>
+#include <Geom_CylindricalSurface.hxx>
 
-class SphericalSurfaceNode : public SurfaceNode
+class CylindricalSurfaceNode : public SurfaceNode
 {
 public:
-  SphericalSurfaceNode();
+  CylindricalSurfaceNode();
   void setOrigin(gp_Pnt origin);
   void setRadius(Standard_Real radius);
 
   std::string getName() override
   {
-    return "SphericalSurface";
+    return "CylindricalSurface";
   }
 
 protected:
   Handle(Geom_Surface) getSurface(const ProgressHandler &handler) override;
 
 private:
-  gp_Pnt m_origin;
   Standard_Real m_radius;
+  gp_Pnt m_origin;
   Standard_Boolean m_surfaceChanged;
 
-  Handle(Geom_SphericalSurface) m_surface;
+  Handle(Geom_CylindricalSurface) m_surface;
 };
 
 #endif

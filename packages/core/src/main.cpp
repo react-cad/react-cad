@@ -44,6 +44,7 @@
 
 #include "SVG.hpp"
 
+#include "CylindricalSurfaceNode.hpp"
 #include "PlaneNode.hpp"
 #include "SphericalSurfaceNode.hpp"
 #include "SurfaceNode.hpp"
@@ -184,6 +185,10 @@ Handle(ReactCADNode) createCADNode(std::string type)
   if (type == "sphericalSurface")
   {
     return new SphericalSurfaceNode();
+  }
+  if (type == "cylindricalSurface")
+  {
+    return new CylindricalSurfaceNode();
   }
 
   return new BoxNode();
@@ -493,14 +498,17 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   emscripten::class_<PlaneNode, emscripten::base<SurfaceNode>>("ReactCADPlaneNode")
       .smart_ptr<Handle(PlaneNode)>("ReactCADPlaneNode")
-      .function("setOrigin", &PlaneNode::setOrigin)
-      .function("setNormal", &PlaneNode::setNormal)
-      .function("setXDirection", &PlaneNode::setXDirection);
+      .function("setOrigin", &PlaneNode::setOrigin);
 
   emscripten::class_<SphericalSurfaceNode, emscripten::base<SurfaceNode>>("ReactCADSphericalSurfaceNode")
       .smart_ptr<Handle(SphericalSurfaceNode)>("ReactCADSphericalSurfaceNode")
-      .function("setOrigin", &SphericalSurfaceNode::setOrigin)
-      .function("setRadius", &SphericalSurfaceNode::setRadius);
+      .function("setRadius", &SphericalSurfaceNode::setRadius)
+      .function("setOrigin", &SphericalSurfaceNode::setOrigin);
+
+  emscripten::class_<CylindricalSurfaceNode, emscripten::base<SurfaceNode>>("ReactCADCylindricalSurfaceNode")
+      .smart_ptr<Handle(CylindricalSurfaceNode)>("ReactCADCylindricalSurfaceNode")
+      .function("setRadius", &CylindricalSurfaceNode::setRadius)
+      .function("setOrigin", &CylindricalSurfaceNode::setOrigin);
 
   emscripten::enum_<Graphic3d_Camera::Projection>("Projection")
       .value("ORTHOGRAPHIC", Graphic3d_Camera::Projection_Orthographic)

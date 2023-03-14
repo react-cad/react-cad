@@ -35,6 +35,7 @@ import * as importElement from "./import";
 
 import * as plane from "./plane";
 import * as sphericalSurface from "./sphericalSurface";
+import * as cylindricalSurface from "./cylindricalSurface";
 
 import * as union from "./union";
 import * as difference from "./difference";
@@ -70,6 +71,7 @@ const elements: Record<ReactCADNodeType, Element> = {
 
   plane,
   sphericalSurface,
+  cylindricalSurface,
 
   union,
   difference,

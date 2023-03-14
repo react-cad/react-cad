@@ -14,7 +14,7 @@ export default {
 } as Meta;
 
 export const loft: Story = (args) => (
-  <Loft {...args}>
+  <Loft smooth={false} {...args}>
     <rotation axis={[0, 1, 0]} angle={-Math.PI / 2}>
       <sphericalSurface radius={5}>
         <svg viewBox="0.5 0.5 1 1">
@@ -24,21 +24,29 @@ export const loft: Story = (args) => (
         </svg>
       </sphericalSurface>
     </rotation>
-    <plane origin={[0, 0, 10]}>
-      <svg viewBox="0 0 10 10">
-        <circle r="6" />
-      </svg>
-    </plane>
-    <plane origin={[0, 0, 20]}>
-      <svg viewBox="0 0 10 10">
-        <ellipse rx="6" ry="4" />
-      </svg>
-    </plane>
-    <plane origin={[0, 0, 30]} normal={[0.3, 0, 1]} xDirection={[0, 1, 0]}>
-      <svg viewBox="0 0 10 10">
-        <circle r="5" />
-      </svg>
-    </plane>
+    <translation z={10}>
+      <plane>
+        <svg viewBox="0 0 10 10">
+          <circle r="6" />
+        </svg>
+      </plane>
+    </translation>
+    <translation z={20}>
+      <plane>
+        <svg viewBox="0 0 10 10">
+          <ellipse rx="6" ry="4" />
+        </svg>
+      </plane>
+    </translation>
+    <translation z={30}>
+      <rotation y={0.1}>
+        <plane>
+          <svg viewBox="0 0 10 10">
+            <circle r="5" />
+          </svg>
+        </plane>
+      </rotation>
+    </translation>
   </Loft>
 );
 
@@ -130,3 +138,37 @@ export const loft3: Story = (args) => {
     </Loft>
   );
 };
+export const loft4: Story = ({ neckRadius = 10, neckHeight = 10 }) => (
+  <union>
+    <difference>
+      <cylinder radius={neckRadius} height={neckHeight} />
+      <cylinder radius={neckRadius} height={neckHeight} />
+    </difference>
+    <loft compatible>
+      <cylindricalSurface radius={neckRadius * 0.99}>
+        <svg viewBox="0 0 10 10">
+          <g transform="rotate(22.5)">
+            <ellipse
+              cx={0}
+              cy={neckHeight / 2}
+              rx={2.05 * Math.PI}
+              ry={neckHeight / 10}
+            />
+          </g>
+        </svg>
+      </cylindricalSurface>
+      <cylindricalSurface radius={neckRadius * 1.05}>
+        <svg viewBox="0 0 10 10">
+          <g transform="rotate(22.5)">
+            <ellipse
+              cx={0}
+              cy={neckHeight / 2}
+              rx={2 * Math.PI}
+              ry={neckHeight / 40}
+            />
+          </g>
+        </svg>
+      </cylindricalSurface>
+    </loft>
+  </union>
+);
