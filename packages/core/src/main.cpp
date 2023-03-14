@@ -24,6 +24,7 @@
 
 #include "EvolutionNode.hpp"
 #include "HelixNode.hpp"
+#include "LoftNode.hpp"
 #include "PipeNode.hpp"
 #include "PrismNode.hpp"
 #include "RevolutionNode.hpp"
@@ -95,6 +96,10 @@ Handle(ReactCADNode) createCADNode(std::string type)
   if (type == "helix")
   {
     return new HelixNode();
+  }
+  if (type == "loft")
+  {
+    return new LoftNode();
   }
   if (type == "intersection")
   {
@@ -414,6 +419,11 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .smart_ptr<Handle(PipeNode)>("ReactCADPipeNode")
       .function("setSpine", &PipeNode::setSpine);
 
+  emscripten::class_<LoftNode, emscripten::base<ReactCADNode>>("ReactCADLoftNode")
+      .smart_ptr<Handle(LoftNode)>("ReactCADLoftNode")
+      .function("setCompatible", &LoftNode::setCompatible)
+      .function("setSmooth", &LoftNode::setSmooth);
+
   // Imports
   emscripten::class_<ImportNode, emscripten::base<ReactCADNode>>("ReactCADImportNode")
       .smart_ptr<Handle(ImportNode)>("ReactCADImportNode")
@@ -480,6 +490,10 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .value("RIGHT", ReactCADView::Viewpoint::Right)
       .value("FRONT", ReactCADView::Viewpoint::Front)
       .value("BACK", ReactCADView::Viewpoint::Back);
+
+  emscripten::constant("PRECISION", Precision::Confusion());
+  emscripten::constant("ANGULAR_PRECISION", Precision::Angular());
+  emscripten::constant("APPROXIMATION_PRECISION", Precision::Approximation());
 
   emscripten::function("createCADNode", &createCADNode);
   emscripten::function("createSVG", &createSVG);

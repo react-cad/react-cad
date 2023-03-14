@@ -79,7 +79,7 @@ function useReactCADView(
         () => view.current && core.setRenderQuality(view.current, ...quality)
       );
     }
-  }, [options.detail, ...options.highDetail, ...options.lowDetail]);
+  }, [loaded, options.detail, ...options.highDetail, ...options.lowDetail]);
 
   return view;
 }

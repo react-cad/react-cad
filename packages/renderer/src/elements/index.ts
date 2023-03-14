@@ -22,6 +22,7 @@ import * as prism from "./prism";
 import * as evolution from "./evolution";
 import * as revolution from "./revolution";
 import * as pipe from "./pipe";
+import * as loft from "./loft";
 
 import * as affine from "./affine";
 import * as rotation from "./rotation";
@@ -51,6 +52,7 @@ const elements: Record<ReactCADNodeType, Element> = {
   evolution,
   revolution,
   pipe,
+  loft,
 
   affine,
   rotation,

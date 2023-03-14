@@ -224,7 +224,22 @@ class ReactCADRoot {
       throw Error("Cannot render a deleted root");
     }
     this.context.callback = callback;
-    reconcilerInstance.updateContainer(element, this.container, null, () => {});
+    reconcilerInstance.updateContainer(
+      React.createElement(
+        PrecisionContext.Provider,
+        {
+          value: {
+            precision: this.context.core.PRECISION,
+            angularPrecision: this.context.core.ANGULAR_PRECISION,
+            approximation: this.context.core.APPROXIMATION_PRECISION,
+          },
+        },
+        element
+      ),
+      this.container,
+      null,
+      () => {}
+    );
   }
 
   public delete() {
@@ -239,5 +254,11 @@ export function createRoot(
 ): ReactCADRoot {
   return new ReactCADRoot(root, core);
 }
+
+export const PrecisionContext = React.createContext({
+  precision: 1e-7,
+  angularPrecision: 1e-12,
+  approximation: 1e-6,
+});
 
 export * from "./types";

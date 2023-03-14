@@ -118,6 +118,11 @@ export class ReactCADHelixNode extends ReactCADNode {
   public setLeftHanded(leftHanded: boolean): void;
 }
 
+export class ReactCADLoftNode extends ReactCADNode {
+  public setCompatible(compatible: boolean): void;
+  public setSmooth(smooth: boolean): void;
+}
+
 // Imports
 export class ReactCADImportNode extends ReactCADNode {
   public setFileContents(contents: string | ArrayBuffer): void;
@@ -180,6 +185,7 @@ export interface ReactCADNodeTypes {
   helix: ReactCADHelixNode;
   pipe: ReactCADPipeNode;
   prism: ReactCADPrismNode;
+  loft: ReactCADLoftNode;
   evolution: ReactCADEvolutionNode;
   revolution: ReactCADRevolutionNode;
   brep: ReactCADBRepImportNode;
@@ -210,6 +216,9 @@ export interface ReactCADCore extends EmscriptenModule {
     FRONT: Viewpoint;
     BACK: Viewpoint;
   };
+  PRECISION: number;
+  ANGULAR_PRECISION: number;
+  APPROXIMATION_PRECISION: number;
   createCADNode<T extends keyof ReactCADNodeTypes = "union">(
     type: T
   ): ReactCADNodeTypes[T];

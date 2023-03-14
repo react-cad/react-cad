@@ -51,7 +51,6 @@ void SVGPathBuilder::Build(const ProgressHandler &handler)
         Handle(Geom2d_Curve) c = curve;
         if (!c.IsNull())
         {
-          c->Translate(gp_Vec2d(0, -image.Height()));
           BRepBuilderAPI_MakeEdge edge(c, m_plane);
           makeWire.Add(edge);
         }

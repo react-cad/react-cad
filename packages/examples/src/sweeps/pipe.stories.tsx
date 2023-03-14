@@ -1,15 +1,15 @@
 import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-import { makePolygon } from "./helpers";
+import Polygon from "./Polygon";
 
 type Props = JSX.IntrinsicElements["pipe"];
 
 const profiles: Record<string, React.ReactElement> = {
-  Triangle: makePolygon(3),
-  Square: makePolygon(4),
-  Pentagon: makePolygon(5),
-  Hexagon: makePolygon(6),
+  Triangle: <Polygon sides={3} />,
+  Square: <Polygon sides={4} />,
+  Pentagon: <Polygon sides={5} />,
+  Hexagon: <Polygon sides={6} />,
   SVG1: (
     <svg>
       <path fill-rule="evenodd" d="M 0,0 h10 v10 h-10 Z M 3,3 v4 h4 v-4 Z" />
@@ -55,5 +55,5 @@ const Template: Story<StoryProps> = ({ profileName, ...args }) => {
 export const pipe = Template.bind({});
 pipe.args = {
   profileName: "Triangle",
-  spine: "M 0 0 L 0 -10 Q 0 -30 20 -30 T 50 -50",
+  spine: "M 0 0 L 0 10 Q 0 30 20 30 T 50 50",
 };

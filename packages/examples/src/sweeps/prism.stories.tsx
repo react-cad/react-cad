@@ -2,16 +2,15 @@ import React from "react";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
 import ReactIcon from "./react-icon";
-
-import { makePolygon } from "./helpers";
+import Polygon from "./Polygon";
 
 type Props = JSX.IntrinsicElements["prism"];
 
 const profiles: Record<string, React.ReactElement> = {
-  Triangle: makePolygon(3),
-  Square: makePolygon(4),
-  Pentagon: makePolygon(5),
-  Hexagon: makePolygon(6),
+  Triangle: <Polygon sides={3} />,
+  Square: <Polygon sides={4} />,
+  Pentagon: <Polygon sides={5} />,
+  Hexagon: <Polygon sides={6} />,
   SVG: <ReactIcon />,
 };
 

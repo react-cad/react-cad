@@ -447,7 +447,7 @@ bool ReactCADView::initViewer()
   aViewer->SetComputedMode(false);
   aViewer->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
   aViewer->SetRectangularGridValues(0, 0, 1, 1, 0);
-  aViewer->SetRectangularGridGraphicValues(1000, 1000, 0);
+  aViewer->SetRectangularGridGraphicValues(100, 100, 0);
   aViewer->Grid()->SetColors(Quantity_NOC_GRAY90, Quantity_NOC_GRAY75);
   aViewer->SetDefaultShadingModel(Graphic3d_TOSM_FRAGMENT);
   gp_Ax3 plane(gp::Origin(), gp::DZ(), gp::DX());

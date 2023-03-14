@@ -18,10 +18,24 @@ const ProgressBar: React.FC<Props> = ({
 
   React.useEffect(() => {
     if (progressIndicator && !progressIndicator.isDeleted()) {
+      let timeout: ReturnType<typeof setTimeout> | undefined;
       const observer = (p: number, m?: string) => {
-        setProgress(p);
-        if (m) {
-          setMessage(m);
+        timeout = setTimeout(() => {
+          setShow(true);
+          setProgress(p);
+          if (m) {
+            setMessage(m);
+          }
+        }, 0);
+      };
+
+      const cancel = () => {
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = undefined;
+        }
+        if (!progressIndicator.isDeleted()) {
+          progressIndicator.unsubscribe(observer);
         }
       };
 
@@ -30,7 +44,10 @@ const ProgressBar: React.FC<Props> = ({
       setMessage("Waiting for renderer...");
       progressIndicator.subscribe(observer);
       progressIndicator.then(
-        () => setShow(false),
+        () => {
+          cancel();
+          setShow(false);
+        },
         (reason) => {
           if (reason) {
             setMessage(`Aborting: ${reason}`);
@@ -41,11 +58,7 @@ const ProgressBar: React.FC<Props> = ({
         }
       );
 
-      return () => {
-        if (!progressIndicator.isDeleted()) {
-          progressIndicator.unsubscribe(observer);
-        }
-      };
+      return cancel;
     }
   }, [progressIndicator]);
 

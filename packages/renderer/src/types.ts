@@ -97,6 +97,10 @@ export interface ReactCADElements {
     height: number;
     leftHanded?: boolean;
   }>;
+  loft: React.PropsWithChildren<{
+    compatible?: boolean;
+    smooth?: boolean;
+  }>;
 
   affine: React.PropsWithChildren<{
     matrix: Matrix;
