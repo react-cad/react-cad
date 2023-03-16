@@ -117,17 +117,19 @@ export class SVGInstance<
   T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements
 > {
   public node: SVGElement;
-  public readonly type: keyof JSX.IntrinsicElements;
   public parent: ReactCADInstance<SurfaceType> | SVGInstance | undefined;
   private readonly core: ReactCADCore;
   private children: SVGInstance[] = [];
   private svgNode: ReactCADSVG | undefined;
   private isChanged = true;
 
-  constructor(core: ReactCADCore, type: T) {
+  constructor(core: ReactCADCore, node: T | SVGElement) {
     this.core = core;
-    this.node = document.createElementNS("http://www.w3.org/2000/svg", type);
-    this.type = type;
+    if (node instanceof Node) {
+      this.node = node;
+    } else {
+      this.node = document.createElementNS("http://www.w3.org/2000/svg", node);
+    }
   }
 
   hasParent(): boolean {
@@ -209,5 +211,38 @@ export class SVGInstance<
       this.svg.setSource(this.node.outerHTML);
       this.isChanged = false;
     }
+  }
+}
+
+export class TextSVGInstance extends SVGInstance {
+  constructor(core: ReactCADCore, text: string) {
+    const div = document.createElement("div");
+    div.innerHTML = text.trim() || "<svg></svg>";
+    const child = div.firstChild as SVGElement | null;
+    if (child) {
+      div.removeChild(child);
+      super(core, child);
+    } else {
+      throw new Error(`Could not create SVG element from string:\n\n${text}`);
+    }
+  }
+
+  commitUpdate(updatePayload: UpdatePayload): void {
+    const text =
+      (updatePayload as Props<"svgString">).children.trim() || "<svg></svg>";
+    const div = document.createElement("div");
+    div.innerHTML = text;
+    const child = div.firstChild as SVGElement | null;
+    if (child) {
+      div.removeChild(child);
+      if (this.parent instanceof SVGInstance) {
+        this.parent.node.insertBefore(child, this.node);
+        this.parent.node.removeChild(this.node);
+      }
+      this.node = child;
+    } else {
+      throw new Error(`Could not create SVG element from string:\n\n${text}`);
+    }
+    this.changed();
   }
 }

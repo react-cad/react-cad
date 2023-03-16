@@ -18,7 +18,7 @@ import {
 } from "./types";
 
 import { isReactCADType } from "./elements";
-import { ReactCADInstance, SVGInstance } from "./instance";
+import { ReactCADInstance, SVGInstance, TextSVGInstance } from "./instance";
 
 export const HostConfig: ReactReconciler.HostConfig<
   Type,
@@ -153,9 +153,12 @@ export const HostConfig: ReactReconciler.HostConfig<
     _internalInstanceHandle: InstanceHandle
   ): Instance {
     const { core, instances } = rootContainerInstance;
-    const instance: Instance = isReactCADType(type)
-      ? new ReactCADInstance(core, type)
-      : new SVGInstance(core, type);
+    const instance: Instance =
+      type === "svgString"
+        ? new TextSVGInstance(core, (props as Props<"svgString">).children)
+        : isReactCADType(type)
+        ? new ReactCADInstance(core, type)
+        : new SVGInstance(core, type);
     instances.push(instance);
     instance.commitUpdate(props);
     return instance;

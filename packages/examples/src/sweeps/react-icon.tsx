@@ -1,7 +1,7 @@
 import React from "react";
 
-const ReactIcon: React.FC = () => (
-  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+const ReactIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g transform="scale(0.2)">
       <circle r="1.8" />
       <path

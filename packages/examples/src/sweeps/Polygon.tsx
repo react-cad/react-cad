@@ -1,7 +1,7 @@
 import React from "react";
 import { PrecisionContext } from "@react-cad/renderer";
 
-interface Props {
+interface Props extends React.SVGProps<SVGSVGElement> {
   sides: number;
   radius?: number;
   pointsPerVertex?: number;
@@ -11,6 +11,7 @@ const Polygon: React.FC<Props> = ({
   sides,
   radius = 5,
   pointsPerVertex = 1,
+  ...props
 }) => {
   const { approximation } = React.useContext(PrecisionContext);
 
@@ -36,7 +37,7 @@ const Polygon: React.FC<Props> = ({
   );
 
   return (
-    <svg viewBox="0 0 10 10">
+    <svg viewBox="0 0 10 10" {...props}>
       <polygon points={points} />
     </svg>
   );

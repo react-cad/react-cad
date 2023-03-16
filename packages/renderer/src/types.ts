@@ -185,12 +185,15 @@ export type HostContext = unknown;
 
 export type ReactCADNodeType = keyof ElementProps;
 export type SVGNodeType = keyof JSX.IntrinsicElements;
-export type Type = ReactCADNodeType | SVGNodeType;
+export type SVGTextNodeType = "svgString";
+export type Type = ReactCADNodeType | SVGNodeType | SVGTextNodeType;
 export type SurfaceType = "plane" | "sphericalSurface" | "cylindricalSurface";
 export type Props<T extends Type = Type> = T extends SVGNodeType
   ? JSX.IntrinsicElements[T]
   : T extends ReactCADNodeType
   ? ElementProps[T]
+  : T extends SVGTextNodeType
+  ? { children: string }
   : never;
 export type Instance = SVGInstance | ReactCADInstance;
 

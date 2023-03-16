@@ -3,6 +3,7 @@ import { Story, Meta } from "@react-cad/storybook-framework";
 
 import Polygon from "./Polygon";
 import Circle from "./Circle";
+import Text from "./Text";
 
 type Props = JSX.IntrinsicElements["loft"];
 
@@ -172,3 +173,20 @@ export const loft4: Story = ({ neckRadius = 10, neckHeight = 10 }) => (
     </loft>
   </union>
 );
+
+export const text: Story = (args) => {
+  return (
+    <Loft {...args}>
+      <cylindricalSurface radius={10}>
+        <Text viewBox="0 0 1 1" width="1" height="10">
+          ReactCAD
+        </Text>
+      </cylindricalSurface>
+      <cylindricalSurface radius={15}>
+        <Text viewBox="0 0 1 1" width="1" height="10">
+          ReactCAD
+        </Text>
+      </cylindricalSurface>
+    </Loft>
+  );
+};
