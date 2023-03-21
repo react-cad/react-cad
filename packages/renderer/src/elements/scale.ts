@@ -1,4 +1,4 @@
-import { ReactCADInstance } from "instance";
+import { CADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
@@ -52,7 +52,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: ReactCADInstance<Scale>,
+  instance: CADInstance<Scale>,
   updatePayload: UpdatePayload<Scale>
 ): void {
   validateProps(updatePayload);

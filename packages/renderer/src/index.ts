@@ -18,7 +18,7 @@ import {
 } from "./types";
 
 import { isReactCADType } from "./elements";
-import { ReactCADInstance, SVGInstance, TextSVGInstance } from "./instance";
+import { CADInstance, SVGInstance, SVGStringInstance } from "./instance";
 
 export const HostConfig: ReactReconciler.HostConfig<
   Type,
@@ -49,7 +49,7 @@ export const HostConfig: ReactReconciler.HostConfig<
     rootContainerInstance.rootInstances = [];
   },
   getPublicInstance(instance: Instance) {
-    return instance.node;
+    return instance.getPublicInstance();
   },
   getRootHostContext(_rootContainerInstance: Container) {
     const context: HostContext = {};
@@ -153,14 +153,16 @@ export const HostConfig: ReactReconciler.HostConfig<
     _internalInstanceHandle: InstanceHandle
   ): Instance {
     const { core, instances } = rootContainerInstance;
-    const instance: Instance =
-      type === "svgString"
-        ? new TextSVGInstance(core, (props as Props<"svgString">).children)
-        : isReactCADType(type)
-        ? new ReactCADInstance(core, type)
-        : new SVGInstance(core, type);
+
+    const instance: Instance = isReactCADType(type)
+      ? new CADInstance(core, type)
+      : type === "svgString"
+      ? new SVGStringInstance(core, (props as Props<"svgString">).children)
+      : new SVGInstance(core, type);
+
     instances.push(instance);
     instance.commitUpdate(props);
+
     return instance;
   },
   appendInitialChild(parent: Instance, child: Instance | TextInstance): void {
@@ -210,7 +212,7 @@ class ReactCADRoot {
       core,
       instances: [],
       rootInstances: [],
-      root: new ReactCADInstance(core, "union", rootNode),
+      root: new CADInstance(core, "union", rootNode),
     };
 
     this.container = reconcilerInstance.createContainer(

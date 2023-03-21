@@ -1,4 +1,4 @@
-import { ReactCADInstance } from "instance";
+import { CADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 
 type CylindricalSurface = "cylindricalSurface";
@@ -15,7 +15,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: ReactCADInstance<CylindricalSurface>,
+  instance: CADInstance<CylindricalSurface>,
   updatePayload: UpdatePayload<CylindricalSurface>
 ): void {
   const { radius = 1 } = updatePayload;

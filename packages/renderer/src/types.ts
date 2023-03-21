@@ -7,17 +7,14 @@ import {
   Quaternion,
   Matrix,
 } from "@react-cad/core";
-import { ReactCADInstance, SVGInstance } from "instance";
+import { CADInstance } from "instance";
 
 export interface Element<T extends ReactCADNodeType = ReactCADNodeType> {
   prepareUpdate(
     oldProps: Props<ReactCADNodeType>,
     newProps: Props<ReactCADNodeType>
   ): UpdatePayload<T> | null;
-  commitUpdate(
-    instance: ReactCADInstance<T>,
-    updatePayload: UpdatePayload<T>
-  ): void;
+  commitUpdate(instance: CADInstance<T>, updatePayload: UpdatePayload<T>): void;
 }
 
 export interface ReactCADElements {
@@ -173,6 +170,22 @@ export interface ReactCADElements {
 
 export type ElementProps = ReactCADElements;
 
+export interface Instance {
+  getPublicInstance(): any;
+  hasParent(): boolean;
+  appendChild(child: Instance): void;
+  insertBefore(child: Instance, before: Instance): void;
+  removeChild(child: Instance): void;
+  prepareUpdate(
+    oldProps: Props<Type>,
+    newProps: Props<Type>,
+    rootContainerInstance: Container,
+    hostContext: HostContext
+  ): UpdatePayload | null;
+  commitUpdate(updatePayload: UpdatePayload): void;
+  delete(): void;
+}
+
 export type Container = {
   core: ReactCADCore;
   root: Instance;
@@ -195,7 +208,6 @@ export type Props<T extends Type = Type> = T extends SVGNodeType
   : T extends SVGTextNodeType
   ? { children: string }
   : never;
-export type Instance = SVGInstance | ReactCADInstance;
 
 export type TextInstance = string;
 export type HydratableInstance = never;

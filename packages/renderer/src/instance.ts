@@ -7,10 +7,12 @@ import {
   HostContext,
   UpdatePayload,
   SurfaceType,
+  Instance,
 } from "types";
 import { prepareUpdate, commitUpdate } from "./elements";
 
-export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
+export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
+  implements Instance {
   public readonly node: ReactCADNodeTypes[T];
   public readonly type: ReactCADNodeType;
   private readonly core: ReactCADCore;
@@ -21,11 +23,15 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
     this.type = type;
   }
 
-  isType<U extends ReactCADNodeType>(type: U): this is ReactCADInstance<U> {
+  getPublicInstance(): ReactCADNodeTypes[T] {
+    return this.node;
+  }
+
+  isType<U extends ReactCADNodeType>(type: U): this is CADInstance<U> {
     return this.type === type;
   }
 
-  isSurface(): this is ReactCADInstance<SurfaceType> {
+  isSurface(): this is CADInstance<SurfaceType> {
     return ["plane", "sphericalSurface", "cylindricalSurface"].includes(
       this.type
     );
@@ -39,7 +45,7 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
     this.node.delete();
   }
 
-  appendChild(child: ReactCADInstance | SVGInstance): void {
+  appendChild(child: Instance): void {
     if (this.isSurface()) {
       if (child instanceof SVGInstance && child.node.tagName === "svg") {
         child.parent = this;
@@ -48,17 +54,14 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
         throw new Error("Surfaces cannot have non-svg children");
       }
     } else {
-      if (child instanceof ReactCADInstance) {
+      if (child instanceof CADInstance) {
         this.node.appendChild(child.node);
       } else {
         throw new Error("Only surfaces can have SVG children");
       }
     }
   }
-  insertBefore(
-    child: ReactCADInstance | SVGInstance,
-    before: ReactCADInstance | SVGInstance
-  ): void {
+  insertBefore(child: Instance, before: Instance): void {
     if (this.isSurface()) {
       if (
         child instanceof SVGInstance &&
@@ -71,24 +74,21 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
         throw new Error("Surfaces cannot have non-svg children");
       }
     } else {
-      if (
-        child instanceof ReactCADInstance &&
-        before instanceof ReactCADInstance
-      ) {
+      if (child instanceof CADInstance && before instanceof CADInstance) {
         this.node.insertChildBefore(child.node, before.node);
       } else {
         throw new Error("Only surfaces can have SVG children");
       }
     }
   }
-  removeChild(child: ReactCADInstance | SVGInstance): void {
+  removeChild(child: Instance): void {
     if (this.isSurface()) {
       if (child instanceof SVGInstance) {
         child.parent = undefined;
         this.node.removeSVG(child.svg);
       }
     } else {
-      if (child instanceof ReactCADInstance) {
+      if (child instanceof CADInstance) {
         this.node.removeChild(child.node);
       }
     }
@@ -115,9 +115,9 @@ export class ReactCADInstance<T extends ReactCADNodeType = ReactCADNodeType> {
 
 export class SVGInstance<
   T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements
-> {
+> implements Instance {
   public node: SVGElement;
-  public parent: ReactCADInstance<SurfaceType> | SVGInstance | undefined;
+  public parent: CADInstance<SurfaceType> | SVGInstance | undefined;
   private readonly core: ReactCADCore;
   private children: SVGInstance[] = [];
   private svgNode: ReactCADSVG | undefined;
@@ -132,6 +132,10 @@ export class SVGInstance<
     }
   }
 
+  getPublicInstance(): SVGElement {
+    return this.node;
+  }
+
   hasParent(): boolean {
     return this.parent !== undefined;
   }
@@ -142,7 +146,7 @@ export class SVGInstance<
     this.parent = undefined;
   }
 
-  appendChild(child: ReactCADInstance | SVGInstance): void {
+  appendChild(child: Instance): void {
     if (child instanceof SVGInstance) {
       child.parent = this;
       this.children.push(child);
@@ -151,10 +155,7 @@ export class SVGInstance<
       throw new Error("SVG cannot have CAD node children");
     }
   }
-  insertBefore(
-    child: ReactCADInstance | SVGInstance,
-    before: ReactCADInstance | SVGInstance
-  ): void {
+  insertBefore(child: Instance, before: Instance): void {
     if (child instanceof SVGInstance && before instanceof SVGInstance) {
       const index = this.children.indexOf(before);
       if (index >= 0) {
@@ -166,7 +167,7 @@ export class SVGInstance<
       throw new Error("SVG cannot have CAD node children");
     }
   }
-  removeChild(child: ReactCADInstance | SVGInstance): void {
+  removeChild(child: Instance): void {
     if (child instanceof SVGInstance) {
       const index = this.children.indexOf(child);
       if (index >= 0) {
@@ -207,14 +208,14 @@ export class SVGInstance<
     return this.svgNode;
   }
   commitSVG(): void {
-    if (this.parent instanceof ReactCADInstance && this.isChanged) {
+    if (this.parent instanceof CADInstance && this.isChanged) {
       this.svg.setSource(this.node.outerHTML);
       this.isChanged = false;
     }
   }
 }
 
-export class TextSVGInstance extends SVGInstance {
+export class SVGStringInstance extends SVGInstance {
   constructor(core: ReactCADCore, text: string) {
     const div = document.createElement("div");
     div.innerHTML = text.trim() || "<svg></svg>";

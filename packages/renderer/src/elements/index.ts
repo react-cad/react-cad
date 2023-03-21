@@ -7,7 +7,7 @@ import {
   HostContext,
   ReactCADNodeType,
 } from "../types";
-import { ReactCADInstance } from "../instance";
+import { CADInstance } from "../instance";
 
 import * as box from "./box";
 import * as wedge from "./wedge";
@@ -83,7 +83,7 @@ export function isReactCADType(t: Type): t is ReactCADNodeType {
 }
 
 export function prepareUpdate<T extends ReactCADNodeType>(
-  _instance: ReactCADInstance<T>,
+  _instance: CADInstance<T>,
   type: T,
   oldProps: Props<T>,
   newProps: Props<T>,
@@ -98,7 +98,7 @@ export function prepareUpdate<T extends ReactCADNodeType>(
 }
 
 export function commitUpdate<T extends ReactCADNodeType>(
-  instance: ReactCADInstance<T>,
+  instance: CADInstance<T>,
   updatePayload: UpdatePayload<T>,
   type: T
 ): void {

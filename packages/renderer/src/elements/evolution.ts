@@ -1,4 +1,4 @@
-import { ReactCADInstance } from "instance";
+import { CADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 
 type Evolution = "evolution";
@@ -27,7 +27,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: ReactCADInstance<Evolution>,
+  instance: CADInstance<Evolution>,
   updatePayload: UpdatePayload<Evolution>
 ): void {
   validateProps(updatePayload);

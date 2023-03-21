@@ -1,4 +1,4 @@
-import { ReactCADInstance } from "instance";
+import { CADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 
 type Loft = "loft";
@@ -18,7 +18,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: ReactCADInstance<Loft>,
+  instance: CADInstance<Loft>,
   updatePayload: UpdatePayload<Loft>
 ): void {
   const { compatible = false, smooth = true } = updatePayload;
