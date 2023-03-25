@@ -14,7 +14,7 @@ const Text: React.FC<Props> = ({ children, ...props }) => {
   ]);
   return (
     <svg viewBox="0 0 1 1" {...props}>
-      <g transform="rotate(90) scale(0.03 0.03) translate(0 20)">
+      <g transform="scale(0.1 0.1) translate(0 27)">
         <path fill-rule="evenodd" d={svg} />
       </g>
     </svg>

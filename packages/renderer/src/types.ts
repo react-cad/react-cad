@@ -96,7 +96,7 @@ export interface ReactCADElements {
     leftHanded?: boolean;
   }>;
   loft: React.PropsWithChildren<{
-    compatible?: boolean;
+    exact?: boolean;
     smooth?: boolean;
   }>;
 
@@ -151,14 +151,14 @@ export interface ReactCADElements {
     data: string | ArrayBuffer;
   };
 
-  plane: React.PropsWithChildren<{
+  planar: React.PropsWithChildren<{
     origin?: Point;
   }>;
-  sphericalSurface: React.PropsWithChildren<{
+  spherical: React.PropsWithChildren<{
     origin?: Point;
     radius?: number;
   }>;
-  cylindricalSurface: React.PropsWithChildren<{
+  cylindrical: React.PropsWithChildren<{
     origin?: Point;
     radius?: number;
   }>;
@@ -200,7 +200,7 @@ export type ReactCADNodeType = keyof ElementProps;
 export type SVGNodeType = keyof JSX.IntrinsicElements;
 export type SVGTextNodeType = "svgString";
 export type Type = ReactCADNodeType | SVGNodeType | SVGTextNodeType;
-export type SurfaceType = "plane" | "sphericalSurface" | "cylindricalSurface";
+export type SurfaceType = "planar" | "spherical" | "cylindrical";
 export type Props<T extends Type = Type> = T extends SVGNodeType
   ? JSX.IntrinsicElements[T]
   : T extends ReactCADNodeType

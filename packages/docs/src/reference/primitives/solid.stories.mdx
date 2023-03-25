@@ -1,0 +1,229 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+
+<Meta title="Reference/Primitives/Solid" />
+
+# solid
+
+The `solid` element creates an arbitrary 3d shape. It takes no props. The children of the `solid` form its faces.
+
+## Examples
+
+### Cube
+
+A cube formed from 6 flat square faces.
+
+<Source language="jsx" code={`
+<solid>
+  <planar>
+    <svg>
+      <rect width="1" height="1" />
+    </svg>
+  </planar>
+
+<rotation y={-Math.PI / 2}>
+  <planar>
+    <svg>
+      <rect width="1" height="1" />
+    </svg>
+  </planar>
+</rotation>
+
+<rotation x={Math.PI / 2}>
+  <planar>
+    <svg>
+      <rect width="1" height="1" />
+    </svg>
+  </planar>
+</rotation>
+
+<translation x={1}>
+  <rotation y={-Math.PI / 2}>
+    <planar>
+      <svg>
+        <rect width="1" height="1" />
+      </svg>
+    </planar>
+  </rotation>
+</translation>
+
+<translation y={1}>
+  <rotation x={Math.PI / 2}>
+    <planar>
+      <svg>
+        <rect width="1" height="1" />
+      </svg>
+    </planar>
+  </rotation>
+</translation>
+
+  <planar origin={[0, 0, 1]}>
+    <svg>
+      <rect width="1" height="1" />
+    </svg>
+  </planar>
+</solid>
+`} />
+
+<Story name="cube">
+  {() => (
+    <solid>
+      <planar>
+        <svg>
+          <rect width="1" height="1" />
+        </svg>
+      </planar>
+      <rotation y={-Math.PI / 2}>
+        <planar>
+          <svg>
+            <rect width="1" height="1" />
+          </svg>
+        </planar>
+      </rotation>
+      <rotation x={Math.PI / 2}>
+        <planar>
+          <svg>
+            <rect width="1" height="1" />
+          </svg>
+        </planar>
+      </rotation>
+      <translation x={1}>
+        <rotation y={-Math.PI / 2}>
+          <planar>
+            <svg>
+              <rect width="1" height="1" />
+            </svg>
+          </planar>
+        </rotation>
+      </translation>
+      <translation y={1}>
+        <rotation x={Math.PI / 2}>
+          <planar>
+            <svg>
+              <rect width="1" height="1" />
+            </svg>
+          </planar>
+        </rotation>
+      </translation>
+      <planar origin={[0, 0, 1]}>
+        <svg>
+          <rect width="1" height="1" />
+        </svg>
+      </planar>
+    </solid>
+  )}
+</Story>
+
+### Chest
+
+A pirate's chest formed from 5 flat faces and a curved face.
+
+<Source
+  language="jsx"
+  code={`
+<solid>
+  {/* Bottom */}
+  <planar>
+    <svg>
+      <rect width="10" height="6" />
+    </svg>
+  </planar>
+  {/* Sides */}
+  <rotation x={Math.PI / 2}>
+    <planar>
+      <svg>
+        <rect width="10" height="3" />
+      </svg>
+    </planar>
+  </rotation>
+  <translation y={6}>
+    <rotation x={Math.PI / 2}>
+      <planar>
+        <svg>
+          <rect width="10" height="3" />
+        </svg>
+      </planar>
+    </rotation>
+  </translation>
+  {/* Ends */}
+  <rotation y={-Math.PI / 2}>
+    <planar>
+      <svg>
+        <path d="M 0 0 L 3 0 A 3 3 0 0 1 3 6 L 0 6 Z" />
+      </svg>
+    </planar>
+  </rotation>
+  <translation x={10}>
+    <rotation y={-Math.PI / 2}>
+      <planar>
+        <svg>
+          <path d="M 0 0 L 3 0 A 3 3 0 0 1 3 6 L 0 6 Z" />
+        </svg>
+      </planar>
+    </rotation>
+  </translation>
+  {/* Lid */}
+  <translation y={3} z={3}>
+    <cylindrical radius={3}>
+      <svg viewBox="0 5 10 10">
+        <rect height={10} width={10} />
+      </svg>
+    </cylindrical>
+  </translation>
+</solid>
+`}
+/>
+
+<Story name="chest">
+  {() => (
+    <solid>
+      {/* Bottom */}
+      <planar>
+        <svg>
+          <rect width="10" height="6" />
+        </svg>
+      </planar>
+      {/* Sides */}
+      <rotation x={Math.PI / 2}>
+        <planar>
+          <svg>
+            <rect width="10" height="3" />
+          </svg>
+        </planar>
+      </rotation>
+      <translation y={6}>
+        <rotation x={Math.PI / 2}>
+          <planar>
+            <svg>
+              <rect width="10" height="3" />
+            </svg>
+          </planar>
+        </rotation>
+      </translation>
+      {/* Ends */}
+      <rotation y={-Math.PI / 2}>
+        <planar>
+          <svg>
+            <path d="M 0 0 L 3 0 A 3 3 0 0 1 3 6 L 0 6 Z" />
+          </svg>
+        </planar>
+      </rotation>
+      <translation x={10}>
+        <rotation y={-Math.PI / 2}>
+          <planar>
+            <svg>
+              <path d="M 0 0 L 3 0 A 3 3 0 0 1 3 6 L 0 6 Z" />
+            </svg>
+          </planar>
+        </rotation>
+      </translation>
+      {/* Lid */}
+      <translation y={3} z={3}>
+        <cylindrical radius={3}>
+          <svg viewBox="0 5 10 10">
+            <rect height={10} width={10} />
+          </svg>
+        </cylindrical>
+      </translation>
+    </solid>
+  )}
+</Story>

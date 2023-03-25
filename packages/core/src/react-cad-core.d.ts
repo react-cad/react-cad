@@ -121,7 +121,7 @@ export class ReactCADHelixNode extends ReactCADNode {
 }
 
 export class ReactCADLoftNode extends ReactCADNode {
-  public setCompatible(compatible: boolean): void;
+  public setExact(exact: boolean): void;
   public setSmooth(smooth: boolean): void;
 }
 
@@ -205,9 +205,9 @@ export interface ReactCADNodeTypes {
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
-  plane: ReactCADPlaneNode;
-  sphericalSurface: ReactCADSphericalSurfaceNode;
-  cylindricalSurface: ReactCADCylindricalSurfaceNode;
+  planar: ReactCADPlaneNode;
+  spherical: ReactCADSphericalSurfaceNode;
+  cylindrical: ReactCADCylindricalSurfaceNode;
 }
 
 export interface ReactCADCore extends EmscriptenModule {

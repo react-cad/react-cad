@@ -12,7 +12,7 @@ ObjImportNode::ObjImportNode()
 {
 }
 
-void ObjImportNode::importFile(const ProgressHandler &handler)
+TopoDS_Shape ObjImportNode::importFile(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Triangulating obj");
@@ -26,7 +26,7 @@ void ObjImportNode::importFile(const ProgressHandler &handler)
   if (mesh.IsNull())
   {
     handler.Abort("objimport: file missing, corrupt or contains no shapes");
-    return;
+    return TopoDS_Shape();
   }
 
 #ifdef REACTCAD_DEBUG
@@ -39,9 +39,14 @@ void ObjImportNode::importFile(const ProgressHandler &handler)
   {
     TopoDS_Shape shape;
     bool success = shapeFromMesh(mesh, shape, handler.WithRange(scope.Next(2)));
+
+#ifdef REACTCAD_DEBUG
+    timer2.end();
+#endif
+
     if (success)
     {
-      setShape(shape);
+      return shape;
     }
     else
     {
@@ -49,7 +54,5 @@ void ObjImportNode::importFile(const ProgressHandler &handler)
     }
   }
 
-#ifdef REACTCAD_DEBUG
-  timer2.end();
-#endif
+  return TopoDS_Shape();
 }

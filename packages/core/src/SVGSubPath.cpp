@@ -69,17 +69,16 @@ TopoDS_Shape SVGSubPath::BuildFaces(NSVGfillRule fillRule, const ProgressHandler
     break;
   }
 
-  BooleanOperation op;
-  op.Union(faces, handler);
-  if (op.HasErrors())
+  BRep_Builder builder;
+  TopoDS_Compound compound;
+  builder.MakeCompound(compound);
+  for (auto it = faces.begin(); it != faces.end(); ++it)
   {
-    handler.Abort("svg parse: boolean operation failed\n\n" + op.Errors());
-    return TopoDS_Shape();
+    ShapeFix_Face fixFace(TopoDS::Face(*it));
+    fixFace.Perform();
+    builder.Add(compound, fixFace.Face());
   }
-  else
-  {
-    return op.Shape();
-  }
+  return compound;
 }
 
 void SVGSubPath::Dump(std::iostream &out, std::string indent)
@@ -146,10 +145,7 @@ void SVGSubPath::BuildFaceEvenOdd(TopTools_ListOfShape &allFaces, BRepBuilderAPI
       child->BuildFaceEvenOdd(allFaces, makeFace, newCount);
     }
 
-    ShapeFix_Face faceFix(makeFace.Face());
-    faceFix.Perform();
-
-    allFaces.Append(faceFix.Face());
+    allFaces.Append(makeFace.Face());
   }
   else
   {

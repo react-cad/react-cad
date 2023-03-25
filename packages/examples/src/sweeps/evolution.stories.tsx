@@ -47,7 +47,7 @@ interface StoryProps {
 const Template: Story<StoryProps> = ({ spineName, ...args }) => {
   return (
     <Evolution {...args}>
-      <plane>{spines[spineName]}</plane>
+      <planar>{spines[spineName]}</planar>
     </Evolution>
   );
 };

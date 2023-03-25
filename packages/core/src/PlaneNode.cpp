@@ -7,7 +7,7 @@
 
 #include "BooleanOperation.hpp"
 
-PlaneNode::PlaneNode() : m_origin(gp::Origin())
+PlaneNode::PlaneNode() : m_origin(gp::Origin()), m_transform()
 {
   m_surface = new Geom_Plane(gp_Ax3(m_origin, gp::DZ(), gp::DX()));
 }
@@ -22,7 +22,7 @@ void PlaneNode::setOrigin(gp_Pnt origin)
   }
 }
 
-Handle(Geom_Surface) PlaneNode::getSurface(const ProgressHandler &handler)
+Handle(Geom_Surface) PlaneNode::getSurface()
 {
   if (m_planeChanged)
   {
@@ -30,4 +30,9 @@ Handle(Geom_Surface) PlaneNode::getSurface(const ProgressHandler &handler)
     m_planeChanged = false;
   }
   return m_surface;
+}
+
+gp_GTrsf2d PlaneNode::getTransform()
+{
+  return m_transform;
 }

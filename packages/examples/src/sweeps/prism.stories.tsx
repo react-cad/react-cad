@@ -7,27 +7,13 @@ import Text from "./Text";
 
 type Props = JSX.IntrinsicElements["prism"];
 
-const profiles: Record<string, React.ComponentType<{ radius?: number }>> = {
-  Triangle: ({ radius = 10 }) => (
-    <Polygon sides={3} radius={1} viewBox="0 0 1 1" width="1" height={radius} />
-  ),
-  Square: ({ radius = 10 }) => (
-    <Polygon sides={4} radius={1} viewBox="0 0 1 1" width="1" height={radius} />
-  ),
-  Pentagon: ({ radius = 10 }) => (
-    <Polygon sides={5} radius={1} viewBox="0 0 1 1" width="1" height={radius} />
-  ),
-  Hexagon: ({ radius = 10 }) => (
-    <Polygon sides={6} radius={1} viewBox="0 0 1 1" width="1" height={radius} />
-  ),
-  SVG: ({ radius = 10 }) => (
-    <ReactIcon viewBox="0 0 1 1" width="1" height={radius} />
-  ),
-  Hello: ({ radius = 10 }) => (
-    <Text viewBox="0 0 1 1" width="1" height={radius}>
-      Hello
-    </Text>
-  ),
+const profiles: Record<string, React.FC<{ text: string }>> = {
+  Triangle: () => <Polygon sides={3} />,
+  Square: () => <Polygon sides={4} />,
+  Pentagon: () => <Polygon sides={5} />,
+  Hexagon: () => <Polygon sides={6} />,
+  SVG: () => <ReactIcon />,
+  Text: ({ text }) => <Text>{text}</Text>,
 };
 
 export const Prism: React.FC<Props> = (props) => <prism {...props} />;
@@ -61,18 +47,17 @@ interface StoryProps {
   x: number;
   y: number;
   z: number;
+  text: string;
 }
 
-const Template: Story<StoryProps> = ({ profileName, ...args }) => {
+const Template: Story<StoryProps> = ({ profileName, text, ...args }) => {
   const Profile = profiles[profileName];
   return (
-    <rotation y={-Math.PI / 2} z={Math.PI}>
-      <Prism {...args}>
-        <cylindricalSurface radius={10}>
-          <Profile radius={10} />
-        </cylindricalSurface>
-      </Prism>
-    </rotation>
+    <Prism {...args}>
+      <spherical radius={15}>
+        <Profile text={text} />
+      </spherical>
+    </Prism>
   );
 };
 
@@ -82,4 +67,5 @@ prism.args = {
   x: 0,
   y: 0,
   z: 1,
+  text: "Text",
 };

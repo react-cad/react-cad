@@ -12,15 +12,15 @@
 #include "LoftNode.hpp"
 #include "PerformanceTimer.hpp"
 
-LoftNode::LoftNode() : m_compatible(false), m_smooth(true)
+LoftNode::LoftNode() : m_exact(false), m_smooth(true)
 {
 }
 
-void LoftNode::setCompatible(Standard_Boolean compatible)
+void LoftNode::setExact(Standard_Boolean exact)
 {
-  if (m_compatible != compatible)
+  if (m_exact != exact)
   {
-    m_compatible = compatible;
+    m_exact = exact;
     propsChanged();
   }
 }
@@ -42,7 +42,7 @@ void LoftNode::computeChildren(TopTools_ListOfShape children, const ProgressHand
 std::shared_ptr<BRepOffsetAPI_ThruSections> LoftNode::createLoft()
 {
   auto loft = std::shared_ptr<BRepOffsetAPI_ThruSections>(new BRepOffsetAPI_ThruSections(Standard_True, !m_smooth));
-  loft->CheckCompatibility(!m_compatible);
+  loft->CheckCompatibility(!m_exact);
   return loft;
 }
 

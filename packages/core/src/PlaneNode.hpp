@@ -20,13 +20,15 @@ public:
   }
 
 protected:
-  Handle(Geom_Surface) getSurface(const ProgressHandler &handler) override;
+  Handle(Geom_Surface) getSurface() override;
+  gp_GTrsf2d getTransform() override;
 
 private:
   gp_Pnt m_origin;
   Standard_Boolean m_planeChanged;
 
   Handle(Geom_Plane) m_surface;
+  gp_GTrsf2d m_transform;
 };
 
 #endif

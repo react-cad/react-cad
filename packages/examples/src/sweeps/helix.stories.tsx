@@ -10,7 +10,7 @@ const profiles: Record<string, React.ReactElement> = {
   Square: <Polygon sides={4} />,
   Pentagon: <Polygon sides={5} />,
   Hexagon: <Polygon sides={6} />,
-  SVG: <ReactIcon />,
+  SVG: <ReactIcon width={5} height={5} />,
 };
 
 export const Helix: React.FC<Props> = (props) => <helix {...props} />;
@@ -56,13 +56,9 @@ interface StoryProps {
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
   return (
     <Helix {...args}>
-      <plane
-        normal={rotated ? [0, 1, 0] : [0, 0, 1]}
-        xDirection={[1, 0, 0]}
-        origin={rotated ? [5, 0, 0] : [0, 0, 0]}
-      >
+      <planar origin={rotated ? [5, 0, 0] : [0, 0, 0]}>
         {profiles[profileName]}
-      </plane>
+      </planar>
     </Helix>
   );
 };

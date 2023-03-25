@@ -1,12 +1,13 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
-import reactIcon from './react-icon';
+import ReactIcon from "../ReactIcon";
+import Link from "../../Link";
 
 <Meta title="Reference/Sweeps/Prism" />
 
 # prism
 
-The `prism` element extrudes a 2-dimensional shape along a vector. The vector is defined by the `x`, `y` and `z` props. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planar polygon, or a string containing an SVG image.
+The `prism` element extrudes a 2-dimensional shape along a vector. The vector is defined either by the `x`, `y` and `z` props or by the `vector` prop. The children of the `prism` form the 2d shape (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
 
 <ArgsTable
   rows={{
@@ -18,7 +19,7 @@ The `prism` element extrudes a 2-dimensional shape along a vector. The vector is
           summary: "number",
         },
         defaultValue: {
-          summary: '0'
+          summary: "0",
         },
       },
     },
@@ -30,7 +31,7 @@ The `prism` element extrudes a 2-dimensional shape along a vector. The vector is
           summary: "number",
         },
         defaultValue: {
-          summary: '0'
+          summary: "0",
         },
       },
     },
@@ -42,20 +43,19 @@ The `prism` element extrudes a 2-dimensional shape along a vector. The vector is
           summary: "number",
         },
         defaultValue: {
-          summary: '0'
+          summary: "0",
         },
       },
     },
-    profile: {
-      name: "profile",
-      description: "The shape to be extruded.",
-      type: {
-        required: true,
-      },
+    vector: {
+      name: "vector",
+      description: "The translation vector.",
       table: {
         type: {
-          summary: 'string | [number, number, number][]',
-          detail: "an SVG image, or a list of [x, y, z] points describing a planar polygon",
+          summary: "[number, number, number]",
+        },
+        defaultValue: {
+          summary: "[0, 0, 0]",
         },
       },
     },
@@ -68,38 +68,96 @@ export const Prism = (props) => <prism {...props} />;
 
 ### Triangular prism
 
-A prism of height 5 with a triangular profile. Since it's defined using a list of points, the profile does not have to be defined in the xy plane, although it still must be planar.
+A prism of height 5 with a triangular profile.
 
-<Source language="jsx" code={`
-  <prism z={5} profile={[[0,0,1], [3,0,0], [1.5,2,0]]} />
-`} />
+<Source
+  language="jsx"
+  code={`
+<prism z={5}>
+  <planar>
+    <svg>
+      <polygon points="0,0 3,0 1.5,2" />
+    </svg>
+  </planar>
+</prism>
+`}
+/>
 
-<Story name="prism" args={{ z: 5, profile: [[0,0,1], [3,0,0], [1.5,2,0]] }}>
+<Story
+  name="prism"
+  args={{
+    z: 5,
+    children: (
+      <planar>
+        <svg>
+          <polygon points="0,0 3,0 1.5,2" />
+        </svg>
+      </planar>
+    ),
+  }}
+>
   {Prism.bind({})}
 </Story>
 
 ### Vector prism
 
-A prism extending along the vector `[1,2,3]` with an SVG `circle` profile. Since it's defined using an SVG it begins in the xy plane.
+A prism extending along the vector `[-2,1,3]` with an SVG `circle` profile drawn on a cylindrical surface.
 
-<Source language="jsx" code={`
-  <prism x={1} y={2} z={3} profile={\`<svg><circle r="3" /></svg>\`} />
-`} />
+<Source
+  language="jsx"
+  code={`
+<prism x={-2} y={1} z={3}>
+  <cylindrical>
+    <svg viewBox="0 0 1 1">
+      <circle r={1} />
+    </svg>
+  </cylindrical>
+</prism>
+`}
+/>
 
-<Story name="ellipse-prism" args={{ x: 1, y: 2, z: 3, profile: `<svg><circle r="3" /></svg>` }}>
+<Story
+  name="circle-prism"
+  args={{
+    x: -2,
+    y: 1,
+    z: 3,
+    children: (
+      <cylindrical>
+        <svg viewBox="0 0 1 1">
+          <circle r={1} />
+        </svg>
+      </cylindrical>
+    ),
+  }}
+>
   {Prism.bind({})}
 </Story>
 
 ### React icon prism
 
-A prism with a more complex SVG shape.
+A prism with a more complex SVG shape drawn on a spherical surface.
 
 <Source language="jsx" code={`
-  import reactIcon from './react-icon.svg';
+  import ReactIcon from './react-icon.svg';
 
-<prism z={10} profile={reactIcon} />
+<prism z={1}>
+  <spherical radius={10}>
+    <ReactIcon />
+  </spherical>
+</prism>
 `} />
 
-<Story name="svg-prism" args={{ z: 10, profile: reactIcon([0,0]) }}>
+<Story
+  name="svg-prism"
+  args={{
+    z: 1,
+    children: (
+      <spherical radius={10}>
+        <ReactIcon />
+      </spherical>
+    ),
+  }}
+>
   {Prism.bind({})}
 </Story>

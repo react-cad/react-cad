@@ -3,6 +3,7 @@
 #include <Geom_Plane.hxx>
 #include <Message.hxx>
 #include <gp_Ax3.hxx>
+#include <gp_GTrsf2d.hxx>
 #include <gp_Pln.hxx>
 
 #include <NCollection_List.hxx>
@@ -44,30 +45,10 @@ void SVGPathBuilder::Build(const ProgressHandler &handler)
     auto path = svgShape.begin();
     if (path != svgShape.end())
     {
-      BRepBuilderAPI_MakeWire makeWire;
+      gp_GTrsf2d transform;
+      shape = path.OpenWire(m_plane, transform);
 
-      for (auto curve = path.begin(); curve != path.end(); ++curve)
-      {
-        Handle(Geom2d_Curve) c = curve;
-        if (!c.IsNull())
-        {
-          BRepBuilderAPI_MakeEdge edge(c, m_plane);
-          makeWire.Add(edge);
-        }
-      }
-
-      TopoDS_Wire suspiciousWire = makeWire;
-
-      BRepLib::BuildCurves3d(suspiciousWire);
-
-      ShapeFix_Wire fixWire;
-      fixWire.SetSurface(m_plane);
-      fixWire.Load(suspiciousWire);
-      fixWire.Perform();
-
-      TopoDS_Wire wire = fixWire.Wire();
-
-      shape = wire;
+      BRepLib::BuildCurves3d(shape);
     }
   }
 

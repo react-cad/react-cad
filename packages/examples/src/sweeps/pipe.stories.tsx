@@ -47,7 +47,7 @@ interface StoryProps {
 const Template: Story<StoryProps> = ({ profileName, ...args }) => {
   return (
     <Pipe {...args}>
-      <plane>{profiles[profileName]}</plane>
+      <planar>{profiles[profileName]}</planar>
     </Pipe>
   );
 };
@@ -55,5 +55,5 @@ const Template: Story<StoryProps> = ({ profileName, ...args }) => {
 export const pipe = Template.bind({});
 pipe.args = {
   profileName: "Triangle",
-  spine: "M 0 0 L 0 10 Q 0 30 20 30 T 50 50",
+  spine: "M 0 0 Q 0 25 25 25 T 50 50",
 };

@@ -178,15 +178,15 @@ Handle(ReactCADNode) createCADNode(std::string type)
   {
     return new STLImportNode();
   }
-  if (type == "plane")
+  if (type == "planar")
   {
     return new PlaneNode();
   }
-  if (type == "sphericalSurface")
+  if (type == "spherical")
   {
     return new SphericalSurfaceNode();
   }
-  if (type == "cylindricalSurface")
+  if (type == "cylindrical")
   {
     return new CylindricalSurfaceNode();
   }
@@ -217,7 +217,7 @@ Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(Re
     node->computeGeometry(handler.WithRange(scope.Next(50)));
     if (scope.More())
     {
-      TopoDS_Shape shape = node->getShape();
+      TopoDS_Shape shape = node->getShape(handler.WithRange(scope.Next()));
       view->render(shape, scope.Next(50));
     }
   });
@@ -441,7 +441,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
 
   emscripten::class_<LoftNode, emscripten::base<ReactCADNode>>("ReactCADLoftNode")
       .smart_ptr<Handle(LoftNode)>("ReactCADLoftNode")
-      .function("setCompatible", &LoftNode::setCompatible)
+      .function("setExact", &LoftNode::setExact)
       .function("setSmooth", &LoftNode::setSmooth);
 
   // Imports

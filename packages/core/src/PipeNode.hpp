@@ -25,7 +25,6 @@ protected:
 
 private:
   Handle(SVGPathBuilder) m_spineBuilder;
-  bool makePipe(const TopoDS_Shape &profile, const TopoDS_Shape &spine, TopoDS_Shape &shape);
 };
 
 #endif

@@ -6,6 +6,7 @@
 
 #include <Geom_Plane.hxx>
 #include <gp_Dir.hxx>
+#include <gp_GTrsf2d.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
 
@@ -21,7 +22,8 @@ public:
 
 protected:
   void computeShape(const ProgressHandler &handler) override;
-  virtual Handle(Geom_Surface) getSurface(const ProgressHandler &handler) = 0;
+  virtual Handle(Geom_Surface) getSurface() = 0;
+  virtual gp_GTrsf2d getTransform() = 0;
 
 private:
   std::vector<Handle(SVG)> m_children;

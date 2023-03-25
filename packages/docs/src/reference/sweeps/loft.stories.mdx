@@ -1,0 +1,249 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+import Link from "../../Link";
+
+<Meta title="Reference/Sweeps/Loft" />
+
+# loft
+
+The `loft` element creates a 3d shape from a series of cross sections. By default the loft forms a smooth shape, but this can be disabled with the `smooth` prop. Use the `exact` prop if you want to join the shapes vertex by vertex and you can guarantee each shape has the same number of vertices.
+
+The children of the `loft` form the 2d cross sections (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
+
+<ArgsTable
+  rows={{
+    height: {
+      name: "smooth",
+      description: "Whether to smooth out the shape.",
+      table: {
+        type: {
+          summary: "boolean",
+        },
+      },
+    },
+    pitch: {
+      name: "exact",
+      description:
+        "Whether to join vertices exactly. If true, each cross section must have the same number of vertices.",
+      table: {
+        type: {
+          summary: "boolean",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Loft = (props) => <loft {...props} />;
+
+### Morphing between shapes
+
+A loft between a square and a circle.
+
+<Source
+  language="jsx"
+  code={`
+<loft>
+  <planar>
+    <svg>
+      <polygon points="5,0 10,5 5,10, 0,5" />
+    </svg>
+  </planar>
+  <planar origin={[0, 0, 10]}>
+    <svg>
+      <circle r="5" />
+    </svg>
+  </planar>
+</loft>
+`}
+/>
+
+<Story name="loft">
+  {() => (
+    <loft>
+      <planar>
+        <svg>
+          <polygon points="5,0 10,5 5,10, 0,5" />
+        </svg>
+      </planar>
+      <planar origin={[0, 0, 10]}>
+        <svg>
+          <circle r="5" />
+        </svg>
+      </planar>
+    </loft>
+  )}
+</Story>
+
+### Boat
+
+A boat created from cross sections.
+
+<Source
+  language="jsx"
+  code={`
+<translation z={1}>
+  <rotation x={-Math.PI / 2}>
+    <Loft exact {...args}>
+      <planar origin={[1.75, 0, 0]}>
+        <svg>
+          <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+        </svg>
+      </planar>
+      <planar origin={[0, 0, 5]}>
+        <svg>
+          <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+        </svg>
+      </planar>
+      <planar origin={[0, 0, 8]}>
+        <svg>
+          <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+        </svg>
+      </planar>
+      <planar origin={[1.75, 0, 12]}>
+        <svg>
+          <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+        </svg>
+      </planar>
+    </Loft>
+  </rotation>
+</translation>
+`}
+/>
+
+<Story
+  name="boat"
+  args={{
+    children: [],
+  }}
+>
+  {() => (
+    <translation z={1}>
+      <rotation x={-Math.PI / 2}>
+        <loft>
+          <planar origin={[1.75, 0, 0]}>
+            <svg>
+              <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+            </svg>
+          </planar>
+          <planar origin={[0, 0, 5]}>
+            <svg>
+              <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+            </svg>
+          </planar>
+          <planar origin={[0, 0, 8]}>
+            <svg>
+              <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+            </svg>
+          </planar>
+          <planar origin={[1.75, 0, 12]}>
+            <svg>
+              <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+            </svg>
+          </planar>
+        </loft>
+      </rotation>
+    </translation>
+  )}
+</Story>
+
+### Bottle screw thread
+
+A screw thread created from a loft between two ellipses on different cylindrical surfaces. This is a part of the [OpenCascade Tutorial](https://dev.opencascade.org/doc/overview/html/occt__tutorial.html) ported to ReactCAD.
+
+<Source
+  language="jsx"
+  code={`
+const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
+  neckRadius,
+  neckHeight,
+}) => {
+  const major = 2 * Math.PI * neckRadius;
+  const minor = neckHeight / 10;
+  const angle1 =
+    (Math.atan((major * 0.99) / (neckHeight / 4)) * 180) / Math.PI;
+  const angle2 =
+    (Math.atan((major * 1.05) / (neckHeight / 4)) * 180) / Math.PI;
+  return (
+    <rotation y={Math.PI / 2}>
+      <loft>
+        <cylindrical radius={neckRadius * 0.99}>
+          <svg viewBox="0 0 10 10">
+            <g transform={\`rotate(\${angle1})\`}>
+              <ellipse
+                cx={0}
+                cy={neckHeight / 2}
+                rx={major * 0.99}
+                ry={minor}
+              />
+            </g>
+          </svg>
+        </cylindrical>
+        <cylindrical radius={neckRadius * 1.05}>
+          <svg viewBox="0 0 10 10">
+            <g transform={\`rotate(\${angle2})\`}>
+              <ellipse
+                cx={0}
+                cy={neckHeight / 2}
+                rx={major * 1.05}
+                ry={minor / 4}
+              />
+            </g>
+          </svg>
+        </cylindrical>
+      </loft>
+    </rotation>
+  );
+};
+`}
+/>
+
+<Story
+  name="screw thread"
+  args={{
+    neckRadius: 10,
+    neckHeight: 10,
+  }}
+>
+  {({ neckHeight, neckRadius }) => {
+    const major = 2 * Math.PI * neckRadius;
+    const minor = neckHeight / 10;
+    const angle1 =
+      (Math.atan((major * 0.99) / (neckHeight / 4)) * 180) / Math.PI;
+    const angle2 =
+      (Math.atan((major * 1.05) / (neckHeight / 4)) * 180) / Math.PI;
+    return (
+      <rotation y={Math.PI / 2}>
+        <loft>
+          <cylindrical radius={neckRadius * 0.99}>
+            <svg viewBox="0 0 10 10">
+              <g transform={`rotate(${angle1})`}>
+                <ellipse
+                  cx={0}
+                  cy={neckHeight / 2}
+                  rx={major * 0.99}
+                  ry={minor}
+                />
+              </g>
+            </svg>
+          </cylindrical>
+          <cylindrical radius={neckRadius * 1.05}>
+            <svg viewBox="0 0 10 10">
+              <g transform={`rotate(${angle2})`}>
+                <ellipse
+                  cx={0}
+                  cy={neckHeight / 2}
+                  rx={major * 1.05}
+                  ry={minor / 4}
+                />
+              </g>
+            </svg>
+          </cylindrical>
+        </loft>
+      </rotation>
+    );
+  }}
+</Story>

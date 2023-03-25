@@ -1,5 +1,7 @@
+#include <BRep_Builder.hxx>
 #include <Geom_Plane.hxx>
 #include <Precision.hxx>
+#include <TopoDS_Compound.hxx>
 #include <gp_Ax3.hxx>
 #include <gp_Pln.hxx>
 
@@ -57,18 +59,22 @@ void SurfaceNode::computeShape(const ProgressHandler &handler)
 
   setShape(TopoDS_Shape());
 
-  Handle(Geom_Surface) surface = getSurface(handler);
+  Handle(Geom_Surface) surface = getSurface();
+  gp_GTrsf2d transform = getTransform();
 
-  TopTools_ListOfShape svgShapes;
+  BRep_Builder builder;
+  TopoDS_Compound compound;
+  builder.MakeCompound(compound);
 
   for (auto it = std::begin(m_children); it != std::end(m_children) && scope.More(); ++it)
   {
     Handle(SVG) svg = (*it);
     svg->SetSurface(surface);
+    svg->SetTransform(transform);
     svg->Build(handler.WithRange(scope.Next()));
     if (svg->IsDone())
     {
-      svgShapes.Append(svg->Shape(handler));
+      builder.Add(compound, svg->Shape(handler));
     }
     else
     {
@@ -81,14 +87,5 @@ void SurfaceNode::computeShape(const ProgressHandler &handler)
     return;
   }
 
-  BooleanOperation op;
-  op.Union(svgShapes, handler.WithRange(scope.Next()));
-  if (op.HasErrors())
-  {
-    handler.Abort("surface: boolean operation failed\n\n" + op.Errors());
-  }
-  else
-  {
-    setShape(op.Shape());
-  }
+  setShape(compound);
 }

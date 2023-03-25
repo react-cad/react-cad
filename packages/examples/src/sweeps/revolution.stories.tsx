@@ -46,7 +46,7 @@ interface StoryProps {
 
 const Template: Story<StoryProps> = ({ profileName, angle, ...args }) => (
   <Revolution angle={(angle / 180) * Math.PI} {...args}>
-    <plane origin={[0, 10, 0]}>{profiles[profileName]}</plane>
+    <planar origin={[0, 10, 0]}>{profiles[profileName]}</planar>
   </Revolution>
 );
 

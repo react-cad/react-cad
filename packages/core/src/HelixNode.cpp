@@ -1,5 +1,8 @@
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeSolid.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_Sewing.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
 #include <BRepLib.hxx>
 #include <BRepOffsetAPI_MakePipeShell.hxx>
 #include <BRepTools.hxx>
@@ -7,11 +10,13 @@
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Message.hxx>
+#include <ShapeFix_Shell.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 #include <gp_Lin2d.hxx>
+#include <gp_Quaternion.hxx>
 
 #include "HelixNode.hpp"
 
@@ -75,25 +80,6 @@ void HelixNode::buildSpineAndGuide()
   m_guide = makeGuide;
 }
 
-bool HelixNode::makeHelix(const TopoDS_Wire &profile, TopoDS_Shape &shape)
-{
-  BRepOffsetAPI_MakePipeShell pipe(m_spine);
-  pipe.SetMode(m_guide, false);
-  pipe.Add(profile);
-
-  pipe.Build();
-  if (pipe.IsDone())
-  {
-    pipe.MakeSolid();
-
-    shape = pipe;
-    return true;
-  }
-
-  shape = TopoDS_Solid();
-  return false;
-}
-
 void HelixNode::computeShape(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
@@ -129,35 +115,35 @@ void HelixNode::computeShape(const ProgressHandler &handler)
       ++nbWires;
     }
 
-    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires * 2);
+    Message_ProgressScope faceScope(scope.Next(), "Computing helix component", nbWires + 1);
 
-    TopoDS_Wire outerWire = BRepTools::OuterWire(face);
-    TopoDS_Shape solid;
-    bool solidSuccess = makeHelix(outerWire, solid);
-    if (!solidSuccess)
-    {
-      handler.Abort("helix: could not make helix for outer wire of face " + std::to_string(faceId));
-      continue;
-    }
+    gp_Trsf topTransform;
+    topTransform.SetTranslationPart(gp_Vec(0, 0, m_height));
+    topTransform.SetRotationPart(gp_Quaternion(gp::DZ(), 2 * M_PI * m_height / m_pitch * (m_leftHanded ? 1 : -1)));
+    BRepBuilderAPI_Transform topTransformBuilder(topTransform);
+    topTransformBuilder.Perform(face, true);
+    TopoDS_Shape topFace = topTransformBuilder.Shape();
 
-    faceScope.Next();
-
-    TopTools_ListOfShape holes;
+    BRepBuilderAPI_Sewing solid;
+    solid.Init(1e-5);
+    solid.Add(face);
+    solid.Add(topFace);
 
     int wireId = -1;
     for (Wires.ReInit(); Wires.More() && faceScope.More(); Wires.Next())
     {
       ++wireId;
+
       TopoDS_Wire wire = TopoDS::Wire(Wires.Current());
-      if (wire.IsEqual(outerWire))
+
+      BRepOffsetAPI_MakePipeShell pipe(m_spine);
+      pipe.SetMode(m_guide, false);
+      pipe.Add(wire);
+
+      pipe.Build();
+      if (pipe.IsDone())
       {
-        continue;
-      }
-      TopoDS_Shape hole;
-      bool holeSuccess = makeHelix(wire, hole);
-      if (holeSuccess)
-      {
-        holes.Append(hole);
+        solid.Add(pipe.Shape());
       }
       else
       {
@@ -165,7 +151,6 @@ void HelixNode::computeShape(const ProgressHandler &handler)
                       std::to_string(faceId));
         continue;
       }
-      faceScope.Next();
     }
 
     if (!faceScope.More())
@@ -173,16 +158,24 @@ void HelixNode::computeShape(const ProgressHandler &handler)
       continue;
     }
 
-    BooleanOperation op;
-    op.Difference(solid, holes, handler.WithRange(faceScope.Next(nbWires)));
-    if (op.HasErrors())
-    {
-      handler.Abort("helix: boolean operation failed\n\n" + op.Errors());
-    }
-    else
-    {
-      builder.Add(compound, op.Shape());
-    }
+    PerformanceTimer timer2("Helix sew");
+    solid.Perform();
+    TopoDS_Shell sewedShape = TopoDS::Shell(solid.SewedShape());
+
+    ShapeFix_Shell fixShell(sewedShape);
+    fixShell.Perform(handler.WithRange(faceScope.Next()));
+    TopoDS_Shell shell = fixShell.Shell();
+
+    BRepBuilderAPI_MakeSolid makeSolid;
+    makeSolid.Add(shell);
+    makeSolid.Build();
+    TopoDS_Solid shape = makeSolid.Solid();
+
+    BRepLib::OrientClosedSolid(shape);
+
+    builder.Add(compound, shape);
+
+    timer2.end();
   }
 
   if (scope.More())

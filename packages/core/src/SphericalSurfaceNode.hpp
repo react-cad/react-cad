@@ -18,7 +18,8 @@ public:
   }
 
 protected:
-  Handle(Geom_Surface) getSurface(const ProgressHandler &handler) override;
+  Handle(Geom_Surface) getSurface() override;
+  gp_GTrsf2d getTransform() override;
 
 private:
   gp_Pnt m_origin;
@@ -26,6 +27,7 @@ private:
   Standard_Boolean m_surfaceChanged;
 
   Handle(Geom_SphericalSurface) m_surface;
+  gp_GTrsf2d m_transform;
 };
 
 #endif

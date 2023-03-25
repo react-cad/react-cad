@@ -12,7 +12,7 @@ class LoftNode : public ReactCADNode
 public:
   LoftNode();
 
-  void setCompatible(Standard_Boolean compatible);
+  void setExact(Standard_Boolean exact);
   void setSmooth(Standard_Boolean smooth);
 
   std::string getName() override
@@ -28,7 +28,7 @@ private:
   std::shared_ptr<BRepOffsetAPI_ThruSections> createLoft();
   TopoDS_Shape buildLoft(const std::shared_ptr<BRepOffsetAPI_ThruSections> &loft, const ProgressHandler &handler);
 
-  Standard_Boolean m_compatible;
+  Standard_Boolean m_exact;
   Standard_Boolean m_smooth;
   TopTools_ListOfShape m_children;
 };

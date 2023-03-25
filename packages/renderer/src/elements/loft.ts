@@ -8,7 +8,7 @@ export function prepareUpdate(
   newProps: Props<Loft>
 ): UpdatePayload<Loft> | null {
   if (
-    oldProps.compatible !== newProps.compatible ||
+    oldProps.exact !== newProps.exact ||
     oldProps.smooth !== newProps.smooth
   ) {
     return newProps;
@@ -21,7 +21,7 @@ export function commitUpdate(
   instance: CADInstance<Loft>,
   updatePayload: UpdatePayload<Loft>
 ): void {
-  const { compatible = false, smooth = true } = updatePayload;
-  instance.node.setCompatible(compatible);
+  const { exact = false, smooth = true } = updatePayload;
+  instance.node.setExact(exact);
   instance.node.setSmooth(smooth);
 }

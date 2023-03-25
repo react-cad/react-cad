@@ -22,7 +22,7 @@ public:
   ReactCADNode();
   virtual ~ReactCADNode();
 
-  TopoDS_Shape getShape();
+  TopoDS_Shape getShape(const ProgressHandler &handler);
   void appendChild(Handle(ReactCADNode) & child);
   void insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before);
   void removeChild(Handle(ReactCADNode) & child);

@@ -15,9 +15,7 @@ const Polygon: React.FC<Props> = ({
 }) => {
   const { approximation } = React.useContext(PrecisionContext);
 
-  const angularPrecision = Math.acos(
-    1 - Math.pow(approximation, 2) / (2 * Math.pow(radius, 2))
-  );
+  const angularPrecision = 2 * Math.asin(approximation / (2 * radius));
 
   const angles = [...Array(sides * pointsPerVertex)].map((_, i) => {
     const vertex = Math.floor(i / pointsPerVertex);
@@ -28,7 +26,6 @@ const Polygon: React.FC<Props> = ({
       nthPerVertex * angularPrecision
     );
   });
-  //.map((angle, _, angles) => angle - angles[0]);
 
   const points = angles.reduce(
     (points, angle) =>

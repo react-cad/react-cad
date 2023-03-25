@@ -31,8 +31,6 @@ private:
 
   TopoDS_Wire m_spine;
   TopoDS_Wire m_guide;
-
-  bool makeHelix(const TopoDS_Wire &profile, TopoDS_Shape &shape);
 };
 
 #endif

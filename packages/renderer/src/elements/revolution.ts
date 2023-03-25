@@ -11,6 +11,9 @@ function validateProps(props: Props<Revolution>): boolean {
   if (typeof props.angle !== "number") {
     throw new Error(`revolution: "angle" must be a number`);
   }
+  if (props.angle <= 0) {
+    throw new Error(`revolution: "angle" must be greater than zero`);
+  }
   return true;
 }
 

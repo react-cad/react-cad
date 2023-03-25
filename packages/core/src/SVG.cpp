@@ -1,6 +1,7 @@
 #include "SVG.hpp"
 #include "SVGSubPath.hpp"
 
+#include <GeomLib.hxx>
 #include <Geom_Plane.hxx>
 #include <gp_Ax3.hxx>
 #include <gp_Pln.hxx>
@@ -9,8 +10,10 @@
 
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepGProp.hxx>
 #include <BRepLib.hxx>
 #include <BRep_Builder.hxx>
+#include <GProp_GProps.hxx>
 
 #include <Message_ProgressScope.hxx>
 #include <ShapeFix_Shape.hxx>
@@ -26,7 +29,9 @@
 #include <gp_Ax3.hxx>
 #include <gp_Pln.hxx>
 
-SVG::SVG() : m_shape(), m_parent(), m_svg(), m_surface(new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()))){};
+SVG::SVG()
+    : m_shape(), m_parent(), m_svg(), m_surface(new Geom_Plane(gp_Ax3(gp::Origin(), gp::DZ(), gp::DX()))),
+      m_transform(){};
 
 void SVG::setParent(const opencascade::handle<SurfaceNode> &parent)
 {
@@ -57,6 +62,11 @@ void SVG::SetSurface(const Handle(Geom_Surface) & surface)
   }
 }
 
+void SVG::SetTransform(gp_GTrsf2d transform)
+{
+  m_transform = transform;
+}
+
 void SVG::Build(const ProgressHandler &handler)
 {
   if (m_done)
@@ -72,7 +82,6 @@ void SVG::Build(const ProgressHandler &handler)
   }
 
   ShapeFix_Wire fixWire;
-  fixWire.SetSurface(m_surface);
 
   int nbShape = 0;
   for (auto shape = image.begin(); shape != image.end(); ++shape)
@@ -98,32 +107,17 @@ void SVG::Build(const ProgressHandler &handler)
 
     for (auto path = shape.begin(); path != shape.end() && pathScope.More(); ++path)
     {
-      float orientation = 0;
-      BRepBuilderAPI_MakeWire makeWire;
+      TopoDS_Wire wire = path.ClosedWire(m_surface, m_transform);
 
-      for (auto curve = path.begin(); curve != path.end(); ++curve)
+      if (wire.IsNull())
       {
-        Handle(Geom2d_Curve) c = curve;
-        if (!c.IsNull())
-        {
-          BRepBuilderAPI_MakeEdge edge(c, m_surface);
-          makeWire.Add(edge);
-
-          orientation += curve.orientation();
-        }
+        continue;
       }
 
-      SVGSubPath::Direction direction = orientation >= 0 ? SVGSubPath::Direction::CW : SVGSubPath::Direction::CCW;
-      TopoDS_Wire suspiciousWire = makeWire;
-      if (direction == SVGSubPath::Direction::CCW)
-      {
-        suspiciousWire.Reverse();
-      }
+      BRepLib::BuildCurves3d(wire);
 
-      fixWire.Load(suspiciousWire);
-      fixWire.Perform();
-
-      TopoDS_Wire wire = fixWire.Wire();
+      SVGSubPath::Direction direction =
+          path.orientation() >= 0 ? SVGSubPath::Direction::CW : SVGSubPath::Direction::CCW;
 
       BRepBuilderAPI_MakeFace face(m_surface, wire);
 
@@ -168,17 +162,15 @@ void SVG::Build(const ProgressHandler &handler)
     return;
   }
 
-  BooleanOperation op;
-  op.Union(svgShapes, handler.WithRange(scope.Next()));
-  if (op.HasErrors())
+  BRep_Builder builder;
+  TopoDS_Compound compound;
+  builder.MakeCompound(compound);
+  for (auto it = svgShapes.begin(); it != svgShapes.end(); ++it)
   {
-    handler.Abort("svg parse: boolean operation failed\n\n" + op.Errors());
+    builder.Add(compound, *it);
   }
-  else
-  {
-    m_shape = op.Shape();
-    m_done = true;
-  }
+  m_shape = compound;
+  m_done = true;
 }
 
 TopoDS_Shape SVG::Shape(const ProgressHandler &handler)

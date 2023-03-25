@@ -13,12 +13,4 @@ ReactCAD provides various elements to construct 3-dimensional solids by sweeping
 - <Link to="reference-sweeps--pipe">Pipe</Link>
 - <Link to="reference-sweeps--evolution">Evolution</Link>
 
-The 2d shapes are defined using SVGs drawn onto surfaces which orient them in 3d space.
-
-Most SVGs should work, but the full spec is not supported. In particular;
-
-- text is not supported (text can be extruded by creating an SVG `path` in the shape of the text)
-- path stroke and fill attributes are ignored - all shapes are filled.
-- self-intersecting shapes cause undefined behaviour.
-
-Also note that the SVG coordinate system is left-handed, while the 3d coordinate system is right-handed, so when rendering SVGs y-coordinates are negated.
+The 2d shapes are defined using SVGs drawn onto surfaces which orient them in 3d space. See <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>.

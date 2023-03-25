@@ -1,12 +1,15 @@
 import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
-import reactIcon from './react-icon';
+import ReactIcon from "../ReactIcon";
+import Link from "../../Link";
 
 <Meta title="Reference/Sweeps/Revolution" />
 
 # revolution
 
 The `revolution` element extrudes a 2-dimensional shape by rotating it around an axis. It is rotated by `angle` radians around an `axis` defined by a 3d vector. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planar polygon, or a string containing an SVG image. The `profile` must not intersect the `axis`.
+
+The children of the `revolution` form the 2d profile (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
 
 <ArgsTable
   rows={{
@@ -35,19 +38,6 @@ The `revolution` element extrudes a 2-dimensional shape by rotating it around an
         },
       },
     },
-    profile: {
-      name: "profile",
-      description: "The shape to be extruded.",
-      type: {
-        required: true,
-      },
-      table: {
-        type: {
-          summary: "string | [number, number, number][]",
-          detail: "an SVG image, or a list of [x, y, z] points describing a planar polygon",
-        },
-      },
-    },
   }}
 />
 
@@ -59,11 +49,33 @@ export const Revolution = (props) => <revolution {...props} />;
 
 A triangular profile rotated in a full circle around the y-axis.
 
-<Source language="jsx" code={`
-  <revolution axis={[0,1,0]} angle={2 * Math.PI} profile={[[1,0,0], [3,0,0], [2,2,0]]} />
-`} />
+<Source
+  language="jsx"
+  code={`
+<revolution axis={[0,1,0]} angle={2 * Math.PI}>
+  <planar>
+    <svg width="2" height="2">
+      <polygon points="1,0 3,0 2,-2" />
+    </svg>
+  </planar>
+</revolution>
+`}
+/>
 
-<Story name="revolution" args={{ axis: [0,1,0], angle: 2 * Math.PI, profile: [[1,0,0], [3,0,0], [2,-2,0]] }}>
+<Story
+  name="revolution"
+  args={{
+    axis: [0, 1, 0],
+    angle: 2 * Math.PI,
+    children: (
+      <planar>
+        <svg width="2" height="2">
+          <polygon points="1,0 3,0 2,2" />
+        </svg>
+      </planar>
+    ),
+  }}
+>
   {Revolution.bind({})}
 </Story>
 
@@ -71,23 +83,61 @@ A triangular profile rotated in a full circle around the y-axis.
 
 An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
 
-<Source language="jsx" code={`
-  <revolution axis={[1,0,1]} angle={3 * Math.PI / 2} profile={\`<svg><ellipse rx="2" ry="3" /></svg>\`} />
-`} />
+<Source
+  language="jsx"
+  code={`
+<revolution axis={[1,0,1]} angle={3 * Math.PI / 2}>
+  <planar>
+    <svg><ellipse rx="2" ry="3" /></svg>
+  </planar>
+</revolution>
+`}
+/>
 
-<Story name="elliptical revolution" args={{ axis: [1,0,1], angle: 3 * Math.PI / 2, profile: `<svg><ellipse rx="2" ry="3" /></svg>` }}>
+<Story
+  name="elliptical revolution"
+  args={{
+    axis: [1, 0, 1],
+    angle: (3 * Math.PI) / 2,
+    children: (
+      <planar>
+        <svg>
+          <ellipse rx="2" ry="3" />
+        </svg>
+      </planar>
+    ),
+  }}
+>
   {Revolution.bind({})}
 </Story>
 
 ### React icon revolution
 
-An complex shape rotated 1 eighth turn around the x-axis.
+An complex shape rotated 1 eighth turn around the x-axis. The SVG's `viewBox` prop is used to move the shape away from the axis of rotation.
 
-<Source language="jsx" code={`
-  import reactIcon from './react-icon.svg';
-<revolution axis={[1,0,0]} angle={Math.PI / 4} profile={reactIcon} />
-`} />
+<Source
+  language="jsx"
+  code={`
+  import ReactIcon from './ReactIcon';
+<revolution axis={[-1,0,0]} angle={Math.PI / 4}>
+  <planar>
+    <ReactIcon viewBox="24 24 48 48" />
+  </planar>
+</revolution>
+`}
+/>
 
-<Story name="react icon revolution" args={{ axis: [1,0,0], angle: Math.PI / 4, profile: reactIcon([0,-6]) }}>
+<Story
+  name="react icon revolution"
+  args={{
+    axis: [-1, 0, 0],
+    angle: Math.PI / 4,
+    children: (
+      <planar>
+        <ReactIcon viewBox="24 24 48 48" />
+      </planar>
+    ),
+  }}
+>
   {Revolution.bind({})}
 </Story>
