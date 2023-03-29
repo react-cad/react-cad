@@ -5,7 +5,7 @@ import Link from "../../Link";
 
 # Surfaces & SVGs
 
-ReactCAD provides various elements to construct 3-dimensional solids from flat shapes. These elements are documented in the <Link to="reference-sweeps--introduction">sweeps</Link> section. The flat shapes themselves are defined by drawing SVG shapes onto surfaces.
+ReactCAD provides various elements to construct 3-dimensional solids from flat shapes. These elements are documented in the <Link to="reference-constructions--introduction">constructions</Link> section. The flat shapes themselves are defined by drawing SVG shapes onto surfaces.
 
 Any SVG element can be used, just as if you were building a ReactDOM website that included SVGs. See <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">the MDN SVG reference</a> for SVG documentation.
 
@@ -13,7 +13,7 @@ Many SVGs will work, but the full spec is not supported. In particular;
 
 - text is not supported (text can be created using an SVG `path` in the shape of the text),
 - path stroke and fill attributes are ignored - all shapes are filled,
-- intersecting shapes cause undefined behaviour.
+- self-intersecting shapes cause undefined behaviour.
 
 SVGs are only valid inside a surface. SVGs don't have a meaning outside surfaces - SVGs provide the paths that make up shapes, but surfaces provide the co-ordinate system that orients those paths in space.
 

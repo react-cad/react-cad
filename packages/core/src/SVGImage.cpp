@@ -21,7 +21,36 @@ SVGImage SVGImage::FromPathData(const std::string &pathData)
 SVGImage::SVGImage(const std::string &svg)
 {
   char *str = strdup(svg.c_str());
-  m_image = nsvgParse(str, "px", 96);
+
+  NSVGparser *p;
+  NSVGimage *ret = 0;
+
+  p = nsvg__createParser();
+  if (p == NULL)
+  {
+    return;
+  }
+  p->dpi = 96;
+
+  nsvg__parseXML(str, nsvg__startElement, nsvg__endElement, nsvg__content, p);
+
+  // Prevent nanosvg behaviour of moving svgs with no viewbox or size
+  if (p->viewWidth == 0 && p->image->width == 0 && p->viewHeight == 0 && p->image->height == 0)
+  {
+    p->viewMinx = 0;
+    p->viewWidth = 1;
+    p->viewMiny = 0;
+    p->viewHeight = 1;
+  }
+
+  // Scale to viewBox
+  nsvg__scaleToViewbox(p, "px");
+
+  m_image = p->image;
+  p->image = NULL;
+
+  nsvg__deleteParser(p);
+
   free(str);
 }
 

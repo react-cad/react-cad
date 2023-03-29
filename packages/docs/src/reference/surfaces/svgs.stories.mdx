@@ -1,0 +1,63 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+
+<Meta title="Reference/Surfaces & SVGs/SVG" />
+
+# svg
+
+SVGs work the same as they do in React for the web. Any SVG element can be used. See <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">the MDN SVG reference</a> for SVG documentation.
+
+Many SVGs will work, but the full spec is not supported. In particular;
+
+- text is not supported (text can be created using an SVG `path` in the shape of the text),
+- path stroke and fill attributes are ignored - all shapes are filled,
+- self-intersecting shapes cause undefined behaviour.
+
+SVGs are only valid inside a surface. SVGs don't have a meaning outside surfaces - SVGs provide the paths that make up shapes, but surfaces provide the co-ordinate system that orients those paths in space.
+
+## Examples
+
+export const Plane = (props) => <planar {...props} />;
+
+### Plane at the origin
+
+An SVG in the xy-plane at the origin.
+
+<Source
+  language="jsx"
+  code={`<planar>
+  <ReactIcon /> {/* ReactIcon is a React component which returns an SVG */
+</planar>
+`}
+/>
+
+<Story name="plane">
+  <planar>
+    <svg>
+      <circle cx={3} cy={3} r={2} />
+    </svg>
+  </planar>
+</Story>
+
+### Translated plane
+
+An SVG in a flat plane raised above the xy-plane.
+
+<Source
+  language="jsx"
+  code={`<planar origin={[30, 20, 10]}>
+  <ReactIcon />
+</planar>
+`}
+/>
+
+<Story
+  name="translated-plane"
+  args={{
+    origin: [30, 20, 10],
+    children: <ReactIcon />,
+  }}
+>
+  {Plane.bind({})}
+</Story>

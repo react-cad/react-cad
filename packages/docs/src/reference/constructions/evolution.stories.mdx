@@ -3,7 +3,7 @@ import { ArgsTable } from "@storybook/components";
 import ReactIcon from "../ReactIcon";
 import Link from "../../Link";
 
-<Meta title="Reference/Sweeps/Evolution" />
+<Meta title="Reference/Constructions/Evolution" />
 
 # evolution
 
@@ -52,13 +52,13 @@ A bezier curve profile swept along the edges of a square.
 <Story
   name="evolution"
   args={{
-    children: [
+    children: (
       <planar>
         <svg>
           <polygon points="0,0 5,0 5,5 0,5" />
         </svg>
-      </planar>,
-    ],
+      </planar>
+    ),
     profile: "M 0 0 C 0 1 1 1 1 2",
   }}
 >
@@ -85,13 +85,13 @@ A convex profile swept along the edge of a circle to form a bowl.
 <Story
   name="bowl"
   args={{
-    children: [
+    children: (
       <planar>
         <svg>
           <circle r="10" />
         </svg>
-      </planar>,
-    ],
+      </planar>
+    ),
     profile: "M 0 0 C -2 0 -3 2 -3 5 S -1 10 -1 9 S -2 8 -2 5 S 0 1 0 1",
   }}
 >
@@ -118,13 +118,13 @@ A circular arc used to create a fillet on a triangular spine.
 <Story
   name="fillet"
   args={{
-    children: [
+    children: (
       <planar>
         <svg>
           <polygon points={`0,0 10,0, 5,${(10 * Math.sqrt(3)) / 2}`} />
         </svg>
-      </planar>,
-    ],
+      </planar>
+    ),
     profile: "M 0 0 A 1 1 0 0 0 1 1",
   }}
 >
@@ -154,7 +154,7 @@ A diagonal profile used to create a chamfer on an SVG.
 <Story
   name="chamfer"
   args={{
-    children: [
+    children: (
       <planar>
         <svg>
           <path
@@ -164,8 +164,8 @@ A diagonal profile used to create a chamfer on an SVG.
             } -2 Z`}
           />
         </svg>
-      </planar>,
-    ],
+      </planar>
+    ),
     profile: "M 0 0 L 1 1",
   }}
 >

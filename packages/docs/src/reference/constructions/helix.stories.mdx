@@ -3,7 +3,7 @@ import { ArgsTable } from "@storybook/components";
 import ReactIcon from "../ReactIcon";
 import Link from "../../Link";
 
-<Meta title="Reference/Sweeps/Helix" />
+<Meta title="Reference/Constructions/Helix" />
 
 # helix
 
@@ -64,7 +64,7 @@ A helix of height 5 and pitch 5 with a square profile. Note that `pitch` refers 
   code={`
 <helix height={5} pitch={5}>
   <planar>
-    <svg width="2" height="2">
+    <svg>
       <rect x={-1} y={-1} width={2} height={2} />
     </svg>
   </planar>
@@ -79,7 +79,7 @@ A helix of height 5 and pitch 5 with a square profile. Note that `pitch` refers 
     pitch: 5,
     children: [
       <planar>
-        <svg width="2" height="2">
+        <svg>
           <rect x={-1} y={-1} width={2} height={2} />
         </svg>
       </planar>,

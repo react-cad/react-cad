@@ -3,7 +3,7 @@ import { ArgsTable } from "@storybook/components";
 import ReactIcon from "../ReactIcon";
 import Link from "../../Link";
 
-<Meta title="Reference/Sweeps/Revolution" />
+<Meta title="Reference/Constructions/Revolution" />
 
 # revolution
 
@@ -54,7 +54,7 @@ A triangular profile rotated in a full circle around the y-axis.
   code={`
 <revolution axis={[0,1,0]} angle={2 * Math.PI}>
   <planar>
-    <svg width="2" height="2">
+    <svg>
       <polygon points="1,0 3,0 2,-2" />
     </svg>
   </planar>
@@ -69,7 +69,7 @@ A triangular profile rotated in a full circle around the y-axis.
     angle: 2 * Math.PI,
     children: (
       <planar>
-        <svg width="2" height="2">
+        <svg>
           <polygon points="1,0 3,0 2,2" />
         </svg>
       </planar>
@@ -88,7 +88,9 @@ An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
   code={`
 <revolution axis={[1,0,1]} angle={3 * Math.PI / 2}>
   <planar>
-    <svg><ellipse rx="2" ry="3" /></svg>
+    <svg>
+      <ellipse rx="2" ry="3" cx={2} cy={3} />
+    </svg>
   </planar>
 </revolution>
 `}
@@ -102,7 +104,7 @@ An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
     children: (
       <planar>
         <svg>
-          <ellipse rx="2" ry="3" />
+          <ellipse rx="2" ry="3" cx={2} cy={3} />
         </svg>
       </planar>
     ),
@@ -113,16 +115,19 @@ An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
 
 ### React icon revolution
 
-An complex shape rotated 1 eighth turn around the x-axis. The SVG's `viewBox` prop is used to move the shape away from the axis of rotation.
+An complex shape rotated 1 eighth turn around the x-axis. The `translation` element is used to move the shape away from the axis of rotation.
 
 <Source
   language="jsx"
   code={`
   import ReactIcon from './ReactIcon';
+    
 <revolution axis={[-1,0,0]} angle={Math.PI / 4}>
-  <planar>
-    <ReactIcon viewBox="24 24 48 48" />
-  </planar>
+  <translation y={-24}>
+    <planar>
+      <ReactIcon />
+    </planar>
+  </translation>
 </revolution>
 `}
 />
@@ -133,9 +138,11 @@ An complex shape rotated 1 eighth turn around the x-axis. The SVG's `viewBox` pr
     axis: [-1, 0, 0],
     angle: Math.PI / 4,
     children: (
-      <planar>
-        <ReactIcon viewBox="24 24 48 48" />
-      </planar>
+      <translation y={-24}>
+        <planar>
+          <ReactIcon />
+        </planar>
+      </translation>
     ),
   }}
 >

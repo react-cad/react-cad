@@ -12,7 +12,10 @@ const profiles: Record<string, React.ReactElement> = {
   Hexagon: <Polygon sides={6} />,
   SVG1: (
     <svg>
-      <path fill-rule="evenodd" d="M 0,0 h10 v10 h-10 Z M 3,3 v4 h4 v-4 Z" />
+      <path
+        fillRule="evenodd"
+        d="M 0 0 L 0 10 L 10 10 L 10 0 Z M 3 3 L 3 7 L 7 7 L 7 3 Z"
+      />
     </svg>
   ),
   SVG2: (

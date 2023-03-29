@@ -3,7 +3,7 @@ import { ArgsTable } from "@storybook/components";
 import ReactIcon from "../ReactIcon";
 import Link from "../../Link";
 
-<Meta title="Reference/Sweeps/Loft" />
+<Meta title="Reference/Constructions/Loft" />
 
 # loft
 
@@ -39,31 +39,33 @@ The children of the `loft` form the 2d cross sections (see <Link to="reference-s
 
 export const Loft = (props) => <loft {...props} />;
 
-### Morphing between shapes
+### Loft
 
-A loft between a square and a circle.
+A loft between a square, a circle and a triangle. On the left with `smooth` false, in the middle with `smooth` true, and on the right the 2d shapes are shown.
 
 <Source
   language="jsx"
   code={`
-<loft>
-  <planar>
-    <svg>
-      <polygon points="5,0 10,5 5,10, 0,5" />
-    </svg>
-  </planar>
-  <planar origin={[0, 0, 10]}>
-    <svg>
-      <circle r="5" />
-    </svg>
-  </planar>
-</loft>
-`}
-/>
-
-<Story name="loft">
-  {() => (
-    <loft>
+<union>
+  <loft>
+    <planar>
+      <svg>
+        <polygon points="5,0 10,5 5,10, 0,5" />
+      </svg>
+    </planar>
+    <planar origin={[0, 0, 10]}>
+      <svg>
+        <circle cx={5} cy={5} r="5" />
+      </svg>
+    </planar>
+    <planar origin={[0, 0, 20]}>
+      <svg>
+        <polygon points="5,0 10,5 5,10" />
+      </svg>
+    </planar>
+  </loft>
+  <translation x={-15}>
+    <loft smooth={false}>
       <planar>
         <svg>
           <polygon points="5,0 10,5 5,10, 0,5" />
@@ -71,46 +73,115 @@ A loft between a square and a circle.
       </planar>
       <planar origin={[0, 0, 10]}>
         <svg>
-          <circle r="5" />
+          <circle cx={5} cy={5} r="5" />
+        </svg>
+      </planar>
+      <planar origin={[0, 0, 20]}>
+        <svg>
+          <polygon points="5,0 10,5 5,10" />
         </svg>
       </planar>
     </loft>
+  </translation>
+</union>
+`}
+/>
+
+<Story name="loft">
+  {() => (
+    <union>
+      <loft>
+        <planar>
+          <svg>
+            <polygon points="5,0 10,5 5,10, 0,5" />
+          </svg>
+        </planar>
+        <planar origin={[0, 0, 10]}>
+          <svg>
+            <circle cx={5} cy={5} r="5" />
+          </svg>
+        </planar>
+        <planar origin={[0, 0, 20]}>
+          <svg>
+            <polygon points="5,0 10,5 5,10" />
+          </svg>
+        </planar>
+      </loft>
+      <translation x={-15}>
+        <loft smooth={false}>
+          <planar>
+            <svg>
+              <polygon points="5,0 10,5 5,10, 0,5" />
+            </svg>
+          </planar>
+          <planar origin={[0, 0, 10]}>
+            <svg>
+              <circle cx={5} cy={5} r="5" />
+            </svg>
+          </planar>
+          <planar origin={[0, 0, 20]}>
+            <svg>
+              <polygon points="5,0 10,5 5,10" />
+            </svg>
+          </planar>
+        </loft>
+      </translation>
+      <translation x={15}>
+        <planar>
+          <svg>
+            <polygon points="5,0 10,5 5,10, 0,5" />
+          </svg>
+        </planar>
+        <planar origin={[0, 0, 10]}>
+          <svg>
+            <circle cx={5} cy={5} r="5" />
+          </svg>
+        </planar>
+        <planar origin={[0, 0, 20]}>
+          <svg>
+            <polygon points="5,0 10,5 5,10" />
+          </svg>
+        </planar>
+      </translation>
+    </union>
   )}
 </Story>
 
 ### Boat
 
-A boat created from cross sections.
+A boat created from cross sections. On the left is the loft, and on the right the 2d shapes are shown.
 
 <Source
   language="jsx"
   code={`
-<translation z={1}>
-  <rotation x={-Math.PI / 2}>
-    <Loft exact {...args}>
-      <planar origin={[1.75, 0, 0]}>
-        <svg>
-          <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
-        </svg>
-      </planar>
-      <planar origin={[0, 0, 5]}>
-        <svg>
-          <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
-        </svg>
-      </planar>
-      <planar origin={[0, 0, 8]}>
-        <svg>
-          <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
-        </svg>
-      </planar>
-      <planar origin={[1.75, 0, 12]}>
-        <svg>
-          <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
-        </svg>
-      </planar>
-    </Loft>
-  </rotation>
-</translation>
+<union>
+  <translation z={1}>
+    <rotation x={-Math.PI / 2}>
+      <loft>
+        <planar origin={[1.75, 0, 0]}>
+          <svg>
+            <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+          </svg>
+        </planar>
+        <planar origin={[0, 0, 5]}>
+          <svg>
+            <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+          </svg>
+        </planar>
+        <planar origin={[0, 0, 8]}>
+          <svg>
+            <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+          </svg>
+        </planar>
+        <planar origin={[1.75, 0, 12]}>
+          <svg>
+            <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+          </svg>
+        </planar>
+      </loft>
+    </rotation>
+  </translation>
+</union>
 `}
 />
 
@@ -121,9 +192,35 @@ A boat created from cross sections.
   }}
 >
   {() => (
-    <translation z={1}>
-      <rotation x={-Math.PI / 2}>
-        <loft>
+    <union>
+      <translation z={1}>
+        <rotation x={-Math.PI / 2}>
+          <loft>
+            <planar origin={[1.75, 0, 0]}>
+              <svg>
+                <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+              </svg>
+            </planar>
+            <planar origin={[0, 0, 5]}>
+              <svg>
+                <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+              </svg>
+            </planar>
+            <planar origin={[0, 0, 8]}>
+              <svg>
+                <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
+              </svg>
+            </planar>
+            <planar origin={[1.75, 0, 12]}>
+              <svg>
+                <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
+              </svg>
+            </planar>
+          </loft>
+        </rotation>
+      </translation>
+      <translation z={1} x={5}>
+        <rotation x={-Math.PI / 2}>
           <planar origin={[1.75, 0, 0]}>
             <svg>
               <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
@@ -144,9 +241,9 @@ A boat created from cross sections.
               <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
             </svg>
           </planar>
-        </loft>
-      </rotation>
-    </translation>
+        </rotation>
+      </translation>
+    </union>
   )}
 </Story>
 
@@ -171,7 +268,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
     <rotation y={Math.PI / 2}>
       <loft>
         <cylindrical radius={neckRadius * 0.99}>
-          <svg viewBox="0 0 10 10">
+          <svg>
             <g transform={\`rotate(\${angle1})\`}>
               <ellipse
                 cx={0}
@@ -183,7 +280,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
           </svg>
         </cylindrical>
         <cylindrical radius={neckRadius * 1.05}>
-          <svg viewBox="0 0 10 10">
+          <svg>
             <g transform={\`rotate(\${angle2})\`}>
               <ellipse
                 cx={0}
@@ -219,7 +316,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
       <rotation y={Math.PI / 2}>
         <loft>
           <cylindrical radius={neckRadius * 0.99}>
-            <svg viewBox="0 0 10 10">
+            <svg>
               <g transform={`rotate(${angle1})`}>
                 <ellipse
                   cx={0}
@@ -231,7 +328,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
             </svg>
           </cylindrical>
           <cylindrical radius={neckRadius * 1.05}>
-            <svg viewBox="0 0 10 10">
+            <svg>
               <g transform={`rotate(${angle2})`}>
                 <ellipse
                   cx={0}

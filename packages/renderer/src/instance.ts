@@ -11,6 +11,8 @@ import {
 } from "types";
 import { prepareUpdate, commitUpdate } from "./elements";
 
+import { attributes } from "./attributes";
+
 export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
   implements Instance {
   public readonly node: ReactCADNodeTypes[T];
@@ -196,7 +198,11 @@ export class SVGInstance<
     for (let i = 0; i < entries.length; i++) {
       const [propKey, propValue] = entries[i];
       if (propKey !== "children") {
-        this.node.setAttribute(propKey, propValue);
+        if (propKey in attributes) {
+          this.node.setAttribute(attributes[propKey], propValue);
+        } else {
+          this.node.setAttribute(propKey, propValue);
+        }
         this.changed();
       }
     }
