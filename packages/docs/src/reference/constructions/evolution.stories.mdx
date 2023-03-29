@@ -40,11 +40,11 @@ A bezier curve profile swept along the edges of a square.
 <Source
   language="jsx"
   code={`<evolution profile="M 0 0 C 0 1 1 1 1 2">
-  <planar>
+  <planeSurface>
     <svg>
       <polygon points="0,0 5,0 5,5 0,5" />
     </svg>
-  </planar>
+  </planeSurface>
 </evolution>
 `}
 />
@@ -53,11 +53,11 @@ A bezier curve profile swept along the edges of a square.
   name="evolution"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <polygon points="0,0 5,0 5,5 0,5" />
         </svg>
-      </planar>
+      </planeSurface>
     ),
     profile: "M 0 0 C 0 1 1 1 1 2",
   }}
@@ -73,11 +73,11 @@ A convex profile swept along the edge of a circle to form a bowl.
   language="jsx"
   code={`
 <evolution profile="M 0 0 C -2 0 -3 2 -3 5 S -1 10 -1 9 S -2 8 -2 5 S 0 1 0 1">
-  <planar>
+  <planeSurface>
     <svg>
       <circle r="3" />
     </svg>
-  </planar>
+  </planeSurface>
 </evolution>
 `}
 />
@@ -86,11 +86,11 @@ A convex profile swept along the edge of a circle to form a bowl.
   name="bowl"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <circle r="10" />
         </svg>
-      </planar>
+      </planeSurface>
     ),
     profile: "M 0 0 C -2 0 -3 2 -3 5 S -1 10 -1 9 S -2 8 -2 5 S 0 1 0 1",
   }}
@@ -106,11 +106,11 @@ A circular arc used to create a fillet on a triangular spine.
   language="jsx"
   code={`
 <evolution profile="M 0 0 A 1 1 0 0 0 1 1">
-  <planar>
+  <planeSurface>
     <svg>
       <polygon points={\`0,0 10,0, 5,\${(10 * Math.sqrt(3)) / 2}\`} />
     </svg>
-  </planar>
+  </planeSurface>
 </evolution>
 `}
 />
@@ -119,11 +119,11 @@ A circular arc used to create a fillet on a triangular spine.
   name="fillet"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <polygon points={`0,0 10,0, 5,${(10 * Math.sqrt(3)) / 2}`} />
         </svg>
-      </planar>
+      </planeSurface>
     ),
     profile: "M 0 0 A 1 1 0 0 0 1 1",
   }}
@@ -139,14 +139,14 @@ A diagonal profile used to create a chamfer on an SVG.
   language="jsx"
   code={`
   <evolution profile="M 0 0 L 1 1">
-    <planar>
+    <planeSurface>
       <svg>
         <path
           fill-rule="evenodd"
           d={\`M 0 0 h 10 v 10 h -10 Z M 3.5 3 l 0 4 l \${2 * Math.sqrt(3)} -2 Z\`}
         />
       </svg>
-    </planar>
+    </planeSurface>
   </evolution>
 `}
 />
@@ -155,7 +155,7 @@ A diagonal profile used to create a chamfer on an SVG.
   name="chamfer"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <path
             fill-rule="evenodd"
@@ -164,7 +164,7 @@ A diagonal profile used to create a chamfer on an SVG.
             } -2 Z`}
           />
         </svg>
-      </planar>
+      </planeSurface>
     ),
     profile: "M 0 0 L 1 1",
   }}

@@ -1,7 +1,7 @@
 import { CADInstance } from "instance";
 import { Props, UpdatePayload } from "../types";
 
-type SphericalSurface = "spherical";
+type SphericalSurface = "sphericalSurface";
 
 export function prepareUpdate(
   oldProps: Props<SphericalSurface>,

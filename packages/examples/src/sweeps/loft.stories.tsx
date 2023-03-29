@@ -17,33 +17,33 @@ export default {
 export const loft: Story = (args) => (
   <Loft smooth={false} {...args}>
     <rotation z={Math.PI / 4}>
-      <spherical radius={5}>
+      <sphericalSurface radius={5}>
         <svg viewBox="0 0 10 10">
           <polygon points="-4,4 -4,-4 4,-4 4,4" />
         </svg>
-      </spherical>
+      </sphericalSurface>
     </rotation>
     <translation z={10}>
-      <planar>
+      <planeSurface>
         <svg viewBox="0 0 10 10">
           <circle r="6" />
         </svg>
-      </planar>
+      </planeSurface>
     </translation>
     <translation z={20}>
-      <planar>
+      <planeSurface>
         <svg viewBox="0 0 10 10">
           <ellipse rx="6" ry="4" />
         </svg>
-      </planar>
+      </planeSurface>
     </translation>
     <translation z={30}>
       <rotation y={0.1}>
-        <planar>
+        <planeSurface>
           <svg viewBox="0 0 10 10">
             <circle r="5" />
           </svg>
-        </planar>
+        </planeSurface>
       </rotation>
     </translation>
   </Loft>
@@ -52,15 +52,15 @@ export const loft: Story = (args) => (
 export const loft2: Story = (args) => {
   return (
     <Loft exact {...args}>
-      <planar>
+      <planeSurface>
         <Polygon sides={6} />
-      </planar>
-      <planar origin={[0, 0, 5]}>
+      </planeSurface>
+      <planeSurface origin={[0, 0, 5]}>
         <Circle vertices={6} />
-      </planar>
-      <planar origin={[0, 0, 10]}>
+      </planeSurface>
+      <planeSurface origin={[0, 0, 10]}>
         <Polygon sides={3} pointsPerVertex={2} />
-      </planar>
+      </planeSurface>
     </Loft>
   );
 };
@@ -68,7 +68,7 @@ export const loft2: Story = (args) => {
 export const loft3: Story = (args) => {
   return (
     <Loft {...args}>
-      <planar>
+      <planeSurface>
         <svg
           width="100"
           height="100"
@@ -90,8 +90,8 @@ export const loft3: Story = (args) => {
             />
           </g>
         </svg>
-      </planar>
-      <planar origin={[0, 0, 50]}>
+      </planeSurface>
+      <planeSurface origin={[0, 0, 50]}>
         <svg
           width="100"
           height="100"
@@ -110,8 +110,8 @@ export const loft3: Story = (args) => {
             <path d="M -50 -50 l 100 0 a 50 50 0 1 1 0 100 l -100 0 l 0 -100 Z M -25 -25 l 50 0 a 25 25 0 1 1 0 50 l -50 0 l 0 -50 Z" />
           </g>
         </svg>
-      </planar>
-      <planar origin={[0, 0, 100]}>
+      </planeSurface>
+      <planeSurface origin={[0, 0, 100]}>
         <svg
           width="100"
           height="100"
@@ -133,7 +133,7 @@ export const loft3: Story = (args) => {
             />
           </g>
         </svg>
-      </planar>
+      </planeSurface>
     </Loft>
   );
 };
@@ -151,7 +151,7 @@ export const loft4: Story = ({ neckRadius = 10, neckHeight = 10 }) => {
         <cylinder radius={neckRadius} height={neckHeight} />
       </difference>
       <loft exact>
-        <cylindrical radius={neckRadius * 0.99}>
+        <cylindricalSurface radius={neckRadius * 0.99}>
           <svg viewBox="0 0 10 10">
             <g transform={`rotate(${angle1})`}>
               <ellipse
@@ -162,8 +162,8 @@ export const loft4: Story = ({ neckRadius = 10, neckHeight = 10 }) => {
               />
             </g>
           </svg>
-        </cylindrical>
-        <cylindrical radius={neckRadius * 1.05}>
+        </cylindricalSurface>
+        <cylindricalSurface radius={neckRadius * 1.05}>
           <svg viewBox="0 0 10 10">
             <g transform={`rotate(${angle2})`}>
               <ellipse
@@ -174,7 +174,7 @@ export const loft4: Story = ({ neckRadius = 10, neckHeight = 10 }) => {
               />
             </g>
           </svg>
-        </cylindrical>
+        </cylindricalSurface>
       </loft>
     </union>
   );
@@ -183,16 +183,16 @@ export const loft4: Story = ({ neckRadius = 10, neckHeight = 10 }) => {
 export const text: Story = (args) => {
   return (
     <Loft {...args}>
-      <cylindrical radius={5}>
+      <cylindricalSurface radius={5}>
         <Text viewBox="0 0 1 1" width="2" height="2">
           ReactCAD
         </Text>
-      </cylindrical>
-      <cylindrical radius={8}>
+      </cylindricalSurface>
+      <cylindricalSurface radius={8}>
         <Text viewBox="0 0 1 1" width="2" height="2">
           ReactCAD
         </Text>
-      </cylindrical>
+      </cylindricalSurface>
     </Loft>
   );
 };
@@ -202,26 +202,26 @@ export const boat: Story = (args) => {
     <translation z={1}>
       <rotation x={-Math.PI / 2}>
         <Loft smooth exact {...args}>
-          <planar origin={[1.75, 0, 0]}>
+          <planeSurface origin={[1.75, 0, 0]}>
             <svg>
               <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
             </svg>
-          </planar>
-          <planar origin={[0, 0, 5]}>
+          </planeSurface>
+          <planeSurface origin={[0, 0, 5]}>
             <svg>
               <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
             </svg>
-          </planar>
-          <planar origin={[0, 0, 8]}>
+          </planeSurface>
+          <planeSurface origin={[0, 0, 8]}>
             <svg>
               <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
             </svg>
-          </planar>
-          <planar origin={[1.75, 0, 12]}>
+          </planeSurface>
+          <planeSurface origin={[1.75, 0, 12]}>
             <svg>
               <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
             </svg>
-          </planar>
+          </planeSurface>
         </Loft>
       </rotation>
     </translation>

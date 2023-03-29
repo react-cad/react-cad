@@ -45,7 +45,12 @@ export const parameters = {
             "Solid",
           ],
           "Surfaces & SVGs",
-          ["Introduction", "Planar", "Spherical", "Cylindrical"],
+          [
+            "Introduction",
+            "Plane surface",
+            "Spherical surface",
+            "Cylindrical surface",
+          ],
           "Imports",
           ["Introduction", "BREP", "STEP", "STL", "OBJ"],
         ],

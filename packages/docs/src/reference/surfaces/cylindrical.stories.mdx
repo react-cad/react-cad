@@ -2,11 +2,11 @@ import { Source, Meta, Story } from "@storybook/addon-docs";
 import { ArgsTable } from "@storybook/components";
 import ReactIcon from "../ReactIcon";
 
-<Meta title="Reference/Surfaces & SVGs/Cylindrical" />
+<Meta title="Reference/Surfaces & SVGs/Cylindrical surface" />
 
-# cylindrical
+# cylindricalSurface
 
-The `cylindrical` surface element orients its SVG children on the surface of a cylinder. The `radius` prop specifies the radius of the cylinder. By default the cylinder is at the origin but an optional `origin` prop can translate the surface.
+The `cylindricalSurface` surface element orients its SVG children on the surface of a cylinder. The `radius` prop specifies the radius of the cylinder. By default the cylinder is at the origin but an optional `origin` prop can translate the surface.
 
 Co-ordinates in the x-direction range from 0 to 2π. Co-ordinates in the y-direction extend to positive and negative infinity.
 
@@ -36,7 +36,7 @@ Co-ordinates in the x-direction range from 0 to 2π. Co-ordinates in the y-direc
 
 ## Examples
 
-export const CylindricalSurface = (props) => <cylindrical {...props} />;
+export const CylindricalSurface = (props) => <cylindricalSurface {...props} />;
 
 ### Cylindrical surface
 
@@ -46,14 +46,14 @@ An SVG in a cylindrical surface with radius 1, located at the origin.
 
 <Source
   language="jsx"
-  code={`<cylindrical>
+  code={`<cylindricalSurface>
   <ReactIcon width={Math.PI * 0.8} height={Math.PI * 0.8}/>
-</cylindrical>
+</cylindricalSurface>
 `}
 />
 
 <Story
-  name="cylindrical"
+  name="cylindricalSurface"
   args={{
     children: <ReactIcon width={Math.PI * 0.8} height={Math.PI * 0.8} />,
   }}
@@ -67,14 +67,14 @@ An SVG on a cylindrical surface with radius 20, translated below the origin.
 
 <Source
   language="jsx"
-  code={`<cylindrical radius={20} origin={[0,0,-20]}>
+  code={`<cylindricalSurface radius={20} origin={[0,0,-20]}>
   <ReactIcon width={40} height={40}/>
-</cylindrical>
+</cylindricalSurface>
 `}
 />
 
 <Story
-  name="large-cylindrical"
+  name="large-cylindricalSurface"
   args={{
     radius: 20,
     origin: [0, 0, -20],

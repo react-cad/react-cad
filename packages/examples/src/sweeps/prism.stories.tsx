@@ -54,10 +54,9 @@ const Template: Story<StoryProps> = ({ profileName, text, ...args }) => {
   const Profile = profiles[profileName];
   return (
     <Prism {...args}>
-      <box x={1} y={1} z={1} />
-      <spherical radius={15}>
+      <sphericalSurface radius={15}>
         <Profile text={text} />
-      </spherical>
+      </sphericalSurface>
     </Prism>
   );
 };

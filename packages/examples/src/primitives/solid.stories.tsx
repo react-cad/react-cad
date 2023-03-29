@@ -13,80 +13,80 @@ export default {
 
 export const cube: Story<Props> = (args) => (
   <solid {...args}>
-    <planar>
+    <planeSurface>
       <svg>
         <rect width="1" height="1" />
       </svg>
-    </planar>
+    </planeSurface>
 
     <rotation y={-Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg>
           <rect width="1" height="1" />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
 
     <rotation x={Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg>
           <rect width="1" height="1" />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
 
     <translation x={1}>
       <rotation y={-Math.PI / 2}>
-        <planar>
+        <planeSurface>
           <svg>
             <rect width="1" height="1" />
           </svg>
-        </planar>
+        </planeSurface>
       </rotation>
     </translation>
 
     <translation y={1}>
       <rotation x={Math.PI / 2}>
-        <planar>
+        <planeSurface>
           <svg>
             <rect width="1" height="1" />
           </svg>
-        </planar>
+        </planeSurface>
       </rotation>
     </translation>
 
-    <planar origin={[0, 0, 1]}>
+    <planeSurface origin={[0, 0, 1]}>
       <svg>
         <rect width="1" height="1" />
       </svg>
-    </planar>
+    </planeSurface>
   </solid>
 );
 
 export const polyhedron: Story<Props> = (args) => (
   <solid {...args}>
-    <planar>
+    <planeSurface>
       <svg viewBox="0 0 10 10">
         <polygon points="0,0 1,0 0,1" />
       </svg>
-    </planar>
+    </planeSurface>
     <rotation x={Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg viewBox="0 0 10 10">
           <polygon points="0,0 1,0 0,1" />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
     <rotation y={-Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg viewBox="0 0 10 10">
           <polygon points="0,0 1,0 0,1" />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
     <translation y={1}>
       <rotation x={Math.PI - Math.atan(Math.sqrt(2))} z={-Math.PI / 4}>
-        <planar>
+        <planeSurface>
           <svg viewBox="0 0 10 10">
             <polygon
               points={`0,0 ${Math.sqrt(2)},0 ${Math.sqrt(2) / 2},${
@@ -94,7 +94,7 @@ export const polyhedron: Story<Props> = (args) => (
               }`}
             />
           </svg>
-        </planar>
+        </planeSurface>
       </rotation>
     </translation>
   </solid>
@@ -103,55 +103,55 @@ export const polyhedron: Story<Props> = (args) => (
 export const chest: Story<Props> = (args) => (
   <solid {...args}>
     {/* Bottom */}
-    <planar>
+    <planeSurface>
       <svg>
         <rect width="10" height="6" />
       </svg>
-    </planar>
+    </planeSurface>
 
     {/* Sides */}
     <rotation x={Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg>
           <rect width="10" height="3" />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
     <translation y={6}>
       <rotation x={Math.PI / 2}>
-        <planar>
+        <planeSurface>
           <svg>
             <rect width="10" height="3" />
           </svg>
-        </planar>
+        </planeSurface>
       </rotation>
     </translation>
 
     {/* Ends */}
     <rotation y={-Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg>
           <path d="M 0 0 L 3 0 A 3 3 0 0 1 3 6 L 0 6 Z" />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
     <translation x={10}>
       <rotation y={-Math.PI / 2}>
-        <planar>
+        <planeSurface>
           <svg>
             <path d="M 0 0 L 3 0 A 3 3 0 0 1 3 6 L 0 6 Z" />
           </svg>
-        </planar>
+        </planeSurface>
       </rotation>
     </translation>
 
     {/* Lid */}
     <translation y={3} z={3}>
-      <cylindrical radius={3}>
+      <cylindricalSurface radius={3}>
         <svg viewBox="0 5 10 10">
           <rect height={10} width={10} />
         </svg>
-      </cylindrical>
+      </cylindricalSurface>
     </translation>
   </solid>
 );

@@ -56,9 +56,9 @@ interface StoryProps {
 const Template: Story<StoryProps> = ({ profileName, rotated, ...args }) => {
   return (
     <Helix {...args}>
-      <planar origin={rotated ? [5, 0, 0] : [0, 0, 0]}>
+      <planeSurface origin={rotated ? [5, 0, 0] : [0, 0, 0]}>
         {profiles[profileName]}
-      </planar>
+      </planeSurface>
     </Helix>
   );
 };

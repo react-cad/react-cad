@@ -43,11 +43,11 @@ Extruding a pipe along straight line doesn't affect the normal of the shape - it
   language="jsx"
   code={`
 <pipe spine="M 0 0 L 0 5 L 5 10">
-  <planar>
+  <planeSurface>
     <svg>
       <rect width={1} height={1} />
     </svg>
-  </planar>
+  </planeSurface>
 </pipe>
 `}
 />
@@ -56,11 +56,11 @@ Extruding a pipe along straight line doesn't affect the normal of the shape - it
   name="pipe"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <rect width={1} height={1} />
         </svg>
-      </planar>
+      </planeSurface>
     ),
     spine: "M 0 0 L 0 5 L 5 10",
   }}
@@ -76,11 +76,11 @@ To make a smooth pipe use curve path commands to round out corners, and the prof
   language="jsx"
   code={`
 <pipe spine="M 0 0 L 0 3 C 0 5 1 6 2 7 L 5 10"  />
-  <planar>
+  <planeSurface>
     <svg>
       <rect width={1} height={1} />
     </svg>
-  </planar>
+  </planeSurface>
 </pipe>
 `}
 />
@@ -89,11 +89,11 @@ To make a smooth pipe use curve path commands to round out corners, and the prof
   name="smooth pipe"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <rect width={1} height={1} />
         </svg>
-      </planar>
+      </planeSurface>
     ),
     spine: "M 0 0 L 0 3 C 0 5 1 6 2 7 L 5 10",
   }}
@@ -111,9 +111,9 @@ A complex SVG pipe.
   import ReactIcon from './ReactIcon';
   
 <pipe spine="M 0 0 C 0 10 10 10 10 20">
-  <planar>
+  <planeSurface>
     <ReactIcon />
-  </planar>
+  </planeSurface>
 </pipe>
 `}
 />
@@ -122,9 +122,9 @@ A complex SVG pipe.
   name="react icon pipe"
   args={{
     children: (
-      <planar>
+      <planeSurface>
         <ReactIcon />
-      </planar>
+      </planeSurface>
     ),
     spine: "M 0 0 C 0 10 10 10 10 20",
   }}

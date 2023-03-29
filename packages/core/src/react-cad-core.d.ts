@@ -205,9 +205,9 @@ export interface ReactCADNodeTypes {
   rotation: ReactCADRotationNode;
   scale: ReactCADScaleNode;
   translation: ReactCADTranslationNode;
-  planar: ReactCADPlaneNode;
-  spherical: ReactCADSphericalSurfaceNode;
-  cylindrical: ReactCADCylindricalSurfaceNode;
+  planeSurface: ReactCADPlaneNode;
+  sphericalSurface: ReactCADSphericalSurfaceNode;
+  cylindricalSurface: ReactCADCylindricalSurfaceNode;
 }
 
 export interface ReactCADCore extends EmscriptenModule {

@@ -63,11 +63,11 @@ A helix of height 5 and pitch 5 with a square profile. Note that `pitch` refers 
   language="jsx"
   code={`
 <helix height={5} pitch={5}>
-  <planar>
+  <planeSurface>
     <svg>
       <rect x={-1} y={-1} width={2} height={2} />
     </svg>
-  </planar>
+  </planeSurface>
 </helix>
 `}
 />
@@ -78,11 +78,11 @@ A helix of height 5 and pitch 5 with a square profile. Note that `pitch` refers 
     height: 5,
     pitch: 5,
     children: [
-      <planar>
+      <planeSurface>
         <svg>
           <rect x={-1} y={-1} width={2} height={2} />
         </svg>
-      </planar>,
+      </planeSurface>,
     ],
   }}
 >
@@ -99,11 +99,11 @@ A spring created using a vertical profile which does not intersect with the orig
 <helix height={9} pitch={3}>
   <translation y={2}>
     <rotation y={-Math.PI / 2}>
-      <planar>
+      <planeSurface>
         <svg>
           <circle r={1} />
         </svg>
-      </planar>
+      </planeSurface>
     </rotation>
   </translation>
 </helix>
@@ -118,11 +118,11 @@ A spring created using a vertical profile which does not intersect with the orig
     children: (
       <translation y={2}>
         <rotation y={-Math.PI / 2}>
-          <planar>
+          <planeSurface>
             <svg>
               <circle r={1} />
             </svg>
-          </planar>
+          </planeSurface>
         </rotation>
       </translation>
     ),
@@ -139,9 +139,9 @@ A partial turn of a helix with a complex SVG shape.
   import ReactIcon from './ReactIcon';
 
 <helix height={5} pitch={50}>
-  <planar>
+  <planeSurface>
     <ReactIcon />
-  </planar>
+  </planeSurface>
 </helix>
 `} />
 
@@ -151,9 +151,9 @@ A partial turn of a helix with a complex SVG shape.
     height: 5,
     pitch: 50,
     children: (
-      <planar>
+      <planeSurface>
         <ReactIcon />
-      </planar>
+      </planeSurface>
     ),
   }}
 >

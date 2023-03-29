@@ -178,15 +178,15 @@ Handle(ReactCADNode) createCADNode(std::string type)
   {
     return new STLImportNode();
   }
-  if (type == "planar")
+  if (type == "planeSurface")
   {
     return new PlaneNode();
   }
-  if (type == "spherical")
+  if (type == "sphericalSurface")
   {
     return new SphericalSurfaceNode();
   }
-  if (type == "cylindrical")
+  if (type == "cylindricalSurface")
   {
     return new CylindricalSurfaceNode();
   }

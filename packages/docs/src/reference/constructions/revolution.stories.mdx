@@ -7,7 +7,7 @@ import Link from "../../Link";
 
 # revolution
 
-The `revolution` element extrudes a 2-dimensional shape by rotating it around an axis. It is rotated by `angle` radians around an `axis` defined by a 3d vector. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planar polygon, or a string containing an SVG image. The `profile` must not intersect the `axis`.
+The `revolution` element extrudes a 2-dimensional shape by rotating it around an axis. It is rotated by `angle` radians around an `axis` defined by a 3d vector. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planeSurface polygon, or a string containing an SVG image. The `profile` must not intersect the `axis`.
 
 The children of the `revolution` form the 2d profile (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
 
@@ -53,11 +53,11 @@ A triangular profile rotated in a full circle around the y-axis.
   language="jsx"
   code={`
 <revolution axis={[0,1,0]} angle={2 * Math.PI}>
-  <planar>
+  <planeSurface>
     <svg>
       <polygon points="1,0 3,0 2,-2" />
     </svg>
-  </planar>
+  </planeSurface>
 </revolution>
 `}
 />
@@ -68,11 +68,11 @@ A triangular profile rotated in a full circle around the y-axis.
     axis: [0, 1, 0],
     angle: 2 * Math.PI,
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <polygon points="1,0 3,0 2,2" />
         </svg>
-      </planar>
+      </planeSurface>
     ),
   }}
 >
@@ -87,11 +87,11 @@ An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
   language="jsx"
   code={`
 <revolution axis={[1,0,1]} angle={3 * Math.PI / 2}>
-  <planar>
+  <planeSurface>
     <svg>
       <ellipse rx="2" ry="3" cx={2} cy={3} />
     </svg>
-  </planar>
+  </planeSurface>
 </revolution>
 `}
 />
@@ -102,11 +102,11 @@ An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
     axis: [1, 0, 1],
     angle: (3 * Math.PI) / 2,
     children: (
-      <planar>
+      <planeSurface>
         <svg>
           <ellipse rx="2" ry="3" cx={2} cy={3} />
         </svg>
-      </planar>
+      </planeSurface>
     ),
   }}
 >
@@ -124,9 +124,9 @@ An complex shape rotated 1 eighth turn around the x-axis. The `translation` elem
     
 <revolution axis={[-1,0,0]} angle={Math.PI / 4}>
   <translation y={-24}>
-    <planar>
+    <planeSurface>
       <ReactIcon />
-    </planar>
+    </planeSurface>
   </translation>
 </revolution>
 `}
@@ -139,9 +139,9 @@ An complex shape rotated 1 eighth turn around the x-axis. The `translation` elem
     angle: Math.PI / 4,
     children: (
       <translation y={-24}>
-        <planar>
+        <planeSurface>
           <ReactIcon />
-        </planar>
+        </planeSurface>
       </translation>
     ),
   }}

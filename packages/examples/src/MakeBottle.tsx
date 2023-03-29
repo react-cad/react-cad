@@ -13,11 +13,11 @@ const Profile: React.FC<{ width: number; thickness: number }> = ({
   }  Z`;
 
   return (
-    <planar>
+    <planeSurface>
       <svg width={width} height={thickness}>
         <path d={d} />
       </svg>
-    </planar>
+    </planeSurface>
   );
 };
 
@@ -30,8 +30,8 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
   const angle = (Math.atan(major / (neckHeight / 4)) * 180) / Math.PI;
   return (
     <rotation y={Math.PI / 2}>
-      <loft compatible>
-        <cylindrical radius={neckRadius * 0.99}>
+      <loft exact>
+        <cylindricalSurface radius={neckRadius * 0.99}>
           <svg viewBox="0 0 10 10">
             <g transform={`rotate(${angle})`}>
               <ellipse
@@ -42,8 +42,8 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
               />
             </g>
           </svg>
-        </cylindrical>
-        <cylindrical radius={neckRadius * 1.05}>
+        </cylindricalSurface>
+        <cylindricalSurface radius={neckRadius * 1.05}>
           <svg viewBox="0 0 10 10">
             <g transform={`rotate(${angle})`}>
               <ellipse
@@ -54,7 +54,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
               />
             </g>
           </svg>
-        </cylindrical>
+        </cylindricalSurface>
       </loft>
     </rotation>
   );

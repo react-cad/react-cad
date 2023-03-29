@@ -34,7 +34,9 @@ export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
   }
 
   isSurface(): this is CADInstance<SurfaceType> {
-    return ["planar", "spherical", "cylindrical"].includes(this.type);
+    return ["planeSurface", "sphericalSurface", "cylindricalSurface"].includes(
+      this.type
+    );
   }
 
   hasParent(): boolean {

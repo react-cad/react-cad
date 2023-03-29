@@ -48,39 +48,39 @@ A loft between a square, a circle and a triangle. On the left with `smooth` fals
   code={`
 <union>
   <loft>
-    <planar>
+    <planeSurface>
       <svg>
         <polygon points="5,0 10,5 5,10, 0,5" />
       </svg>
-    </planar>
-    <planar origin={[0, 0, 10]}>
+    </planeSurface>
+    <planeSurface origin={[0, 0, 10]}>
       <svg>
         <circle cx={5} cy={5} r="5" />
       </svg>
-    </planar>
-    <planar origin={[0, 0, 20]}>
+    </planeSurface>
+    <planeSurface origin={[0, 0, 20]}>
       <svg>
         <polygon points="5,0 10,5 5,10" />
       </svg>
-    </planar>
+    </planeSurface>
   </loft>
   <translation x={-15}>
     <loft smooth={false}>
-      <planar>
+      <planeSurface>
         <svg>
           <polygon points="5,0 10,5 5,10, 0,5" />
         </svg>
-      </planar>
-      <planar origin={[0, 0, 10]}>
+      </planeSurface>
+      <planeSurface origin={[0, 0, 10]}>
         <svg>
           <circle cx={5} cy={5} r="5" />
         </svg>
-      </planar>
-      <planar origin={[0, 0, 20]}>
+      </planeSurface>
+      <planeSurface origin={[0, 0, 20]}>
         <svg>
           <polygon points="5,0 10,5 5,10" />
         </svg>
-      </planar>
+      </planeSurface>
     </loft>
   </translation>
 </union>
@@ -91,57 +91,57 @@ A loft between a square, a circle and a triangle. On the left with `smooth` fals
   {() => (
     <union>
       <loft>
-        <planar>
+        <planeSurface>
           <svg>
             <polygon points="5,0 10,5 5,10, 0,5" />
           </svg>
-        </planar>
-        <planar origin={[0, 0, 10]}>
+        </planeSurface>
+        <planeSurface origin={[0, 0, 10]}>
           <svg>
             <circle cx={5} cy={5} r="5" />
           </svg>
-        </planar>
-        <planar origin={[0, 0, 20]}>
+        </planeSurface>
+        <planeSurface origin={[0, 0, 20]}>
           <svg>
             <polygon points="5,0 10,5 5,10" />
           </svg>
-        </planar>
+        </planeSurface>
       </loft>
       <translation x={-15}>
         <loft smooth={false}>
-          <planar>
+          <planeSurface>
             <svg>
               <polygon points="5,0 10,5 5,10, 0,5" />
             </svg>
-          </planar>
-          <planar origin={[0, 0, 10]}>
+          </planeSurface>
+          <planeSurface origin={[0, 0, 10]}>
             <svg>
               <circle cx={5} cy={5} r="5" />
             </svg>
-          </planar>
-          <planar origin={[0, 0, 20]}>
+          </planeSurface>
+          <planeSurface origin={[0, 0, 20]}>
             <svg>
               <polygon points="5,0 10,5 5,10" />
             </svg>
-          </planar>
+          </planeSurface>
         </loft>
       </translation>
       <translation x={15}>
-        <planar>
+        <planeSurface>
           <svg>
             <polygon points="5,0 10,5 5,10, 0,5" />
           </svg>
-        </planar>
-        <planar origin={[0, 0, 10]}>
+        </planeSurface>
+        <planeSurface origin={[0, 0, 10]}>
           <svg>
             <circle cx={5} cy={5} r="5" />
           </svg>
-        </planar>
-        <planar origin={[0, 0, 20]}>
+        </planeSurface>
+        <planeSurface origin={[0, 0, 20]}>
           <svg>
             <polygon points="5,0 10,5 5,10" />
           </svg>
-        </planar>
+        </planeSurface>
       </translation>
     </union>
   )}
@@ -158,26 +158,26 @@ A boat created from cross sections. On the left is the loft, and on the right th
   <translation z={1}>
     <rotation x={-Math.PI / 2}>
       <loft>
-        <planar origin={[1.75, 0, 0]}>
+        <planeSurface origin={[1.75, 0, 0]}>
           <svg>
             <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
           </svg>
-        </planar>
-        <planar origin={[0, 0, 5]}>
+        </planeSurface>
+        <planeSurface origin={[0, 0, 5]}>
           <svg>
             <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
           </svg>
-        </planar>
-        <planar origin={[0, 0, 8]}>
+        </planeSurface>
+        <planeSurface origin={[0, 0, 8]}>
           <svg>
             <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
           </svg>
-        </planar>
-        <planar origin={[1.75, 0, 12]}>
+        </planeSurface>
+        <planeSurface origin={[1.75, 0, 12]}>
           <svg>
             <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
           </svg>
-        </planar>
+        </planeSurface>
       </loft>
     </rotation>
   </translation>
@@ -196,51 +196,51 @@ A boat created from cross sections. On the left is the loft, and on the right th
       <translation z={1}>
         <rotation x={-Math.PI / 2}>
           <loft>
-            <planar origin={[1.75, 0, 0]}>
+            <planeSurface origin={[1.75, 0, 0]}>
               <svg>
                 <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
               </svg>
-            </planar>
-            <planar origin={[0, 0, 5]}>
+            </planeSurface>
+            <planeSurface origin={[0, 0, 5]}>
               <svg>
                 <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
               </svg>
-            </planar>
-            <planar origin={[0, 0, 8]}>
+            </planeSurface>
+            <planeSurface origin={[0, 0, 8]}>
               <svg>
                 <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
               </svg>
-            </planar>
-            <planar origin={[1.75, 0, 12]}>
+            </planeSurface>
+            <planeSurface origin={[1.75, 0, 12]}>
               <svg>
                 <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
               </svg>
-            </planar>
+            </planeSurface>
           </loft>
         </rotation>
       </translation>
       <translation z={1} x={5}>
         <rotation x={-Math.PI / 2}>
-          <planar origin={[1.75, 0, 0]}>
+          <planeSurface origin={[1.75, 0, 0]}>
             <svg>
               <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
             </svg>
-          </planar>
-          <planar origin={[0, 0, 5]}>
+          </planeSurface>
+          <planeSurface origin={[0, 0, 5]}>
             <svg>
               <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
             </svg>
-          </planar>
-          <planar origin={[0, 0, 8]}>
+          </planeSurface>
+          <planeSurface origin={[0, 0, 8]}>
             <svg>
               <path d="M 0 0 L 4 0 L 4 1 C 3 3 1 3 0 1 Z" />
             </svg>
-          </planar>
-          <planar origin={[1.75, 0, 12]}>
+          </planeSurface>
+          <planeSurface origin={[1.75, 0, 12]}>
             <svg>
               <polygon points="0,0 0.5,0 0.5,0.5, 0,0.5" />
             </svg>
-          </planar>
+          </planeSurface>
         </rotation>
       </translation>
     </union>
@@ -267,7 +267,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
   return (
     <rotation y={Math.PI / 2}>
       <loft>
-        <cylindrical radius={neckRadius * 0.99}>
+        <cylindricalSurface radius={neckRadius * 0.99}>
           <svg>
             <g transform={\`rotate(\${angle1})\`}>
               <ellipse
@@ -278,8 +278,8 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
               />
             </g>
           </svg>
-        </cylindrical>
-        <cylindrical radius={neckRadius * 1.05}>
+        </cylindricalSurface>
+        <cylindricalSurface radius={neckRadius * 1.05}>
           <svg>
             <g transform={\`rotate(\${angle2})\`}>
               <ellipse
@@ -290,7 +290,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
               />
             </g>
           </svg>
-        </cylindrical>
+        </cylindricalSurface>
       </loft>
     </rotation>
   );
@@ -315,7 +315,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
     return (
       <rotation y={Math.PI / 2}>
         <loft>
-          <cylindrical radius={neckRadius * 0.99}>
+          <cylindricalSurface radius={neckRadius * 0.99}>
             <svg>
               <g transform={`rotate(${angle1})`}>
                 <ellipse
@@ -326,8 +326,8 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
                 />
               </g>
             </svg>
-          </cylindrical>
-          <cylindrical radius={neckRadius * 1.05}>
+          </cylindricalSurface>
+          <cylindricalSurface radius={neckRadius * 1.05}>
             <svg>
               <g transform={`rotate(${angle2})`}>
                 <ellipse
@@ -338,7 +338,7 @@ const ScrewThread: React.FC<{ neckRadius: number; neckHeight: number }> = ({
                 />
               </g>
             </svg>
-          </cylindrical>
+          </cylindricalSurface>
         </loft>
       </rotation>
     );
