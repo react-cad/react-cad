@@ -1,0 +1,85 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+
+<Meta title="Reference/Surfaces & SVGs/Cylindrical surface" />
+
+# cylindricalSurface
+
+The `cylindricalSurface` surface element orients its SVG children on the surface of a cylinder. The `radius` prop specifies the radius of the cylinder. By default the cylinder is at the origin but an optional `origin` prop can translate the surface.
+
+Co-ordinates in the x-direction range from 0 to 2π. Co-ordinates in the y-direction extend to positive and negative infinity.
+
+<ArgsTable
+  rows={{
+    radius: {
+      name: "radius",
+      description: "The radius of the cylindrical surface",
+      table: {
+        type: {
+          summary: "number",
+        },
+      },
+    },
+    origin: {
+      name: "origin",
+      description: "The position of the surface's origin in 3d space.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a vector [x,y,z]",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const CylindricalSurface = (props) => <cylindricalSurface {...props} />;
+
+### Cylindrical surface
+
+An SVG in a cylindrical surface with radius 1, located at the origin.
+
+`ReactIcon` is a React component which returns an SVG element. Its `width` and `height` props are passed to the SVG, and in conjunction with the SVG's `viewBox` prop they cause the shape to be scaled to fit within the sphere's co-ordinate system.
+
+<Source
+  language="jsx"
+  code={`<cylindricalSurface>
+  <ReactIcon width={Math.PI * 0.8} height={Math.PI * 0.8}/>
+</cylindricalSurface>
+`}
+/>
+
+<Story
+  name="cylindricalSurface"
+  args={{
+    children: <ReactIcon width={Math.PI * 0.8} height={Math.PI * 0.8} />,
+  }}
+>
+  {CylindricalSurface.bind({})}
+</Story>
+
+### Large, translated cylindrical surface
+
+An SVG on a cylindrical surface with radius 20, translated below the origin.
+
+<Source
+  language="jsx"
+  code={`<cylindricalSurface radius={20} origin={[0,0,-20]}>
+  <ReactIcon width={40} height={40}/>
+</cylindricalSurface>
+`}
+/>
+
+<Story
+  name="large-cylindricalSurface"
+  args={{
+    radius: 20,
+    origin: [0, 0, -20],
+    children: <ReactIcon width={40} height={40} />,
+  }}
+>
+  {CylindricalSurface.bind({})}
+</Story>

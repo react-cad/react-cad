@@ -22,6 +22,7 @@ public:
   ReactCADNode();
   virtual ~ReactCADNode();
 
+  TopoDS_Shape getShape(const ProgressHandler &handler);
   void appendChild(Handle(ReactCADNode) & child);
   void insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before);
   void removeChild(Handle(ReactCADNode) & child);
@@ -29,9 +30,9 @@ public:
 
   void computeGeometry(const ProgressHandler &handler);
   virtual std::string getName() = 0;
-  TopoDS_Shape shape;
 
 protected:
+  void setShape(const TopoDS_Shape &shape);
   void propsChanged();
 
   virtual void computeChildren(TopTools_ListOfShape children, const ProgressHandler &handler);
@@ -40,6 +41,7 @@ protected:
   TopoDS_Shape m_childShape;
 
 private:
+  TopoDS_Shape m_shape;
   Handle(ReactCADNode) m_parent;
   std::vector<Handle(ReactCADNode)> m_children;
 

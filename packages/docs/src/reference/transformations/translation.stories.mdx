@@ -17,7 +17,7 @@ The `translation` element translates its children along a vector. This can be de
           summary: "number",
         },
         defaultValue: {
-          summary: '0'
+          summary: "0",
         },
       },
     },
@@ -29,7 +29,7 @@ The `translation` element translates its children along a vector. This can be de
           summary: "number",
         },
         defaultValue: {
-          summary: '0'
+          summary: "0",
         },
       },
     },
@@ -41,22 +41,19 @@ The `translation` element translates its children along a vector. This can be de
           summary: "number",
         },
         defaultValue: {
-          summary: '0'
+          summary: "0",
         },
       },
     },
     vector: {
       name: "vector",
-      type: {
-        required: true,
-      },
       description: "The translation vector.",
       table: {
         type: {
           summary: "[number, number, number]",
         },
         defaultValue: {
-          summary: '[0, 0, 0]'
+          summary: "[0, 0, 0]",
         },
       },
     },
@@ -71,13 +68,19 @@ export const Translation = (props) => <translation {...props} />;
 
 A cube translated by a vector.
 
-<Source language="jsx" code={`
+<Source
+  language="jsx"
+  code={`
 <translation vector={[3,-1,-2]}>
   <box x={5} y={5} z={5} />
 </translation>
-`} />
+`}
+/>
 
-<Story name="translation" args={{ vector: [3,-1,-2], children: [<box x={5} y={5} z={5} />] }}>
+<Story
+  name="translation"
+  args={{ vector: [3, -1, -2], children: [<box x={5} y={5} z={5} />] }}
+>
   {Translation.bind({})}
 </Story>
 
@@ -85,13 +88,19 @@ A cube translated by a vector.
 
 A cube translated by `x`, `y` and `z` props.
 
-<Source language="jsx" code={`
+<Source
+  language="jsx"
+  code={`
 <translation x={3} y={2} z={1}>
   <box x={5} y={5} z={5} />
 </translation>
-`} />
+`}
+/>
 
-<Story name="translation x y z" args={{ x: 3, y: 2, z: 1, children: [<box x={5} y={5} z={5} />] }}>
+<Story
+  name="translation x y z"
+  args={{ x: 3, y: 2, z: 1, children: [<box x={5} y={5} z={5} />] }}
+>
   {Translation.bind({})}
 </Story>
 
@@ -99,12 +108,18 @@ A cube translated by `x`, `y` and `z` props.
 
 A cube translated by the `x` prop only.
 
-<Source language="jsx" code={`
+<Source
+  language="jsx"
+  code={`
 <translation x={3} >
   <box x={5} y={5} z={5} />
 </translation>
-`} />
+`}
+/>
 
-<Story name="translation x" args={{ x: 3, children: [<box x={5} y={5} z={5} />] }}>
+<Story
+  name="translation x"
+  args={{ x: 3, children: [<box x={5} y={5} z={5} />] }}
+>
   {Translation.bind({})}
 </Story>

@@ -2,20 +2,19 @@ import { Fiber } from "react-reconciler";
 import {
   ReactCADCore,
   ReactCADNode,
-  Profile,
   Point,
-  ReactCADNodeTypes,
   Vector,
   Quaternion,
   Matrix,
 } from "@react-cad/core";
+import { CADInstance } from "instance";
 
-export interface Element<T extends Type = Type> {
+export interface Element<T extends ReactCADNodeType = ReactCADNodeType> {
   prepareUpdate(
-    oldProps: Props<T>,
-    newProps: Props<T>
+    oldProps: Props<ReactCADNodeType>,
+    newProps: Props<ReactCADNodeType>
   ): UpdatePayload<T> | null;
-  commitUpdate(instance: Instance<T>, updatePayload: UpdatePayload<T>): void;
+  commitUpdate(instance: CADInstance<T>, updatePayload: UpdatePayload<T>): void;
 }
 
 export interface ReactCADElements {
@@ -69,18 +68,15 @@ export interface ReactCADElements {
     points: Point[];
     faces: number[][];
   };
+  solid: React.PropsWithChildren<unknown>;
 
-  evolution: {
-    profile: Point[] | string;
-    spine: Profile;
-  };
-  pipe: {
-    profile: Profile;
-    spine: Point[] | string;
-  };
-  prism: {
-    profile: Profile;
-  } & (
+  evolution: React.PropsWithChildren<{
+    profile: string;
+  }>;
+  pipe: React.PropsWithChildren<{
+    spine: string;
+  }>;
+  prism: React.PropsWithChildren<
     | {
         x?: number;
         y?: number;
@@ -89,17 +85,20 @@ export interface ReactCADElements {
     | {
         vector: Vector;
       }
-  );
-  revolution: {
-    profile: Profile;
+  >;
+  revolution: React.PropsWithChildren<{
     axis: Vector;
     angle: number;
-  };
-  helix: {
-    profile: Profile;
+  }>;
+  helix: React.PropsWithChildren<{
     pitch: number;
     height: number;
-  };
+    leftHanded?: boolean;
+  }>;
+  loft: React.PropsWithChildren<{
+    exact?: boolean;
+    smooth?: boolean;
+  }>;
 
   affine: React.PropsWithChildren<{
     matrix: Matrix;
@@ -152,6 +151,18 @@ export interface ReactCADElements {
     data: string | ArrayBuffer;
   };
 
+  planeSurface: React.PropsWithChildren<{
+    origin?: Point;
+  }>;
+  sphericalSurface: React.PropsWithChildren<{
+    origin?: Point;
+    radius?: number;
+  }>;
+  cylindricalSurface: React.PropsWithChildren<{
+    origin?: Point;
+    radius?: number;
+  }>;
+
   union: React.PropsWithChildren<unknown>;
   difference: React.PropsWithChildren<unknown>;
   intersection: React.PropsWithChildren<unknown>;
@@ -159,25 +170,51 @@ export interface ReactCADElements {
 
 export type ElementProps = ReactCADElements;
 
+export interface Instance {
+  getPublicInstance(): any;
+  hasParent(): boolean;
+  appendChild(child: Instance): void;
+  insertBefore(child: Instance, before: Instance): void;
+  removeChild(child: Instance): void;
+  prepareUpdate(
+    oldProps: Props<Type>,
+    newProps: Props<Type>,
+    rootContainerInstance: Container,
+    hostContext: HostContext
+  ): UpdatePayload | null;
+  commitUpdate(updatePayload: UpdatePayload): void;
+  delete(): void;
+}
+
 export type Container = {
   core: ReactCADCore;
-  root: ReactCADNode;
-  nodes: ReactCADNode[];
-  rootNodes: ReactCADNode[];
+  root: Instance;
+  instances: Instance[];
+  rootInstances: Instance[];
   callback?: () => void;
 };
 
 export type HostContext = unknown;
-export type Type = keyof ElementProps;
-export type Props<T extends Type = Type> = ElementProps[T];
-export interface Instance<T extends Type = Type> {
-  core: ReactCADCore;
-  type: T;
-  node: ReactCADNodeTypes[T];
-}
+
+export type ReactCADNodeType = keyof ElementProps;
+export type SVGNodeType = keyof JSX.IntrinsicElements;
+export type SVGTextNodeType = "svgString";
+export type Type = ReactCADNodeType | SVGNodeType | SVGTextNodeType;
+export type SurfaceType =
+  | "planeSurface"
+  | "sphericalSurface"
+  | "cylindricalSurface";
+export type Props<T extends Type = Type> = T extends SVGNodeType
+  ? JSX.IntrinsicElements[T]
+  : T extends ReactCADNodeType
+  ? ElementProps[T]
+  : T extends SVGTextNodeType
+  ? { children: string }
+  : never;
+
 export type TextInstance = string;
 export type HydratableInstance = never;
-export type PublicInstance = ReactCADNode;
+export type PublicInstance = ReactCADNode | SVGElement;
 export type UpdatePayload<T extends Type = Type> = Props<T>;
 
 export type ChildSet = never;

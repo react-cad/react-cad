@@ -1,0 +1,150 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+import Link from "../../Link";
+
+<Meta title="Reference/Constructions/Revolution" />
+
+# revolution
+
+The `revolution` element extrudes a 2-dimensional shape by rotating it around an axis. It is rotated by `angle` radians around an `axis` defined by a 3d vector. The 2d shape is passed to the `profile` prop, which can either be a list of points describing a planeSurface polygon, or a string containing an SVG image. The `profile` must not intersect the `axis`.
+
+The children of the `revolution` form the 2d profile (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
+
+<ArgsTable
+  rows={{
+    axis: {
+      name: "axis",
+      description: "The axis to rotate the profile around",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: "[number, number, number]",
+        },
+      },
+    },
+    angle: {
+      name: "angle",
+      description: "The angle in radians to rotate the profile through",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero and less than or equal to 2π",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Revolution = (props) => <revolution {...props} />;
+
+### Triangular revolution
+
+A triangular profile rotated in a full circle around the y-axis.
+
+<Source
+  language="jsx"
+  code={`
+<revolution axis={[0,1,0]} angle={2 * Math.PI}>
+  <planeSurface>
+    <svg>
+      <polygon points="1,0 3,0 2,-2" />
+    </svg>
+  </planeSurface>
+</revolution>
+`}
+/>
+
+<Story
+  name="revolution"
+  args={{
+    axis: [0, 1, 0],
+    angle: 2 * Math.PI,
+    children: (
+      <planeSurface>
+        <svg>
+          <polygon points="1,0 3,0 2,2" />
+        </svg>
+      </planeSurface>
+    ),
+  }}
+>
+  {Revolution.bind({})}
+</Story>
+
+### Partial elliptical revolution
+
+An elliptical profile rotated 3 quarters of a turn around a diagonal axis.
+
+<Source
+  language="jsx"
+  code={`
+<revolution axis={[1,0,1]} angle={3 * Math.PI / 2}>
+  <planeSurface>
+    <svg>
+      <ellipse rx="2" ry="3" cx={2} cy={3} />
+    </svg>
+  </planeSurface>
+</revolution>
+`}
+/>
+
+<Story
+  name="elliptical revolution"
+  args={{
+    axis: [1, 0, 1],
+    angle: (3 * Math.PI) / 2,
+    children: (
+      <planeSurface>
+        <svg>
+          <ellipse rx="2" ry="3" cx={2} cy={3} />
+        </svg>
+      </planeSurface>
+    ),
+  }}
+>
+  {Revolution.bind({})}
+</Story>
+
+### React icon revolution
+
+An complex shape rotated 1 eighth turn around the x-axis. The `translation` element is used to move the shape away from the axis of rotation.
+
+<Source
+  language="jsx"
+  code={`
+  import ReactIcon from './ReactIcon';
+    
+<revolution axis={[-1,0,0]} angle={Math.PI / 4}>
+  <translation y={-24}>
+    <planeSurface>
+      <ReactIcon />
+    </planeSurface>
+  </translation>
+</revolution>
+`}
+/>
+
+<Story
+  name="react icon revolution"
+  args={{
+    axis: [-1, 0, 0],
+    angle: Math.PI / 4,
+    children: (
+      <translation y={-24}>
+        <planeSurface>
+          <ReactIcon />
+        </planeSurface>
+      </translation>
+    ),
+  }}
+>
+  {Revolution.bind({})}
+</Story>

@@ -43,7 +43,7 @@ void WedgeNode::setMinMax(Standard_Real xmin, Standard_Real xmax, Standard_Real 
 
 void WedgeNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   BRepPrimAPI_MakeWedge makeWedge(1, 1, 1, 1);
 
@@ -59,7 +59,7 @@ void WedgeNode::computeShape(const ProgressHandler &handler)
   makeWedge.Build(/*theRange*/);
   if (makeWedge.IsDone())
   {
-    shape = makeWedge.Solid();
+    setShape(makeWedge.Solid());
   }
   else
   {

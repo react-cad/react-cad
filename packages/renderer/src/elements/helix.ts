@@ -1,12 +1,9 @@
-import { Point } from "@react-cad/core";
-import { Props, Instance, UpdatePayload } from "../types";
+import { CADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 
 type Helix = "helix";
 
 function validateProps(props: Props<Helix>): boolean {
-  if (typeof props.profile != "string" && props.profile.length < 3) {
-    throw new Error(`helix: "profile" prop must be contain at least 3 points`);
-  }
   if (props.pitch <= 0) {
     throw new Error(`helix: "pitch" prop must be greater than or equal to 0`);
   }
@@ -22,9 +19,9 @@ export function prepareUpdate(
   newProps: Props<Helix>
 ): UpdatePayload<Helix> | null {
   if (
-    oldProps.profile !== newProps.profile ||
     oldProps.pitch !== newProps.pitch ||
-    oldProps.height !== newProps.height
+    oldProps.height !== newProps.height ||
+    oldProps.leftHanded !== newProps.leftHanded
   ) {
     validateProps(newProps);
     return newProps;
@@ -33,26 +30,13 @@ export function prepareUpdate(
   return null;
 }
 
-const defaultProfile: Point[] = [
-  [-0.5, -0.5, 0],
-  [-0.5, 0.5, 0],
-  [0.5, 0.5, 0],
-  [0.5, -0.5, 0],
-];
-
 export function commitUpdate(
-  instance: Instance<Helix>,
+  instance: CADInstance<Helix>,
   updatePayload: UpdatePayload<Helix>
 ): void {
   validateProps(updatePayload);
-  const { profile = defaultProfile, height = 10, pitch = 10 } = updatePayload;
-
-  if (typeof profile === "string") {
-    instance.node.setProfileSVG(profile);
-  } else {
-    instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
-  }
-
+  const { pitch, height, leftHanded = false } = updatePayload;
   instance.node.setPitch(pitch);
   instance.node.setHeight(height);
+  instance.node.setLeftHanded(leftHanded);
 }

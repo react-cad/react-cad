@@ -1,0 +1,85 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+
+<Meta title="Reference/Surfaces & SVGs/Spherical surface" />
+
+# sphericalSurface
+
+The `sphericalSurface` element orients its SVG children on the surface of a sphere. The `radius` prop specifies the radius of the sphere. By default the sphere is at the origin but an optional `origin` prop can translate the surface.
+
+Co-ordinates in the x-direction range from 0 to 2π. Co-ordinates in the y-direction range from -π/2 to π/2.
+
+<ArgsTable
+  rows={{
+    radius: {
+      name: "radius",
+      description: "The radius of the spherical surface",
+      table: {
+        type: {
+          summary: "number",
+        },
+      },
+    },
+    origin: {
+      name: "origin",
+      description: "The position of the surface's origin in 3d space.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a vector [x,y,z]",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const SphericalSurface = (props) => <sphericalSurface {...props} />;
+
+### Spherical surface
+
+An SVG in a spherical surface with radius 1, located at the origin.
+
+`ReactIcon` is a React component which returns an SVG element. Its `width` and `height` props are passed to the SVG, and in conjunction with the SVG's `viewBox` prop they cause the shape to be scaled to fit within the sphere's co-ordinate system.
+
+<Source
+  language="jsx"
+  code={`<sphericalSurface>
+  <ReactIcon width={Math.PI * 0.75} height={Math.PI * 0.75}/>
+</sphericalSurface>
+`}
+/>
+
+<Story
+  name="sphericalSurface"
+  args={{
+    children: <ReactIcon width={Math.PI * 0.75} height={Math.PI * 0.75} />,
+  }}
+>
+  {SphericalSurface.bind({})}
+</Story>
+
+### Large, translated spherical surface
+
+An SVG in a spherical surface with radius 20, raised above the origin.
+
+<Source
+  language="jsx"
+  code={`<sphericalSurface radius={20} origin={[0,0,10]}>
+  <ReactIcon width={40} height={40}/>
+</sphericalSurface>
+`}
+/>
+
+<Story
+  name="large-sphericalSurface"
+  args={{
+    radius: 20,
+    origin: [0, 0, 10],
+    children: <ReactIcon width={40} height={40} />,
+  }}
+>
+  {SphericalSurface.bind({})}
+</Story>

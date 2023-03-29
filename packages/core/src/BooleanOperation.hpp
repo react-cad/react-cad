@@ -4,6 +4,7 @@
 #include "ProgressHandler.hpp"
 #include <BRepAlgoAPI_BooleanOperation.hxx>
 #include <TopTools_ListOfShape.hxx>
+#include <TopoDS_Compound.hxx>
 #include <TopoDS_Shape.hxx>
 
 class BooleanOperation
@@ -17,6 +18,7 @@ public:
   void Intersection(TopTools_ListOfShape shapes, const ProgressHandler &handler);
 
   void Union(TopTools_ListOfShape shapes, const ProgressHandler &handler);
+  void Union(TopoDS_Shape shape, const ProgressHandler &handler);
 
   Standard_Boolean HasErrors();
   std::string Errors();

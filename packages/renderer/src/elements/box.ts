@@ -1,4 +1,5 @@
-import { Props, Instance, UpdatePayload } from "../types";
+import { CADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 
 type Box = "box";
 
@@ -34,7 +35,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<Box>,
+  instance: CADInstance<Box>,
   updatePayload: UpdatePayload<Box>
 ): void {
   validateProps(updatePayload);

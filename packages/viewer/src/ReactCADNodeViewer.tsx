@@ -37,7 +37,7 @@ const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       focus,
       borderless,
       highDetail = [0.001, 0.5],
-      lowDetail = [0.002, 1],
+      lowDetail = [0.05, 0.5],
       setDetail,
       rerender,
       onError,

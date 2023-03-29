@@ -12,12 +12,12 @@ STLImportNode::STLImportNode()
 {
 }
 
-void STLImportNode::importFile(const ProgressHandler &handler)
+TopoDS_Shape STLImportNode::importFile(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Triangulating STL");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   Message_ProgressScope scope(handler, "Importing STL file", 3);
 
@@ -37,14 +37,22 @@ void STLImportNode::importFile(const ProgressHandler &handler)
     PerformanceTimer timer2("Sewing STL mesh");
 #endif
 
+    TopoDS_Shape shape;
     bool success = shapeFromMesh(mesh, shape, handler.WithRange(scope.Next(2)));
-    if (!success)
-    {
-      handler.Abort("stlimport: mesh sewing failed");
-    }
 
 #ifdef REACTCAD_DEBUG
     timer2.end();
 #endif
+
+    if (success)
+    {
+      return shape;
+    }
+    else
+    {
+      handler.Abort("stlimport: mesh sewing failed");
+    }
   }
+
+  return TopoDS_Shape();
 }

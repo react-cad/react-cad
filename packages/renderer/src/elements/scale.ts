@@ -1,4 +1,5 @@
-import { Props, Instance, UpdatePayload } from "../types";
+import { CADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
 type Scale = "scale";
@@ -51,7 +52,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<Scale>,
+  instance: CADInstance<Scale>,
   updatePayload: UpdatePayload<Scale>
 ): void {
   validateProps(updatePayload);

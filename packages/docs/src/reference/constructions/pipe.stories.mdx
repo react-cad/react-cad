@@ -1,0 +1,133 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+import Link from "../../Link";
+
+<Meta title="Reference/Constructions/Pipe" />
+
+# pipe
+
+The `pipe` element extrudes a 2-dimensional shape along an arbitrary 2-dimensional path. The path is passed to `spine` as a string of SVG path commands (the same format used for the `d` attribute of an SVG `path` element). The path will be traced in the xz plane, with SVG y-values mapped to the z-axis.
+
+The children of the `pipe` form the 2d profile (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
+
+<ArgsTable
+  rows={{
+    path: {
+      name: "path",
+      description: "The path along which to extruded the profile.",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: "string",
+          detail: "a series of SVG path commands",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Pipe = (props) => <pipe {...props} />;
+
+### Triangular pipe
+
+A triangular profile extruded along a series of straight lines. We extend the path in the negative y-direction, as this will equate to the positive z-direction.
+
+Extruding a pipe along straight line doesn't affect the normal of the shape - it remains flat whichever direction the line goes.
+
+<Source
+  language="jsx"
+  code={`
+<pipe spine="M 0 0 L 0 5 L 5 10">
+  <planeSurface>
+    <svg>
+      <rect width={1} height={1} />
+    </svg>
+  </planeSurface>
+</pipe>
+`}
+/>
+
+<Story
+  name="pipe"
+  args={{
+    children: (
+      <planeSurface>
+        <svg>
+          <rect width={1} height={1} />
+        </svg>
+      </planeSurface>
+    ),
+    spine: "M 0 0 L 0 5 L 5 10",
+  }}
+>
+  {Pipe.bind({})}
+</Story>
+
+### Smooth pipe
+
+To make a smooth pipe use curve path commands to round out corners, and the profile will follow the curve.
+
+<Source
+  language="jsx"
+  code={`
+<pipe spine="M 0 0 L 0 3 C 0 5 1 6 2 7 L 5 10"  />
+  <planeSurface>
+    <svg>
+      <rect width={1} height={1} />
+    </svg>
+  </planeSurface>
+</pipe>
+`}
+/>
+
+<Story
+  name="smooth pipe"
+  args={{
+    children: (
+      <planeSurface>
+        <svg>
+          <rect width={1} height={1} />
+        </svg>
+      </planeSurface>
+    ),
+    spine: "M 0 0 L 0 3 C 0 5 1 6 2 7 L 5 10",
+  }}
+>
+  {Pipe.bind({})}
+</Story>
+
+### React icon pipe
+
+A complex SVG pipe.
+
+<Source
+  language="jsx"
+  code={`
+  import ReactIcon from './ReactIcon';
+  
+<pipe spine="M 0 0 C 0 10 10 10 10 20">
+  <planeSurface>
+    <ReactIcon />
+  </planeSurface>
+</pipe>
+`}
+/>
+
+<Story
+  name="react icon pipe"
+  args={{
+    children: (
+      <planeSurface>
+        <ReactIcon />
+      </planeSurface>
+    ),
+    spine: "M 0 0 C 0 10 10 10 10 20",
+  }}
+>
+  {Pipe.bind({})}
+</Story>

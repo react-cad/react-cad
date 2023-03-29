@@ -1,5 +1,5 @@
-import { Point } from "@react-cad/core";
-import { Props, Instance, UpdatePayload } from "../types";
+import { CADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
 type Prism = "prism";
@@ -29,10 +29,7 @@ export function prepareUpdate(
 ): UpdatePayload<Prism> | null {
   const oldVector = getVector(oldProps);
   const newVector = getVector(newProps);
-  if (
-    oldProps.profile !== newProps.profile ||
-    !arrayEqual(oldVector, newVector)
-  ) {
+  if (!arrayEqual(oldVector, newVector)) {
     validateProps(newProps);
     return newProps;
   }
@@ -40,26 +37,11 @@ export function prepareUpdate(
   return null;
 }
 
-const defaultProfile: Point[] = [
-  [-0.5, -0.5, 0],
-  [-0.5, 0.5, 0],
-  [0.5, 0.5, 0],
-  [0.5, -0.5, 0],
-];
-
 export function commitUpdate(
-  instance: Instance<Prism>,
+  instance: CADInstance<Prism>,
   updatePayload: UpdatePayload<Prism>
 ): void {
   validateProps(updatePayload);
-  const { profile } = updatePayload;
   const vector = getVector(updatePayload);
-
-  if (typeof profile === "string") {
-    instance.node.setProfileSVG(profile);
-  } else {
-    instance.node.setProfile(profile?.length > 2 ? profile : defaultProfile);
-  }
-
   instance.node.setVector(vector);
 }

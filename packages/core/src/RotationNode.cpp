@@ -9,14 +9,6 @@ RotationNode::RotationNode() : m_angle(0), m_axis(gp::DX()), m_quaternion(gp::DX
 {
 }
 
-void RotationNode::setTransform()
-{
-}
-
-void RotationNode::setDirectionAngle(gp_Dir direction, Standard_Real angle)
-{
-}
-
 void RotationNode::setAxisAngle(gp_Vec axis, Standard_Real angle)
 {
   if (!IsEqual(angle, m_angle) || !axis.IsParallel(m_axis, RealEpsilon()))
@@ -53,12 +45,12 @@ void RotationNode::setRotation(Quaternion quaternion)
 
 void RotationNode::computeShape(const ProgressHandler &handler)
 {
-  shape = m_childShape;
+  setShape(m_childShape);
   BRepBuilderAPI_Transform theTransform(m_transform);
   theTransform.Perform(m_childShape, true);
   if (theTransform.IsDone())
   {
-    shape = theTransform.Shape();
+    setShape(theTransform.Shape());
   }
   else
   {

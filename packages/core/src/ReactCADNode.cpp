@@ -2,10 +2,13 @@
 #include <math.h>
 
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
+#include <BRep_Builder.hxx>
 #include <Message.hxx>
 #include <Message_ProgressScope.hxx>
-
-#include <mutex>
+#include <TopoDS_Compound.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Trsf.hxx>
 
 #include "BooleanOperation.hpp"
 #include "ReactCADNode.hpp"
@@ -13,13 +16,34 @@
 #include "PerformanceTimer.hpp"
 
 ReactCADNode::ReactCADNode()
-    : m_parent(), shape(TopoDS_Shape()), m_propsChanged(true), m_children(), m_childrenChanged(false),
-      m_childShape(TopoDS_Shape())
+    : m_parent(), m_shape(), m_propsChanged(true), m_children(), m_childrenChanged(false), m_childShape(TopoDS_Shape())
 {
 }
 
 ReactCADNode::~ReactCADNode()
 {
+}
+
+void ReactCADNode::setShape(const TopoDS_Shape &shape)
+{
+  m_shape = shape;
+}
+
+TopoDS_Shape ReactCADNode::getShape(const ProgressHandler &handler)
+{
+  if (m_shape.IsNull())
+  {
+    return m_shape;
+  }
+
+  gp_Ax2 mirror(gp::Origin(), gp::DY());
+  gp_Trsf trsf;
+  trsf.SetMirror(mirror);
+  BRepBuilderAPI_Transform transform(trsf);
+  transform.Perform(m_shape, true);
+  TopoDS_Shape shape = transform.Shape();
+
+  return shape;
 }
 
 void ReactCADNode::appendChild(Handle(ReactCADNode) & child)
@@ -96,7 +120,7 @@ void ReactCADNode::computeGeometry(const ProgressHandler &handler)
         std::stringstream name;
         name << handler.Name() << "/" << i << "-" << (*child)->getName();
         (*child)->computeGeometry(handler.WithRangeAndName(childScope.Next(), name.str()));
-        shapes.Append((*child)->shape);
+        shapes.Append((*child)->m_shape);
         ++i;
       }
 
@@ -136,15 +160,22 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Progress
   Message_ProgressScope scope(handler, "Computing union", 1);
   if (scope.More())
   {
-    BooleanOperation op;
-    op.Union(children, handler.WithRange(scope.Next()));
-    if (op.HasErrors())
+    m_childShape = TopoDS_Shape();
+
+    if (children.Size() == 1)
     {
-      handler.Abort("union: boolean operation failed\n\n" + op.Errors());
+      m_childShape = children.First();
     }
-    else
+    else if (children.Size() > 1)
     {
-      m_childShape = op.Shape();
+      BRep_Builder builder;
+      TopoDS_Compound compound;
+      builder.MakeCompound(compound);
+      for (auto it = children.begin(); it != children.end(); ++it)
+      {
+        builder.Add(compound, *it);
+      }
+      m_childShape = compound;
     }
   }
 
@@ -155,5 +186,5 @@ void ReactCADNode::computeChildren(TopTools_ListOfShape children, const Progress
 
 void ReactCADNode::computeShape(const ProgressHandler &handler)
 {
-  shape = m_childShape;
+  m_shape = m_childShape;
 }

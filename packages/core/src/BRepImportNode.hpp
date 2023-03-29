@@ -14,7 +14,7 @@ public:
   }
 
 protected:
-  void importFile(const ProgressHandler &handler) override;
+  TopoDS_Shape importFile(const ProgressHandler &handler) override;
 };
 
 #endif

@@ -11,12 +11,12 @@ STEPImportNode::STEPImportNode()
 {
 }
 
-void STEPImportNode::importFile(const ProgressHandler &handler)
+TopoDS_Shape STEPImportNode::importFile(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import STEP");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   Message_ProgressScope scope(handler, "Importing STEP file", 1);
 
@@ -29,7 +29,7 @@ void STEPImportNode::importFile(const ProgressHandler &handler)
     errors << "Error loading STEP file:\n";
     reader.PrintCheckLoad(errors, true, IFSelect_ItemsByEntity);
     handler.Abort("stepimport: import failed\n\n" + errors.str());
-    return;
+    return TopoDS_Shape();
   }
 
   Standard_Integer num = reader.TransferRoots(scope.Next());
@@ -40,12 +40,12 @@ void STEPImportNode::importFile(const ProgressHandler &handler)
     errors << "Error transferring STEP entities:\n";
     reader.PrintCheckTransfer(errors, true, IFSelect_ItemsByEntity);
     handler.Abort("stepimport: import failed\n\n" + errors.str());
-    return;
+    return TopoDS_Shape();
   }
-
-  shape = reader.OneShape();
 
 #ifdef REACTCAD_DEBUG
   timer.end();
 #endif
+
+  return reader.OneShape();
 }

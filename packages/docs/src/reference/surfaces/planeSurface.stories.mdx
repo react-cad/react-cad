@@ -1,0 +1,71 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+
+<Meta title="Reference/Surfaces & SVGs/Plane surface" />
+
+# planeSurface
+
+The `planeSurface` surface element orients its SVG children in a flat plane parallel to the xy-plane. By default it _is_ the xy-plane, but an optional `origin` prop can move the plane's origin elsewhere in space.
+
+<ArgsTable
+  rows={{
+    origin: {
+      name: "origin",
+      description: "The position of the plane's origin in 3d space.",
+      table: {
+        type: {
+          summary: "[number, number, number]",
+          detail: "a vector [x,y,z]",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Plane = (props) => <planeSurface {...props} />;
+
+### Plane at the origin
+
+An SVG in the xy-plane at the origin.
+
+<Source
+  language="jsx"
+  code={`<planeSurface>
+  <ReactIcon /> {/* ReactIcon is a React component which returns an SVG */
+</planeSurface>
+`}
+/>
+
+<Story
+  name="plane"
+  args={{
+    children: <ReactIcon />,
+  }}
+>
+  {Plane.bind({})}
+</Story>
+
+### Translated plane
+
+An SVG in a flat plane raised above the xy-plane.
+
+<Source
+  language="jsx"
+  code={`<planeSurface origin={[30, 20, 10]}>
+  <ReactIcon />
+</planeSurface>
+`}
+/>
+
+<Story
+  name="translated-plane"
+  args={{
+    origin: [30, 20, 10],
+    children: <ReactIcon />,
+  }}
+>
+  {Plane.bind({})}
+</Story>

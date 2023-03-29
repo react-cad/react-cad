@@ -1,4 +1,5 @@
-import { Props, Instance, UpdatePayload } from "../types";
+import { CADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 import { arrayEqual } from "./helpers";
 
 type Affine = "affine";
@@ -28,7 +29,7 @@ export function prepareUpdate(
 }
 
 export function commitUpdate(
-  instance: Instance<Affine>,
+  instance: CADInstance<Affine>,
   updatePayload: UpdatePayload<Affine>
 ): void {
   validateProps(updatePayload);

@@ -447,9 +447,12 @@ bool ReactCADView::initViewer()
   aViewer->SetComputedMode(false);
   aViewer->ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines);
   aViewer->SetRectangularGridValues(0, 0, 1, 1, 0);
-  aViewer->SetRectangularGridGraphicValues(1000, 1000, 0);
+  aViewer->SetRectangularGridGraphicValues(100, 100, 0);
   aViewer->Grid()->SetColors(Quantity_NOC_GRAY90, Quantity_NOC_GRAY75);
   aViewer->SetDefaultShadingModel(Graphic3d_TOSM_FRAGMENT);
+  gp_Ax3 plane(gp::Origin(), gp::DZ(), gp::DX());
+  plane.YReverse();
+  aViewer->SetPrivilegedPlane(plane);
 
   Handle(V3d_DirectionalLight) aDirLight = new V3d_DirectionalLight(V3d_XposZneg, Quantity_NOC_WHITE, Standard_True);
   Handle(V3d_AmbientLight) anAmbLight = new V3d_AmbientLight(Quantity_NOC_WHITE);

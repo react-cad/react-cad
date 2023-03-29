@@ -13,12 +13,12 @@ BRepImportNode::BRepImportNode()
 {
 }
 
-void BRepImportNode::importFile(const ProgressHandler &handler)
+TopoDS_Shape BRepImportNode::importFile(const ProgressHandler &handler)
 {
 #ifdef REACTCAD_DEBUG
   PerformanceTimer timer("Import BRep");
 #endif
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   Message_ProgressScope scope(handler, "Importing BREP file", 1);
 
@@ -26,16 +26,18 @@ void BRepImportNode::importFile(const ProgressHandler &handler)
   BRep_Builder builder;
   Standard_Boolean success = BRepTools::Read(brep, m_filename.c_str(), builder, scope.Next());
 
+#ifdef REACTCAD_DEBUG
+  timer.end();
+#endif
+
   if (success)
   {
-    shape = brep;
+    return brep;
   }
   else
   {
     handler.Abort("brepimport: file is missing, corrupt or contains no shapes");
   }
 
-#ifdef REACTCAD_DEBUG
-  timer.end();
-#endif
+  return TopoDS_Shape();
 }

@@ -25,7 +25,7 @@ protected:
   void computeShape(const ProgressHandler &handler) override;
 
   std::string m_filename;
-  virtual void importFile(const ProgressHandler &handler) = 0;
+  virtual TopoDS_Shape importFile(const ProgressHandler &handler) = 0;
 };
 
 #endif

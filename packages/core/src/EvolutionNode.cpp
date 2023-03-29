@@ -20,55 +20,28 @@
 
 #include "PerformanceTimer.hpp"
 
-#include "PolygonBuilder.hpp"
-#include "SVGBuilder.hpp"
 #include "SVGPathBuilder.hpp"
 
-EvolutionNode::EvolutionNode() : m_spineBuilder(), m_profileBuilder()
+EvolutionNode::EvolutionNode() : m_profileBuilder()
 {
 }
 
-void EvolutionNode::setProfile(const NCollection_Array1<gp_Pnt> &points)
+void EvolutionNode::setProfile(const std::string &pathData)
 {
-  m_profileBuilder = new PolygonBuilder(points, Standard_False);
-  propsChanged();
-}
-
-void EvolutionNode::setProfileSVG(const std::string &pathData)
-{
-  Handle(Geom_Plane) yzPlane = new Geom_Plane(gp_Ax3(gp::Origin(), gp::DX(), gp::DY()));
+  gp_Ax3 position(gp::Origin(), gp::DX(), gp::DY());
+  Handle(Geom_Plane) yzPlane = new Geom_Plane(position);
   m_profileBuilder = new SVGPathBuilder(pathData, yzPlane);
-  propsChanged();
-}
-
-void EvolutionNode::setSpine(const NCollection_Array1<gp_Pnt> &points)
-{
-  m_spineBuilder = new PolygonBuilder(points, true);
-  propsChanged();
-}
-
-void EvolutionNode::setSpineSVG(const std::string &svg)
-{
-  m_spineBuilder = new SVGBuilder(svg);
   propsChanged();
 }
 
 void EvolutionNode::computeShape(const ProgressHandler &handler)
 {
   PerformanceTimer timer("Build evolution");
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   GeomAbs_JoinType aJoinType = GeomAbs_Arc;
   Standard_Boolean aIsGlobalCS = Standard_True;
   Standard_Boolean aIsSolid = Standard_True;
-
-  m_spineBuilder->Build(handler);
-  if (!m_spineBuilder->IsDone())
-  {
-    handler.Abort("evolution: could not build spine");
-    return;
-  }
-  TopoDS_Shape spine = m_spineBuilder->Shape(handler);
 
   m_profileBuilder->Build(handler);
   if (!m_profileBuilder->IsDone())
@@ -84,7 +57,7 @@ void EvolutionNode::computeShape(const ProgressHandler &handler)
 
   TopExp_Explorer Ex;
   int nbFaces = 0;
-  for (Ex.Init(spine, TopAbs_FACE); Ex.More(); Ex.Next())
+  for (Ex.Init(m_childShape, TopAbs_FACE); Ex.More(); Ex.Next())
   {
     ++nbFaces;
   }
@@ -114,7 +87,7 @@ void EvolutionNode::computeShape(const ProgressHandler &handler)
 
   if (scope.More())
   {
-    shape = compound;
+    setShape(compound);
   }
 
   timer.end();

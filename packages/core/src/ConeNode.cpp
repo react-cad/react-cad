@@ -37,7 +37,7 @@ void ConeNode::setAngle(Standard_Real angle)
 
 void ConeNode::computeShape(const ProgressHandler &handler)
 {
-  shape = TopoDS_Shape();
+  setShape(TopoDS_Shape());
 
   TopoDS_Solid cone;
 
@@ -68,5 +68,5 @@ void ConeNode::computeShape(const ProgressHandler &handler)
     cone.Move(translation);
   }
 
-  shape = cone;
+  setShape(cone);
 }

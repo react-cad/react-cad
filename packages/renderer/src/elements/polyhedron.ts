@@ -1,5 +1,6 @@
 import { Point } from "@react-cad/core";
-import { Props, Instance, UpdatePayload } from "../types";
+import { CADInstance } from "instance";
+import { Props, UpdatePayload } from "../types";
 
 import { arrayEqual } from "./helpers";
 
@@ -89,7 +90,7 @@ const defaultFaces: number[][] = [
 ];
 
 export function commitUpdate(
-  instance: Instance<Polyhedron>,
+  instance: CADInstance<Polyhedron>,
   updatePayload: UpdatePayload<Polyhedron>
 ): void {
   validateProps(updatePayload);

@@ -4,8 +4,10 @@
 #include <GCE2d_MakeSegment.hxx>
 #include <Geom2d_BezierCurve.hxx>
 #include <Geom2d_BoundedCurve.hxx>
+#include <Geom_Surface.hxx>
 #include <NCollection_Array1.hxx>
 #include <Standard_Transient.hxx>
+#include <TopoDS_Wire.hxx>
 #include <gp_Pnt2d.hxx>
 
 #include <limits>
@@ -36,8 +38,25 @@ public:
   float Width();
   bool IsDone();
 
-  struct SVGBezierCurve
+  struct CurvePoint
   {
+    float x;
+    float y;
+  };
+
+  struct Curve
+  {
+    CurvePoint p0;
+    CurvePoint p1;
+    CurvePoint p2;
+    CurvePoint p3;
+    struct Curve *next;
+    struct Curve *prev;
+  };
+
+  class SVGBezierCurve
+  {
+  public:
     using iterator_category = std::forward_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = float;
@@ -61,19 +80,30 @@ public:
       return a.m_ptr != b.m_ptr;
     };
 
-    operator Handle(Geom2d_Curve)();
+    void getCurve(Curve &curve);
     float orientation();
+
     gp_Pnt2d p0();
     gp_Pnt2d p1();
     gp_Pnt2d p2();
     gp_Pnt2d p3();
 
-  private:
-    constexpr Standard_Boolean floatEqual(float x, float y);
-    Standard_Boolean IsStraightLine();
-    Standard_Boolean IsZeroLength();
-
+  protected:
     pointer m_ptr;
+  };
+
+  class SVGBezierCurveReverse : public SVGBezierCurve
+  {
+  public:
+    SVGBezierCurveReverse(pointer ptr) : SVGBezierCurve(ptr){};
+
+    SVGBezierCurveReverse &operator++()
+    {
+      m_ptr -= 6;
+      return *this;
+    }
+
+    void getCurve(Curve &curve);
   };
 
   struct SVGPath
@@ -84,7 +114,7 @@ public:
     using pointer = value_type *;
     using reference = value_type &;
 
-    SVGPath(pointer ptr) : m_ptr(ptr){};
+    SVGPath(pointer ptr) : m_ptr(ptr), m_orientation(0){};
 
     reference operator*() const
     {
@@ -98,6 +128,7 @@ public:
     SVGPath &operator++()
     {
       m_ptr = m_ptr->next;
+      m_orientation = 0;
       return *this;
     }
 
@@ -105,6 +136,7 @@ public:
     {
       SVGPath tmp = *this;
       ++(*this);
+      m_orientation = 0;
       return tmp;
     }
 
@@ -117,6 +149,9 @@ public:
       return a.m_ptr != b.m_ptr;
     };
 
+    TopoDS_Wire OpenWire(const Handle(Geom_Surface) & surface, const gp_GTrsf2d &transform);
+    TopoDS_Wire ClosedWire(const Handle(Geom_Surface) & surface, const gp_GTrsf2d &transform);
+
     SVGBezierCurve begin()
     {
       return SVGBezierCurve(m_ptr->pts);
@@ -126,8 +161,21 @@ public:
       return SVGBezierCurve(m_ptr->pts + ((m_ptr->npts - 1) * (std::ptrdiff_t)2));
     }
 
+    SVGBezierCurveReverse rbegin()
+    {
+      return SVGBezierCurveReverse(m_ptr->pts + ((m_ptr->npts - 4) * (std::ptrdiff_t)2));
+    }
+    SVGBezierCurveReverse rend()
+    {
+      return SVGBezierCurveReverse(m_ptr->pts - 3 * (std::ptrdiff_t)2);
+    }
+
+    float orientation();
+
   private:
     pointer m_ptr;
+
+    float m_orientation;
   };
 
   struct SVGShape

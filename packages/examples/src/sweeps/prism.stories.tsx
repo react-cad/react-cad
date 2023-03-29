@@ -1,19 +1,19 @@
 import React from "react";
-import type { Profile } from "@react-cad/core";
 import { Story, Meta } from "@react-cad/storybook-framework";
 
-import reactIcon from "./react-icon";
-
-import { makePolygon } from "./helpers";
+import ReactIcon from "./react-icon";
+import Polygon from "./Polygon";
+import Text from "./Text";
 
 type Props = JSX.IntrinsicElements["prism"];
 
-const profiles: Record<string, Profile> = {
-  Triangle: makePolygon(3),
-  Square: makePolygon(4),
-  Pentagon: makePolygon(5),
-  Hexagon: makePolygon(6),
-  SVG: reactIcon([0, 0]),
+const profiles: Record<string, React.FC<{ text: string }>> = {
+  Triangle: () => <Polygon sides={3} />,
+  Square: () => <Polygon sides={4} />,
+  Pentagon: () => <Polygon sides={5} />,
+  Hexagon: () => <Polygon sides={6} />,
+  SVG: () => <ReactIcon />,
+  Text: ({ text }) => <Text>{text}</Text>,
 };
 
 export const Prism: React.FC<Props> = (props) => <prism {...props} />;
@@ -47,11 +47,19 @@ interface StoryProps {
   x: number;
   y: number;
   z: number;
+  text: string;
 }
 
-const Template: Story<StoryProps> = ({ profileName, ...args }) => (
-  <Prism profile={profiles[profileName]} {...args} />
-);
+const Template: Story<StoryProps> = ({ profileName, text, ...args }) => {
+  const Profile = profiles[profileName];
+  return (
+    <Prism {...args}>
+      <sphericalSurface radius={15}>
+        <Profile text={text} />
+      </sphericalSurface>
+    </Prism>
+  );
+};
 
 export const prism = Template.bind({});
 prism.args = {
@@ -59,4 +67,5 @@ prism.args = {
   x: 0,
   y: 0,
   z: 1,
+  text: "Text",
 };

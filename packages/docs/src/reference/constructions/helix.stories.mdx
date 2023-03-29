@@ -1,0 +1,161 @@
+import { Source, Meta, Story } from "@storybook/addon-docs";
+import { ArgsTable } from "@storybook/components";
+import ReactIcon from "../ReactIcon";
+import Link from "../../Link";
+
+<Meta title="Reference/Constructions/Helix" />
+
+# helix
+
+The `helix` element extrudes a 2-dimensional shape while rotating it around the z-axis. It has a `height` in the z-direction and a `pitch`, which is the height of one complete turn. By default the helix is right-handed, but can be made left-handed with the `leftHanded` prop.
+
+The children of the `helix` form the 2d profile (see <Link to="reference-surfaces-svgs--introduction">Surfaces & SVGs</Link>).
+
+<ArgsTable
+  rows={{
+    height: {
+      name: "height",
+      description: "The height of the helix on the z-axis",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+      },
+    },
+    pitch: {
+      name: "pitch",
+      description: "The height of one complete turn of the helix.",
+      type: {
+        required: true,
+      },
+      table: {
+        type: {
+          summary: "number",
+          detail: "a number greater than zero",
+        },
+      },
+    },
+    pitch: {
+      name: "leftHanded",
+      description: "Whether the helix is leftHanded.",
+      table: {
+        type: {
+          summary: "boolean",
+        },
+      },
+    },
+  }}
+/>
+
+## Examples
+
+export const Helix = (props) => <helix {...props} />;
+
+### Square helix
+
+A helix of height 5 and pitch 5 with a square profile. Note that `pitch` refers to one full rotation; since the square has four points it is creates a multistart screw with a thread pitch smaller than 5!
+
+<Source
+  language="jsx"
+  code={`
+<helix height={5} pitch={5}>
+  <planeSurface>
+    <svg>
+      <rect x={-1} y={-1} width={2} height={2} />
+    </svg>
+  </planeSurface>
+</helix>
+`}
+/>
+
+<Story
+  name="helix"
+  args={{
+    height: 5,
+    pitch: 5,
+    children: [
+      <planeSurface>
+        <svg>
+          <rect x={-1} y={-1} width={2} height={2} />
+        </svg>
+      </planeSurface>,
+    ],
+  }}
+>
+  {Helix.bind({})}
+</Story>
+
+### Spring
+
+A spring created using a vertical profile which does not intersect with the origin.
+
+<Source
+  language="jsx"
+  code={`
+<helix height={9} pitch={3}>
+  <translation y={2}>
+    <rotation y={-Math.PI / 2}>
+      <planeSurface>
+        <svg>
+          <circle r={1} />
+        </svg>
+      </planeSurface>
+    </rotation>
+  </translation>
+</helix>
+`}
+/>
+
+<Story
+  name="spring"
+  args={{
+    height: 9,
+    pitch: 3,
+    children: (
+      <translation y={2}>
+        <rotation y={-Math.PI / 2}>
+          <planeSurface>
+            <svg>
+              <circle r={1} />
+            </svg>
+          </planeSurface>
+        </rotation>
+      </translation>
+    ),
+  }}
+>
+  {Helix.bind({})}
+</Story>
+
+### React icon helix
+
+A partial turn of a helix with a complex SVG shape.
+
+<Source language="jsx" code={`
+  import ReactIcon from './ReactIcon';
+
+<helix height={5} pitch={50}>
+  <planeSurface>
+    <ReactIcon />
+  </planeSurface>
+</helix>
+`} />
+
+<Story
+  name="svg-helix"
+  args={{
+    height: 5,
+    pitch: 50,
+    children: (
+      <planeSurface>
+        <ReactIcon />
+      </planeSurface>
+    ),
+  }}
+>
+  {Helix.bind({})}
+</Story>

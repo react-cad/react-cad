@@ -6,6 +6,9 @@
 #include <OSD_File.hxx>
 #include <OSD_Path.hxx>
 
+#include <BRepBuilderAPI_Transform.hxx>
+#include <gp_Ax2.hxx>
+
 #include <emscripten.h>
 
 ImportNode::ImportNode() : m_filename(UUID::get())
@@ -38,5 +41,12 @@ void ImportNode::setFileContents(emscripten::val contents)
 
 void ImportNode::computeShape(const ProgressHandler &handler)
 {
-  return importFile(handler);
+  TopoDS_Shape shape = importFile(handler);
+  // Translate to our co-ordinate system
+  gp_Ax2 mirror(gp::Origin(), gp::DY());
+  gp_Trsf trsf;
+  trsf.SetMirror(mirror);
+  BRepBuilderAPI_Transform transform(trsf);
+  transform.Perform(shape, true);
+  setShape(transform.Shape());
 }

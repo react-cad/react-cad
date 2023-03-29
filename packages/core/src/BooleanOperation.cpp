@@ -3,6 +3,7 @@
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
+#include <TopExp_Explorer.hxx>
 
 BooleanOperation::BooleanOperation() : m_hasErrors(false), m_errors(), m_shape(){};
 
@@ -34,6 +35,8 @@ void BooleanOperation::Difference(TopoDS_Shape positive, TopTools_ListOfShape ne
     m_errors = os.str();
     return;
   }
+
+  aBuilder.SimplifyResult();
 
   m_shape = aBuilder.Shape();
 }
@@ -80,6 +83,17 @@ void BooleanOperation::Union(TopTools_ListOfShape shapes, const ProgressHandler 
     return;
   }
   }
+}
+
+void BooleanOperation::Union(TopoDS_Shape shape, const ProgressHandler &handler)
+{
+  TopExp_Explorer solidExplorer;
+  TopTools_ListOfShape solids;
+  for (solidExplorer.Init(shape, TopAbs_SOLID); solidExplorer.More(); solidExplorer.Next())
+  {
+    solids.Append(solidExplorer.Current());
+  }
+  return Union(solids, handler);
 }
 
 void BooleanOperation::IntersectionInternal(TopoDS_Shape negative, const ProgressHandler &handler)

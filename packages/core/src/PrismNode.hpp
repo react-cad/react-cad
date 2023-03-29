@@ -2,11 +2,11 @@
 #define PrismNode_HeaderFile
 
 #include "Geometry.hpp"
-#include "SweepNode.hpp"
+#include "ReactCADNode.hpp"
 
 #include <gp_Vec.hxx>
 
-class PrismNode : public SweepNode
+class PrismNode : public ReactCADNode
 {
 public:
   PrismNode();

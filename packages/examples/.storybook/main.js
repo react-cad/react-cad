@@ -45,6 +45,10 @@ module.exports = {
         },
       },
     });
+    config.module.rules.push({
+      test: /\.otffont$/,
+      use: "arraybuffer-loader",
+    });
 
     return config;
   },
