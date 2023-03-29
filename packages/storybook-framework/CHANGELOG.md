@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/react-cad/react-cad/compare/v0.21.0...v0.22.0) (2023-03-29)
+
+
+### Bug Fixes
+
+* **storybook-framework:** mutate existing shape ([ca908b4](https://github.com/react-cad/react-cad/commit/ca908b4e52e8c9e6fe282edeed7ece793dad629c))
+
+
+
+
+
 # [0.21.0](https://github.com/react-cad/react-cad/compare/v0.20.0...v0.21.0) (2023-03-06)
 
 **Note:** Version bump only for package @react-cad/storybook-framework

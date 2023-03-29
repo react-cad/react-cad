@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/react-cad/react-cad/compare/v0.21.0...v0.22.0) (2023-03-29)
+
+
+### Bug Fixes
+
+* rename surface elements ([3301365](https://github.com/react-cad/react-cad/commit/330136565dc49a921ea7bdfec3ef35e8d9883e5b))
+* stop nanosvg moving svgs with no viewbox or size ([b5c4351](https://github.com/react-cad/react-cad/commit/b5c435159ae5d137e85582fa9885965c20745bc2))
+
+
+### Features
+
+* fixes and documentation ([14b766a](https://github.com/react-cad/react-cad/commit/14b766aa6a9d9a428c36afaacbd4365c7e986a78))
+* **surface:** add optional right handed surfaces ([0208000](https://github.com/react-cad/react-cad/commit/02080007ed7d40b216bff6ed6e12614e5fe53842))
+
+
+
+
+
 # [0.21.0](https://github.com/react-cad/react-cad/compare/v0.20.0...v0.21.0) (2023-03-06)
 
 

@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/react-cad/react-cad/compare/v0.21.0...v0.22.0) (2023-03-29)
+
+
+### Bug Fixes
+
+* rename surface elements ([3301365](https://github.com/react-cad/react-cad/commit/330136565dc49a921ea7bdfec3ef35e8d9883e5b))
+* stop nanosvg moving svgs with no viewbox or size ([b5c4351](https://github.com/react-cad/react-cad/commit/b5c435159ae5d137e85582fa9885965c20745bc2))
+
+
+### Features
+
+* add surfaces for svgs ([b540ef4](https://github.com/react-cad/react-cad/commit/b540ef4ae85ac860ba3ea8bbbee120a9fdc61f69))
+* **core:** add cylindrical surface ([08239c9](https://github.com/react-cad/react-cad/commit/08239c9afb0c96ce5bbbe40cf211a9be6b33c01d))
+* **core:** add left-handed option to helix ([47227a5](https://github.com/react-cad/react-cad/commit/47227a585f6013075a9162864fdb74c0c62c92cd))
+* **core:** add loft component ([74693d3](https://github.com/react-cad/react-cad/commit/74693d3f4f50b0a2a26e9a0a778890978ba564e2))
+* **core:** add solid component ([9c0d1a5](https://github.com/react-cad/react-cad/commit/9c0d1a57d88a362fa8a51b8154d18594f2bf2bde))
+* **core:** add spherical surfaces ([47b1a71](https://github.com/react-cad/react-cad/commit/47b1a71e66e44056eddd843d974d907f7e583478))
+* **core:** switch to left-handed coordinate system ([f89c90d](https://github.com/react-cad/react-cad/commit/f89c90d4fb4249a7a3c05e725a875cacc26b7e9b))
+* fixes and documentation ([14b766a](https://github.com/react-cad/react-cad/commit/14b766aa6a9d9a428c36afaacbd4365c7e986a78))
+* **surface:** add optional right handed surfaces ([0208000](https://github.com/react-cad/react-cad/commit/02080007ed7d40b216bff6ed6e12614e5fe53842))
+
+
+
+
+
 # [0.21.0](https://github.com/react-cad/react-cad/compare/v0.20.0...v0.21.0) (2023-03-06)
 
 **Note:** Version bump only for package @react-cad/examples

@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/react-cad/react-cad/compare/v0.21.0...v0.22.0) (2023-03-29)
+
+
+### Features
+
+* add surfaces for svgs ([b540ef4](https://github.com/react-cad/react-cad/commit/b540ef4ae85ac860ba3ea8bbbee120a9fdc61f69))
+* **core:** add loft component ([74693d3](https://github.com/react-cad/react-cad/commit/74693d3f4f50b0a2a26e9a0a778890978ba564e2))
+* fixes and documentation ([14b766a](https://github.com/react-cad/react-cad/commit/14b766aa6a9d9a428c36afaacbd4365c7e986a78))
+
+
+
+
+
 # [0.21.0](https://github.com/react-cad/react-cad/compare/v0.20.0...v0.21.0) (2023-03-06)
 
 
