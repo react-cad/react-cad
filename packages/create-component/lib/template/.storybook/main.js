@@ -10,6 +10,6 @@ module.exports = {
     manager: "webpack5",
   },
   reactOptions: {
-    fastRefresh: false,
+    fastRefresh: true,
   },
 };
