@@ -2,9 +2,15 @@
   "name": "@react-cad/viewer",
   "version": "0.23.0",
   "description": "React component to view @react-cad projects in the browser",
-  "main": "lib/index.js",
+  "main": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js",
+    "default": "./dist/esm/index.js"
+  },
   "files": [
-    "lib/**/*",
+    "dist/**/*",
     "README.md",
     "*.js"
   ],
@@ -21,14 +27,12 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
-  },
-  "devDependencies": {
-    "@react-cad/core": "^0.23.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
+    "@react-cad/core": "^0.23.0",
     "@react-cad/renderer": "^0.23.0",
     "@storybook/theming": "^6.5.12",
     "error-stack-parser": "^2.1.4",
@@ -37,7 +41,7 @@
     "sourcemapped-stacktrace": "^1.1.11"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc --project tsconfig.cjs.json",
     "start": "tsc --watch --preserveWatchOutput"
   },
   "publishConfig": {

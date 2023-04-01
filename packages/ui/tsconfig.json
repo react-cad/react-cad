@@ -7,7 +7,12 @@
     "rootDir": "./src",
     "rootDirs": ["./src", "./__tests__"],
     "outDir": "./dist/esm",
-    "declarationDir": "./dist/types"
+    "declarationDir": "./dist/types",
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/react-cad/types",
+      "../react-cad/types"
+    ]
   },
   "include": ["./src/**/*"],
   "exclude": ["**/__tests__/**/*"]

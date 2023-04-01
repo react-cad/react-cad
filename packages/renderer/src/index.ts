@@ -1,5 +1,6 @@
 import React from "react";
 import ReactReconciler from "react-reconciler";
+import { LegacyRoot, DefaultEventPriority } from "react-reconciler/constants";
 import { ReactCADCore, ReactCADNode } from "@react-cad/core";
 
 import {
@@ -15,6 +16,7 @@ import {
   ChildSet,
   InstanceHandle,
   ElementProps,
+  SuspenseInstance,
 } from "./types";
 
 import { isReactCADType } from "./elements";
@@ -26,27 +28,37 @@ export const HostConfig: ReactReconciler.HostConfig<
   Container,
   Instance,
   TextInstance,
+  SuspenseInstance,
   HydratableInstance,
   PublicInstance,
   HostContext,
   UpdatePayload,
   ChildSet,
   number,
-  undefined
+  number
 > = {
-  isPrimaryRenderer: false,
   supportsMutation: true,
   supportsPersistence: false,
   supportsHydration: false,
-  setTimeout: setTimeout,
-  clearTimeout: clearTimeout,
-  noTimeout: undefined,
-  now: Date.now,
-  // @ts-expect-error reconciler types don't include clearContainer but omitting causes a crash
-  clearContainer(rootContainerInstance: Container) {
-    const { rootInstances, root } = rootContainerInstance;
-    rootInstances.forEach((instance) => root.removeChild(instance));
-    rootContainerInstance.rootInstances = [];
+  scheduleTimeout: setTimeout,
+  cancelTimeout: clearTimeout,
+  noTimeout: -1,
+  supportsMicrotasks: true,
+  scheduleMicrotask: queueMicrotask,
+  isPrimaryRenderer: false,
+  warnsIfNotActing: false,
+  getCurrentEventPriority() {
+    return DefaultEventPriority;
+  },
+  getInstanceFromNode(_node: any) {
+    return undefined;
+  },
+  beforeActiveInstanceBlur() {},
+  afterActiveInstanceBlur() {},
+  prepareScopeUpdate(_scopeInstance: any, _instance: any) {},
+  detachDeletedInstance(_node: Instance) {},
+  getInstanceFromScope(_scopeInstance: any) {
+    return null;
   },
   getPublicInstance(instance: Instance) {
     return instance.getPublicInstance();
@@ -65,7 +77,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   appendChildToContainer(rootContainerInstance: Container, child: Instance) {
     const { rootInstances, root } = rootContainerInstance;
     root.appendChild(child);
-    rootInstances.push(child);
+    rootInstances.add(child);
   },
   insertInContainerBefore(
     rootContainerInstance: Container,
@@ -74,16 +86,16 @@ export const HostConfig: ReactReconciler.HostConfig<
   ) {
     const { root, rootInstances } = rootContainerInstance;
     root.insertBefore(child, before);
-    rootInstances.push(child);
+    rootInstances.add(child);
   },
   removeChildFromContainer(rootContainerInstance: Container, child: Instance) {
     const { root, rootInstances } = rootContainerInstance;
-    const index = rootInstances.indexOf(child);
-    if (index < 0) {
+    if (!rootInstances.has(child)) {
       throw new Error(`removeChildFromContainer child does not exist`);
     }
-    rootInstances.splice(index, 1);
+    rootInstances.delete(child);
     root.removeChild(child);
+    setTimeout(() => child.delete(), 0);
   },
   insertBefore(parent, child, before) {
     if (typeof child === "string" || typeof before === "string") {
@@ -93,6 +105,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   },
   removeChild(parent: Instance, child: Instance) {
     parent.removeChild(child);
+    setTimeout(() => child.delete(), 0);
   },
   finalizeInitialChildren<T extends Type>(
     _instance: Instance,
@@ -103,29 +116,14 @@ export const HostConfig: ReactReconciler.HostConfig<
   ): boolean {
     return false;
   },
-  prepareForCommit(containerInfo: Container) {
-    const { instances } = containerInfo;
-    instances.forEach(
-      (instance) => instance instanceof SVGInstance && instance.commitSVG()
-    );
+  prepareForCommit(_containerInfo: Container) {
     return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { rootInstances, instances, callback } = rootContainerInstance;
+    const { updatedSVGs, callback } = rootContainerInstance;
 
-    // Free memory of removed nodes
-    const removedInstances = instances.filter(
-      (instance) => !instance.hasParent()
-    );
-    removedInstances.forEach((instance) => instance.delete());
-
-    // Remove deleted nodes from list
-    rootContainerInstance.instances = instances.filter(
-      (instance) => !removedInstances.includes(instance)
-    );
-    rootContainerInstance.rootInstances = rootInstances.filter(
-      (instance) => !removedInstances.includes(instance)
-    );
+    updatedSVGs.forEach((svg) => svg instanceof SVGInstance && svg.commitSVG());
+    updatedSVGs.clear();
 
     callback?.();
   },
@@ -142,9 +140,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   },
   commitTextUpdate() {},
   resetTextContent() {},
-  shouldDeprioritizeSubtree(_type: Type, _props: Props) {
-    return false;
-  },
+  preparePortalMount(_containerInfo: Container) {},
   createInstance<T extends Type>(
     type: T,
     props: Props<T>,
@@ -152,15 +148,23 @@ export const HostConfig: ReactReconciler.HostConfig<
     _hostContext: HostContext,
     _internalInstanceHandle: InstanceHandle
   ): Instance {
-    const { core, instances } = rootContainerInstance;
+    const { core, updatedSVGs } = rootContainerInstance;
 
-    const instance: Instance = isReactCADType(type)
-      ? new CADInstance(core, type)
-      : type === "svgString"
-      ? new SVGStringInstance(core, (props as Props<"svgString">).children)
-      : new SVGInstance(core, type);
+    let instance: Instance;
 
-    instances.push(instance);
+    if (isReactCADType(type)) {
+      instance = new CADInstance(core, type);
+    } else if (type === "svgString") {
+      instance = new SVGStringInstance(
+        core,
+        (props as Props<"svgString">).children
+      );
+      updatedSVGs.add(instance);
+    } else {
+      instance = new SVGInstance(core, type);
+      updatedSVGs.add(instance);
+    }
+
     instance.commitUpdate(props);
 
     return instance;
@@ -179,29 +183,49 @@ export const HostConfig: ReactReconciler.HostConfig<
   },
   prepareUpdate<T extends Type>(
     instance: Instance,
-    _type: T,
+    type: T,
     oldProps: Props<T>,
     newProps: Props<T>,
     rootContainerInstance: Container,
     hostContext: HostContext
   ): UpdatePayload | null {
-    return instance.prepareUpdate(
+    const { updatedSVGs } = rootContainerInstance;
+    const updatePayload = instance.prepareUpdate(
       oldProps,
       newProps,
       rootContainerInstance,
       hostContext
     );
+    if (updatePayload && !isReactCADType(type)) {
+      updatedSVGs.add(instance);
+    }
+    return updatePayload;
   },
   commitUpdate(instance: Instance, updatePayload: UpdatePayload): void {
     instance.commitUpdate(updatePayload);
+  },
+  clearContainer(rootContainerInstance: Container) {
+    const { rootInstances } = rootContainerInstance;
+    rootInstances.forEach((instance) =>
+      // eslint-disable-next-line
+      this.removeChildFromContainer!(rootContainerInstance, instance)
+    );
+    rootInstances.clear();
   },
 };
 
 const reconcilerInstance = ReactReconciler(HostConfig);
 reconcilerInstance.injectIntoDevTools({
   rendererPackageName: "react-cad",
-  version: "17.0.1",
+  version: "18.2.0",
   bundleType: process.env.NODE_ENV !== "production" ? 1 : 0,
+});
+
+reconcilerInstance.injectIntoDevTools({
+  findFiberByHostInstance: () => null,
+  bundleType: 1,
+  version: "18.2.0",
+  rendererPackageName: "react-cad",
 });
 
 class ReactCADRoot {
@@ -210,20 +234,22 @@ class ReactCADRoot {
   private isDeleted: boolean;
 
   public constructor(rootNode: ReactCADNode, core: ReactCADCore) {
-    const isAsync = false;
-    const hydrate = false;
-
     this.context = {
       core,
-      instances: [],
-      rootInstances: [],
+      updatedSVGs: new Set(),
+      rootInstances: new Set(),
       root: new CADInstance(core, "union", rootNode),
     };
 
     this.container = reconcilerInstance.createContainer(
       this.context,
-      isAsync,
-      hydrate
+      LegacyRoot,
+      null,
+      false,
+      false,
+      "",
+      () => {},
+      null
     );
 
     this.isDeleted = false;
@@ -231,7 +257,8 @@ class ReactCADRoot {
 
   public render(element: React.ReactElement, callback = () => {}) {
     if (this.isDeleted) {
-      throw Error("Cannot render a deleted root");
+      return;
+      // throw Error("Cannot render a deleted root");
     }
     this.context.callback = callback;
     reconcilerInstance.updateContainer(
@@ -253,7 +280,7 @@ class ReactCADRoot {
   }
 
   public delete() {
-    this.context.instances.forEach((instance) => instance.delete());
+    this.context.rootInstances.forEach((instance) => instance.delete());
     this.isDeleted = true;
   }
 }
