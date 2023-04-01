@@ -2,7 +2,7 @@ import React from "react";
 
 const Box: React.FC = () => (
   <union>
-    <prism z={4}>
+    <prism z={5}>
       <planeSurface>
         <svg>
           <rect width={2} height={1} />

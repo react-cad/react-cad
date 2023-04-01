@@ -221,13 +221,6 @@ reconcilerInstance.injectIntoDevTools({
   bundleType: process.env.NODE_ENV !== "production" ? 1 : 0,
 });
 
-reconcilerInstance.injectIntoDevTools({
-  findFiberByHostInstance: () => null,
-  bundleType: 1,
-  version: "18.2.0",
-  rendererPackageName: "react-cad",
-});
-
 class ReactCADRoot {
   private context: Container;
   private container: ReactReconciler.FiberRoot;
@@ -255,7 +248,11 @@ class ReactCADRoot {
     this.isDeleted = false;
   }
 
-  public render(element: React.ReactElement, callback = () => {}) {
+  public render(
+    element: React.ReactElement,
+    callback = () => {},
+    parent: React.Component | null = null
+  ) {
     if (this.isDeleted) {
       return;
       // throw Error("Cannot render a deleted root");
@@ -274,7 +271,7 @@ class ReactCADRoot {
         element
       ),
       this.container,
-      null,
+      parent,
       () => {}
     );
   }
