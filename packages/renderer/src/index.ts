@@ -34,7 +34,7 @@ export const HostConfig: ReactReconciler.HostConfig<
   number,
   undefined
 > = {
-  isPrimaryRenderer: true,
+  isPrimaryRenderer: false,
   supportsMutation: true,
   supportsPersistence: false,
   supportsHydration: false,
@@ -198,6 +198,11 @@ export const HostConfig: ReactReconciler.HostConfig<
 };
 
 const reconcilerInstance = ReactReconciler(HostConfig);
+reconcilerInstance.injectIntoDevTools({
+  rendererPackageName: "react-cad",
+  version: "17.0.1",
+  bundleType: process.env.NODE_ENV !== "production" ? 1 : 0,
+});
 
 class ReactCADRoot {
   private context: Container;
