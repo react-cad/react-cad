@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.23.0](https://github.com/react-cad/react-cad/compare/v0.22.0...v0.23.0) (2023-04-01)
+
+
+### Features
+
+* enable react fast refresh ([a473c82](https://github.com/react-cad/react-cad/commit/a473c82ef92cbae0ef04f2c4fdea3f8d9c8ebd9b))
+
+
+
+
+
 # [0.22.0](https://github.com/react-cad/react-cad/compare/v0.21.0...v0.22.0) (2023-03-29)
 
 
