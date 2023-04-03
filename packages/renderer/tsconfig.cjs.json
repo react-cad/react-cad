@@ -1,13 +1,11 @@
 {
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-    "module": "ES2020",
-    "moduleResolution": "Node",
     "baseUrl": "./src",
     "rootDir": "./src",
     "rootDirs": ["./src", "./__tests__"],
-    "outDir": "./dist/esm",
-    "declarationDir": "./dist/types"
+    "outDir": "./dist/cjs",
+    "declaration": false
   },
   "include": ["./src/**/*"],
   "exclude": ["**/__tests__/**/*"]

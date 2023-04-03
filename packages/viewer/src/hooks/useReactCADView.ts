@@ -2,13 +2,10 @@ import React from "react";
 import type { ReactCADCore, ReactCADView } from "@react-cad/core";
 import { ViewOptions } from "../types";
 
-import { AddTask } from "./useProgressQueue";
-
 function useReactCADView(
   canvasContainerRef: React.RefObject<HTMLDivElement>,
   core: ReactCADCore,
-  options: ViewOptions,
-  addTask: AddTask
+  options: ViewOptions
 ): React.MutableRefObject<ReactCADView | undefined> {
   const canvasRef = React.useRef<HTMLCanvasElement>();
   const view = React.useRef<ReactCADView>();
@@ -72,11 +69,9 @@ function useReactCADView(
   ]);
 
   React.useEffect(() => {
-    if (loaded) {
-      const quality =
-        options.detail === "HIGH" ? options.highDetail : options.lowDetail;
-      addTask(
-        () => view.current && core.setRenderQuality(view.current, ...quality)
+    if (view.current) {
+      view.current.setQuality(
+        ...(options.detail === "HIGH" ? options.highDetail : options.lowDetail)
       );
     }
   }, [loaded, options.detail, ...options.highDetail, ...options.lowDetail]);

@@ -8,6 +8,7 @@ import {
   UpdatePayload,
   SurfaceType,
   Instance,
+  SVGNodeType,
 } from "types";
 import { prepareUpdate, commitUpdate } from "./elements";
 
@@ -17,12 +18,12 @@ export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
   implements Instance {
   public readonly node: ReactCADNodeTypes[T];
   public readonly type: ReactCADNodeType;
-  private readonly core: ReactCADCore;
+  private readonly children: Set<Instance>;
 
   constructor(core: ReactCADCore, type: T, node?: ReactCADNodeTypes[T]) {
     this.node = node ?? core.createCADNode(type);
-    this.core = core;
     this.type = type;
+    this.children = new Set();
   }
 
   getPublicInstance(): ReactCADNodeTypes[T] {
@@ -45,25 +46,31 @@ export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
 
   delete(): void {
     this.node.delete();
+    this.children.forEach((child) => child.delete());
   }
 
   appendChild(child: Instance): void {
     if (this.isSurface()) {
       if (child instanceof SVGInstance && child.node.tagName === "svg") {
         child.parent = this;
+        this.children.add(child);
         this.node.appendSVG(child.svg);
       } else {
         throw new Error("Surfaces cannot have non-svg children");
       }
     } else {
       if (child instanceof CADInstance) {
+        this.children.add(child);
         this.node.appendChild(child.node);
       } else {
         throw new Error("Only surfaces can have SVG children");
       }
     }
   }
+
   insertBefore(child: Instance, before: Instance): void {
+    const shouldInsert = !this.children.has(child);
+
     if (this.isSurface()) {
       if (
         child instanceof SVGInstance &&
@@ -71,18 +78,25 @@ export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
         child.node.tagName === "svg"
       ) {
         child.parent = this;
+        if (shouldInsert) {
+          this.children.add(child);
+        }
         this.node.insertSVGBefore(child.svg, before.svg);
       } else {
         throw new Error("Surfaces cannot have non-svg children");
       }
     } else {
       if (child instanceof CADInstance && before instanceof CADInstance) {
+        if (shouldInsert) {
+          this.children.add(child);
+        }
         this.node.insertChildBefore(child.node, before.node);
       } else {
         throw new Error("Only surfaces can have SVG children");
       }
     }
   }
+
   removeChild(child: Instance): void {
     if (this.isSurface()) {
       if (child instanceof SVGInstance) {
@@ -94,7 +108,9 @@ export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
         this.node.removeChild(child.node);
       }
     }
+    this.children.delete(child);
   }
+
   prepareUpdate(
     oldProps: Props<Type>,
     newProps: Props<Type>,
@@ -110,6 +126,7 @@ export class CADInstance<T extends ReactCADNodeType = ReactCADNodeType>
       hostContext
     );
   }
+
   commitUpdate(updatePayload: UpdatePayload): void {
     return commitUpdate(this, updatePayload, this.type);
   }
@@ -121,7 +138,7 @@ export class SVGInstance<
   public node: SVGElement;
   public parent: CADInstance<SurfaceType> | SVGInstance | undefined;
   private readonly core: ReactCADCore;
-  private children: SVGInstance[] = [];
+  private children: Set<SVGInstance>;
   private svgNode: ReactCADSVG | undefined;
   private isChanged = true;
 
@@ -132,6 +149,7 @@ export class SVGInstance<
     } else {
       this.node = document.createElementNS("http://www.w3.org/2000/svg", node);
     }
+    this.children = new Set();
   }
 
   getPublicInstance(): SVGElement {
@@ -144,41 +162,45 @@ export class SVGInstance<
 
   delete(): void {
     this.svgNode?.delete();
-    this.children = [];
+    this.children.forEach((child) => child.delete());
     this.parent = undefined;
   }
 
   appendChild(child: Instance): void {
     if (child instanceof SVGInstance) {
       child.parent = this;
-      this.children.push(child);
+      this.children.add(child);
       this.node.appendChild(child.node);
+      this.changed();
     } else {
       throw new Error("SVG cannot have CAD node children");
     }
   }
+
   insertBefore(child: Instance, before: Instance): void {
     if (child instanceof SVGInstance && before instanceof SVGInstance) {
-      const index = this.children.indexOf(before);
-      if (index >= 0) {
+      this.node.insertBefore(child.node, before.node);
+      this.changed();
+      if (!this.children.has(child)) {
         child.parent = this;
-        this.children.splice(index, 0, child);
-        this.node.insertBefore(child.node, before.node);
+        this.children.add(child);
       }
     } else {
       throw new Error("SVG cannot have CAD node children");
     }
   }
+
   removeChild(child: Instance): void {
     if (child instanceof SVGInstance) {
-      const index = this.children.indexOf(child);
-      if (index >= 0) {
+      if (this.children.has(child)) {
         child.parent = undefined;
-        this.children.splice(index, 1);
         this.node.removeChild(child.node);
+        this.children.delete(child);
+        this.changed();
       }
     }
   }
+
   changed(): void {
     if (!this.isChanged) {
       this.isChanged = true;
@@ -187,37 +209,49 @@ export class SVGInstance<
       }
     }
   }
+
   prepareUpdate(
-    _oldProps: Props<Type>,
-    newProps: Props<Type>,
+    oldProps: Props<SVGNodeType>,
+    newProps: Props<SVGNodeType>,
     _rootContainerInstance: Container,
     _hostContext: HostContext
-  ): UpdatePayload | null {
-    return newProps;
+  ): UpdatePayload<SVGNodeType> | null {
+    let changed = false;
+    const updatePayload: any = {};
+    const keys = (Object.keys(
+      newProps
+    ) as unknown) as (keyof typeof newProps)[];
+    keys.forEach((key) => {
+      if (oldProps[key] !== newProps[key]) {
+        updatePayload[key] = newProps[key];
+        changed = true;
+      }
+    });
+    return changed ? updatePayload : null;
   }
+
   commitUpdate(updatePayload: UpdatePayload): void {
     const entries = Object.entries(updatePayload);
     for (let i = 0; i < entries.length; i++) {
       const [propKey, propValue] = entries[i];
       if (propKey !== "children") {
-        if (propKey in attributes) {
-          this.node.setAttribute(attributes[propKey], propValue);
-        } else {
-          this.node.setAttribute(propKey, propValue);
-        }
+        const key = propKey in attributes ? attributes[propKey] : propKey;
+        this.node.setAttribute(key, propValue);
         this.changed();
       }
     }
   }
+
   get svg(): ReactCADSVG {
     this.svgNode = this.svgNode ?? this.core.createSVG();
     return this.svgNode;
   }
+
   commitSVG(): void {
     if (this.parent instanceof CADInstance && this.isChanged) {
       this.svg.setSource(this.node.outerHTML);
-      this.isChanged = false;
     }
+    this.isChanged = false;
   }
 }
 

@@ -1,6 +1,6 @@
 import React from "react";
 import RedBox from "./RedBox";
-import { GeometryError } from "@react-cad/core";
+import { ComputeError } from "@react-cad/core";
 
 const nthNumber = (n: number) => {
   if (n > 3 && n < 21) return "th";
@@ -17,24 +17,24 @@ const nthNumber = (n: number) => {
 };
 
 interface Props {
-  geometryError?: GeometryError;
+  computeError?: ComputeError;
   renderError?: Error;
   renderErrorContext?: string;
   showStackTrace?: boolean;
 }
 
 const RenderError: React.FC<Props> = ({
-  geometryError,
+  computeError,
   renderError,
   renderErrorContext,
   showStackTrace = true,
 }) => {
-  const geometryContext = React.useMemo(() => {
-    if (!geometryError) {
+  const computeContext = React.useMemo(() => {
+    if (!computeError) {
       return;
     }
 
-    const geometryParts = geometryError.route
+    const computeParts = computeError.route
       .split("/")
       .map(
         (p) =>
@@ -46,9 +46,9 @@ const RenderError: React.FC<Props> = ({
           ]
       );
 
-    const component = geometryParts[geometryParts.length - 1][1];
+    const component = computeParts[computeParts.length - 1][1];
 
-    return `The above error occured in the ${component} node:\n\n${geometryParts.reduce(
+    return `The above error occured in the ${component} node:\n\n${computeParts.reduce(
       (acc, [index, name], idx) => {
         if (idx === 0) {
           return "";
@@ -60,11 +60,11 @@ const RenderError: React.FC<Props> = ({
       },
       ""
     )}`;
-  }, [geometryError]);
+  }, [computeError]);
 
   return (
     <>
-      {(renderError || geometryError) && (
+      {(renderError || computeError) && (
         <div
           style={{
             position: "absolute",
@@ -85,10 +85,10 @@ const RenderError: React.FC<Props> = ({
               showStackTrace={showStackTrace}
             />
           )}
-          {geometryError && (
+          {computeError && (
             <RedBox
-              error={geometryError}
-              context={geometryContext}
+              error={computeError}
+              context={computeContext}
               showStackTrace={false}
             />
           )}

@@ -1,66 +1,66 @@
 import React from "react";
 
-import type { ProgressIndicator } from "@react-cad/core";
+import TaskManager, {
+  QueueEvent,
+  ProgressEvent,
+  StartEvent,
+} from "./TaskManager";
 
 interface Props {
-  progressIndicator?: ProgressIndicator;
-  queuedTasks: number;
+  taskManager: TaskManager;
 }
 
-const ProgressBar: React.FC<Props> = ({
-  progressIndicator,
-  queuedTasks,
-  children,
-}) => {
+const ProgressBar: React.FC<Props> = ({ taskManager, children }) => {
   const [progress, setProgress] = React.useState<number>(0);
   const [message, setMessage] = React.useState<string>();
   const [show, setShow] = React.useState(false);
+  const [queuedTasks, setQueuedTasks] = React.useState(0);
+
+  const handleQueued = React.useCallback((event: Event) => {
+    setQueuedTasks((event as QueueEvent).detail.queuedTasks);
+  }, []);
+
+  const handleStart = React.useCallback((event: Event) => {
+    setShow(true);
+    setProgress(0);
+    setMessage(`Starting ${(event as StartEvent).detail.task}`);
+  }, []);
+
+  const handleProgress = React.useCallback((event: Event) => {
+    const e = event as ProgressEvent;
+    setShow(true);
+    setProgress(e.detail.progress);
+    if (e.detail.message) {
+      setMessage(e.detail.message);
+    }
+    setQueuedTasks(e.detail.queuedTasks);
+  }, []);
+
+  const handleCancel = React.useCallback(() => {
+    setShow(true);
+    setProgress(0);
+    setMessage("Cancelling...");
+  }, []);
+
+  const handleComplete = React.useCallback(() => {
+    setShow(false);
+  }, []);
 
   React.useEffect(() => {
-    if (progressIndicator && !progressIndicator.isDeleted()) {
-      let timeout: ReturnType<typeof setTimeout> | undefined;
-      const observer = (p: number, m?: string) => {
-        timeout = setTimeout(() => {
-          setShow(true);
-          setProgress(p);
-          if (m) {
-            setMessage(m);
-          }
-        }, 0);
-      };
+    taskManager.addEventListener("progress", handleProgress);
+    taskManager.addEventListener("cancel", handleCancel);
+    taskManager.addEventListener("complete", handleComplete);
+    taskManager.addEventListener("start", handleStart);
+    taskManager.addEventListener("queued", handleQueued);
 
-      const cancel = () => {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = undefined;
-        }
-        if (!progressIndicator.isDeleted()) {
-          progressIndicator.unsubscribe(observer);
-        }
-      };
-
-      setShow(true);
-      setProgress(0);
-      setMessage("Waiting for renderer...");
-      progressIndicator.subscribe(observer);
-      progressIndicator.then(
-        () => {
-          cancel();
-          setShow(false);
-        },
-        (reason) => {
-          if (reason) {
-            setMessage(`Aborting: ${reason}`);
-            setShow(false);
-          } else {
-            setMessage("Options changed, waiting for renderer...");
-          }
-        }
-      );
-
-      return cancel;
-    }
-  }, [progressIndicator]);
+    return () => {
+      taskManager.removeEventListener("progress", handleProgress);
+      taskManager.removeEventListener("cancel", handleCancel);
+      taskManager.removeEventListener("complete", handleComplete);
+      taskManager.removeEventListener("start", handleStart);
+      taskManager.removeEventListener("queued", handleQueued);
+    };
+  }, [taskManager]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>

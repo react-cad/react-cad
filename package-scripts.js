@@ -8,7 +8,8 @@ module.exports = {
       web:
         "lerna run --stream --scope '@react-cad/{docs,playground}' build && mv packages/playground/lib packages/docs/storybook-static/playground",
     },
-    default: "lerna run --parallel start",
+    default:
+      "lerna run --ignore '@react-cad/{docs,examples,playground,storybook-framework}' --parallel start",
     test: "jest --forceExit",
     lint: "eslint . --ext .js,.jsx,.ts,.tsx",
     format:

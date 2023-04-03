@@ -24,6 +24,15 @@ void SurfaceNode::insertSVGBefore(Handle(SVG) & child, const Handle(SVG) & befor
 {
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
+    if (*it == child)
+    {
+      m_children.erase(it);
+      break;
+    }
+  }
+
+  for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
+  {
     if (*it == before)
     {
       m_children.insert(it, child);

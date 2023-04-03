@@ -189,9 +189,10 @@ export interface Instance {
 export type Container = {
   core: ReactCADCore;
   root: Instance;
-  instances: Instance[];
-  rootInstances: Instance[];
-  callback?: () => void;
+  updatedSVGs: Set<Instance>;
+  rootInstances: Set<Instance>;
+  onPrepare: () => void;
+  onCommit: () => void;
 };
 
 export type HostContext = unknown;
@@ -213,6 +214,7 @@ export type Props<T extends Type = Type> = T extends SVGNodeType
   : never;
 
 export type TextInstance = string;
+export type SuspenseInstance = Instance;
 export type HydratableInstance = never;
 export type PublicInstance = ReactCADNode | SVGElement;
 export type UpdatePayload<T extends Type = Type> = Props<T>;

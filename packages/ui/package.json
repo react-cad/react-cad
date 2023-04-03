@@ -1,0 +1,40 @@
+{
+  "name": "@react-cad/ui",
+  "version": "0.23.0",
+  "description": "Web UI for ReactCAD components",
+  "private": true,
+  "repository": "https://github.com/react-cad/react-cad",
+  "author": {
+    "name": "React CAD Dev",
+    "email": "react.cad.dev@gmail.com"
+  },
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack serve --open"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.21.4",
+    "@babel/plugin-transform-react-jsx": "^7.21.0",
+    "@babel/plugin-transform-runtime": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "@types/react": "^18.0.31",
+    "@types/react-dom": "^18.0.11",
+    "babel-loader": "^9.1.2",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "react-refresh": "^0.14.0",
+    "webpack": "^5.77.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.1"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.21.0",
+    "@react-cad/core": "^0.23.0",
+    "@react-cad/viewer": "^0.23.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

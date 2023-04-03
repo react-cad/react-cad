@@ -28,7 +28,7 @@ const ZOOM_AMOUNT = 50;
 interface Props {
   options: ViewOptions;
   setOptions: (updater: (options: ViewOptions) => ViewOptions) => void;
-  exportFns: ExportFns;
+  exportFns?: ExportFns;
   onSetViewpoint: (viewpoint: Viewpoint) => void;
   onZoom: (amount: number) => void;
   onResetView: () => void;
@@ -312,9 +312,11 @@ const Toolbar: React.FC<Props> = ({
           </Button>
           <Separator />
         </Section>
-        <Section>
-          <ExportButton {...exportFns} />
-        </Section>
+        {exportFns && (
+          <Section>
+            <ExportButton {...exportFns} />
+          </Section>
+        )}
       </div>
       <div style={{ flexGrow: 1 }}>{children}</div>
     </div>

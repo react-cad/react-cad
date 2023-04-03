@@ -51,7 +51,7 @@ public:
   ReactCADView(emscripten::val canvas);
   virtual ~ReactCADView();
 
-  void render(TopoDS_Shape &shape, const Message_ProgressRange &theRange = Message_ProgressRange());
+  void render(const TopoDS_Shape &shape, const Message_ProgressRange &theRange = Message_ProgressRange());
 
   enum Viewpoint
   {
@@ -63,9 +63,7 @@ public:
     Back
   };
 
-  void setQuality(double deviationCoefficent, double angle,
-                  const Message_ProgressRange &theRange = Message_ProgressRange());
-  void setQualitySync(double deviationCoefficent, double angle);
+  void setQuality(double deviationCoefficent, double angle);
 
   void setColor(std::string color);
 
@@ -109,7 +107,7 @@ private:
   //! Flush events and redraw view.
   void redrawView();
 
-  void drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange);
+  void drawShape(const TopoDS_Shape &shape, const Message_ProgressRange &theRange);
 
   //! Request view redrawing.
   void updateView();

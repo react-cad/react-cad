@@ -17,7 +17,7 @@ export interface ViewOptions {
 export type Viewpoint = "TOP" | "BOTTOM" | "LEFT" | "RIGHT" | "FRONT" | "BACK";
 
 export interface ExportFns {
-  exportSTL: () => Promise<void>;
-  exportBREP: () => Promise<void>;
-  exportSTEP: () => Promise<void>;
+  exportSTL: () => Promise<any>;
+  exportBREP: () => Promise<any>;
+  exportSTEP: () => Promise<any>;
 }

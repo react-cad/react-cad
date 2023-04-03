@@ -90,7 +90,7 @@ ReactCADView::~ReactCADView()
   emscripten_webgl_destroy_context(myWebglContext);
 }
 
-void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
+void ReactCADView::drawShape(const TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
   Message_ProgressScope scope(theRange, "Rendering", 100);
 
@@ -135,7 +135,7 @@ void ReactCADView::drawShape(TopoDS_Shape &shape, const Message_ProgressRange &t
   }
 }
 
-void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theRange)
+void ReactCADView::render(const TopoDS_Shape &shape, const Message_ProgressRange &theRange)
 {
   {
     Message_ProgressScope scope(theRange, "Rendering", 100);
@@ -163,34 +163,17 @@ void ReactCADView::render(TopoDS_Shape &shape, const Message_ProgressRange &theR
   }
 }
 
-void ReactCADView::setQualitySync(double deviationCoefficent, double angle)
+void ReactCADView::setQuality(double deviationCoefficent, double angle)
 {
-  setQuality(deviationCoefficent, angle);
-}
-
-void ReactCADView::setQuality(double deviationCoefficent, double angle, const Message_ProgressRange &theRange)
-{
-
-  Standard_Real oldCoefficient, previousCoeffient, oldAngle, previousAngle;
-  Standard_Boolean initialized = myShaded->OwnDeviationCoefficient(previousCoeffient, oldCoefficient);
-  myShaded->OwnDeviationAngle(previousAngle, oldAngle);
-
-  if (!initialized || !IsEqual(deviationCoefficent, previousCoeffient) || !IsEqual(angle, previousAngle))
+  if (!IsEqual(myContext->DeviationCoefficient(), deviationCoefficent))
   {
+    myContext->SetDeviationCoefficient(deviationCoefficent);
     myQualityChanged = true;
-
-    Handle(BRepMesh_DiscretRoot) aMeshAlgo =
-        BRepMesh_DiscretFactory::Get().Discret(myShape, deviationCoefficent, angle);
-    if (!aMeshAlgo.IsNull())
-    {
-      Message_ProgressScope meshScope(theRange, "Generating mesh", 1);
-      aMeshAlgo->Perform(meshScope.Next());
-    }
-
-    myShaded->SetOwnDeviationCoefficient(deviationCoefficent);
-    myShaded->SetOwnDeviationAngle(angle);
-    myWireframe->SetOwnDeviationCoefficient(deviationCoefficent);
-    myWireframe->SetOwnDeviationAngle(angle);
+  }
+  if (!IsEqual(myContext->DeviationAngle(), angle))
+  {
+    myContext->SetDeviationAngle(angle);
+    myQualityChanged = true;
   }
 }
 

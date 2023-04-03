@@ -5,51 +5,41 @@ import { Detail } from "./types";
 
 import ReactCADNodeViewer from "./ReactCADNodeViewer";
 import RenderError from "./ErrorOverlay";
-import { GeometryError } from "@react-cad/core";
 
 interface Props
   extends Omit<
     React.ComponentProps<typeof ReactCADNodeViewer>,
-    "node" | "rerender" | "setDetail"
+    "shape" | "setDetail"
   > {
-  shape?: React.ReactElement<unknown>;
+  element?: React.ReactElement<unknown>;
   showStackTraceOnError?: boolean;
 }
 
 const ReactCADViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
-  (
-    { core, shape, reset, showStackTraceOnError = true, ...props },
-    forwardedRef
-  ) => {
+  ({ core, element, showStackTraceOnError = true, ...props }, forwardedRef) => {
     const [detail, setDetail] = React.useState<Detail>("LOW");
 
-    const [
-      rootNode,
-      frameID,
-      shouldReset,
+    const {
+      taskManager,
+      shape,
+      computeError,
       renderError,
       renderErrorContext,
-    ] = useReactCADRenderer(core, shape, detail, reset);
-
-    const [geometryError, setGeometryError] = React.useState<GeometryError>();
-
-    React.useEffect(() => setGeometryError(undefined), [frameID]);
+    } = useReactCADRenderer(core, element, detail);
 
     return (
       <div style={{ width: "100%", height: "100%", position: "relative" }}>
         <ReactCADNodeViewer
           ref={forwardedRef}
           core={core}
+          taskManager={taskManager}
           setDetail={setDetail}
-          node={rootNode}
-          reset={shouldReset}
-          rerender={frameID}
-          onError={setGeometryError}
+          shape={shape}
           {...props}
         />
 
         <RenderError
-          geometryError={geometryError}
+          computeError={computeError}
           renderError={renderError}
           renderErrorContext={renderErrorContext}
           showStackTrace={showStackTraceOnError}

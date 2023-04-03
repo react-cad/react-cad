@@ -1,8 +1,8 @@
 import React from "react";
-import type { ReactCADCore, ReactCADNode } from "@react-cad/core";
+import type { ReactCADShape } from "@react-cad/core";
 
 import { ExportFns } from "../types";
-import { AddTask } from "./useProgressQueue";
+import TaskManager from "../TaskManager";
 
 function download(
   content: string | ArrayBuffer,
@@ -20,67 +20,56 @@ function download(
 }
 
 function useExport(
-  core: ReactCADCore,
-  addTask: AddTask,
-  node: ReactCADNode,
+  taskManager: TaskManager,
+  shape: ReactCADShape | undefined,
   name: string | undefined
-): ExportFns {
+): ExportFns | undefined {
   const linearDeflection = 0.05;
   const angularDeflection = 0.5;
 
   const exportBREP = React.useCallback(
     () =>
-      addTask(() => {
-        const progress = core.renderBREP(node);
-
-        progress.then(
-          (content) =>
-            content &&
-            download(content, `${name || "react-cad"}.brep`, "model/brep")
-        );
-
-        return progress;
-      }, false),
-    [core, addTask, node, name]
+      shape
+        ? taskManager
+            .exportBREP(shape)
+            .then(
+              (content) =>
+                content &&
+                download(content, `${name || "react-cad"}.brep`, "model/brep")
+            )
+        : Promise.reject(),
+    [taskManager, shape, name]
   );
 
   const exportSTEP = React.useCallback(
     () =>
-      addTask(() => {
-        const progress = core.renderSTEP(node);
-
-        progress.then(
-          (content) =>
-            content &&
-            download(content, `${name || "react-cad"}.step`, "model/step")
-        );
-
-        return progress;
-      }, false),
-    [core, addTask, node, name]
+      shape
+        ? taskManager
+            .exportSTEP(shape)
+            .then(
+              (content) =>
+                content &&
+                download(content, `${name || "react-cad"}.step`, "model/step")
+            )
+        : Promise.reject(),
+    [taskManager, shape, name]
   );
 
   const exportSTL = React.useCallback(
     () =>
-      addTask(() => {
-        const progress = core.renderSTL(
-          node,
-          linearDeflection,
-          angularDeflection
-        );
-
-        progress.then(
-          (content) =>
-            content &&
-            download(content, `${name || "react-cad"}.stl`, "model/stl")
-        );
-
-        return progress;
-      }, false),
-    [core, node, addTask, name]
+      shape
+        ? taskManager
+            .exportSTL(shape, linearDeflection, angularDeflection)
+            .then(
+              (content) =>
+                content &&
+                download(content, `${name || "react-cad"}.stl`, "model/stl")
+            )
+        : Promise.reject(),
+    [taskManager, shape, name]
   );
 
-  return { exportSTL, exportBREP, exportSTEP };
+  return shape && { exportSTL, exportBREP, exportSTEP };
 }
 
 export default useExport;

@@ -1,20 +1,18 @@
 import React from "react";
-import type {
-  GeometryError,
-  ReactCADCore,
-  ReactCADNode,
-} from "@react-cad/core";
+import type { ReactCADCore, ReactCADShape } from "@react-cad/core";
 
-import { useExport, useProgressQueue, useReactCADView } from "./hooks";
+import { useExport, useReactCADView } from "./hooks";
 import { ViewOptions, Viewpoint } from "./types";
 
 import Toolbar from "./Toolbar";
 import ProgressBar from "./ProgressBar";
+import TaskManager from "./TaskManager";
 
 interface Props {
   className?: string;
   core: ReactCADCore;
-  node: ReactCADNode;
+  taskManager?: TaskManager;
+  shape?: ReactCADShape;
   name?: string;
   reset?: boolean;
   focus?: boolean;
@@ -22,8 +20,6 @@ interface Props {
   highDetail?: [number, number];
   lowDetail?: [number, number];
   setDetail?: (detail: ViewOptions["detail"]) => void;
-  rerender?: any;
-  onError?: (error: GeometryError) => void;
 }
 
 const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
@@ -31,7 +27,8 @@ const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
     {
       className,
       core,
-      node,
+      taskManager: existingTaskManager,
+      shape,
       name,
       reset,
       focus,
@@ -39,8 +36,6 @@ const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       highDetail = [0.001, 0.5],
       lowDetail = [0.05, 0.5],
       setDetail,
-      rerender,
-      onError,
     },
     forwardedRef
   ) => {
@@ -62,40 +57,36 @@ const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
       lowDetail,
     });
 
-    const [progressIndicator, addTask, queuedTasks] = useProgressQueue();
+    const taskManager = React.useMemo(
+      () => existingTaskManager ?? new TaskManager(core),
+      [core, existingTaskManager]
+    );
 
     const canvasContainerRef = React.useRef<HTMLDivElement>(null);
 
-    const view = useReactCADView(canvasContainerRef, core, options, addTask);
+    const view = useReactCADView(canvasContainerRef, core, options);
 
-    const shouldReset = React.useRef(false);
+    const [shouldReset, setShouldReset] = React.useState(reset);
+    React.useEffect(() => {
+      if (reset) {
+        setShouldReset(true);
+      }
+    }, [reset]);
 
     React.useEffect(() => {
-      if (rerender) {
-        addTask(() => {
-          if (view.current) {
-            const progress = core.renderNodeAsync(node, view.current);
-
-            progress.then(
-              () => {
-                if (reset || shouldReset.current) {
-                  view.current?.resetView();
-                  shouldReset.current = false;
-                }
-              },
-              (error) => {
-                if (error instanceof Error) {
-                  onError?.(error as GeometryError);
-                }
-                shouldReset.current = Boolean(reset || shouldReset.current);
-              }
-            );
-
-            return progress;
-          }
-        });
+      if (shape && view.current) {
+        console.log("rendering");
+        taskManager.render(shape, view.current).then(
+          () => {
+            if (reset || shouldReset) {
+              view.current?.resetView();
+              setShouldReset(false);
+            }
+          },
+          () => {}
+        );
       }
-    }, [node, rerender, onError]);
+    }, [shape]);
 
     React.useEffect(
       () => setOptions((options) => ({ ...options, highDetail, lowDetail })),
@@ -120,7 +111,7 @@ const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
 
     const handleFit = React.useCallback(() => view.current?.fit(), []);
 
-    const exportFns = useExport(core, addTask, node, name);
+    const exportFns = useExport(taskManager, shape, name);
 
     return (
       <div
@@ -144,10 +135,7 @@ const ReactCADNodeViewer = React.forwardRef<HTMLDivElement | undefined, Props>(
           focus={focus}
           borderless={borderless}
         >
-          <ProgressBar
-            progressIndicator={progressIndicator}
-            queuedTasks={queuedTasks}
-          >
+          <ProgressBar taskManager={taskManager}>
             <div
               style={{ width: "100%", height: "100%" }}
               ref={canvasContainerRef}

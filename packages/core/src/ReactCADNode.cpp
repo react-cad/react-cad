@@ -16,7 +16,8 @@
 #include "PerformanceTimer.hpp"
 
 ReactCADNode::ReactCADNode()
-    : m_parent(), m_shape(), m_propsChanged(true), m_children(), m_childrenChanged(false), m_childShape(TopoDS_Shape())
+    : m_parent(), m_shape(), m_propsChanged(true), m_children(), m_childrenChanged(false), m_childShape(TopoDS_Shape()),
+      m_rightHandedShape()
 {
 }
 
@@ -29,21 +30,27 @@ void ReactCADNode::setShape(const TopoDS_Shape &shape)
   m_shape = shape;
 }
 
-TopoDS_Shape ReactCADNode::getShape(const ProgressHandler &handler)
+Handle(ReactCADShape) ReactCADNode::getShape()
 {
-  if (m_shape.IsNull())
+  PerformanceTimer timer("Node getshape");
+  if (m_rightHandedShape.IsNull())
   {
-    return m_shape;
+    if (m_shape.IsNull())
+    {
+      m_rightHandedShape = new ReactCADShape(TopoDS_Shape());
+    }
+    else
+    {
+      gp_Ax2 mirror(gp::Origin(), gp::DY());
+      gp_Trsf trsf;
+      trsf.SetMirror(mirror);
+      BRepBuilderAPI_Transform transform(trsf);
+      transform.Perform(m_shape, true);
+      m_rightHandedShape = new ReactCADShape(transform.Shape());
+    }
   }
-
-  gp_Ax2 mirror(gp::Origin(), gp::DY());
-  gp_Trsf trsf;
-  trsf.SetMirror(mirror);
-  BRepBuilderAPI_Transform transform(trsf);
-  transform.Perform(m_shape, true);
-  TopoDS_Shape shape = transform.Shape();
-
-  return shape;
+  timer.end();
+  return m_rightHandedShape;
 }
 
 void ReactCADNode::appendChild(Handle(ReactCADNode) & child)
@@ -56,6 +63,15 @@ void ReactCADNode::appendChild(Handle(ReactCADNode) & child)
 
 void ReactCADNode::insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before)
 {
+  for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
+  {
+    if (*it == child)
+    {
+      m_children.erase(it);
+      break;
+    }
+  }
+
   for (auto it = std::begin(m_children); it != std::end(m_children); ++it)
   {
     if (*it == before)
@@ -110,6 +126,7 @@ void ReactCADNode::computeGeometry(const ProgressHandler &handler)
   Message_ProgressScope scope(handler, "Computing geometry", 1);
   if (m_propsChanged || m_childrenChanged)
   {
+    m_rightHandedShape.Nullify();
     if (m_childrenChanged)
     {
       Message_ProgressScope childScope(scope.Next(), "Computing child geometry", m_children.size() + 2);

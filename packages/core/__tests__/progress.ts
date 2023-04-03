@@ -4,7 +4,7 @@ describe("progress", () => {
   it("should return a promise", async () => {
     const core = await reactCadCore();
     const node = core.createCADNode("cylinder");
-    const promise = core.computeNodeAsync(node);
+    const promise = core.computeNode(node);
     return promise.then(() => {
       node.delete();
       promise.delete();

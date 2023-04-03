@@ -1,13 +1,11 @@
 {
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-    "module": "ES2020",
-    "moduleResolution": "Node",
     "rootDir": "./src",
-    "outDir": "./dist/esm",
+    "outDir": "./dist/cjs",
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "declarationDir": "./dist/types"
+    "declaration": false
   },
   "include": ["./src/**/*"]
 }

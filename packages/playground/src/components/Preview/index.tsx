@@ -24,7 +24,7 @@ const Preview: React.FC<Props> = ({ shape }) => {
           borderless
           core={core}
           reset={reset}
-          shape={oldShape}
+          element={oldShape}
           showStackTraceOnError={false}
         />
       )}
