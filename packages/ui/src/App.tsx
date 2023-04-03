@@ -5,17 +5,21 @@ import useReactCADCore from "./useReactCADCore";
 
 interface Props {
   shape: React.ReactElement;
-  reset?: boolean;
 }
 
-const App: React.FC<Props> = ({ shape, reset }) => {
+const App: React.FC<Props> = ({ shape }) => {
   const core = useReactCADCore();
+
+  const [reset, setReset] = React.useState(true);
+  React.useEffect(() => setReset(true), [core]);
+  React.useEffect(() => setReset(false), [reset]);
+
   return (
     <div style={{ position: "fixed", height: "100%", width: "100%" }}>
       {core && (
         <ReactCADViewer
           core={core}
-          shape={shape}
+          element={shape}
           reset={reset}
           name="Test"
           focus

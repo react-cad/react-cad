@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
@@ -47,10 +48,8 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: [
-              "@babel/preset-typescript",
-              ["@babel/preset-env", { targets: "defaults" }],
-            ],
+            targets: "last 2 versions and not dead",
+            presets: ["@babel/preset-typescript", "@babel/preset-env"],
             plugins: [
               "@babel/plugin-transform-runtime",
               "@babel/plugin-transform-react-jsx",

@@ -14,10 +14,11 @@ function useClickHandler(fn: ExportFns[keyof ExportFns], close: () => void) {
       event.preventDefault();
       if (!waiting) {
         setWaiting(true);
-        fn().then(() => {
+        const fulfilled = () => {
           setWaiting(false);
           close();
-        });
+        };
+        fn().then(fulfilled, fulfilled);
       }
     },
     [waiting, fn, close]

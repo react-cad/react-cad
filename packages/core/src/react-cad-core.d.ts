@@ -3,7 +3,10 @@ export class EmClass {
   isDeleted(): boolean;
 }
 
+export class ReactCADShape extends EmClass {}
+
 export class ReactCADNode extends EmClass {
+  public getShape(): ReactCADShape;
   public appendChild(child: ReactCADNode): void;
   public insertChildBefore(child: ReactCADNode, before: ReactCADNode): void;
   public removeChild(child: ReactCADNode): void;
@@ -211,6 +214,7 @@ export interface ReactCADNodeTypes {
 }
 
 export interface ReactCADCore extends EmscriptenModule {
+  ReactCADShape: typeof ReactCADShape;
   ReactCADNode: typeof ReactCADNode;
   ReactCADView: typeof ReactCADView;
   ReactCADSVG: typeof ReactCADSVG;
@@ -234,23 +238,18 @@ export interface ReactCADCore extends EmscriptenModule {
   ): ReactCADNodeTypes[T];
   createSVG(): ReactCADSVG;
   createView(canvas: HTMLCanvasElement): ReactCADView;
-  computeNodeAsync(node: ReactCADNode): ProgressIndicator;
-  renderNodeAsync(node: ReactCADNode, view: ReactCADView): ProgressIndicator;
-  setRenderQuality(
-    view: ReactCADView,
-    deviationCoefficent: number,
-    angle: number
-  ): ProgressIndicator;
+  computeNode(node: ReactCADNode): ProgressIndicator;
+  renderShape(shape: ReactCADShape, view: ReactCADView): ProgressIndicator;
   renderSTL(
-    node: ReactCADNode,
+    shape: ReactCADShape,
     linearDeflection: number,
     angularDeflection: number
   ): ProgressIndicator<string | ArrayBuffer | undefined>;
   renderBREP(
-    node: ReactCADNode
+    shape: ReactCADShape
   ): ProgressIndicator<string | ArrayBuffer | undefined>;
   renderSTEP(
-    node: ReactCADNode
+    shape: ReactCADShape
   ): ProgressIndicator<string | ArrayBuffer | undefined>;
   canvas: HTMLCanvasElement;
   canvases: Record<string, HTMLCanvasElement>;
@@ -258,7 +257,7 @@ export interface ReactCADCore extends EmscriptenModule {
   testProgress?: () => ProgressIndicator;
 }
 
-export class GeometryError extends Error {
+export class ComputeError extends Error {
   public route: string;
 }
 

@@ -35,7 +35,7 @@ export const parameters = {
 
       return (
         <ViewContainer
-          shape={storyFn()}
+          element={storyFn()}
           name={id}
           highDetail={highDetail}
           lowDetail={lowDetail}

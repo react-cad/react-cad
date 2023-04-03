@@ -204,31 +204,14 @@ Handle(ReactCADView) createView(emscripten::val canvas)
   return new ReactCADView(canvas);
 }
 
-Handle(ProgressIndicator) computeNodeAsync(Handle(ReactCADNode) & node)
+Handle(ProgressIndicator) computeNode(Handle(ReactCADNode) & node)
 {
   return Async::Perform([=](const ProgressHandler &handler) { node->computeGeometry(handler); });
 }
 
-Handle(ProgressIndicator) renderNodeAsync(Handle(ReactCADNode) & node, Handle(ReactCADView) & view)
+Handle(ProgressIndicator) renderShape(const Handle(ReactCADShape) & shape, Handle(ReactCADView) & view)
 {
-  return Async::Perform([=](const ProgressHandler &handler) {
-    Message_ProgressScope scope(handler, "Computing shape", 101);
-    scope.Next();
-    node->computeGeometry(handler.WithRange(scope.Next(50)));
-    if (scope.More())
-    {
-      TopoDS_Shape shape = node->getShape(handler.WithRange(scope.Next()));
-      view->render(shape, scope.Next(50));
-    }
-  });
-}
-
-Handle(ProgressIndicator)
-    setRenderQuality(Handle(ReactCADView) & view, double linearDeflection, double angularDeflection)
-{
-  return Async::Perform([=](const Message_ProgressRange &progressRange) {
-    view->setQuality(linearDeflection, angularDeflection, progressRange);
-  });
+  return Async::Perform([=](const ProgressHandler &handler) { view->render(shape->getShape(), handler); });
 }
 
 #ifdef REACTCAD_DEBUG
@@ -312,10 +295,12 @@ struct TypeID<
 
 EMSCRIPTEN_BINDINGS(react_cad)
 {
+  emscripten::class_<ReactCADShape>("ReactCADShape").smart_ptr<Handle(ReactCADShape)>("ReactCADShape");
 
   // Base node
   emscripten::class_<ReactCADNode>("ReactCADNode")
       .smart_ptr<Handle(ReactCADNode)>("ReactCADNode")
+      .function("getShape", &ReactCADNode::getShape)
       .function("appendChild", &ReactCADNode::appendChild)
       .function("insertChildBefore", &ReactCADNode::insertChildBefore)
       .function("removeChild", &ReactCADNode::removeChild)
@@ -326,7 +311,7 @@ EMSCRIPTEN_BINDINGS(react_cad)
       .function("render", &ReactCADView::render)
       // .function("setColor", &ReactCADView::setColor)
       .function("zoom", &ReactCADView::zoom)
-      .function("setQuality", &ReactCADView::setQualitySync)
+      .function("setQuality", &ReactCADView::setQuality)
       .function("resetView", &ReactCADView::resetView)
       .function("fit", &ReactCADView::fit)
       .function("setViewpoint", &ReactCADView::setViewpoint)
@@ -532,9 +517,8 @@ EMSCRIPTEN_BINDINGS(react_cad)
   emscripten::function("renderSTL", &renderSTL);
   emscripten::function("renderBREP", &renderBREP);
   emscripten::function("renderSTEP", &renderSTEP);
-  emscripten::function("computeNodeAsync", &computeNodeAsync);
-  emscripten::function("renderNodeAsync", &renderNodeAsync);
-  emscripten::function("setRenderQuality", &setRenderQuality);
+  emscripten::function("computeNode", &computeNode);
+  emscripten::function("renderShape", &renderShape);
 #ifdef REACTCAD_DEBUG
   emscripten::function("testProgress", &testProgress);
 #endif

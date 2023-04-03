@@ -54,7 +54,6 @@ EM_JS(emscripten::EM_VAL, jsGetProgress, (), {
   };
   progressObject["cancel"] = () => {
     if (!progressObject["fulfilled"]) {
-      progressObject.notify(lastProgress, "Cancelling");
       progressObject.reject("Cancelled");
     }
   };
@@ -196,8 +195,11 @@ emscripten::val ProgressIndicator::isFulfilled()
 
 void ProgressIndicator::cancel()
 {
-  m_cancelled = true;
-  m_js_progress.call<void>("cancel");
+  if (!m_cancelled)
+  {
+    m_cancelled = true;
+    m_js_progress.call<void>("cancel");
+  }
 }
 
 void ProgressIndicator::resolve(emscripten::val result)

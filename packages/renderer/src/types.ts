@@ -191,7 +191,8 @@ export type Container = {
   root: Instance;
   updatedSVGs: Set<Instance>;
   rootInstances: Set<Instance>;
-  callback?: () => void;
+  onPrepare: () => void;
+  onCommit: () => void;
 };
 
 export type HostContext = unknown;

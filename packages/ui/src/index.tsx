@@ -11,4 +11,4 @@ const appDiv = document.getElementById("app")!;
 
 // Render your React component instead
 const root = createRoot(appDiv);
-root.render(<App shape={<Shape />} reset={true} />);
+root.render(<App shape={<Shape />} />);

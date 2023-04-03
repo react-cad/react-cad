@@ -11,42 +11,42 @@
 #include "ReactCADNode.hpp"
 #include "UUID.hpp"
 
-Handle(ProgressIndicator) renderSTL(const Handle(ReactCADNode) & node, const Standard_Real theLinDeflection,
-                                    const Standard_Real theAngDeflection)
+Handle(ProgressIndicator)
+    renderSTL(Handle(ReactCADShape) shape, const Standard_Real theLinDeflection, const Standard_Real theAngDeflection)
 {
   std::string filename(UUID::get());
   return Async::GenerateFile(filename, [=](const ProgressHandler &handler) {
-    Message_ProgressScope scope(handler, "Writing STL", 5);
-    node->computeGeometry(handler.WithRange(scope.Next(2)));
+    Message_ProgressScope scope(handler, "Writing STL", 2);
 
-    TopoDS_Shape shape = node->getShape(handler.WithRange(scope.Next()));
+    TopoDS_Shape myShape = shape->getShape();
 
     Handle(BRepMesh_DiscretRoot) aMeshAlgo =
-        BRepMesh_DiscretFactory::Get().Discret(shape, theLinDeflection, theAngDeflection);
-    aMeshAlgo->Perform(scope.Next(2));
+        BRepMesh_DiscretFactory::Get().Discret(myShape, theLinDeflection, theAngDeflection);
 
-    StlAPI::Write(shape, filename.c_str());
+    scope.Next();
+
+    StlAPI::Write(myShape, filename.c_str());
   });
 }
 
-Handle(ProgressIndicator) renderBREP(const Handle(ReactCADNode) & node)
+Handle(ProgressIndicator) renderBREP(Handle(ReactCADShape) shape)
 {
   std::string filename(UUID::get());
   return Async::GenerateFile(filename, [=](const ProgressHandler &handler) {
-    Message_ProgressScope scope(handler, "Writing BREP", 4);
-    node->computeGeometry(handler.WithRange(scope.Next(3)));
-    BRepTools::Write(node->getShape(handler.WithRange(scope.Next())), filename.c_str(), scope.Next());
+    TopoDS_Shape myShape = shape->getShape();
+    Message_ProgressScope scope(handler, "Writing BREP", 1);
+    BRepTools::Write(myShape, filename.c_str(), scope.Next());
   });
 }
 
-Handle(ProgressIndicator) renderSTEP(const Handle(ReactCADNode) & node)
+Handle(ProgressIndicator) renderSTEP(Handle(ReactCADShape) shape)
 {
   std::string filename(UUID::get());
   return Async::GenerateFile(filename, [=](const ProgressHandler &handler) {
-    Message_ProgressScope scope(handler, "Writing BREP", 5);
-    node->computeGeometry(handler.WithRange(scope.Next(2)));
+    TopoDS_Shape myShape = shape->getShape();
+    Message_ProgressScope scope(handler, "Writing STEP", 5);
     STEPControl_Writer writer;
-    writer.Transfer(node->getShape(handler.WithRange(scope.Next())), STEPControl_AsIs, Standard_True, scope.Next(2));
+    writer.Transfer(myShape, STEPControl_AsIs, Standard_True, scope.Next(2));
     writer.Write(filename.c_str());
   });
 }

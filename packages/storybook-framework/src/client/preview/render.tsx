@@ -50,7 +50,7 @@ export function renderToDOM(
       <ViewContainer
         forceRemount={forceRemount}
         id={id}
-        shape={storyFn()}
+        element={storyFn()}
         name={id}
         focus
         highDetail={highDetail}

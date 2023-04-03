@@ -2,17 +2,17 @@ import React from "react";
 
 const Box: React.FC = () => (
   <union>
-    <prism z={5}>
+    <helix height={10} pitch={10}>
       <planeSurface>
         <svg>
-          <rect width={2} height={1} />
+          <rect width={4} height={2} />
         </svg>
       </planeSurface>
-    </prism>
+    </helix>
     <prism z={3}>
       <planeSurface>
         <svg>
-          <rect width={1} height={2} />
+          <rect width={2} height={3} />
         </svg>
       </planeSurface>
     </prism>

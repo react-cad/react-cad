@@ -116,16 +116,18 @@ export const HostConfig: ReactReconciler.HostConfig<
   ): boolean {
     return false;
   },
-  prepareForCommit(_containerInfo: Container) {
+  prepareForCommit(containerInfo: Container) {
+    const { onPrepare } = containerInfo;
+    onPrepare();
     return null;
   },
   resetAfterCommit(rootContainerInstance: Container) {
-    const { updatedSVGs, callback } = rootContainerInstance;
+    const { updatedSVGs, onCommit } = rootContainerInstance;
 
     updatedSVGs.forEach((svg) => svg instanceof SVGInstance && svg.commitSVG());
     updatedSVGs.clear();
 
-    callback?.();
+    onCommit();
   },
   shouldSetTextContent(_type: Type, _props: Props) {
     return false;
@@ -221,17 +223,21 @@ reconcilerInstance.injectIntoDevTools({
   bundleType: process.env.NODE_ENV !== "production" ? 1 : 0,
 });
 
-class ReactCADRoot {
+class ReactCADRoot extends EventTarget {
   private context: Container;
   private container: ReactReconciler.FiberRoot;
   private isDeleted: boolean;
 
   public constructor(rootNode: ReactCADNode, core: ReactCADCore) {
+    super();
+
     this.context = {
       core,
       updatedSVGs: new Set(),
       rootInstances: new Set(),
       root: new CADInstance(core, "union", rootNode),
+      onPrepare: () => this.dispatchEvent(new Event("prepare")),
+      onCommit: () => this.dispatchEvent(new Event("commit")),
     };
 
     this.container = reconcilerInstance.createContainer(
@@ -250,14 +256,11 @@ class ReactCADRoot {
 
   public render(
     element: React.ReactElement,
-    callback = () => {},
     parent: React.Component | null = null
   ) {
     if (this.isDeleted) {
       return;
-      // throw Error("Cannot render a deleted root");
     }
-    this.context.callback = callback;
     reconcilerInstance.updateContainer(
       React.createElement(
         PrecisionContext.Provider,

@@ -5,9 +5,9 @@
 
 #include "ProgressIndicator.hpp"
 
-Handle(ProgressIndicator) renderSTL(const Handle(ReactCADNode) & node, const Standard_Real theLinDeflection,
-                                    const Standard_Real theAngDeflection);
-Handle(ProgressIndicator) renderBREP(const Handle(ReactCADNode) & node);
-Handle(ProgressIndicator) renderSTEP(const Handle(ReactCADNode) & node);
+Handle(ProgressIndicator)
+    renderSTL(Handle(ReactCADShape) shape, const Standard_Real theLinDeflection, const Standard_Real theAngDeflection);
+Handle(ProgressIndicator) renderBREP(Handle(ReactCADShape) shape);
+Handle(ProgressIndicator) renderSTEP(Handle(ReactCADShape) shape);
 
 #endif

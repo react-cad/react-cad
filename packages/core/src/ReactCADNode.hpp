@@ -14,6 +14,7 @@
 #include <emscripten/bind.h>
 
 #include "ProgressHandler.hpp"
+#include "ReactCADShape.hpp"
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
 class ReactCADNode : public Standard_Transient
@@ -22,7 +23,7 @@ public:
   ReactCADNode();
   virtual ~ReactCADNode();
 
-  TopoDS_Shape getShape(const ProgressHandler &handler);
+  Handle(ReactCADShape) getShape();
   void appendChild(Handle(ReactCADNode) & child);
   void insertChildBefore(Handle(ReactCADNode) & child, const Handle(ReactCADNode) & before);
   void removeChild(Handle(ReactCADNode) & child);
@@ -48,6 +49,8 @@ private:
   bool m_propsChanged;
   bool m_childrenChanged;
   void notifyAncestors();
+
+  Handle(ReactCADShape) m_rightHandedShape;
 };
 
 #endif // ReactCADNode_HeaderFile
